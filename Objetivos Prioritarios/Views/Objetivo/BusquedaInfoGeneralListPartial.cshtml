@@ -1,0 +1,261 @@
+﻿@model List<Objetivos_Prioritarios.Models.SP_ObjPri_getListinfogeneral_Result>
+
+<div class="row">
+    <table id="objetivoDataTable" class="dataTable table table-striped" style="width:100%"></table>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        var infoGeneralColumns = [
+            { title: "ID", data: "id", orderable: true, visible: false },
+            { title: "Clave Persona", data: "CLAVE_PERSO", orderable: true },
+            {
+                title: "ID's",
+                data: "id_concat",
+                orderable: true,
+                render: function (data) {
+                    return data ? data.replace(/(\r\n|\n|\r)/g, "<br>") : "";
+                }
+            },
+            {
+                title: "Nombre Completo",
+                data: null,
+                render: function (data, type, row) {
+                    let nombreLines = (row.nombre || "").split(/\r\n|\r|\n/);
+                    let paternoLines = (row.paterno || "").split(/\r\n|\r|\n/);
+                    let maternoLines = (row.materno || "").split(/\r\n|\r|\n/);
+                    let maxLen = Math.max(nombreLines.length, paternoLines.length, maternoLines.length);
+                    let resultado = [];
+
+                    for (let i = 0; i < maxLen; i++) {
+                        let n = nombreLines[i] || "";
+                        let p = paternoLines[i] || "";
+                        let m = maternoLines[i] || "";
+                        resultado.push(`${n} ${p} ${m},`);
+                    }
+
+                    return resultado.join("<br>");
+                }
+            },
+            {
+                title: "Alias",
+                data: "alias",
+                orderable: true,
+                render: function (data) {
+                    if (!data) return "";
+                    let result = data.split(/\r\n|\r|\n/).map(a => a.trim()).join(",<br>");
+                    return result;
+                }
+
+            },
+            { title: "Cla_Calle", data: "Cla_Calle", orderable: true, visible: false },
+            { title: "Cla_Calle_concat", data: "Cla_Calle_concat", orderable: true, visible: false },
+            {
+                title: "Calle",
+                data: "Calle",
+                orderable: true,
+                render: function (data) {
+                    if (!data) return "";
+                    let result = data.split(/\r\n|\r|\n/).map(a => a.trim()).join(", ");
+                    return result;
+                }
+            },
+            {
+                title: "Número de Casa",
+                data: "Num_Casa",
+                orderable: true,
+                render: function (data) {
+                    if (!data) return "";
+                    let result = data.split(/\r\n|\r|\n/).map(a => a.trim()).join(",<br>");
+                    return result;
+                }
+
+            },
+            { title: "Cve_col_concat", data: "Cve_col_concat", orderable: true, visible: false },
+            { title: "Cve_col", data: "Cve_col", orderable: true, visible: false },
+            {
+                title: "Colonia",
+                data: "Colonia",
+                orderable: true,
+                render: function (data) {
+                        if (!data) return "";
+                        let result = data.split(/\r\n|\r|\n/).map(a => a.trim()).join(",<br>");
+                        return result;
+                }
+            },
+            { title: "Cve_mun_concat", data: "Cve_mun_concat", orderable: true, visible: false },
+            { title: "Cve_mun", data: "Cve_mun", orderable: true, visible: false },
+            {
+                title: "Municipio",
+                data: "Municipio",
+                orderable: true,
+                render: function (data) {
+                        if (!data) return "";
+                        let result = data.split(/\r\n|\r|\n/).map(a => a.trim()).join(",<br>");
+                        return result;
+                }
+            },
+            { title: "Cve_Edo_concat", data: "Cve_Edo_concat", orderable: true, visible: false },
+            { title: "Cve_Edo", data: "Cve_Edo", orderable: true, visible: false },
+            {
+                title: "Estado",
+                data: "Estado",
+                orderable: true,
+                render: function (data) {
+                    if (!data) return "";
+                    let result = data.split(/\r\n|\r|\n/).map(a => a.trim()).join(",<br>");
+                    return result;
+                }
+            },
+
+            // 📅 Otros datos
+            {
+                title: "Fecha Captura",
+                data: "Fec_Captu_concat",
+                orderable: true,
+                render: function (data) {
+                    if (!data) return "";
+                    let fechas = data.split(/\r\n|\r|\n/).filter(Boolean);
+                    fechas = fechas.map(f => {
+                        const fecha = new Date(f);
+                        return isNaN(fecha) ? f : fecha.toLocaleDateString();
+                    });
+                    return fechas.join("<br>");
+                }
+            },
+            { title: "CLAVE_PERSO", data: "CLAVE_PERSO", orderable: true, visible: false },
+            {
+                title: "Acciones",
+                data: null,
+                orderable: false,
+                render: function (data, type, row) {
+                    return `
+                <button class="btn btn-success btnAddInfo" data-id="${row.id}">
+                    <i class="fa fa-fw fa-check"></i> Agregar
+                </button>
+            `;
+                }
+            }
+        ];
+
+        var datos = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model));
+        console.log("Datos recibidos en la partial:", datos);
+
+        var tabla = $('#objetivoDataTable').DataTable({
+            destroy: true,
+            searching: true,
+            responsive: true,
+            scrollX: true,
+            data: datos,
+            columns: infoGeneralColumns
+        });
+
+        $('#objetivoDataTable').on('click', '.btnAddInfo', function () {
+            const rowData = tabla.row($(this).closest('tr')).data();
+            console.log("Fila seleccionada:", rowData);
+            AddObjetivoInfoGeneral(rowData);
+        });
+    });
+
+    // 🔹 Función AJAX que envía los datos al controlador
+    @*function AddObjetivoInfoGeneral(rowData) {
+        var Datos = {
+            id_objetivo: +$("#int_id_objetivo").val(),
+            id_municipio: rowData.id_municipio,
+            colonia: rowData.colonia,
+            calle_numero: rowData.calle_numero,
+            alias: rowData.alias,
+            nombre_completo: rowData.nombre_completo
+        };
+
+        console.log("Datos a enviar:", Datos);
+
+        $.ajax({
+            url: '@Url.Action("AddInfoGeneral", "Objetivo")',
+            type: 'POST',
+            contentType: 'application/json; charset=utf-8',
+            data: JSON.stringify(Datos),
+            success: function (response) {
+                if (response.IsSuccess) {
+                    swal("Éxito", response.Message, "success");
+                } else {
+                    swal("Error", response.Message, "error");
+                }
+            },
+            error: function (xhr, status, error) {
+                swal("Error", "No se pudo guardar la información.", "error");
+                console.error(error);
+            }
+        });
+    }*@
+
+
+    function AddObjetivoInfoGeneral(rowData) {
+        // Obtener el ID del objetivo desde el input oculto o visible
+        var idObjetivo = parseInt($("#int_id_objetivo").val(), 10) || null;
+
+        // Combinar los datos recibidos con el ID del objetivo
+        var Datos = Object.assign({}, rowData, { id_objetivo: idObjetivo });
+
+        // Enviar la información general al backend
+        $.ajax({
+            url: '/Objetivo/AddInfoGeneral',
+            type: 'POST',
+            data: JSON.stringify(Datos),
+            contentType: 'application/json; charset=utf-8',
+            success: function (response) {
+                if (response && response.IsSuccess) {
+                    // Activar la pestaña de fotos
+                    var tabTrigger = new bootstrap.Tab(document.querySelector('#fotos-tab'));
+                    tabTrigger.show();
+
+                    // Cargar la vista parcial de la foto principal
+
+                    $.ajax({
+                        url: '/Objetivo/FotoPrincipal',
+                        type: 'POST',
+                        data: JSON.stringify(Datos),
+                        contentType: 'application/json; charset=utf-8',
+                        beforeSend: function () {
+                            // Limpia el contenedor y muestra mensaje de carga
+                            $('#busquedafotos #galeriaFotos')
+                                .empty()
+                                .html('<div class="text-center text-muted">Cargando foto...</div>');
+                        },
+                        success: function (partialHtml) {
+                            // Si el servidor devuelve JSON (por ejemplo, sin foto), manejarlo
+                            if (typeof partialHtml === 'object' && partialHtml.IsSuccess === false) {
+                                swal({
+                                    title: "No Existe Una Fotografía del Objetivo",
+                                    text: response.Message,
+                                    type: 'info',
+                                    confirmButtonText: "Continuar",
+                                    closeOnConfirm: true,
+                                }, function (isConfirm) {
+                                });
+                                return;
+                            }
+
+                            // Insertar la vista parcial en el contenedor
+                            $('#busquedafotos #galeriaFotos').html(partialHtml);
+
+                        },
+                        error: function () {
+                            swal("Error", "No se pudo cargar la foto del detenido.", "error");
+                            $('#modalFotosDetenido').modal('hide');
+                        }
+                    });
+                } else {
+                    swal("Error", response ? response.Message : "Respuesta inesperada", "error");
+                }
+            },
+            error: function () {
+                swal("Error", "No se pudo guardar la información.", "error");
+            }
+        });
+    }
+
+
+
+
+</script>

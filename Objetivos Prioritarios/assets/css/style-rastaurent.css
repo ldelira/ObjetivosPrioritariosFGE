@@ -1,0 +1,591 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+
+body {
+ 
+  line-height: 26px;
+  font-size: 14px;
+  background-image: url(../images/deals/body.png);
+  background-repeat: repeat;
+  background-color: #ebebeb;
+  color: #4d4d4d;
+  font-weight: 400;
+background: #fff;}
+
+
+@font-face {
+  font-family: 'Raleway-ExtraLight';
+  src: url('../fonts/Raleway-ExtraLight.eot');
+  src: url('../fonts/Raleway-ExtraLight.woff2') format('woff2'),
+       url('../fonts/Raleway-ExtraLight.woff') format('woff'),
+       url('../fonts/Raleway-ExtraLight.ttf') format('truetype'),
+       url('../fonts/Raleway-ExtraLight.svg#Raleway-ExtraLight') format('svg'),
+       url('../fonts/Raleway-ExtraLight.eot?#iefix') format('embedded-opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Raleway-Regular';
+  src: url('../fonts/Raleway-Regular.eot');
+  src: url('../fonts/Raleway-Regular.woff2') format('woff2'),
+       url('../fonts/Raleway-Regular.woff') format('woff'),
+       url('../fonts/Raleway-Regular.ttf') format('truetype'),
+       url('../fonts/Raleway-Regular.svg#Raleway-Regular') format('svg'),
+       url('../fonts/Raleway-Regulart.eot?#iefix') format('embedded-opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Raleway-Medium';
+  src: url('../fonts/Raleway-Medium.eot');
+  src: url('../fonts/Raleway-Medium.woff2') format('woff2'),
+       url('../fonts/Raleway-Medium.woff') format('woff'),
+       url('../fonts/Raleway-Medium.ttf') format('truetype'),
+       url('../fonts/Raleway-Medium.svg#Raleway-Medium') format('svg'),
+       url('../fonts/Raleway-Medium.eot?#iefix') format('embedded-opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+
+
+.no-padding{
+padding:0px;}
+
+.row{
+margin:0px;}
+
+a {
+  text-decoration: none;
+  transition: all 0.3s;
+  -webkit-transition: all 0.3s;
+font-family: 'Raleway', sans-serif;}
+
+a:hover, a:focus {
+  text-decoration: none;
+  outline: 0 !important; }
+
+h1, h2, h3, h4, h5 {
+  color: #363636;
+  margin-top: 0px; 
+}
+
+.top-bar span {
+    border-right: solid 1px #7c7978;
+    padding-right: 10px;
+    padding-left: 10px;
+
+    font-size: 13px;
+}
+.top-bar .list-inline>li{
+    padding-left: 0px;
+}
+
+.maincontainer{
+    padding: 100px 0px 0px;
+}
+
+.border-image:before {
+    width: 90%;
+    height: 90%;
+    left: 5%;
+    top: 5%;
+    z-index: 1;
+    content: "";
+    border: 1px solid #fff200;
+    position: absolute;
+    
+}
+.border-image:after {
+    left: 5%;
+    top: 5%;
+    z-index: 1;
+    content: "";
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    border-top: 6px solid #fff200;
+    border-left: 6px solid #fff200;
+    margin-left: -3px;
+    margin-top: -3px;
+}
+.border-image span:after {
+          right: 28px;
+    bottom: 24px;
+    z-index: 1;
+    content: "";
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    border-right: 6px solid #fff200;
+    border-bottom: 6px solid #fff200;
+    margin-right: -3px;
+    margin-bottom: -3px;
+}
+
+.top-bar {
+  background-color: #060c17;
+  color: #fff;
+  padding: 5px 0; }
+
+.top-bar ul {
+  margin: 0px;
+  padding: 0px; }
+
+.top-bar ul li a {
+  color: #fff; }
+
+.top-bar ul li a:hover {
+  color: #999; }
+
+.header-transparent {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  z-index: 999; }
+  .header-transparent .top-bar {
+    background-color: rgba(68, 14, 98, 0.36); }
+
+.navbar-default {
+  background-color: #fff;
+  border: 0px;
+  margin: 0px;
+  position: relative;
+  box-shadow: 0px 1px 10px 0px rgba(0, 0, 0, 0.4); }
+
+.navbar-default .navbar-nav > li > a {
+  color: #000;
+  font-weight: 700;
+  position: relative;
+  padding-top: 35px;
+  padding-bottom: 35px; }
+
+.navbar-default .navbar-nav > li.active > a:after {
+  content: "";
+  width: 7px;
+  height: 30px;
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  margin-left: -4px;
+  background: url(../images/v1-active.png) no-repeat; }
+
+.navbar-default .navbar-nav > .active > a, .navbar-default .navbar-nav > .active > a:focus, .navbar-default .navbar-nav > .active > a:hover, .navbar-default .navbar-nav > .open > a, .navbar-default .navbar-nav > .open > a:focus, .navbar-default .navbar-nav > .open > a:hover {
+  color: #000;
+  background-color: transparent; }
+
+.navbar-brand {
+  padding: 20px 15px; }
+
+.top-search {
+  width: 250px;
+  padding: 10px 15px; }
+
+.clients {
+  padding: 30px 0;
+  margin: 0px; }
+
+.clients li {
+  vertical-align: middle;
+  padding: 10px 20px; }
+
+.footer {
+  padding: 50px 0;
+  background-color: #060c17; }
+
+.footer p {
+  color: #647188; }
+
+.footer h3 {
+  text-transform: uppercase;
+  font-weight: 700;
+  margin-bottom: 20px;
+  font-size: 14px;
+  color: #fff; }
+
+.footer ul.f-nav li a {
+  display: block;
+  color: #fff; }
+
+.footer ul.f-nav li a:before {
+  content: "\f101";
+  font-family: 'FontAwesome';
+  margin-right: 6px; }
+
+.news-list li img {
+  border-radius: 5px;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.5);
+  float: left;
+  margin-right: 15px; }
+
+.news-list h5 {
+  margin: 0px;
+  font-weight: 700;
+  margin-bottom: 5px;
+  color: #fff; }
+
+.news-list p {
+  margin-bottom: 0px;
+  font-size: 14px;
+  line-height: 16px; }
+
+.news-list span {
+  font-size: 12px;
+  color: #333f55; }
+
+.news-list li {
+  padding-bottom: 20px; }
+
+.footer-bottom {
+  padding: 20px 0;
+  background-color: #fff;
+  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.5); }
+
+.footer-bottom ul {
+  margin: 0;
+  padding: 0; }
+
+.footer-bottom ul li a {
+  color: #999;
+  font-size: 20px; }
+
+.footer-bottom ul li a:hover {
+  color: #333f55; }
+
+.footer .col-md-3 {
+  margin-bottom: 30px; }
+
+.footer form {
+  position: relative;
+  margin-bottom: 20px; }
+
+.footer form button {
+  position: absolute;
+  right: 0;
+  top: 0;
+  border: 0px;
+  background-color: #e8ca00;
+  height: 40px;
+  line-height: 40px;
+  padding: 0px 20px;
+  color: #000;
+  font-size: 14px; }
+
+.footer .form-control {
+  border-radius: 0px;
+  height: 40px;
+  box-shadow: none;
+  border: 0px; }
+
+.banner-deal {
+  padding-bottom: 100px;
+  padding-top: 300px;
+  background: url("../images/deals/bg1.jpg") no-repeat top center;
+  background-size: cover;
+  text-align: center; }
+  .banner-deal h1, .banner-deal h2, .banner-deal p {
+    color: #fff; }
+  .banner-deal p {
+    font-size: 18px;
+    width: 70%;
+    margin: 0 auto; }
+  .banner-deal h1 {
+    font-weight: 900;
+    font-size: 50px;
+    line-height: 50px;
+    text-transform: capitalize; }
+  .banner-deal h2 {
+    color: #e8ca00;
+    text-transform: uppercase;
+    font-weight: 900;
+    font-size: 70px;
+    line-height: 70px; }
+  .banner-deal form {
+    margin-top: 30px; }
+  .banner-deal .form-group {
+    position: relative; }
+    .banner-deal .form-group i {
+      position: absolute;
+      left: 10px;
+      top: 12px;
+      color: #999; }
+    .banner-deal .form-group .form-control {
+      padding-left: 30px;
+      border-radius: 0px;
+      height: 40px;
+      border: 0px; }
+  .banner-deal .btn {
+    height: 40px;
+    line-height: 40px;
+    padding: 0px 10px; }
+    .banner-deal .btn i {
+      margin-right: 9px; }
+  .banner-deal h5 {
+    color: #fff;
+    margin-top: 20px;
+    font-size: 18px; }
+
+.btn-yellow {
+  background: #e8ca00;
+  text-transform: uppercase;
+  font-size: 13px;
+  font-weight: 500;
+  text-transform: uppercase;
+  border-radius: 0px;
+  -webkit-border-radius: 0px; }
+
+.categories {
+  background: #fff; }
+  .categories h4 {
+    padding: 12px 15px;
+    font-weight: 700;
+    margin: 0px; }
+  .categories li a {
+    position: relative;
+    display: block;
+    padding: 0px 15px;
+    height: 40px;
+    line-height: 40px;
+    border-top: 1px solid #f5f5f5;
+    padding-left: 60px;
+    color: #777; }
+    .categories li a i {
+      position: absolute;
+      height: 40px;
+      width: 40px;
+      display: block;
+      text-align: center;
+      line-height: 40px;
+      background: #f5f5f5;
+      color: #777;
+      top: 0;
+      left: 0; }
+  .categories li.active a, .categories li a:hover {
+    background: #f5f5f5; }
+    .categories li.active a:before, .categories li.active a:after, .categories li a:hover:before, .categories li a:hover:after {
+      left: 40px;
+      top: 50%;
+      border: solid transparent;
+      content: " ";
+      height: 0;
+      width: 0;
+      position: absolute;
+      pointer-events: none; }
+    .categories li.active a:after, .categories li a:hover:after {
+      border-color: rgba(66, 28, 82, 0);
+      border-left-color: #421c52;
+      border-width: 6px;
+      margin-top: -6px; }
+    .categories li.active a :before, .categories li a:hover :before {
+      border-color: rgba(66, 28, 82, 0);
+      border-left-color: #421c52;
+      border-width: 12px;
+      margin-top: -12px; }
+    .categories li.active a i, .categories li a:hover i {
+      color: #fff;
+      background: #421c52; }
+
+.slide-btm {
+  padding: 15px 20px;
+  background: #fff; }
+  .slide-btm h1, .slide-btm .rating i {
+    color: #421c52; }
+  .slide-btm h1 {
+    font-weight: 900;
+    margin: 0px; }
+  .slide-btm h4 {
+    font-weight: 700;
+    margin-bottom: 6px; }
+
+.tag {
+  display: inline-block;
+  text-decoration: underline;
+  font-size: 13px;
+  text-transform: uppercase;
+  color: #999;
+  font-weight: 500; }
+
+.main-heading {
+  padding: 15px 0px;
+  background: #fff;
+  margin-bottom: 60px; }
+  .main-heading h1 {
+    margin: 0px; }
+  .main-heading a {
+    color: #000;
+    font-size: 20px;
+    margin-top: 6px; }
+
+.deal-box {
+  margin-bottom: 30px; }
+  .deal-box .deal-desc {
+    padding: 25px 15px;
+    background: #fff; }
+    .deal-box .deal-desc h4 {
+      color: #363636; }
+    .deal-box .deal-desc span {
+      text-transform: uppercase;
+      font-size: 12px;
+      display: block; }
+    .deal-box .deal-desc .rating {
+      color: #421c52;
+      margin-bottom: 15px; }
+
+.btn-border {
+  text-transform: uppercase;
+  padding: 10px 25px;
+  border: 1px dashed #ec008c;
+  color: #ec008c;
+  font-size: 11px;
+  border-radius: 0px;
+  font-weight: 500; }
+  .btn-border:hover {
+    background: #ec008c;
+    color: #fff; }
+
+.coupon-thumb {
+  background: #fff;
+  padding: 20px 0;
+  margin-bottom: 15px; }
+  .coupon-thumb img {
+    display: block;
+    margin: 0 auto; }
+
+.coupon-text {
+  margin-bottom: 30px; }
+  .coupon-text h5 {
+    margin-bottom: 10px; }
+  .coupon-text .rating {
+    margin-bottom: 15px; }
+
+.space-70 {
+  height: 70px; }
+
+.ms-slide .ms-layer, .ms-fixed-layers .ms-layer {
+    position: absolute;
+    pointer-events: auto;
+}
+
+.text7 {
+    color: #fff;
+    font-size: 15px;
+}
+.full-wid {
+    width: 100%;
+    text-align: center;
+}
+.text6 {
+    color: #fff;
+    font-weight: 900;
+    font-size: 60px;
+}
+.text6 {
+    color: #fff;
+    font-weight: 900;
+    font-size: 60px;
+}
+.btn-blue {
+    background-color: #ed1c24;
+    color: #fff;
+    border-radius: 0px;
+}
+.btn-yellow {
+    background-color: #00a651;
+    color: #333;
+    border-radius: 0px;
+}
+
+/*# sourceMappingURL=style-deals.css.map */
+@media(max-width:1199px){
+    .about-text {
+    padding: 25px 0px;
+}
+.menu-item__img{
+    height: 100%;
+}
+.tab-v8 .nav-tabs{
+   padding-left: 165px;
+}
+.clients li {
+    padding: 10px 6px;
+}
+.about-panel img{
+    height: 100%;
+}
+.about-panel .border-image span:after{
+        right: 24px;
+    bottom: 26px;
+}
+.view-dish .special-right h3{
+    font-size: 40px;
+}
+.view-dish a{
+        padding: 5px 15px;
+}
+}
+@media(max-width:991px){
+    
+    .navbar-brand>img {
+    margin-top: -13px;
+}
+.border-image img{
+    width: 100%;
+}
+.border-image span:after{
+        margin-right: 4px;
+    margin-bottom: 3px;
+}
+.price-tag{
+    right: 160px
+}
+.nav-tabs>li>a{
+    margin-right: 20px;
+}
+.heading-v20__para{
+    font-size: 12px;
+}
+.event img{
+    width: 100%;
+}
+section.letest-event p{
+    font-size: 12px;
+}
+.top-bar span {
+    padding-right: 3px;
+    padding-left: 0px;
+    font-size: 12px;
+}
+.about-panel .about-text{
+    padding: 30px 0px 0px;
+}
+.view-dish .price-tag{
+    top: 0;
+}
+.our-team p{
+    font-size: 12px;
+}
+.our-team h3:after{
+    top: 48%;
+}
+.our-team{
+    padding-bottom: 50px;
+}
+}
+
+@media(max-width:767px){
+    .about-panel .border-image span:after {
+    right: 29px;
+    bottom: 26px;
+}
+.about-panel {
+    padding-bottom: 40px;
+}
+.our-partners.wow.animated.fadeInUp.animated .list-inline>li{
+      padding-left: 25px;
+    padding-right: 25px;
+}    
+}

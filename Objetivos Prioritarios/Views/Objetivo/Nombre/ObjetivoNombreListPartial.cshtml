@@ -1,0 +1,227 @@
+﻿<!-- Estado y botón -->
+<div class="row">
+    <div class="col-md-2">
+        <label class="control-label">Estado:</label>
+    </div>
+    <div class="col-md-4">
+        <select class="form-control" id="estadoObjetivoNombre">
+            <option value="1" id="1" @((bool)ViewBag.Actives ? "selected" : "")>Activo</option>
+            <option value="0" id="0" @(!(bool)ViewBag.Actives ? "selected" : "")>Inactivo</option>
+        </select>
+    </div>
+    <div class="col-md-6" style="text-align:right">
+        <button class="btn btn-primary" onclick="AddObjetivoNombreModal()">Agregar Nombre</button>
+    </div>
+</div>
+<br />
+
+<!-- Tabla -->
+<div class="row">
+    <table id="objetivoNombreDataTable" class="dataTable table table-striped" style="width:100%"></table>
+</div>
+
+<!-- CSS para el switch -->
+<style>
+    .switch {
+        position: relative;
+        display: inline-block;
+        width: 40px;
+        height: 20px;
+    }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        transition: .4s;
+    }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 14px;
+            width: 14px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+        }
+
+    input:checked + .slider {
+        background-color: #2196F3;
+    }
+
+        input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+
+    .slider.round {
+        border-radius: 20px;
+    }
+
+        .slider.round:before {
+            border-radius: 50%;
+        }
+</style>
+
+<!-- Scripts -->
+<script type="text/javascript">
+    $(document).ready(function () {
+        FillGridObjetivoNombre();
+    });
+
+    $("#estadoObjetivoNombre").change(function () {
+        var valor = $("#estadoObjetivoNombre").val();
+        refreshNombresList(valor === "1");
+    });
+
+    var objetivoNombreColumns = [
+        { title: "Id", data: "id_nombre", visible: false },
+        { title: "Nombre", data: "nombre_competo" },
+        { title: "Paterno", data: "paterno", visible: false },
+        { title: "Materno", data: "materno", visible: false },
+        { title: "Nombre", data: "nombre", visible: false },
+        {
+            title: "Acciones",
+            data: "id_nombre",
+            render: function (data, type, full, meta) {
+                var action;
+                if ('@ViewBag.Actives'.toUpperCase() === 'TRUE') {
+                    action = [
+                        { divId: 'div_EditObjetivoNombre_' + data, data: data, functionToExec: 'EditObjetivoNombre', toolTip: 'Editar', icon: 'fa fa-edit' },
+                        { divId: 'div_DisableObjetivoNombre_' + data, data: data, functionToExec: 'DisableObjetivoNombre', toolTip: 'Desactivar', icon: 'fa fa-trash' },
+                        { divId: 'div_SelectObjetivoPrincipal_' + data, data: data, functionToExec: 'SelectObjetivoPrincipal', toolTip: 'Principal', type: 'switch', switchState: full.bit_principal }
+                    ];
+                } else {
+                    action = [
+                        { divId: 'div_ActivateObjetivoNombre_' + data, data: data, functionToExec: 'ActivateObjetivoNombre', toolTip: 'Activar', icon: 'fa fa-power-off' }
+                    ];
+                }
+                return AddActionsToGrid(action);
+            }
+        }
+    ];
+
+    function FillGridObjetivoNombre() {
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("FillObjetivoNombreList", "Objetivo")',
+            data: {
+                active: @Json.Encode(ViewBag.Actives),
+                int_id_objetivo: $("#int_id_objetivo").val()
+            },
+            success: function (data) {
+                $('#objetivoNombreDataTable').DataTable({
+                    destroy: true,
+                    searching: true,
+                    responsive: true,
+                    scrollX: true,
+                    data: data,
+                    columns: objetivoNombreColumns,
+                    language: {
+                        sProcessing: "Procesando...",
+                        sLengthMenu: "Mostrar _MENU_ registros",
+                        sZeroRecords: "No se encontraron resultados",
+                        sEmptyTable: "Ningún dato disponible en esta tabla",
+                        sInfo: "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                        sInfoEmpty: "Mostrando registros del 0 al 0 de un total de 0 registros",
+                        sInfoFiltered: "(filtrado de un total de _MAX_ registros)",
+                        sSearch: "Buscar:",
+                        sLoadingRecords: "Cargando...",
+                        oPaginate: {
+                            sFirst: "Primero",
+                            sLast: "Último",
+                            sNext: "Siguiente",
+                            sPrevious: "Anterior"
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    function AddActionsToGrid(actions) {
+        let html = '';
+        actions.forEach(function (action) {
+            if (action.type === 'switch') {
+                html += `
+                <label class="switch" title="${action.toolTip}">
+                    <input type="checkbox"
+                           ${action.switchState ? 'checked disabled' : ''}
+                           onchange="${action.functionToExec}('${action.data}', this)" />
+                    <span class="slider round"></span>
+                </label>
+            `;
+            } else {
+                html += `
+                <button id="${action.divId}" title="${action.toolTip}" onclick="${action.functionToExec}('${action.data}')" class="btn btn-sm btn-default">
+                    <i class="${action.icon}"></i>
+                </button>
+            `;
+            }
+        });
+        return html;
+    }
+
+    function DisableObjetivoNombre(id) {
+        $.post('@Url.Action("DesactivarObjetivoNombre", "Objetivo")', { int_id_nombre: id }, function (data) {
+            if (data.IsSuccess) {
+                swal("", data.Message, "success", () => refreshNombresList());
+            } else {
+                swal("Error", "No tienes permisos para esta acción. Contacta al administrador.", "error", () => {
+                    window.location.href = '@Url.Action("Index", "ObjetivoNombre")';
+                });
+            }
+        });
+    }
+
+    function ActivateObjetivoNombre(id) {
+        $.post('@Url.Action("ReactivarObjetivoNombre", "Objetivo")', { int_id_nombre: id }, function (data) {
+            if (data.IsSuccess) {
+                swal("", data.Message, "success", () => refreshNombresList());
+            } else {
+                swal("Error", "No tienes permisos para esta acción. Contacta al administrador.", "error", () => {
+                    window.location.href = '@Url.Action("Index", "ObjetivoNombre")';
+                });
+            }
+        });
+    }
+
+   function SelectObjetivoPrincipal(id, checkbox) {
+    const wasChecked = checkbox.checked;
+
+    swal({
+        title: "¿Estás seguro?",
+        text: "Este nombre será marcado como principal. ¿Deseas continuar?",
+        type: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Sí, marcar como principal",
+        cancelButtonText: "Cancelar"
+    }, function (isConfirm) {
+        if (isConfirm) {
+            $.post('@Url.Action("MarcarComoPrincipal", "Objetivo")', { int_id_nombre: id }, function (data) {
+                if (data.IsSuccess) {
+                    refreshNombresList();
+                } else {
+                    swal("Error", data.Message, "error");
+                    checkbox.checked = !wasChecked;
+                }
+            });
+        } else {
+            checkbox.checked = !wasChecked;
+        }
+    });
+}
+</script>

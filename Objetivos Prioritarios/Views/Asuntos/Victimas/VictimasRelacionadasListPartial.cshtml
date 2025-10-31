@@ -1,0 +1,378 @@
+﻿@model List<Objetivos_Prioritarios.Models.tb_Victimas>
+
+<div class="main-panel">
+    <div class="content-wrapper">
+        <div class="row">
+            <div class="col-md-12 stretch-card grid-margin">
+                <div class="card">
+                    <div class="card-body card-fixed">
+                        <p class="card-title">Listado de Víctimas Relacionadas</p>
+
+                        <div class="row mb-3">
+                            <div class="col-md-1">
+                                <label class="control-label">Estados:</label>
+                            </div>
+                            <div class="col-md-2">
+                                <select class="form-control" id="estadoVictimas">
+                                    <option value="1" id="1" @((bool)ViewBag.Actives ? "selected" : "")>Activo</option>
+                                    <option value="0" id="0" @(!(bool)ViewBag.Actives ? "selected" : "")>Inactivo</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2"></div>
+                            <div class="col-md-7 text-end">
+                                <button type="button" class="btn btn-primary"
+                                        onclick="AddVictimaRelacionada()">
+                                    Agregar Víctima
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="table-responsive">
+                                    <table id="victimasDataTable" class="dataTable table table-striped w-100"></table>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div> <!-- card-body -->
+                </div> <!-- card -->
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="modalFoto" tabindex="-1" role="dialog" aria-labelledby="modalFotoTitulo" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="modalFotoTitulo">Fotografía</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            
+            </div>
+            <div class="modal-body text-center">
+                <img id="modalFotoImagen" src="" alt="Fotografía" class="img-fluid rounded shadow-sm" style="max-height: 450px;">
+            </div>
+            <div class="modal-footer">
+                @*<a id="modalDescargar" href="#" class="btn btn-outline-secondary" style="display:none;">Descargar</a>*@
+                <button type="button" class="btn btn-secondary" id="closeModal" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+
+    $("#closeModal").click(function () {
+        $("#modalFoto").modal('hide');
+    });
+
+    $(document).ready(function () {
+        FillVictimasGrid();
+    });
+
+    $("#estadoVictimas").change(function () {
+        var valor = $("#estadoVictimas").val();
+        if (valor == "1") {
+            refreshVictimasRelacionadasList(true);
+        } else {
+            refreshVictimasRelacionadasList(false);
+        }
+    });
+
+    // ============================
+    //  CONFIGURACIÓN DE COLUMNAS
+    // ============================
+    var columnVictimas = [
+        {
+            title: "ID",
+            data: "int_id_asunto_victima",
+            orderable: true,
+            IsFiltered: false
+        },
+        {
+            title: "ID Víctima",
+            data: "int_id_victima",
+            orderable: true,
+            IsFiltered: false,
+            visible:false
+        },
+        {
+            title: "Nombre Completo",
+            data: "NombreCompleto",
+            orderable: true,
+            IsFiltered: false
+        },
+        {
+            title: "Fotografía",
+            data: "FotoBase63",
+            orderable: false,
+            render: function (data, type, full, meta) {
+                if (data) {
+                    return '<img src="data:image/jpeg;base64,' + data + '" class="img-thumbnail" style="width:60px;height:60px;object-fit:cover;" />';
+                } else {
+                    return '<span class="text-muted">Sin foto</span>';
+                }
+            }
+        },
+        {
+            title: "Acciones",
+            data: null,
+            orderable: false,
+            render: function (data, type, full, meta) {
+                var id = full.int_id_asunto_victima;
+
+                var fotoBase64 = full.FotoBase63;
+
+                // no usar directamente la cadena cruda en un atributo si es muy larga:
+                // guardamos también en un input hidden dentro del cell para mayor fiabilidad.
+                var fotoEncoded = fotoBase64 ? encodeURIComponent(fotoBase64) : '';
+
+                var btnView = `
+            <button class="btn btn-sm btn-primary ver-foto"
+                data-id="${id}"
+                title="Ver Fotografía">
+                <i class="fa fa-eye"></i>
+            </button>`;
+
+                var btnDelete = `
+            <button class="btn btn-sm btn-danger eliminar-victima" onclick="DisableVictimaRelacionada(${id})"
+                data-id="${id}"
+                title="Eliminar Víctima">
+                <i class="fa fa-trash"></i>
+            </button>`;
+
+                var btnActivate = `
+            <button class="btn btn-sm btn-success activar-victima" onclick="ActivateVictimaRelacionada(${id})"
+                data-id="${id}"
+                title="Activar Víctima">
+                <i class="fa fa-power-off"></i>
+            </button>`;
+
+                // input hidden con la foto (valor urlencoded) — más fiable que attribute largo
+                var hidden = `<input type="hidden" class="foto-base64-hidden" value="${fotoEncoded}" />`;
+
+                if ('@ViewBag.Actives'.toUpperCase() === 'TRUE') {
+                    return `<div class="btn-group">${btnView}${btnDelete}${hidden}</div>`;
+                } else {
+                    return `<div class="btn-group">${btnActivate}${hidden}</div>`;
+                }
+            }
+        }
+
+
+    ];
+
+    // ============================
+    //   LLENAR TABLA CON AJAX
+    // ============================
+ function FillVictimasGrid() {
+    $.ajax({
+        type: 'POST',
+        url: '@Url.Action("FillVictimasRelacionadasList", "Asuntos")',
+        data: {
+            activo: @Json.Encode(ViewBag.Actives),
+            int_id_asunto_relacionado: $("#int_id_asunto_relacionado").val()
+        },
+        success: function (data) {
+            // Si ya existe una DataTable, se limpia y destruye antes de volver a crearla
+            if ($.fn.dataTable.isDataTable('#victimasDataTable')) {
+                $('#victimasDataTable').DataTable().clear().destroy();
+            }
+
+            // Inicializa la DataTable
+            var table = $('#victimasDataTable').DataTable({
+                data: data,
+                columns: columnVictimas,
+                responsive: true,
+                scrollX: true,
+                searching: true,
+                pageLength: 5,
+                language: {
+                    "sProcessing": "Procesando...",
+                    "sLengthMenu": "Mostrar _MENU_ registros",
+                    "sZeroRecords": "No se encontraron resultados",
+                    "sEmptyTable": "Ningún dato disponible en esta tabla",
+                    "sInfo": "Mostrando _START_ a _END_ de _TOTAL_ registros",
+                    "sInfoEmpty": "Mostrando 0 a 0 de 0 registros",
+                    "sInfoFiltered": "(filtrado de _MAX_ registros)",
+                    "sSearch": "Buscar:",
+                    "sLoadingRecords": "Cargando...",
+                    "oPaginate": {
+                        "sFirst": "Primero",
+                        "sLast": "Último",
+                        "sNext": "Siguiente",
+                        "sPrevious": "Anterior"
+                    }
+                },
+                initComplete: function (settings) {
+                    var api = this.api();
+
+                    // Recorre cada columna para agregar input de búsqueda
+                    api.columns().every(function () {
+                        var column = this;
+                        var nameColumn = column.header().textContent;
+                        var columnDef = settings.aoColumns.find(function (col) {
+                            return col.sTitle === nameColumn;
+                        });
+
+                        if (columnDef && columnDef.IsFiltered) {
+                            $('<input type="text" placeholder="Buscar" />')
+                                .appendTo($(column.header()))
+                                .on('click', function (e) {
+                                    e.stopPropagation();
+                                });
+                        }
+
+                        $('input', column.header()).on('keyup change clear', function () {
+                            if (column.search() !== this.value) {
+                                column.search(this.value).draw();
+                            }
+                        });
+                    });
+
+                    // Ajuste de columnas y recalculo de responsive (si está disponible)
+                    setTimeout(function () {
+                        api.columns.adjust();
+                        if (api.responsive) {
+                            api.responsive.recalc();
+                        }
+                    }, 200);
+                }
+            });
+
+            // Ajuste adicional cuando el DataTable está dentro de un tab de Bootstrap
+            $('a[data-bs-toggle="tab"]').on('shown.bs.tab', function () {
+                var tabla = $('#victimasDataTable').DataTable();
+                tabla.columns.adjust();
+                if (tabla.responsive) {
+                    tabla.responsive.recalc();
+                }
+            });
+        }
+    });
+}
+
+
+    // ============================
+    //   ACCIONES
+    // ============================
+    function AddVictimaRelacionada() {
+        // Aquí iría tu modal o redirección para agregar víctima
+        swal("Agregar Víctima", "Función no implementada aún.", "info");
+    }
+
+
+
+    function DisableVictimaRelacionada(id) {
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("DisableVictimaRelacionada", "Asuntos")',
+            data: { int_id_asunto_victima: id },
+            success: function (data) {
+                if (data.IsSuccess) {
+                    swal({
+                        title: "",
+                        text: data.Message,
+                        type: 'success'
+                    }, function () { swal.close(); refreshVictimasRelacionadasList(); });
+                } else {
+                    swal({
+                        title: "Error",
+                        text: data.Message || "No tienes permisos para esta acción.",
+                        type: 'error'
+                    });
+                }
+            }
+        });
+    }
+
+    function ActivateVictimaRelacionada(id) {
+        debugger;
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("ActivateVictimaRelacionada", "Asuntos")',
+            data: { int_id_asunto_victima: id },
+            success: function (data) {
+                if (data.IsSuccess) {
+                    swal({
+                        title: "",
+                        text: data.Message,
+                        type: 'success'
+                    }, function () { swal.close(); refreshVictimasRelacionadasList(); });
+                } else {
+                    swal({
+                        title: "Error",
+                        text: data.Message || "No tienes permisos para esta acción.",
+                        type: 'error'
+                    });
+                }
+            }
+        });
+    }
+
+
+
+    $(document).on('click', '.ver-foto', function () {
+        // 1) intentar leer el valor del input hidden (preferible)
+        var $btn = $(this);
+        var $cell = $btn.closest('.btn-group'); // o .closest('td') según tu render
+        var encoded = $cell.find('.foto-base64-hidden').val();
+
+        // 2) fallback: intentar leer el atributo data-foto (por si lo tuvieras)
+        if (!encoded) {
+            encoded = $btn.attr('data-foto') || $btn.data('foto') || '';
+        }
+
+        // debug: qué valor recibimos (no mostrar todo en producción si es muy grande)
+        console.log('valor encoded recibido (slice):', (encoded || '').substr(0, 100));
+
+        if (!encoded) {
+            console.warn('No se encontró imagen en el registro.');
+            $('#modalFotoTitulo').text("Sin fotografía disponible");
+            $('#modalFotoImagen').attr('src', '');
+            $('#modalDescargar').hide && $('#modalDescargar').hide();
+            $('#modalFoto').modal('show');
+            return;
+        }
+
+        // decodeURIComponent puede lanzar si la cadena no está encoded; protegemos con try/catch
+        var fotoBase64;
+        try {
+            fotoBase64 = decodeURIComponent(encoded);
+        } catch (e) {
+            console.warn('decodeURIComponent falló, usando valor tal cual');
+            fotoBase64 = encoded;
+        }
+
+        console.log('fotoBase64 startsWith data:image?:', fotoBase64.startsWith('data:image'));
+
+        // preparar src: si ya trae el prefijo "data:image/..." lo usamos; si no, asumimos jpeg
+        var src = fotoBase64.startsWith('data:image')
+            ? fotoBase64
+            : 'data:image/jpeg;base64,' + fotoBase64;
+
+        // para verificar visualmente en consola (evitar impresión gigante)
+        console.log('src slice:', src.substr(0, 80));
+
+        $('#modalFotoTitulo').text("Fotografía del registro");
+        $('#modalFotoImagen').attr('src', src);
+
+        // preparar link de descarga si quieres
+        if ($('#modalDescargar').length) {
+            $('#modalDescargar').attr('href', src);
+            $('#modalDescargar').attr('download', 'foto_' + ($btn.data('id') || 'img') + '.jpg');
+            $('#modalDescargar').show();
+        }
+
+        $('#modalFoto').modal('show');
+    });
+
+
+
+
+
+
+</script>

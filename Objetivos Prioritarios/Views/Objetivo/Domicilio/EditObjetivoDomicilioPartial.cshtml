@@ -1,0 +1,225 @@
+﻿@model Objetivos_Prioritarios.Models.getInfoObjetivoListById_Result
+
+<div class="modal" id="modalEditDomicilio" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Editar Domicilio del Objetivo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row mb-2">
+                    <div class="col-md-3"><label class="control-label">Estado:</label></div>
+                    <div class="col-md-9">
+                        <select class="form-control" id="Estado">
+                        </select>
+                    </div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-md-3"><label class="control-label">Municipio:</label></div>
+                    <div class="col-md-9">
+                        <select class="form-control" id="Municipio"></select>
+                    </div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-md-3"><label class="control-label">Colonia:</label></div>
+                    <div class="col-md-9">
+                        <select class="form-control" id="Colonia"></select>
+                    </div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-md-3"><label class="control-label">Calle:</label></div>
+                    <div class="col-md-9">
+                        <select class="form-control" id="Calle"></select>
+                    </div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-md-3"><label class="control-label">Número:</label></div>
+                    <div class="col-md-9">
+                        <input type="text" class="form-control" id="txtNumero" value="@Model.nvarchar_no_casa" />
+                    </div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-md-3"><label class="control-label">Código Postal:</label></div>
+                    <div class="col-md-9">
+                        <input type="text" class="form-control" id="txtCP" value="@Model.nvarchar_cp" />
+                    </div>
+                </div>
+
+
+                <div class="row mb-2">
+                    <div class="col-md-3"><label class="control-label">Observaciones:</label></div>
+                    <div class="col-md-9">
+                        <textarea class="form-control" id="txtObservaciones" rows="3">@Model.nvarchar_observaciones</textarea>
+                    </div>
+                </div>
+
+
+
+                <input type="hidden" id="int_id_informacion" value="@Model.int_id_informacion" />
+                <input type="hidden" id="int_id_objetivo" value="@Model.int_id_objetivo" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="closeModal">Cerrar</button>
+                <button type="button" class="btn btn-primary" id="btnSave">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+$(document).ready(function () {
+    $("#modalEditDomicilio").modal("show");
+
+    var estadoSelect    = $('#Estado').selectize()[0].selectize;
+    var municipioSelect = $('#Municipio').selectize()[0].selectize;
+    var coloniaSelect   = $('#Colonia').selectize()[0].selectize;
+    var calleSelect     = $('#Calle').selectize()[0].selectize;
+
+    var selectedEstado    = '@Model.ID_Estado';
+    var selectedMunicipio = '@Model.Cve_mun';
+    var selectedColonia   = '@Model.Cve_col';
+    var selectedCalle     = '@Model.Cve_Calle';
+
+    // Funciones para cargar selects dependientes
+    function cargarMunicipios(idEstado, callback) {
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("GetMunicipioList", "Catalogo")',
+            data: { idEstado: idEstado },
+            success: function(municipios) {
+                municipioSelect.clearOptions();
+                municipios.forEach(function(item) {
+                    municipioSelect.addOption({ value: item.Cve_mun, text: item.Municipio1 });
+                });
+                if (callback) callback();
+            }
+        });
+    }
+
+    function cargarColonias(idMunicipio, callback) {
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("GetColoniaList", "Catalogo")',
+            data: { idMunicipio: idMunicipio },
+            success: function(colonias) {
+                coloniaSelect.clearOptions();
+                colonias.forEach(function(item) {
+                    coloniaSelect.addOption({ value: item.Cve_col, text: item.Colonia1 });
+                });
+                if (callback) callback();
+            }
+        });
+    }
+
+    function cargarCalles(idColonia, callback) {
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("GetCallesList", "Catalogo")',
+            data: { idColonia: idColonia },
+            success: function(calles) {
+                calleSelect.clearOptions();
+                calles.forEach(function(item) {
+                    calleSelect.addOption({ value: item.Cve_Calle, text: item.Calle1 });
+                });
+                if (callback) callback();
+            }
+        });
+    }
+
+    // Carga inicial con valores guardados
+    $.ajax({
+        type: 'POST',
+        url: '@Url.Action("GetEstadosList", "Catalogo")',
+        success: function(estados) {
+            estadoSelect.clearOptions();
+            estados.forEach(function(item) {
+                estadoSelect.addOption({ value: item.ID_Estado, text: item.Estado1 });
+            });
+            estadoSelect.setValue(selectedEstado, true);
+
+            cargarMunicipios(selectedEstado, function() {
+                municipioSelect.setValue(selectedMunicipio, true);
+                cargarColonias(selectedMunicipio, function() {
+                    coloniaSelect.setValue(selectedColonia, true);
+                    cargarCalles(selectedColonia, function() {
+                        calleSelect.setValue(selectedCalle, true);
+                    });
+                });
+            });
+        }
+    });
+
+    // Eventos para cambios manuales del usuario
+    estadoSelect.on('change', function(value) {
+        if (!value) return;
+        cargarMunicipios(value, function() {
+            municipioSelect.setValue(null); // limpia selección anterior
+            coloniaSelect.clearOptions();
+            calleSelect.clearOptions();
+        });
+    });
+
+    municipioSelect.on('change', function(value) {
+        if (!value) return;
+        cargarColonias(value, function() {
+            coloniaSelect.setValue(null);
+            calleSelect.clearOptions();
+        });
+    });
+
+    coloniaSelect.on('change', function(value) {
+        if (!value) return;
+        cargarCalles(value, function() {
+            calleSelect.setValue(null);
+        });
+    });
+});
+
+
+
+     $("#btnSave").click(function () {
+         var datas = {
+             Cve_Calle: $("#Calle").val(),
+             nvarchar_no_casa: $("#txtNumero").val(),
+             nvarchar_observaciones: $("#txtObservaciones").val(),
+             nvarchar_cp: $("#txtCP").val(),
+             int_id_objetivo: $("#int_id_objetivo").val(),
+             int_id_informacion: $("#int_id_informacion").val()
+         };
+
+         $.ajax({
+             type: 'POST',
+             url: '@Url.Action("EditObjetivoDomicilio", "Objetivo")',
+             data: datas,
+             success: function (data) {
+                 debugger;
+                 if (data.IsSuccess) {
+                     swal({
+                         title: "",
+                         text: data.Message,
+                         type: 'success',
+                         showCancelButton: false,
+                         confirmButtonText: "Continuar",
+                         closeOnConfirm: true,
+                     },
+                         function (isConfirm) {
+                             //swal.close();
+
+                             $('#closeModal').trigger('click');
+                             refreshDomicilioList();
+                         });
+                 } else {
+                     swal({
+                         title: "Error",
+                         text: data.Message ?? "No tienes permisos para esta acción. Contacta al administrador.",
+                         type: 'error',
+                         confirmButtonText: "Continuar"
+                     });
+                 }
+             }
+         });
+     });
+
+
+</script>

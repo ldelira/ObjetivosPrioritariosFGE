@@ -1,0 +1,160 @@
+﻿@model List<Objetivos_Prioritarios.Models.getNamePhotoList_Result>
+
+@if (Model == null)
+{
+    <div class="alert alert-secondary text-center">No hay objetivos prioritarios con la información</div>
+}
+else
+{
+    if (Model.Count > 0)
+    {
+        <table class="table table-bordered table-sm align-middle" id="tblobjetivo">
+            <thead class="table-light">
+                <tr>
+                    <th>Nombre Objetivo Prioritario</th>
+                    <th style="width:90px;">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.NOMBRES_COMPLETOS</td>
+                        <td class="text-center">
+                            <button class="btn btn-success btn-sm" onclick="addObjetivoVictima(@item.int_id_objetivo)">
+                                <i class="fa fa-check"></i>
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <div class="alert alert-secondary text-center">No hay objetivos prioritarios con la información</div>
+
+    }
+
+}
+
+
+<!-- Modal Selección de Nombre -->
+<div class="modal fade" id="modalSeleccionNombreObj" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">Seleccionar Nombre del Objetivo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <label for="selectNombreObjetivo" class="form-label">Nombre completo:</label>
+                <select id="selectNombreObjetivo" class="form-select">
+                    <option value="">Seleccione un nombre...</option>
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-success" id="btnAceptarNombreObj">
+                    <i class="fa fa-check"></i> Aceptar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+    $(document).ready(function () {
+        $("#tblobjetivo").DataTable({
+            pageLength: 5,          // 👈 muestra solo 5 registros por página
+            lengthChange: false,    // 👈 oculta el combo de "mostrar X registros"
+            language: {
+                url: "//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json" // 👈 español (opcional)
+            }
+        });
+    });
+
+
+      let clavePersonaSeleccionada = null;
+
+  // ✅ Llamado desde el botón ✔️ del DataTable
+    function addObjetivoVictima(int_id_objetivo) {
+        clavePersonaSeleccionada = int_id_objetivo;
+      debugger;
+      // Limpia el select antes de cargar
+      $("#selectNombreObjetivo").empty()
+          .append('<option value="">Cargando nombres...</option>');
+
+      // Llama al controlador
+
+      $.ajax({
+          type: 'POST',
+          url: '@Url.Action("getListNombresObjetivo", "Asuntos")',
+          data: { id_objetivo: int_id_objetivo },
+          success: function (data) {
+              $("#selectNombreObjetivo").empty()
+                  .append('<option value="">Seleccione un nombre...</option>');
+
+              if (data && data.length > 0) {
+                  $.each(data, function (i, item) {
+                      const esPrincipal = (item.bit_principal === true || item.bit_principal === 1);
+                      const textoPrincipal = esPrincipal ? " (Principal)" : "";
+                      const selectedAttr = esPrincipal ? ' selected' : '';
+
+                      $("#selectNombreObjetivo").append(
+                          `<option value="${item.id_nombre}"${selectedAttr}>${item.nombre_completo}${textoPrincipal}</option>`
+                      );
+                  });
+              } else {
+                  $("#selectNombreObjetivo").append('<option value="">Sin nombres disponibles</option>');
+              }
+              // Muestra el modal
+              $("#modalSeleccionNombreObj").modal("show");
+          }
+      });
+
+
+      @*$.get("@Url.Action("getlistNombresDetenido", "Asuntos")", { clave_persona: clave_persona })
+          .done(function (data) {
+
+          })
+          .fail(function () {
+              swal("Error", "No se pudieron cargar los nombres.", "error");
+          });*@
+  }
+
+  // ✅ Cuando el usuario presiona "Aceptar"
+  $("#btnAceptarNombreObj").click(function () {
+      const idSeleccionado = $("#selectNombreObjetivo").val();
+      const nombreSeleccionado = $("#selectNombreObjetivo option:selected").text();
+
+      if (!idSeleccionado) {
+          swal("Atención", "Selecciona un nombre antes de continuar.", "warning");
+          return;
+      }
+
+      // Aquí puedes agregar el registro a otra tabla (por ejemplo, DataTable de detenidos)
+      agregarObjetivoSeleccionado(idSeleccionado);
+
+      // Cierra el modal
+      $("#modalSeleccionNombreObj").modal("hide");
+  });
+
+  // 🧩 Función para agregar el seleccionado a otra tabla
+    function agregarObjetivoSeleccionado(id_nombre) {
+        debugger;
+        $.post("@Url.Action("addObjetivoVictima", "Asuntos")", { id_asunto_relacionado: $("#int_id_asunto_relacionado").val(), id_nombre: id_nombre }, function (resp) {
+           if (resp.IsSuccess) {
+               swal("", resp.Message, "success");
+               refreshVictimasRelacionadasList();
+           } else {
+               swal("Error", resp.Message, "error");
+           }
+      });
+
+
+  }
+
+</script>

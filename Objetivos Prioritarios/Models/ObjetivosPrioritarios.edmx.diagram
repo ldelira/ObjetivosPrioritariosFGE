@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="3e05be1af5c647ad975faddf616dfeb7" Name="Diagram1">
+        <EntityTypeShape EntityType="Objetivos_PrioritariosModel.cat_EstatusAsunto" Width="1.5" PointX="3.75" PointY="6.75" />
+        <EntityTypeShape EntityType="Objetivos_PrioritariosModel.cat_EstatusProceso" Width="1.5" PointX="0.75" PointY="11.75" />
+        <EntityTypeShape EntityType="Objetivos_PrioritariosModel.cat_TipoActividadDelictiva" Width="1.5" PointX="3.75" PointY="38.75" />
+        <EntityTypeShape EntityType="Objetivos_PrioritariosModel.cat_TipoAgrupacion" Width="1.5" PointX="1.5" PointY="27.75" />
+        <EntityTypeShape EntityType="Objetivos_PrioritariosModel.tb_AliasObjetivo" Width="1.5" PointX="3" PointY="30.875" />
+        <EntityTypeShape EntityType="Objetivos_PrioritariosModel.tb_AsuntoRelacionado" Width="1.5" PointX="6" PointY="6.25" />
+        <EntityTypeShape EntityType="Objetivos_PrioritariosModel.tb_AsuntoVictimas" Width="1.5" PointX="8.25" PointY="6.625" />
+        <EntityTypeShape EntityType="Objetivos_PrioritariosModel.tb_CarpetasObjetivo" Width="1.5" PointX="5.25" PointY="23.375" />
+        <EntityTypeShape EntityType="Objetivos_PrioritariosModel.tb_Detenido" Width="1.5" PointX="5.25" PointY="10.25" />
+        <EntityTypeShape EntityType="Objetivos_PrioritariosModel.tb_Detenidos_DelitoIngreso" Width="1.5" PointX="7.5" PointY="10.75" />
+        <EntityTypeShape EntityType="Objetivos_PrioritariosModel.tb_FichaAsunto" Width="1.5" PointX="8.25" PointY="15.625" />
+        <EntityTypeShape EntityType="Objetivos_PrioritariosModel.tb_FichaObjetivo" Width="1.5" PointX="3" PointY="15.125" />
+        <EntityTypeShape EntityType="Objetivos_PrioritariosModel.tb_Grupo_Delictivo" Width="1.5" PointX="3.75" PointY="27.375" />
+        <EntityTypeShape EntityType="Objetivos_PrioritariosModel.tb_GrupoTipoActividadDelictiva" Width="1.5" PointX="6" PointY="27.625" />
+        <EntityTypeShape EntityType="Objetivos_PrioritariosModel.tb_InformacionObjetivo" Width="1.5" PointX="3" PointY="34.25" />
+        <EntityTypeShape EntityType="Objetivos_PrioritariosModel.tb_NombreObjetivo" Width="1.5" PointX="3" PointY="23.125" />
+        <EntityTypeShape EntityType="Objetivos_PrioritariosModel.tb_Objetivo" Width="1.5" PointX="0.75" PointY="15.25" />
+        <EntityTypeShape EntityType="Objetivos_PrioritariosModel.tb_ObjetivoGrupo" Width="1.5" PointX="6" PointY="15.25" />
+        <EntityTypeShape EntityType="Objetivos_PrioritariosModel.tb_OrdenAprehension" Width="1.5" PointX="5.25" PointY="19.5" />
+        <EntityTypeShape EntityType="Objetivos_PrioritariosModel.tb_Usuarios" Width="1.5" PointX="0.75" PointY="0.75" />
+        <EntityTypeShape EntityType="Objetivos_PrioritariosModel.tb_Victimas" Width="1.5" PointX="6" PointY="2.5" />
+        <AssociationConnector Association="Objetivos_PrioritariosModel.FK_tb_AsuntoRelacionado_cat_EstatusAsunto" />
+        <AssociationConnector Association="Objetivos_PrioritariosModel.FK_tb_FichaObjetivo_cat_EstatusProceso" />
+        <AssociationConnector Association="Objetivos_PrioritariosModel.FK_tb_GrupoTipoActividadDelictiva_cat_TipoActividadDelictiva" />
+        <AssociationConnector Association="Objetivos_PrioritariosModel.FK_tb_Grupo_Delictivo_cat_TipoAgrupacion" />
+        <AssociationConnector Association="Objetivos_PrioritariosModel.FK_tb_AliasObjetivo_tb_Objetivo" />
+        <AssociationConnector Association="Objetivos_PrioritariosModel.FK_tb_AsuntoVictimas_tb_AsuntoRelacionado" />
+        <AssociationConnector Association="Objetivos_PrioritariosModel.FK_tb_FichaAsunto_tb_AsuntoRelacionado" />
+        <AssociationConnector Association="Objetivos_PrioritariosModel.FK_tb_AsuntoVictimas_tb_Victimas" />
+        <AssociationConnector Association="Objetivos_PrioritariosModel.FK_tb_CarpetasObjetivo_tb_FichaObjetivo" />
+        <AssociationConnector Association="Objetivos_PrioritariosModel.FK_tb_Detenido_tb_FichaObjetivo" />
+        <AssociationConnector Association="Objetivos_PrioritariosModel.FK_tb_Detenidos_DelitoIngreso_tb_Detenido" />
+        <AssociationConnector Association="Objetivos_PrioritariosModel.FK_tb_FichaAsunto_tb_FichaObjetivo" />
+        <AssociationConnector Association="Objetivos_PrioritariosModel.FK_tb_FichaObjetivo_tb_Objetivo" />
+        <AssociationConnector Association="Objetivos_PrioritariosModel.FK_tb_OrdenAprehension_tb_FichaObjetivo" />
+        <AssociationConnector Association="Objetivos_PrioritariosModel.FK_tb_GrupoTipoActividadDelictiva_tb_Grupo_Delictivo" />
+        <AssociationConnector Association="Objetivos_PrioritariosModel.FK_tb_ObjetivoGrupo_tb_Grupo_Delictivo" />
+        <AssociationConnector Association="Objetivos_PrioritariosModel.FK_tb_InformacionObjetivo_tb_Objetivo" />
+        <AssociationConnector Association="Objetivos_PrioritariosModel.FK_tb_NombreObjetivo_tb_Objetivo" />
+        <AssociationConnector Association="Objetivos_PrioritariosModel.FK_tb_ObjetivoGrupo_tb_Objetivo" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

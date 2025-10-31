@@ -1,0 +1,131 @@
+﻿
+
+<div class="row">
+    <table id="carpetaObjetivoDataTable" class="dataTable table table-striped" style="width:100%"></table>
+</div>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        FillGridCarpetaObjetivo();
+    });
+
+
+    var carpetaObjetivoColumns = [
+        
+        {
+            title: "NumAvp",
+            data: "CarpetaInvestigacion",
+            orderable: true
+        },
+        {
+            title: "FechaAlta",
+            data: "FechaAlta",
+            render: $.fn.dataTable.render.moment(undefined, 'DD-MM-YYYY', 'en'),
+            orderable: true
+        },
+        {
+            title: "Nombre",
+            data: "Nombre",
+            orderable: true
+        },
+        {
+            title: "Delito",
+            data: "Delito",
+            orderable: true
+        },
+        {
+            title: "Obs",
+            data: "Obs",
+            orderable: true
+        },
+        {
+            title: "Acciones",
+            data: "CarpetaInvestigacion", render: function (data, type, full, meta) {
+                var action = [
+                        { divId: 'div_ActivateCarpetaObjetivo_' + data, data: data, functionToExec: 'AgregarCarpeta', toolTip: 'Activar', icon: 'fa fa-check' }
+                    ];
+                
+                return AddActionsToGrid(action);
+            }
+        }
+    ];
+
+    function FillGridCarpetaObjetivo() {
+
+        var movimiento = $("input[name='tipoBusqueda']:checked").val();
+
+        var datos = {
+            movimiento: movimiento,
+            nombre: $("#searchName").val(),
+            paterno: $("#searchPaterno").val(),
+            materno: $("#searchMaterno").val(),
+            numavp: $("#numavp").val()
+        };
+
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("FillBusquedaCarpetasList", "FichaObjetivo")',
+            data: datos,
+            success: function (data) {
+                $('#carpetaObjetivoDataTable').DataTable({
+                    destroy: true,
+                    searching: true,
+                    responsive: true,
+                    scrollX: true,
+                    data: data,
+                    columns: carpetaObjetivoColumns,
+                    language: {
+                        "sProcessing": "Procesando...",
+                        "sLengthMenu": "Mostrar _MENU_ registros",
+                        "sZeroRecords": "No se encontraron resultados",
+                        "sEmptyTable": "Ningún dato disponible en esta tabla",
+                        "sInfo": "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                        "sInfoEmpty": "Mostrando registros del 0 al 0 de un total de 0 registros",
+                        "sInfoFiltered": "(filtrado de un total de _MAX_ registros)",
+                        "sSearch": "Buscar:",
+                        "sLoadingRecords": "Cargando...",
+                        "oPaginate": {
+                            "sFirst": "Primero",
+                            "sLast": "Último",
+                            "sNext": "Siguiente",
+                            "sPrevious": "Anterior"
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    function AgregarCarpeta(numavp) {
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("AddCarpetaObjetivo", "FichaObjetivo")',
+            data: { int_id_ficha_objetivo: $('#int_id_ficha_objetivo').val(),numavp: numavp },
+            success: function (data) {
+                if (data.IsSuccess) {
+                    swal({
+                        title: "",
+                        text: data.Message,
+                        type: 'success',
+                        confirmButtonText: "Continuar",
+                        closeOnConfirm: true,
+                    }, function (isConfirm) {
+                        if (isConfirm) {
+                            swal.close();
+                            refreshCarpetasAgregadasList();
+                        }
+                    });
+                } else {
+                    swal({
+                        title: "Error",
+                        text: data.Message,
+                        type: 'error'
+                    });
+                }
+            }
+        });
+    }
+
+   
+</script>

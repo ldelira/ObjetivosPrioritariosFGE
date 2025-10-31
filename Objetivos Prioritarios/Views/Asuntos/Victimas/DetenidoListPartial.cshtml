@@ -1,0 +1,158 @@
+﻿@model List<Objetivos_Prioritarios.Models.SP_ObjPri_getFiliObjetivoInfo_Result>
+
+@if (Model == null)
+{
+    <div class="alert alert-secondary text-center">No hay información de Detenidos.</div>
+}
+else
+{
+    if (Model.Count > 0)
+    {
+        <table class="table table-bordered table-sm align-middle" id="tbldetenido">
+            <thead class="table-light">
+                <tr>
+                    <th>Nombre Detenido</th>
+                    <th style="width:90px;">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.NOMBRES_COMPLETOS</td>
+                        <td class="text-center">
+                            <button class="btn btn-success btn-sm" onclick="addDetenidoVictima(@item.CLAVE_PERSO)">
+                                <i class="fa fa-check"></i>
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <div class="alert alert-secondary text-center">No hay información de Detenidos.</div>
+    }
+
+}
+
+
+<!-- Modal Selección de Nombre -->
+<div class="modal fade" id="modalSeleccionNombre" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">Seleccionar Nombre del Detenido</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <label for="selectNombreDetenido" class="form-label">Nombre completo:</label>
+                <select id="selectNombreDetenido" class="form-select">
+                    <option value="">Seleccione un nombre...</option>
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-success" id="btnAceptarNombre">
+                    <i class="fa fa-check"></i> Aceptar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+    $(document).ready(function () {
+        $("#tbldetenido").DataTable({
+            pageLength: 5,          // 👈 muestra solo 5 registros por página
+            lengthChange: false,    // 👈 oculta el combo de "mostrar X registros"
+            language: {
+                url: "//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json" // 👈 español (opcional)
+            }
+        });
+    });
+
+
+
+    let clavePersonaSeleccionada = null;
+
+    // ✅ Llamado desde el botón ✔️ del DataTable
+    function addDetenidoVictima(clave_persona) {
+        clavePersonaSeleccionada = clave_persona;
+        debugger;
+        // Limpia el select antes de cargar
+        $("#selectNombreDetenido").empty()
+            .append('<option value="">Cargando nombres...</option>');
+
+        // Llama al controlador
+
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("getListNombresDetenido", "Asuntos")',
+            data: { clave_persona: clave_persona },
+            success: function (data) {
+                $("#selectNombreDetenido").empty()
+                    .append('<option value="">Seleccione un nombre...</option>');
+
+                if (data && data.length > 0) {
+                    $.each(data, function (i, item) {
+                        $("#selectNombreDetenido").append(
+                            `<option value="${item.id}">${item.NOMBRE_COMPLETO}</option>`
+                        );
+                    });
+                } else {
+                    $("#selectNombreDetenido").append('<option value="">Sin nombres disponibles</option>');
+                }
+
+                // Muestra el modal
+                $("#modalSeleccionNombre").modal("show");
+            }
+        });
+
+
+        @*$.get("@Url.Action("getlistNombresDetenido", "Asuntos")", { clave_persona: clave_persona })
+            .done(function (data) {
+
+            })
+            .fail(function () {
+                swal("Error", "No se pudieron cargar los nombres.", "error");
+            });*@
+    }
+
+    // ✅ Cuando el usuario presiona "Aceptar"
+    $("#btnAceptarNombre").click(function () {
+        const idSeleccionado = $("#selectNombreDetenido").val();
+        const nombreSeleccionado = $("#selectNombreDetenido option:selected").text();
+
+        if (!idSeleccionado) {
+            swal("Atención", "Selecciona un nombre antes de continuar.", "warning");
+            return;
+        }
+
+        // Aquí puedes agregar el registro a otra tabla (por ejemplo, DataTable de detenidos)
+        agregarDetenidoSeleccionado(idSeleccionado);
+
+        // Cierra el modal
+        $("#modalSeleccionNombre").modal("hide");
+    });
+
+    // 🧩 Función para agregar el seleccionado a otra tabla
+    function agregarDetenidoSeleccionado(id) {
+        debugger;
+        $.post("@Url.Action("addDetenidoVictima", "Asuntos")", { id_asunto_relacionado: $("#int_id_asunto_relacionado").val(),id:id }, function (resp) {
+             if (resp.IsSuccess) {
+                 swal("", resp.Message, "success");
+                 refreshVictimasRelacionadasList();
+             } else {
+                 swal("Error", resp.Message, "error");
+             }
+        });
+
+        
+    }
+
+
+</script>

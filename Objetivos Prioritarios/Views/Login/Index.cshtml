@@ -1,0 +1,120 @@
+﻿@model Objetivos_Prioritarios.Utils.LoginUser
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_LayoutLogin.cshtml";
+}
+
+
+
+<div class="container-scroller">
+    <div class="container-fluid page-body-wrapper full-page-wrapper">
+        <div class="content-wrapper d-flex align-items-center auth px-0">
+            <div class="row w-100 mx-0">
+                <div class="col-lg-4 mx-auto">
+                    <div class="auth-form-light text-left py-5 px-4 px-sm-5">
+                        <div class=" text-center ">
+                            <img src="~/images/logoNe.png" alt="logo" class="img-fluid" style="max-width: 300px;">
+                        </div>
+                        <div class="card-title text-center mb-4">
+                            <h3>OBJETIVOS PRIORITARIOS</h3>
+                        </div>
+                        <h6 class="font-weight-light">Ingresa tu usuario y contraseña para iniciar sesión</h6>
+                        <form class="pt-3">
+                            <div class="form-group">
+                                @Html.EditorFor(model => model.UserName, new { htmlAttributes = new { @class = "form-control", placeholder = "Usuario" } })
+                            </div>
+                            <div class="form-group">
+                                @Html.PasswordFor(model => model.Password, new { @class = "form-control", placeholder = "Contraseña" })
+                            </div>
+                            <div class="mt-3">
+                                <a class="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn" id="btnSave" >Inicar Sesión</a>
+                            </div>
+                           
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- content-wrapper ends -->
+    </div>
+    <!-- page-body-wrapper ends -->
+</div>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        var ban = '@ViewBag.Error';
+
+        if (ban.toLowerCase() == 'true') {
+            var mss = '@ViewBag.Message';
+            swal({
+                title: "",
+                text: mss.replace('&#241;','\u00f1'),
+                type: 'error',
+                showCancelButton: false,
+                confirmButtonText: "Continuar",
+                closeOnConfirm: true,
+            },
+                function (isConfirm) {
+                    if (isConfirm) {
+
+
+                    }
+                });
+        }
+    });
+
+
+
+
+    document.querySelector("#Password").onkeyup = function (event) {
+        if (event.key === "Enter") {
+            event.preventDefault(); // Evita acciones predeterminadas
+            inicioSesion();
+        }
+    };
+
+
+    $("#btnSave").click(function () {
+        inicioSesion();
+
+    });
+
+    function inicioSesion() {
+         var data = {
+     UserName: $("#UserName").val(),
+     Password: $("#Password").val()
+ }
+ 
+ $.ajax({
+     type: 'POST',
+     url: '@Url.Action("ValidateCredentials", "Login")',
+     data: data,
+     success: function (data) {
+         
+         if (data.IsSuccess) {
+              window.location.href = '@Url.Action("index", "Objetivo")';
+
+         } else {
+             swal({
+                 title: "",
+                 text: data.Message,
+                 type: 'error',
+                 showCancelButton: false,
+                 confirmButtonText: "Continuar",
+                 closeOnConfirm: true,
+             },
+                 function (isConfirm) {
+                     if (isConfirm) {
+
+
+                     }
+                 });
+         }
+     },
+     complete: function () {
+     }
+ });
+    }
+
+</script>

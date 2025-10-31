@@ -1,0 +1,62 @@
+@import url(https://fonts.googleapis.com/css?family=Roboto:400,700,500italic,500,400italic,300italic,300,100italic,100);
+
+
+/***********
+
+Reset / Basics
+
+***********/
+
+.margin-b-30 {
+    margin-bottom: 30px;
+}
+
+/****tiles*********/
+.tile .tile-title {
+    color: #fff;
+    text-transform: capitalize;
+    background-color: rgba(255,255,255,0.1);
+    padding: 3px 15px;
+}
+
+.tile-body {
+    padding: 15px;
+}
+
+    .tile-body i {
+        font-size: 35px;
+        color: #fff;
+    }
+
+    .tile-body h4 {
+        color: #fff;
+        text-transform: uppercase;
+        font-size: 35px;
+        margin: 0px;
+    }
+
+.tile-footer {
+    padding: 4px 15px;
+    color: #fff;
+    background-color: rgba(255,255,255,0.1);
+}
+
+    .tile-footer a {
+        color: #fff;
+    }
+
+.tile.red {
+    background-color: #fa4345;
+}
+
+.tile.green {
+    background-color: #91be24;
+}
+
+.tile.blue {
+    background-color: #165bf7;
+}
+
+.tile.purple {
+    background-color: #972cf1;
+}

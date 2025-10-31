@@ -1,0 +1,145 @@
+﻿<div class="row mb-3">
+    <div class="col-md-2">
+        <label class="control-label">Estado:</label>
+    </div>
+    <div class="col-md-4">
+        <select class="form-control" id="estadoDomicilio">
+            <option value="1" @((bool)ViewBag.Actives ? "selected" : "")>Activo</option>
+            <option value="0" @(!(bool)ViewBag.Actives ? "selected" : "")>Inactivo</option>
+        </select>
+    </div>
+    <div class="col-md-3"></div>
+    <div class="col-md-3 text-end">
+        <button class="btn btn-primary" onclick="AddObjetivoDomicilioModal()">Agregar Domicilio</button>
+    </div>
+</div>
+
+<div class="row">
+    <table id="domicilioDataTable" class="table table-striped" style="width:100%"></table>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        FillGridDomicilio(@Json.Encode(ViewBag.Actives));
+    });
+
+    // cambiar filtro Activos/Inactivos
+
+    $("#estadoDomicilio").change(function () {
+        var valor = $("#estadoDomicilio").val();
+        if (valor == "1") {
+            refreshDomicilioList(true);
+        } else {
+            refreshDomicilioList(false);
+        }
+    });
+
+    var domicilioColumns = [
+        { title: "Id", data: "int_id_informacion", orderable: true },
+        { title: "Estado", data: "Estado", orderable: true },
+        { title: "Municipio", data: "Municipio", orderable: true },
+        { title: "Colonia", data: "Colonia", orderable: true },
+        { title: "Calle", data: "Calle", orderable: true },
+        { title: "Número", data: "nvarchar_no_casa", orderable: true },
+        { title: "CP", data: "nvarchar_cp", orderable: true },
+        { title: "Obvservacion", data: "nvarchar_observaciones", orderable: true },
+
+
+        {
+            title: "Acciones",
+            data: "int_id_informacion", render: function (data, type, full, meta) {
+                var action;
+                if ('@ViewBag.Actives'.toUpperCase() == 'TRUE') {
+                    action = [
+                        { divId: 'div_EditDomicilio_' + data, data: data, functionToExec: 'EditObjetivoDomicilio', toolTip: 'Editar', icon: 'fa fa-edit' },
+                        { divId: 'div_DisableDomicilio_' + data, data: data, functionToExec: 'DisableDomicilio', toolTip: 'Desactivar', icon: 'fa fa-trash' },
+                    ];
+                } else {
+                    action = [
+                        { divId: 'div_ActivateDomicilio_' + data, data: data, functionToExec: 'ActivateDomicilio', toolTip: 'Activar', icon: 'fa fa-power-off' }
+                    ];
+                }
+                return AddActionsToGrid(action);
+            }
+        }
+    ];
+
+    function FillGridDomicilio(actives) {
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("FillObjetivoDomicilioList", "Objetivo")',
+            data: { active: actives, int_id_objetivo: $("#int_id_objetivo").val() },
+            success: function (data) {
+                $('#domicilioDataTable').DataTable({
+                    searching: true,
+                    responsive: true,
+                    scrollX: true,
+                    destroy: true,
+                    data: data,
+                    columns: domicilioColumns,
+                    language: {
+                        "sZeroRecords": "No se encontraron resultados",
+                        "sSearch": "Buscar:"
+                    }
+                });
+            }
+        });
+    }
+
+
+    function DisableDomicilio(int_id_domicilio) {
+        $.post('@Url.Action("DesactivarObjetivoDomicilio", "Objetivo")', { int_id_domicilio: int_id_domicilio }, function (data) {
+            if (data.IsSuccess) {
+                swal({
+                    title: "",
+                    text: data.Message,
+                    type: 'success',
+                    showCancelButton: false,
+                    confirmButtonText: "Continuar",
+                    closeOnConfirm: true,
+                },
+                    function (isConfirm) {
+
+                        refreshDomicilioList();
+                    });
+            } else {
+                swal({
+                    title: "Error",
+                    text: data.Message ?? "No tienes permisos para esta acción. Contacta al administrador.",
+                    type: 'error',
+                    confirmButtonText: "Continuar"
+                });
+            }
+        });
+    }
+
+    function ActivateDomicilio(int_id_domicilio) {
+        $.post('@Url.Action("ReactivarObjetivoDomicilio", "Objetivo")', { int_id_domicilio: int_id_domicilio }, function (data) {
+            if (data.IsSuccess) {
+                swal({
+                    title: "",
+                    text: data.Message,
+                    type: 'success',
+                    showCancelButton: false,
+                    confirmButtonText: "Continuar",
+                    closeOnConfirm: true,
+                },
+                    function (isConfirm) {
+
+                        refreshDomicilioList();
+                    });
+            } else {
+                swal({
+                    title: "Error",
+                    text: data.Message ?? "No tienes permisos para esta acción. Contacta al administrador.",
+                    type: 'error',
+                    confirmButtonText: "Continuar"
+                });
+            }
+        });
+    }
+
+
+
+
+</script>

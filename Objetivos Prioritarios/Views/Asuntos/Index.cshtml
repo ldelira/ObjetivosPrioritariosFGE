@@ -1,0 +1,20 @@
+﻿@{
+    ViewBag.Title = "ASUNTOS RELACIONADOS";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div id="asuntosListContainer"></div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        refresAsuntosList();
+    });
+
+    function refresAsuntosList(active) {
+        var datos = {
+            actives: active
+        };
+        $("#asuntosListContainer").empty();
+        $("#asuntosListContainer").load("@Url.Action("AsuntosListPartial", "Asuntos")", datos);
+    }
+</script>

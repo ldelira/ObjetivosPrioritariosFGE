@@ -1,0 +1,130 @@
+﻿<div class="row">
+    <table id="busquedaFiliacionDataTable" class="dataTable table table-striped" style="width:100%"></table>
+</div>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        FillGridBusquedaFiliacion();
+    });
+
+    var busquedaFiliacionColumns = [
+
+
+        {
+            title: "Id",
+            data: "CLAVE_PERSO",
+            orderable: true
+        },
+        {
+            title: "NUM_AVP",
+            data: "NUM_AVP",
+            orderable: true
+        },
+        {
+            title: "Nombre",
+            data: "NOMBRES_COMPLETOS",
+            orderable: true
+        },
+        {
+            title: "Delito",
+            data: "DELITOS",
+            orderable: true
+        },
+        {
+            title: "Acciones",
+            data: "CLAVE_PERSO",
+            render: function (data, type, full, meta) {
+                var action = [
+                    {
+                        divId: 'div_AddFiliacion_' + data,
+                        data: data,
+                        functionToExec: 'AgregarFiliacion',
+                        toolTip: 'Agregar',
+                        icon: 'fa fa-check'
+                    }
+                ];
+                return AddActionsToGrid(action);
+            }
+        }
+    ];
+
+    function FillGridBusquedaFiliacion() {
+
+        var movimiento = $("input[name='tipoBusqueda3']:checked").val();
+
+        var datos = {
+            movimiento: movimiento,
+            nombre: $("#searchNameFili").val(),
+            paterno: $("#searchPaternoFili").val(),
+            materno: $("#searchMaternoFili").val(),
+            numavp: $("#numavpFili").val()
+        };
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("FillFiliacionList", "FichaObjetivo")', // ⬅️ método en FiliacionController
+            data: datos,
+            success: function (data) {
+                $('#busquedaFiliacionDataTable').DataTable({
+                    destroy: true,
+                    searching: true,
+                    responsive: true,
+                    scrollX: true,
+                    data: data,
+                    columns: busquedaFiliacionColumns,
+                    language: {
+                        "sProcessing": "Procesando...",
+                        "sLengthMenu": "Mostrar _MENU_ registros",
+                        "sZeroRecords": "No se encontraron resultados",
+                        "sEmptyTable": "Ningún dato disponible en esta tabla",
+                        "sInfo": "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                        "sInfoEmpty": "Mostrando registros del 0 al 0 de un total de 0 registros",
+                        "sInfoFiltered": "(filtrado de un total de _MAX_ registros)",
+                        "sSearch": "Buscar:",
+                        "sLoadingRecords": "Cargando...",
+                        "oPaginate": {
+                            "sFirst": "Primero",
+                            "sLast": "Último",
+                            "sNext": "Siguiente",
+                            "sPrevious": "Anterior"
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    function AgregarFiliacion(clave_persona) {
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("AddFiliacionDelito", "FichaObjetivo")', // ⬅️ método en FiliacionController
+            data: {
+                int_id_ficha_objetivo: $('#int_id_ficha_objetivo').val(),
+                clave_persona: clave_persona
+            },
+            success: function (data) {
+                if (data.IsSuccess) {
+                    swal({
+                        title: "",
+                        text: data.Message,
+                        type: 'success',
+                        confirmButtonText: "Continuar",
+                        closeOnConfirm: true,
+                    }, function (isConfirm) {
+                        if (isConfirm) {
+                            swal.close();
+                            refreshFiliacionAgregadaList(); // ⬅️ refresca la tabla de filiaciones agregadas
+                        }
+                    });
+                } else {
+                    swal({
+                        title: "Error",
+                        text: data.Message,
+                        type: 'error'
+                    });
+                }
+            }
+        });
+    }
+
+</script>

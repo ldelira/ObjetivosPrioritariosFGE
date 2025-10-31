@@ -1,0 +1,119 @@
+﻿<div class="modal" id="modalAddObjetivoGrupo" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Agregar Grupo al Objetivo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+
+                <div class="row mb-2">
+                    <div class="col-sm-4 col-md-4"><label class="control-label">Grupo Delictivo:</label></div>
+                    <div class="col-sm-8 col-md-8">
+                        <select class="form-control" id="ddlGrupoDelictivo"></select>
+                    </div>
+                </div>
+
+                <div class="row mb-2">
+                    <div class="col-sm-4 col-md-4"><label class="control-label">Fecha Ingreso:</label></div>
+                    <div class="col-sm-8 col-md-8">
+                        <input type="date" class="form-control" id="txtFechaIngreso" />
+                    </div>
+                </div>
+
+                <div class="row mb-2">
+                    <div class="col-sm-4 col-md-4"><label class="control-label">Fecha Salida:</label></div>
+                    <div class="col-sm-8 col-md-8">
+                        <input type="date" class="form-control" id="txtFechaSalida" />
+                    </div>
+                </div>
+
+                <div class="row mb-2">
+                    <div class="col-sm-4 col-md-4"><label class="control-label">Observaciones:</label></div>
+                    <div class="col-sm-8 col-md-8">
+                        <textarea class="form-control" id="txtObservaciones" rows="3"></textarea>
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="closeModal">CERRAR</button>
+                <button type="button" class="btn btn-primary" id="btnSaveGrupo">GUARDAR</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#modalAddObjetivoGrupo").modal("show");
+
+        // 🔹 Cargar lista de grupos delictivos en el dropdown
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("GetGrupoDelictivoNotinObjetivoList", "Objetivo")', // este método debe existir
+            data: { int_id_objetivo: $("#int_id_objetivo").val()},
+            success: function (data) {
+                $("#ddlGrupoDelictivo").empty();
+                data.forEach(function (item) {
+                    $("#ddlGrupoDelictivo").append(
+                        `<option value="${item.int_id_grupo}">${item.nvarchar_alias}</option>`
+                    );
+                });
+            }
+        });
+
+        // 🔹 Guardar nuevo registro
+        $("#btnSaveGrupo").click(function () {
+
+            if ($("#ddlGrupoDelictivo").val() == null || $("#ddlGrupoDelictivo").val() == undefined) {
+                swal({
+                    title: "Error",
+                    text: "Selecciona un Grupo Delictivo",
+                    type: 'error',
+                    confirmButtonText: "Continuar",
+                    closeOnConfirm: true,
+                });
+            }
+            else {
+
+                var datas = {
+                    int_id_objetivo: $("#int_id_objetivo").val(),
+                    int_id_grupo: $("#ddlGrupoDelictivo").val(),
+                    date_fecha_ingreso: $("#txtFechaIngreso").val(),
+                    date_fecha_salida: $("#txtFechaSalida").val(),
+                    nvarchar_observaciones: $("#txtObservaciones").val()
+                };
+
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Action("AddObjetivoGrupo", "Objetivo")',
+                    data: datas,
+                    success: function (data) {
+                        if (data.IsSuccess) {
+                            swal({
+                                title: "",
+                                text: data.Message,
+                                type: 'success',
+                                confirmButtonText: "Continuar",
+                                closeOnConfirm: true,
+                            },
+                                function () {
+                                    $('#closeModal').trigger('click');
+                                    refreshGrupoList(); // refresca la tabla
+                                });
+                        } else {
+                            swal({
+                                title: "Error",
+                                text: data.Message || "No tienes permisos para esta acción",
+                                type: 'error',
+                                confirmButtonText: "Continuar",
+                                closeOnConfirm: true,
+                            });
+                        }
+                    }
+                });
+            }
+        });
+    });
+</script>

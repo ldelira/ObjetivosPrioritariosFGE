@@ -1,0 +1,168 @@
+﻿<div class="row">
+    <div class="col-md-2">
+        <label class="control-label">Estado:</label>
+    </div>
+    <div class="col-md-4">
+        <select class="form-control" id="estadoCarpetaObjetivo">
+            <option value="1" id="1" @((bool)ViewBag.Actives ? "selected" : "")>Activo</option>
+            <option value="0" id="0" @(!(bool)ViewBag.Actives ? "selected" : "")>Inactivo</option>
+        </select>
+    </div>
+
+</div>
+
+<br />
+
+<div class="row">
+    <table id="listaCarpetasAgregadasDataTable" class="dataTable table table-striped" style="width:100%"></table>
+</div>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        FillGridListaCarpetaObjetivo();
+    });
+
+    $("#estadoCarpetaObjetivo").change(function () {
+        var valor = $("#estadoCarpetaObjetivo").val();
+        if (valor == "1") {
+            refreshCarpetasAgregadasList(true);
+        } else {
+            refreshCarpetasAgregadasList(false);
+        }
+    });
+
+    var carpetaObjetivoColumns = [
+        {
+            title: "ID",
+            data: "int_id_carpeta_objetivo",
+            visible: false
+        },
+        {
+            title: "Número de Carpeta",
+            data: "numavp",
+            orderable: true
+        },
+        {
+            title: "Delito",
+            data: "Delito",
+            orderable: true
+        },
+        {
+            title: "Obs",
+            data: "nvarchar_observacion",
+            orderable: true
+        },
+        {
+            title: "Acciones",
+            data: "int_id_carpeta_objetivo", render: function (data, type, full, meta) {
+                var action;
+                if ('@ViewBag.Actives'.toUpperCase() == 'TRUE') {
+                    action = [
+                        { divId: 'div_DisableCarpetaObjetivo_' + data, data: data, functionToExec: 'DisableCarpetaObjetivo', toolTip: 'Desactivar', icon: 'fa fa-trash' },
+                    ];
+                }
+                else {
+                    action = [
+                        { divId: 'div_ActivateCarpetaObjetivo_' + data, data: data, functionToExec: 'ActivateCarpetaObjetivo', toolTip: 'Activar', icon: 'fa fa-power-off' }
+                    ];
+                }
+                return AddActionsToGrid(action);
+            }
+        }
+    ];
+
+    function FillGridListaCarpetaObjetivo() {
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("FillBusquedaCarpetasRelacionadasList", "FichaObjetivo")',
+            data: { active: @Json.Encode(ViewBag.Actives), int_id_ficha_objetivo: $("#int_id_ficha_objetivo").val() },
+            success: function (data) {
+                $('#listaCarpetasAgregadasDataTable').DataTable({
+                    destroy: true,
+                    searching: true,
+                    responsive: true,
+                    scrollX: true,
+                    data: data,
+                    columns: carpetaObjetivoColumns,
+                    language: {
+                        "sProcessing": "Procesando...",
+                        "sLengthMenu": "Mostrar _MENU_ registros",
+                        "sZeroRecords": "No se encontraron resultados",
+                        "sEmptyTable": "Ningún dato disponible en esta tabla",
+                        "sInfo": "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                        "sInfoEmpty": "Mostrando registros del 0 al 0 de un total de 0 registros",
+                        "sInfoFiltered": "(filtrado de un total de _MAX_ registros)",
+                        "sSearch": "Buscar:",
+                        "sLoadingRecords": "Cargando...",
+                        "oPaginate": {
+                            "sFirst": "Primero",
+                            "sLast": "Último",
+                            "sNext": "Siguiente",
+                            "sPrevious": "Anterior"
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    function DisableCarpetaObjetivo(id) {
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("DisableCarpetaObjetivo", "FichaObjetivo")',
+            data: { int_id_carpeta_objetivo: id },
+            success: function (data) {
+                if (data.IsSuccess) {
+                    swal({
+                        title: "",
+                        text: data.Message,
+                        type: 'success',
+                        confirmButtonText: "Continuar",
+                        closeOnConfirm: true,
+                    }, function (isConfirm) {
+                        if (isConfirm) {
+                            swal.close();
+                            refreshCarpetasAgregadasList();
+                        }
+                    });
+                } else {
+                    swal({
+                        title: "Error",
+                        text: "No tienes permisos para esta acción.",
+                        type: 'error'
+                    });
+                }
+            }
+        });
+    }
+
+    function ActivateCarpetaObjetivo(id) {
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("ActivateCarpetaObjetivo", "FichaObjetivo")',
+            data: { int_id_carpeta_objetivo: id },
+            success: function (data) {
+                if (data.IsSuccess) {
+                    swal({
+                        title: "",
+                        text: data.Message,
+                        type: 'success',
+                        confirmButtonText: "Continuar",
+                        closeOnConfirm: true,
+                    }, function () {
+                        swal.close();
+                        refreshCarpetasAgregadasList();
+                    });
+                } else {
+                    swal({
+                        title: "Error",
+                        text: "No tienes permisos para esta acción.",
+                        type: 'error'
+                    });
+                }
+            }
+        });
+    }
+
+</script>

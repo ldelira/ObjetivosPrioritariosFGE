@@ -1,0 +1,158 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="Mandamientos_JudicialesModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <Function Name="SP_ObjPri_getListinfogeneral" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="nombre" Type="nvarchar" Mode="In" />
+          <Parameter Name="paterno" Type="nvarchar" Mode="In" />
+          <Parameter Name="materno" Type="nvarchar" Mode="In" />
+        </Function>
+        <Function Name="sp_ObjPri_getObjetivoInfo" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="movimiento" Type="int" Mode="In" />
+          <Parameter Name="nombre" Type="nvarchar" Mode="In" />
+          <Parameter Name="paterno" Type="nvarchar" Mode="In" />
+          <Parameter Name="materno" Type="nvarchar" Mode="In" />
+          <Parameter Name="numavp" Type="nvarchar" Mode="In" />
+          <Parameter Name="id_mandamiento" Type="int" Mode="In" />
+        </Function>
+        <EntityContainer Name="Mandamientos_JudicialesModelStoreContainer" />
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="Mandamientos_JudicialesModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityContainer Name="Mandamientos_JudicialesEntities" annotation:LazyLoadingEnabled="true" >
+          <FunctionImport Name="sp_ObjPri_getObjetivoInfo" ReturnType="Collection(Mandamientos_JudicialesModel.sp_ObjPri_getObjetivoInfo_Result)">
+            <Parameter Name="movimiento" Mode="In" Type="Int32" />
+            <Parameter Name="nombre" Mode="In" Type="String" />
+            <Parameter Name="paterno" Mode="In" Type="String" />
+            <Parameter Name="materno" Mode="In" Type="String" />
+            <Parameter Name="numavp" Mode="In" Type="String" />
+            <Parameter Name="id_mandamiento" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="SP_ObjPri_getListinfogeneral" ReturnType="Collection(Mandamientos_JudicialesModel.SP_ObjPri_getListinfogeneral_Result)">
+            <Parameter Name="nombre" Mode="In" Type="String" />
+            <Parameter Name="paterno" Mode="In" Type="String" />
+            <Parameter Name="materno" Mode="In" Type="String" />
+          </FunctionImport>
+        </EntityContainer>
+        <ComplexType Name="sp_ObjPri_getObjetivoInfo_Result">
+          <Property Type="Int32" Name="id" Nullable="false" />
+          <Property Type="String" Name="numero_control" Nullable="false" MaxLength="12" />
+          <Property Type="String" Name="numero_expediente_juzgado" Nullable="false" MaxLength="12" />
+          <Property Type="String" Name="numero_expediente" Nullable="false" MaxLength="50" />
+          <Property Type="String" Name="nombre" Nullable="false" MaxLength="60" />
+          <Property Type="String" Name="paterno" Nullable="false" MaxLength="50" />
+          <Property Type="String" Name="materno" Nullable="true" MaxLength="50" />
+          <Property Type="Int32" Name="principal" Nullable="false" />
+          <Property Type="Int32" Name="id_estado_proceso" Nullable="true" />
+          <Property Type="String" Name="tipo" Nullable="false" MaxLength="50" />
+          <Property Type="DateTime" Name="fecha_estatus_mandamiento" Nullable="true" Precision="23" />
+          <Property Type="Int32" Name="id_delito" Nullable="false" />
+          <Property Type="String" Name="delito" Nullable="true" MaxLength="200" />
+          <Property Type="Int32" Name="delito_principal" Nullable="true" />
+        </ComplexType>
+        <ComplexType Name="SP_ObjPri_getListinfogeneral_Result">
+          <Property Type="Int32" Name="CLAVE_PERSO" Nullable="false" />
+          <Property Type="Int32" Name="id" Nullable="true" />
+          <Property Type="String" Name="id_concat" Nullable="true" MaxLength="8000" />
+          <Property Type="String" Name="nombre" Nullable="true" MaxLength="4000" />
+          <Property Type="String" Name="paterno" Nullable="true" MaxLength="4000" />
+          <Property Type="String" Name="materno" Nullable="true" MaxLength="4000" />
+          <Property Type="String" Name="alias" Nullable="true" MaxLength="4000" />
+          <Property Type="Int32" Name="Cla_Calle" Nullable="true" />
+          <Property Type="String" Name="Cla_Calle_concat" Nullable="true" MaxLength="8000" />
+          <Property Type="String" Name="Calle" Nullable="true" MaxLength="4000" />
+          <Property Type="String" Name="Num_Casa" Nullable="true" MaxLength="4000" />
+          <Property Type="Int32" Name="Cve_mun" Nullable="true" />
+          <Property Type="String" Name="Cve_mun_concat" Nullable="true" MaxLength="8000" />
+          <Property Type="String" Name="Municipio" Nullable="true" MaxLength="4000" />
+          <Property Type="Decimal" Name="Cve_col" Nullable="true" Precision="18" Scale="0" />
+          <Property Type="String" Name="Cve_col_concat" Nullable="true" MaxLength="8000" />
+          <Property Type="String" Name="Colonia" Nullable="true" MaxLength="4000" />
+          <Property Type="String" Name="Cve_Edo" Nullable="true" MaxLength="4" />
+          <Property Type="String" Name="Cve_Edo_concat" Nullable="true" MaxLength="8000" />
+          <Property Type="String" Name="Estado" Nullable="true" MaxLength="4000" />
+          <Property Type="DateTime" Name="Fec_Captu" Nullable="true" Precision="16" />
+          <Property Type="String" Name="Fec_Captu_concat" Nullable="true" MaxLength="8000" />
+        </ComplexType>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="Mandamientos_JudicialesModelStoreContainer" CdmEntityContainer="Mandamientos_JudicialesEntities" >
+          <FunctionImportMapping FunctionImportName="sp_ObjPri_getObjetivoInfo" FunctionName="Mandamientos_JudicialesModel.Store.sp_ObjPri_getObjetivoInfo">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="Mandamientos_JudicialesModel.sp_ObjPri_getObjetivoInfo_Result">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="numero_control" ColumnName="numero_control" />
+                <ScalarProperty Name="numero_expediente_juzgado" ColumnName="numero_expediente_juzgado" />
+                <ScalarProperty Name="numero_expediente" ColumnName="numero_expediente" />
+                <ScalarProperty Name="nombre" ColumnName="nombre" />
+                <ScalarProperty Name="paterno" ColumnName="paterno" />
+                <ScalarProperty Name="materno" ColumnName="materno" />
+                <ScalarProperty Name="principal" ColumnName="principal" />
+                <ScalarProperty Name="id_estado_proceso" ColumnName="id_estado_proceso" />
+                <ScalarProperty Name="tipo" ColumnName="tipo" />
+                <ScalarProperty Name="fecha_estatus_mandamiento" ColumnName="fecha_estatus_mandamiento" />
+                <ScalarProperty Name="id_delito" ColumnName="id_delito" />
+                <ScalarProperty Name="delito" ColumnName="delito" />
+                <ScalarProperty Name="delito_principal" ColumnName="delito_principal" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="SP_ObjPri_getListinfogeneral" FunctionName="Mandamientos_JudicialesModel.Store.SP_ObjPri_getListinfogeneral">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="Mandamientos_JudicialesModel.SP_ObjPri_getListinfogeneral_Result">
+                <ScalarProperty Name="CLAVE_PERSO" ColumnName="CLAVE_PERSO" />
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="id_concat" ColumnName="id_concat" />
+                <ScalarProperty Name="nombre" ColumnName="nombre" />
+                <ScalarProperty Name="paterno" ColumnName="paterno" />
+                <ScalarProperty Name="materno" ColumnName="materno" />
+                <ScalarProperty Name="alias" ColumnName="alias" />
+                <ScalarProperty Name="Cla_Calle" ColumnName="Cla_Calle" />
+                <ScalarProperty Name="Cla_Calle_concat" ColumnName="Cla_Calle_concat" />
+                <ScalarProperty Name="Calle" ColumnName="Calle" />
+                <ScalarProperty Name="Num_Casa" ColumnName="Num_Casa" />
+                <ScalarProperty Name="Cve_mun" ColumnName="Cve_mun" />
+                <ScalarProperty Name="Cve_mun_concat" ColumnName="Cve_mun_concat" />
+                <ScalarProperty Name="Municipio" ColumnName="Municipio" />
+                <ScalarProperty Name="Cve_col" ColumnName="Cve_col" />
+                <ScalarProperty Name="Cve_col_concat" ColumnName="Cve_col_concat" />
+                <ScalarProperty Name="Colonia" ColumnName="Colonia" />
+                <ScalarProperty Name="Cve_Edo" ColumnName="Cve_Edo" />
+                <ScalarProperty Name="Cve_Edo_concat" ColumnName="Cve_Edo_concat" />
+                <ScalarProperty Name="Estado" ColumnName="Estado" />
+                <ScalarProperty Name="Fec_Captu" ColumnName="Fec_Captu" />
+                <ScalarProperty Name="Fec_Captu_concat" ColumnName="Fec_Captu_concat" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="false" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="Ninguno" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

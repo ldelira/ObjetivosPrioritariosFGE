@@ -1,0 +1,353 @@
+/*
+wedding template
+*/
+@import "https://fonts.googleapis.com/css?family=Raleway:200,300,400,600,700";
+body {
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 25px;
+  color: #7a7a7a;
+  font-family: 'Raleway', sans-serif; }
+
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 0px;
+  color: #000; }
+
+.footer {
+  padding: 50px 0;
+  background-color: #060c17; }
+
+.footer p {
+  color: #647188; }
+
+.footer h3 {
+  text-transform: uppercase;
+  font-weight: 700;
+  margin-bottom: 20px;
+  font-size: 18px;
+  color: #fff; }
+
+.footer ul.f-nav li a {
+  display: block;
+  color: #fff; }
+
+.footer ul.f-nav li a:before {
+  content: "\f101";
+  font-family: 'FontAwesome';
+  margin-right: 6px; }
+
+.news-list li img {
+  border-radius: 5px;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.5);
+  float: left;
+  margin-right: 15px; }
+
+.news-list h5 {
+  margin: 0px;
+  font-weight: 700;
+  margin-bottom: 5px; }
+
+.news-list p {
+  margin-bottom: 0px;
+  font-size: 14px;
+  line-height: 16px; }
+
+.news-list span {
+  font-size: 12px;
+  color: #333f55; }
+
+.news-list li {
+  padding-bottom: 20px; }
+
+.footer-bottom {
+  padding: 20px 0;
+  background-color: #fff;
+  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.5); }
+
+.footer-bottom ul {
+  margin: 0;
+  padding: 0; }
+
+.footer-bottom ul li a {
+  color: #999;
+  font-size: 20px; }
+
+.footer-bottom ul li a:hover {
+  color: #333f55; }
+
+.footer .col-md-3 {
+  margin-bottom: 30px; }
+
+.footer form {
+  position: relative;
+  margin-bottom: 20px; }
+
+.footer form button {
+  position: absolute;
+  right: 0;
+  top: 0;
+  border: 0px;
+  background-color: #e8ca00;
+  height: 40px;
+  line-height: 40px;
+  padding: 0px 20px;
+  color: #000;
+  font-size: 14px; }
+
+.footer .form-control {
+  border-radius: 0px;
+  height: 40px;
+  box-shadow: none;
+  border: 0px; }
+
+.header {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  padding: 10px 0;
+  background: transparent;
+  z-index: 999; }
+
+.banner {
+  position: relative;
+  overflow: hidden; }
+  .banner .banner-overlay {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%; }
+
+.table-display {
+  display: table;
+  width: 100%;
+  height: 100%;
+  position: relative; }
+  .table-display .v-middle {
+    width: 100%;
+    display: table-cell;
+    vertical-align: middle; }
+
+.banner-text {
+  text-align: center; }
+  .banner-text h1 {
+    text-transform: uppercase;
+    font-weight: 200;
+    font-size: 120px;
+    line-height: 120px;
+    color: #fff;
+    text-shadow: 1px 2px #333; }
+  .banner-text p {
+    font-size: 20px;
+    color: #fff; }
+
+.our-story {
+  padding: 90px 0;
+  background-image: url(../images/wedding/bg-bubbles.png);
+  background-repeat: no-repeat;
+  background-position: 50% 0%;
+  background-color: #fff; }
+  .our-story a {
+    color: #ed1c24;
+    font-weight: 600;
+    text-transform: capitalize; }
+  .our-story h1 {
+    margin-bottom: 50px; }
+
+.reminder {
+  background: url(../images/wedding/bg2.jpg) no-repeat;
+  background-size: cover;
+  padding: 90px 0; }
+  .reminder h4 {
+    font-weight: 700;
+    color: #fff;
+    margin: 30px 0; }
+  .reminder h1 {
+    color: #fff;
+    font-weight: 300;
+    margin-top: 0px; }
+
+.gift-registry {
+  padding: 90px 0; }
+  .gift-registry h1 {
+    font-weight: 300;
+    text-transform: capitalize;
+    font-size: 50px;
+    line-height: 50px;
+    margin-top: 0px;
+    color: #000; }
+    .gift-registry h1 span {
+      color: #ed1c24; }
+  .gift-registry p {
+    margin-bottom: 50px; }
+  .gift-registry ul li img {
+    display: block;
+    margin: 10px auto; }
+
+.rsvp {
+  padding: 90px 0;
+  background: url(../images/wedding/bg3.jpg) no-repeat; }
+  .rsvp h1, .rsvp p {
+    color: #fff; }
+  .rsvp p {
+    margin-bottom: 50px; }
+  .rsvp h1 {
+    font-size: 50px; }
+  .rsvp form {
+    position: relative;
+    max-width: 500px;
+    margin: 0 auto; }
+    .rsvp form .form-control {
+      border: 0px;
+      box-shadow: none;
+      height: 50px;
+      border-radius: 100px;
+      padding-left: 30px; }
+    .rsvp form i {
+      position: absolute;
+      top: 18px;
+      right: 19px; }
+
+.work-box {
+  position: relative;
+  display: block;
+  overflow: hidden; }
+  .work-box .work-overlay {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(237, 28, 36, 0.85);
+    transition: all 0.3s;
+    -webkit-transition: all 0.3s;
+    -moz-transition: all 0.3s;
+    -o-transition: all 0.3s;
+    -ms-transition: all 0.3s;
+    opacity: 0; }
+    .work-box .work-overlay span {
+      display: block;
+      background-image: url(../images/wedding/plus.png);
+      background-repeat: no-repeat;
+      width: 108px;
+      height: 100px;
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      margin-left: -50px;
+      margin-top: -54px;
+      z-index: 1; }
+  .work-box:hover .work-overlay {
+    opacity: 1; }
+
+.gallery .container-fluid, .gallery .col-sm-3 {
+  padding: 0px; }
+.gallery .row {
+  margin: 0px; }
+
+.event-detail {
+  padding: 90px 0; }
+  .event-detail h1 {
+    font-weight: 300;
+    text-transform: capitalize;
+    font-size: 50px;
+    line-height: 50px;
+    margin-top: 0px;
+    color: #000; }
+    .event-detail h1 span {
+      color: #ed1c24; }
+
+.event-box {
+  position: relative;
+  background: #ebebeb;
+  margin: 9px 0;
+  margin-top: 50px; }
+  .event-box:before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: -8px;
+    width: 100%;
+    height: 9px;
+    background: url(../images/wedding/top.png) no-repeat;
+    background-size: contain; }
+  .event-box:after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -8px;
+    width: 100%;
+    height: 9px;
+    background: url(../images/wedding/bot.png) no-repeat;
+    background-size: contain; }
+  .event-box .event-content {
+    position: absolute;
+    height: 100%;
+    width: 30%;
+    top: 0;
+    right: 0;
+    padding: 10px 30px; }
+    .event-box .event-content h3 {
+      font-weight: 700;
+      color: #363636; }
+  .event-box .img-responsive {
+    width: 70%; }
+
+.btn-danger {
+  background: #ed1c24; }
+
+.btn {
+  border: 0px;
+  text-transform: uppercase;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 12px 20px; }
+
+.event-box.right .img-responsive {
+  float: right; }
+.event-box.right .event-content {
+  right: auto;
+  left: 0; }
+
+.top-search {
+  width: 250px;
+  padding: 10px 15px;
+  right: 0;
+  left: auto; }
+
+.right-menu-icons .dropdown {
+  display: inline-block; }
+.right-menu-icons a {
+  display: block;
+  padding: 15px;
+  color: #fff;
+  float: left;
+  cursor: pointer; }
+
+.navmenu-nav > li > a {
+  color: #363636;
+  text-transform: uppercase;
+  font-size: 12px;
+  font-weight: 600; }
+.ms-slide .ms-layer, .ms-fixed-layers .ms-layer {
+    position: absolute;
+    pointer-events: auto;
+}
+.text-title {
+    font-weight: 900;
+    color: #fff;
+    text-transform: uppercase;
+    font-size: 130px;
+    line-height: 130px;
+    text-shadow: 4px 4px rgba(0, 0, 0, 0.1);
+}
+.text-text {
+    font-size: 18px;
+    font-weight: 400;
+    color: #fff;
+}
+.full-width {
+    width: 100%;
+}
+/*# sourceMappingURL=style-wedding.css.map */

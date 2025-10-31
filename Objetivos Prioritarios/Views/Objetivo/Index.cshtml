@@ -1,0 +1,28 @@
+﻿
+@{
+    ViewBag.Title = "OBJETIVOS PRIORITARIOS";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+
+<div id="objetivosList"></div>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        refresobjetivosList();
+
+
+    });
+
+    function refresobjetivosList(active) {
+        var datos = {
+            actives: active
+        };
+        $("#objetivosList").empty();
+        $("#objetivosList").load("@Url.Action("ObjetivosListPartial", "Objetivo")",datos);
+    }
+</script>
+

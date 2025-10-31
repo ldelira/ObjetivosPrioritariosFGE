@@ -1,0 +1,216 @@
+﻿@model List<Objetivos_Prioritarios.Models.tb_AsuntoRelacionado>
+
+<div class="main-panel">
+    <div class="content-wrapper">
+
+        <div class="row">
+            <div class="col-md-12 stretch-card grid-margin ">
+                <div class="card">
+                    <div class="card-body card-fixed">
+                        <p class="card-title">Listado de Asuntos Relacionados</p>
+                        <div class="row">
+                            <div class="col-md-1">
+                                <label class="control-label">Estados:</label>
+                            </div>
+                            <div class="col-md-2">
+                                <select class="form-control" id="estadoAsuntos">
+                                    <option value="1" id="1" @((bool)ViewBag.Actives ? "selected" : "")>Activo</option>
+                                    <option value="0" id="0" @(!(bool)ViewBag.Actives ? "selected" : "")>Inactivo</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2"></div>
+                            <div class="col-md-7" style="text-align:right">
+                                <button type="button" class="btn btn-primary"
+                                        onclick="AddEditAsunto()">
+                                    Agregar Asunto
+                                </button>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="table-responsive ">
+                                    <table id="asuntosDataTable" class="dataTable table table-striped" style="width:100%">
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<!-- main-panel ends -->
+
+<script>
+    $(document).ready(function () {
+        FillAsuntosGrid();
+    });
+
+    $("#estadoAsuntos").change(function () {
+        var valor = $("#estadoAsuntos").val();
+        if (valor == "1") {
+            refresAsuntosList(true);
+        } else {
+            refresAsuntosList(false);
+        }
+    });
+
+    var columnAsuntos = [
+        {
+            title: "Id",
+            data: "int_id_asunto_relacionado",
+            orderable: true,
+            IsFiltered: false
+        },
+        {
+            title: "Alias",
+            data: "nvarchar_alias",
+            orderable: true,
+            IsFiltered: false
+        },
+        {
+            title: "Descripción",
+            data: "nvarchar_descripcion",
+            orderable: true,
+            IsFiltered: false
+        },
+        {
+            title: "Fecha Asunto",
+            data: "date_fecha_asunto",
+            render: $.fn.dataTable.render.moment(undefined, 'DD-MM-YYYY', 'en'),
+            orderable: true,
+            IsFiltered: false
+        },
+        {
+            title: "Num AVP",
+            data: "numavp",
+            orderable: true,
+            IsFiltered: false
+        },
+        {
+            title: "Acciones",
+            data: "int_id_asunto_relacionado",
+            render: function (data, type, full, meta) {
+                var action;
+                if ('@ViewBag.Actives'.toUpperCase() == 'TRUE') {
+                    action = [
+                        { divId: 'div_EditAsunto_' + data, data: data, functionToExec: 'AddEditAsunto', toolTip: 'Editar Asunto', icon: 'fa fa-eye' },
+                        { divId: 'div_InactivateAsunto_' + data, data: data, functionToExec: 'DisableAsunto', toolTip: 'Desactivar Asunto', icon: 'fa fa-trash' }
+                    ];
+                } else {
+                    action = [
+                        { divId: 'div_InactivateAsunto_' + data, data: data, functionToExec: 'ActivateAsunto', toolTip: 'Activar Asunto', icon: 'fa fa-power-off' },
+                    ];
+                }
+
+                return AddActionsToGrid(action);
+            }
+        }
+    ];
+
+    function FillAsuntosGrid(estado = null) {
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("FillAsuntosList", "Asuntos")',
+            data: { active: @Json.Encode(ViewBag.Actives) },
+            success: function (data) {
+                if ($.fn.dataTable.isDataTable('#asuntosDataTable')) {
+                    $('#asuntosDataTable').DataTable().clear().destroy();
+                }
+                var table = $('#asuntosDataTable').DataTable({
+                    searching: true,
+                    responsive: true,
+                    scrollX: true,
+                    data: data,
+                    columns: columnAsuntos,
+                    language: {
+                        "sProcessing": "Procesando...",
+                        "sLengthMenu": "Mostrar _MENU_ registros",
+                        "sZeroRecords": "No se encontraron resultados",
+                        "sEmptyTable": "Ningún dato disponible en esta tabla",
+                        "sInfo": "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                        "sInfoEmpty": "Mostrando registros del 0 al 0 de un total de 0 registros",
+                        "sInfoFiltered": "(filtrado de un total de _MAX_ registros)",
+                        "sSearch": "Buscar:",
+                        "sLoadingRecords": "Cargando...",
+                        "oPaginate": {
+                            "sFirst": "Primero",
+                            "sLast": "Último",
+                            "sNext": "Siguiente",
+                            "sPrevious": "Anterior"
+                        }
+                    },
+                    initComplete: function (oSettings) {
+                        this.api().columns().every(function () {
+                            var column = this;
+                            var nameColumn = column.header().textContent;
+                            var columnDef = oSettings.aoColumns.find(column => {
+                                return column.sTitle === nameColumn;
+                            });
+                            if (columnDef.IsFiltered) {
+                                $('<input type="text" placeholder="buscar" />')
+                                    .appendTo($(column.header()))
+                                    .on('click', function (e) { e.stopPropagation(); })
+                            }
+                            $('input', column.header()).on('keyup change clear', function () {
+                                if (column.search !== this.value) {
+                                    column
+                                        .column($(this).parent().index() + ':visible')
+                                        .search(this.value)
+                                        .draw();
+                                }
+                            });
+                        });
+                        $($.fn.dataTable.tables(true)).DataTable().columns.adjust();
+                    }
+                });
+            },
+            complete: function () { }
+        });
+    }
+
+
+
+    function AddEditAsunto(int_id_asunto_relacionado) {
+        location.href = '@Url.Action("AddEditAsuntos","Asuntos")?int_id_asunto_relacionado=' + int_id_asunto_relacionado;
+    }
+
+    function DisableAsunto(id) {
+        debugger;
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("DisableAsunto", "Asuntos")',
+            data: { id: id },
+            success: function (data) {
+                if (data.IsSuccess) {
+                    swal({ title: "", text: data.Message, type: 'success', confirmButtonText: "Continuar", closeOnConfirm: true },
+                        function () { swal.close(); refresAsuntosList(); });
+                } else {
+                    swal({ title: "Error", text: data.Message || "No tienes permisos para esta acción. Contacta al administrador.", type: 'error', confirmButtonText: "Continuar", closeOnConfirm: true },
+                        function () { window.location.href = '@Url.Action("Index", "Asuntos")'; });
+                }
+            }
+        });
+    }
+
+    function ActivateAsunto(id) {
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("ActivateAsunto", "Asuntos")',
+            data: { id: id },
+            success: function (data) {
+                if (data.IsSuccess) {
+                    swal({ title: "", text: data.Message, type: 'success', confirmButtonText: "Continuar", closeOnConfirm: true },
+                        function () { swal.close(); refresAsuntosList(); });
+                } else {
+                    swal({ title: "Error", text: data.Message || "No tienes permisos para esta acción. Contacta al administrador.", type: 'error', confirmButtonText: "Continuar", closeOnConfirm: true },
+                        function () { window.location.href = '@Url.Action("Index", "Asuntos")'; });
+                }
+            }
+        });
+    }
+
+</script>

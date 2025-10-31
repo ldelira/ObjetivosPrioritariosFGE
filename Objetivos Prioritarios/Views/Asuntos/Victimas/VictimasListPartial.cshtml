@@ -1,0 +1,97 @@
+﻿@model List<Objetivos_Prioritarios.Models.getListVictimasByNombre_Result>
+
+@if (Model == null || !Model.Any())
+{
+    <div class="alert alert-secondary text-center">No hay información de víctimas.</div>
+}
+else
+{
+    if (Model.Count > 0)
+    {
+        <table class="table table-bordered table-sm align-middle" id="tblVictima">
+            <thead class="table-light">
+                <tr>
+                    <th>Nombre Victima</th>
+                    <th>Foto</th>
+
+                    <th style="width:90px;">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.NombreCompleto</td>
+                        <td><img src="data:image/jpeg;base64,@item.nvarchar_foto" class="img-thumbnail" style="width:60px;height:60px;object-fit:cover;"></td>
+
+                        <td class="text-center">
+                            @if (ViewBag.opcion == 1)
+                            {
+                                <button class="btn btn-success btn-sm" onclick="agregarVictimaSeleccionado(@item.int_id_victima)">
+                                    <i class="fa fa-check"></i>
+                                </button>
+                            }
+                            else
+                            {
+
+
+                                if (ViewBag.active)
+                                {
+                                    <button class="btn btn-primary btn-sm" onclick="abrirModalVictima(@item.int_id_victima)">
+                                        <i class="fa fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-danger btn-sm" onclick="agregarVictimaSeleccionado(@item.int_id_victima)">
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-success btn-sm" onclick="agregarVictimaSeleccionado(@item.int_id_victima)">
+                                        <i class="fa fa-power-off"></i>
+                                    </button>
+                                }
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <div class="alert alert-secondary text-center">No hay información de víctimas.</div>
+
+    }
+}
+
+<script>
+    $(document).ready(function () {
+        if ($.fn.DataTable.isDataTable("#tblVictima")) {
+            $("#tblVictima").DataTable().destroy();
+        }
+
+        $("#tblVictima").DataTable({
+            destroy: true,
+            pageLength: 5,
+            lengthChange: false,
+            language: {
+                url: "//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json"
+            }
+        });
+    });
+
+    function agregarVictimaSeleccionado(id) {
+
+        $.post("@Url.Action("addVictimaVictima", "Asuntos")", { id_asunto_relacionado: $("#int_id_asunto_relacionado").val(), id_victima: id }, function (resp) {
+            if (resp.IsSuccess) {
+                swal("", resp.Message, "success");
+                refreshVictimasRelacionadasList();
+            } else {
+                swal("Error", resp.Message, "error");
+            }
+        });
+
+
+    }
+
+</script>

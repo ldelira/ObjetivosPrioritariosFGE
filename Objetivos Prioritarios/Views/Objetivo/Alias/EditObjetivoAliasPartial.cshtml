@@ -1,0 +1,84 @@
+﻿@model Objetivos_Prioritarios.Models.tb_AliasObjetivo
+
+<div class="modal" id="modalEditAlias" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Editar Alias del Objetivo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <input id="int_id_alias" value="@Model.int_id_alias" style="display:none" />
+                    <div class="row">
+                        <div class="col-sm-2 col-md-2"><label class="control-label">Alias: </label></div>
+                        <div class="col-sm-10 col-md-10">
+                            <input type="text" class="form-control" id="txtAlias" value="@Model.nvarchar_alias" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="closeModal">CERRAR</button>
+                <button type="button" class="btn btn-primary" id="btnSave">GUARDAR</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#modalEditAlias").modal("show");
+
+        $("#btnSave").click(function () {
+            var datas = {
+                int_id_alias: $('#int_id_alias').val(),
+                nvarchar_alias: $("#txtAlias").val(),
+                int_id_objetivo: $("#int_id_objetivo").val()
+            };
+
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("EditObjetivoAlias", "Objetivo")',
+                data: datas,
+                success: function (data) {
+                    if (data.IsSuccess) {
+                        swal({
+                            title: "",
+                            text: data.Message,
+                            type: 'success',
+                            showCancelButton: false,
+                            confirmButtonText: "Continuar",
+                            closeOnConfirm: true,
+                        },
+                        function (isConfirm) {
+                            $('#closeModal').trigger('click');
+                            refreshAliasList();
+                        });
+                    }
+                    if (data.IsSuccess == undefined) {
+                        swal({
+                            title: "Error",
+                            text: "No tienes permisos para llevar a cabo esta acción. Favor de contactar al administrador",
+                            type: 'error',
+                            showCancelButton: false,
+                            confirmButtonText: "Continuar",
+                            closeOnConfirm: true,
+                                                        },
+                                function (isConfirm) {
+                                    if (isConfirm) {
+                                        swal.close();
+                                    }
+                                });
+                      }
+                  },
+                  complete: function () {
+                  }
+              });
+
+        });
+
+
+    });
+</script>
+

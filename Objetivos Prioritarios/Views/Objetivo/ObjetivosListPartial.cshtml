@@ -1,0 +1,316 @@
+﻿@model List<Objetivos_Prioritarios.Models.tb_Objetivo>
+
+
+
+
+<div class="main-panel">
+    <div class="content-wrapper">
+
+        <div class="row">
+            <div class="col-md-12 stretch-card grid-margin ">
+                <div class="card" >
+                    <div class="card-body card-fixed">
+                        <p class="card-title">Listado de objetivos dados de alta en el sistema</p>
+                        <div class="row">
+                            <div class="col-md-1">
+                                <label class="control-label">Estados:</label>
+                            </div>
+                            <div class="col-md-2">
+                                <select class="form-control" id="estadoGeneral">
+                                    <option value="1" id="1" @((bool)ViewBag.Actives ? "selected" : "")>Activo</option>
+                                    <option value="0" id="0" @(!(bool)ViewBag.Actives ? "selected" : "")>Inactivo</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2"></div>
+                            <div class="col-md-7" style="text-align:right">
+                                <button type="button" class="btn btn-primary"
+                                        onclick="AddObjetivo()">
+                                    Agregar Objetivo Prioritario
+                                </button>
+                            </div>
+
+                        </div>
+                        <br>
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="table-responsive ">
+                                    <table id="generalDataTable" class="dataTable table table-striped" style="width:100%">
+                                    </table>
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                </div>
+
+
+            </div>
+        </div>
+
+
+
+    </div>
+ 
+</div>
+<!-- main-panel ends -->
+
+
+<script>
+    $(document).ready(function () {
+        FillGrid();
+    });
+
+    $("#estadoGeneral").change(function () {
+        var valor = $("#estadoGeneral").val();
+        if (valor == "1") {
+            refresobjetivosList(true);
+        } else {
+            refresobjetivosList(false);
+        }
+    });
+
+
+    var columnFichaInfo = [
+
+        {
+            title: "Id",
+            data: "int_id_objetivo",
+            orderable: true,
+            IsFiltered: false
+        },
+        {
+            title: "Nombres",
+            data: "Nombres",
+            orderable: true,
+            IsFiltered: false
+        },
+        {
+            title: "Alias",
+            data: "Aliases",
+            orderable: true,
+            IsFiltered: false
+        },
+        {
+            title: "GruposDelictivos",
+            data: "GruposDelictivos",
+            orderable: true,
+            IsFiltered: false
+        },
+        {
+            title: "Fecha Nacimiento",
+            data: "FechaNacimiento", render: $.fn.dataTable.render.moment(undefined, 'DD-MM-YYYY', 'en'),
+            orderable: true,
+            IsFiltered: false
+        },
+
+       
+
+        {
+            title: "Acciones",
+            data: "int_id_objetivo", render: function (data, type, full, meta) {
+                var action;
+                if ('@ViewBag.Actives'.toUpperCase() == 'TRUE') {
+                    action = [
+                        { divId: 'div_EditUser_' + data, data: data, functionToExec: 'EditObjetivo', toolTip: 'Editar Objetivo', icon: 'fa fa-eye' },
+                        { divId: 'div_InactivateUser_' + data, data: data, functionToExec: 'DisableObjetivo', toolTip: 'Desactivar Objetivo', icon: 'fa fa-trash' },
+
+
+
+                    ];
+                } else {
+                    action = [
+                        { divId: 'div_InactivateUser_' + data, data: data, functionToExec: 'ActivateObjetivo', toolTip: 'Activar Objetivo', icon: 'fa fa-power-off' },
+                    ];
+                }
+
+                return AddActionsToGrid(action);
+            }
+        }
+    ];
+
+
+    function FillGrid(estado = null) {
+
+
+
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("FillObjetivosList", "Objetivo")',
+            data: { active: @Json.Encode(ViewBag.Actives)},
+
+            success: function (data) {
+                if ($.fn.dataTable.isDataTable('#generalDataTable')) {
+                    $('#generalDataTable').DataTable().clear().destroy();
+                }
+                var table = $('#generalDataTable').DataTable({
+                    searching: true,
+                    responsive: true,
+                    scrollX: true,
+                    data: data,
+                    columns: columnFichaInfo,
+                    columnDefs: [
+                        //{
+                        //    targets: 4, // Índice de la columna "Observaciones" (0-based)
+                        //    createdCell: function (td, cellData, rowData, row, col) {
+                        //        var maxLength = 100;  // Límite de caracteres
+                        //        if (cellData.length > maxLength) {
+                        //            $(td).text(cellData.substring(0, maxLength) + '...');  // Truncar y añadir '...'
+                        //        } else {
+                        //            $(td).text(cellData);  // De lo contrario, mostrar el texto completo
+                        //        }
+                        //        $(td).addClass('col-observaciones');  // Aplica la clase de CSS
+                        //    }
+                        //}
+                        //,
+                        //{
+                        //    targets: 3, // Índice de la columna "Imputado" (0-based)
+                        //    createdCell: function (td, cellData, rowData, row, col) {
+                        //        var maxLength = 100;  // Límite de caracteres
+                        //        if (cellData.length > maxLength) {
+                        //            $(td).text(cellData.substring(0, maxLength) + '...');  // Truncar y añadir '...'
+                        //        } else {
+                        //            $(td).text(cellData);  // De lo contrario, mostrar el texto completo
+                        //        }
+                        //        $(td).addClass('col-imputado');  // Aplica la clase de CSS
+                        //    }
+                        //}
+                    ],
+                    language: {
+                        "sProcessing": "Procesando...",
+                        "sLengthMenu": "Mostrar _MENU_ registros",
+                        "sZeroRecords": "No se encontraron resultados",
+                        "sEmptyTable": "Ningún dato disponible en esta tabla",
+                        "sInfo": "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                        "sInfoEmpty": "Mostrando registros del 0 al 0 de un total de 0 registros",
+                        "sInfoFiltered": "(filtrado de un total de _MAX_ registros)",
+                        "sInfoPostFix": "",
+                        "sSearch": "Buscar:",
+                        "sUrl": "",
+                        "sInfoThousands": ",",
+                        "sLoadingRecords": "Cargando...",
+                        "oPaginate": {
+                            "sFirst": "Primero",
+                            "sLast": "Último",
+                            "sNext": "Siguiente",
+                            "sPrevious": "Anterior"
+                        },
+                        "oAria": {
+                            "sSortAscending": ": Activar para ordenar la columna de manera ascendente",
+                            "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+                        }
+                    },
+                    //buttons: [
+                    //    'copy', 'csv', 'excel', 'pdf', 'print'
+                    //],
+                @*buttons: {
+                    buttons: [
+                        {
+                            text: 'New',
+                            action: function (e, dt, node, config) {
+                                var url = '@Url.Action("AddUser", "Users", new { __RequestVerificationToken = @AntiForgeryValidator.GetTokenValidation() }, null)';
+                                window.location.href = url;
+                            },
+                            className: "green"
+                        }
+                    ],
+                    dom: {
+                        button: {
+                            tag: "button",
+                            className: "btn btn-primary"
+                        },
+                        buttonLiner: {
+                            tag: null
+                        }
+                    }
+                },*@
+                    initComplete: function (oSettings) {
+                        this.api().columns().every(function () {
+                            var column = this;
+                            var nameColumn = column.header().textContent;
+                            var columnDef = oSettings.aoColumns.find(column => {
+                                return column.sTitle === nameColumn;
+                            });
+                            if (columnDef.IsFiltered) {
+                                $('<input type="text" placeholder="buscar" />')
+                                    .appendTo($(column.header()))
+                                    .on('click', function (e) { e.stopPropagation(); })
+                            }
+                            $('input', column.header()).on('keyup change clear', function () {
+                                if (column.search !== this.value) {
+                                    column
+                                        .column($(this).parent().index() + ':visible')
+                                        .search(this.value)
+                                        .draw();
+                                }
+                            });
+                        });
+                        $($.fn.dataTable.tables(true)).DataTable().columns.adjust();
+                    }
+
+                });
+            },
+            complete: function () {
+
+            }
+        });
+    }
+
+    function AddObjetivo() {
+        swal({
+            title: "¿Estás seguro?",
+            text: "Se generara un Id y Esta acción no se puede deshacer",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Sí",
+            cancelButtonText: "No",
+            closeOnConfirm: false,
+            closeOnCancel: true
+        },
+            function (isConfirm) {
+                if (isConfirm) {
+                    location.href = '@Url.Action("AddEditObjetivos","Objetivo")';
+                } else {
+
+                }
+            });
+    }
+
+    function EditObjetivo(int_id_objetivo) {
+        location.href = '@Url.Action("AddEditObjetivos","Objetivo")?int_id_objetivo=' + int_id_objetivo;
+    }
+
+    function DisableObjetivo(id) {
+     $.ajax({
+         type: 'POST',
+         url: '@Url.Action("DisableObjetivo", "Objetivo")',
+         data: { int_id_objetivo: id },
+         success: function (data) {
+             if (data.IsSuccess) {
+                 swal({ title: "", text: data.Message, type: 'success', confirmButtonText: "Continuar", closeOnConfirm: true },
+                     function () { swal.close(); refresobjetivosList(); });
+             } else {
+                 swal({ title: "Error", text: "No tienes permisos para esta acción. Contacta al administrador.", type: 'error', confirmButtonText: "Continuar", closeOnConfirm: true },
+                     function () { window.location.href = '@Url.Action("Index", "Objetivo")'; });
+             }
+         }
+     });
+ }
+
+    function ActivateObjetivo(id) {
+     $.ajax({
+         type: 'POST',
+         url: '@Url.Action("ActivateObjetivo", "Objetivo")',
+         data: { int_id_objetivo: id },
+         success: function (data) {
+             if (data.IsSuccess) {
+                 swal({ title: "", text: data.Message, type: 'success', confirmButtonText: "Continuar", closeOnConfirm: true },
+                     function () { swal.close(); refresobjetivosList(); });
+             } else {
+                 swal({ title: "Error", text: "No tienes permisos para esta acción. Contacta al administrador.", type: 'error', confirmButtonText: "Continuar", closeOnConfirm: true },
+                     function () { window.location.href = '@Url.Action("Index", "Objetivo")'; });
+             }
+         }
+     });
+ }
+
+
+</script>

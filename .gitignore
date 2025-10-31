@@ -1,0 +1,11 @@
+bin/
+obj/
+.vs/
+*.db
+*.dll
+*.pdb
+*.user
+*.vsidx
+*.suo
+*.cache
+*.log

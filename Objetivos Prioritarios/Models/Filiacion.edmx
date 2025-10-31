@@ -1,0 +1,442 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="FiliacionModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="Nom_perso">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="NOMBRE" Type="nvarchar" MaxLength="20" Nullable="false" />
+          <Property Name="AP_PATERNO" Type="nvarchar" MaxLength="20" Nullable="false" />
+          <Property Name="AP_MATERNO" Type="nvarchar" MaxLength="20" Nullable="false" />
+          <Property Name="CLAVE_PERSO" Type="int" Nullable="false" />
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Fec_Captu" Type="smalldatetime" Nullable="false" />
+          <Property Name="rowguid" Type="uniqueidentifier" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Persona">
+          <Key>
+            <PropertyRef Name="CLAVE_PERSO" />
+          </Key>
+          <Property Name="CLAVE_PERSO" Type="int" Nullable="false" />
+          <Property Name="NUM_FICH" Type="nvarchar" MaxLength="9" Nullable="false" />
+          <Property Name="NUM_FILIA" Type="nvarchar" MaxLength="9" Nullable="false" />
+          <Property Name="CLA_CALLE" Type="int" Nullable="false" />
+          <Property Name="NUM_CASA" Type="char" MaxLength="16" Nullable="false" />
+          <Property Name="ESTATURA" Type="char" MaxLength="4" Nullable="false" />
+          <Property Name="DIES_SINIES" Type="char" MaxLength="1" Nullable="false" />
+          <Property Name="CLA_OCUPA" Type="int" Nullable="false" />
+          <Property Name="LTRABAJO" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="FEC_NAC" Type="datetime" Nullable="false" />
+          <Property Name="OBSERVA" Type="nvarchar" MaxLength="250" Nullable="false" />
+          <Property Name="PESO" Type="char" MaxLength="3" Nullable="false" />
+          <Property Name="EDAD" Type="char" MaxLength="3" Nullable="false" />
+          <Property Name="CLA_EDO" Type="char" MaxLength="3" Nullable="false" />
+          <Property Name="SEXO" Type="char" MaxLength="1" Nullable="false" />
+          <Property Name="FORMULA" Type="char" MaxLength="11" Nullable="false" />
+          <Property Name="FEC_FILI" Type="datetime" Nullable="false" />
+          <Property Name="C_PIEL" Type="int" Nullable="false" />
+          <Property Name="C_PELO" Type="int" Nullable="false" />
+          <Property Name="CARAC_PEL" Type="int" Nullable="false" />
+          <Property Name="C_OJOS" Type="int" Nullable="false" />
+          <Property Name="COMPLEXI" Type="int" Nullable="false" />
+          <Property Name="CEJAS" Type="int" Nullable="false" />
+          <Property Name="LABIOS" Type="int" Nullable="false" />
+          <Property Name="BOCA" Type="int" Nullable="false" />
+          <Property Name="NARIZ1" Type="int" Nullable="false" />
+          <Property Name="NARIZ2" Type="int" Nullable="false" />
+          <Property Name="NARIZ3" Type="int" Nullable="false" />
+          <Property Name="FRENTE" Type="int" Nullable="false" />
+          <Property Name="MENTON1" Type="int" Nullable="false" />
+          <Property Name="MENTON2" Type="int" Nullable="false" />
+          <Property Name="TIPCARA" Type="int" Nullable="false" />
+          <Property Name="ESPANAZO" Type="int" Nullable="false" />
+          <Property Name="INSEPEL" Type="int" Nullable="false" />
+          <Property Name="CALVICIE" Type="int" Nullable="false" />
+          <Property Name="NCP" Type="nvarchar" MaxLength="16" Nullable="false" />
+          <Property Name="IDECRIM" Type="nvarchar" MaxLength="15" Nullable="false" />
+          <Property Name="PAISNAC" Type="int" Nullable="false" />
+          <Property Name="MUNINAC" Type="int" Nullable="false" />
+          <Property Name="NACIONALIDAD" Type="int" Nullable="false" />
+          <Property Name="CIVIL" Type="nvarchar" MaxLength="2" Nullable="false" />
+          <Property Name="TELEFONO" Type="char" MaxLength="20" Nullable="false" />
+          <Property Name="LENTES" Type="int" Nullable="false" />
+          <Property Name="FECHANCP" Type="datetime" />
+          <Property Name="Verificador" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Ubi_Lu_Trabajo" Type="nvarchar" MaxLength="150" Nullable="false" />
+          <Property Name="Telefono_Trabajo" Type="nvarchar" MaxLength="20" Nullable="false" />
+          <Property Name="Tipo_Casa" Type="int" Nullable="false" />
+          <Property Name="Nombre_Esposa" Type="nvarchar" MaxLength="20" Nullable="false" />
+          <Property Name="Paterno_Esposa" Type="nvarchar" MaxLength="20" Nullable="false" />
+          <Property Name="Materno_Esposa" Type="nvarchar" MaxLength="20" Nullable="false" />
+          <Property Name="Nombre_Padre" Type="nvarchar" MaxLength="20" Nullable="false" />
+          <Property Name="Paterno_Padre" Type="nvarchar" MaxLength="20" Nullable="false" />
+          <Property Name="Materno_Padre" Type="nvarchar" MaxLength="20" Nullable="false" />
+          <Property Name="Vivo_Padre" Type="int" Nullable="false" />
+          <Property Name="Domicilio_Padre" Type="nvarchar" MaxLength="150" Nullable="false" />
+          <Property Name="Nombre_Madre" Type="nvarchar" MaxLength="20" Nullable="false" />
+          <Property Name="Paterno_Madre" Type="nvarchar" MaxLength="20" Nullable="false" />
+          <Property Name="Materno_Madre" Type="nvarchar" MaxLength="20" Nullable="false" />
+          <Property Name="Vivo_Madre" Type="int" Nullable="false" />
+          <Property Name="Domicilio_Madre" Type="nvarchar" MaxLength="150" Nullable="false" />
+          <Property Name="Avisar_Telefono" Type="nvarchar" MaxLength="20" Nullable="false" />
+          <Property Name="Avisar_Nombre_Persona" Type="nvarchar" MaxLength="20" Nullable="false" />
+          <Property Name="Avisar_Paterno_Persona" Type="nvarchar" MaxLength="20" Nullable="false" />
+          <Property Name="Avisar_Materno_Persona" Type="nvarchar" MaxLength="20" Nullable="false" />
+          <Property Name="Avisar_Domicilio" Type="nvarchar" MaxLength="150" Nullable="false" />
+          <Property Name="Fec_Captu" Type="smalldatetime" Nullable="false" />
+          <Property Name="rowguid" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="Cla_Calle_Anterior" Type="int" />
+          <Property Name="Cla_Calle_Nuevo" Type="int" />
+          <Property Name="Cla_Ocupa_Anterior" Type="int" />
+          <Property Name="Cla_Ocupa_Nuevo" Type="int" />
+          <Property Name="Cla_Edo_Anterior" Type="char" MaxLength="3" />
+          <Property Name="Cla_Edo_Nuevo" Type="char" MaxLength="3" />
+          <Property Name="MuniNac_Anterior" Type="int" />
+          <Property Name="MuniNac_Nuevo" Type="int" />
+          <Property Name="Nacionalidad_Anterior" Type="int" />
+          <Property Name="Nacionalidad_Nuevo" Type="int" />
+          <Property Name="PaisNac_Anterior" Type="int" />
+          <Property Name="PaisNac_Nuevo" Type="int" />
+          <Property Name="Vivo_Det" Type="int" Nullable="false" />
+          <Property Name="CoordX" Type="nvarchar" MaxLength="30" Nullable="false" />
+          <Property Name="CoordY" Type="nvarchar" MaxLength="30" Nullable="false" />
+          <Property Name="MapaLogin" Type="nvarchar" MaxLength="15" Nullable="false" />
+          <Property Name="MapaCve_Usuario" Type="int" Nullable="false" />
+          <Property Name="MapaFechaAct" Type="datetime" Nullable="false" />
+          <Property Name="MapaHoraAct" Type="nvarchar" MaxLength="5" Nullable="false" />
+          <Property Name="MapaLogin_Red" Type="nvarchar" MaxLength="15" Nullable="false" />
+        </EntityType>
+        <Function Name="SP_ObjPri_getFiliObjetivoClavePersona" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="clave_persona" Type="int" Mode="In" />
+        </Function>
+        <Function Name="SP_ObjPri_getFiliObjetivoInfo" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="movimiento" Type="int" Mode="In" />
+          <Parameter Name="nombre" Type="nvarchar" Mode="In" />
+          <Parameter Name="paterno" Type="nvarchar" Mode="In" />
+          <Parameter Name="materno" Type="nvarchar" Mode="In" />
+          <Parameter Name="numavp" Type="nvarchar" Mode="In" />
+          <Parameter Name="clave_persona" Type="int" Mode="In" />
+        </Function>
+        <EntityContainer Name="FiliacionModelStoreContainer">
+          <EntitySet Name="Nom_perso" EntityType="Self.Nom_perso" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Persona" EntityType="Self.Persona" Schema="dbo" store:Type="Tables" />
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="FiliacionModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityContainer Name="FiliacionEntities" annotation:LazyLoadingEnabled="true" >
+          <FunctionImport Name="SP_ObjPri_getFiliObjetivoInfo" ReturnType="Collection(FiliacionModel.SP_ObjPri_getFiliObjetivoInfo_Result)">
+            <Parameter Name="movimiento" Mode="In" Type="Int32" />
+            <Parameter Name="nombre" Mode="In" Type="String" />
+            <Parameter Name="paterno" Mode="In" Type="String" />
+            <Parameter Name="materno" Mode="In" Type="String" />
+            <Parameter Name="numavp" Mode="In" Type="String" />
+            <Parameter Name="clave_persona" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="SP_ObjPri_getFiliObjetivoClavePersona" ReturnType="Collection(FiliacionModel.SP_ObjPri_getFiliObjetivoClavePersona_Result)">
+          <Parameter Name="clave_persona" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <EntitySet Name="Nom_perso" EntityType="FiliacionModel.Nom_perso" />
+          <EntitySet Name="Persona" EntityType="FiliacionModel.Persona" />
+        </EntityContainer>
+        <ComplexType Name="SP_ObjPri_getFiliObjetivoInfo_Result">
+          <Property Type="Int32" Name="CLAVE_PERSO" Nullable="false" />
+          <Property Type="String" Name="NUM_FILIA" Nullable="false" MaxLength="9" />
+          <Property Type="String" Name="NUM_FICH" Nullable="false" MaxLength="9" />
+          <Property Type="String" Name="NOMBRES_COMPLETOS" Nullable="true" />
+          <Property Type="String" Name="DELITOS" Nullable="true" />
+          <Property Type="String" Name="NUM_AVP" Nullable="true" />
+        </ComplexType>
+        <ComplexType Name="SP_ObjPri_getFiliObjetivoClavePersona_Result">
+          <Property Type="Int32" Name="CLAVE_PERSO" Nullable="false" />
+          <Property Type="DateTime" Name="FE_INGRE" Nullable="false" Precision="23" />
+          <Property Type="DateTime" Name="FEC_DET" Nullable="false" Precision="23" />
+          <Property Type="String" Name="HORA_DET" Nullable="false" MaxLength="5" />
+          <Property Type="String" Name="LU_DETEN" Nullable="false" MaxLength="150" />
+          <Property Type="String" Name="NUM_AVP" Nullable="false" MaxLength="50" />
+          <Property Type="DateTime" Name="Fec_Captu" Nullable="false" Precision="16" />
+          <Property Type="DateTime" Name="Ingreso_FecCaptu" Nullable="false" Precision="16" />
+          <Property Type="Int32" Name="IngresoId" Nullable="false" />
+          <Property Type="Int32" Name="CLA_DELITO" Nullable="true" />
+          <Property Type="String" Name="DELITO_DESCRIP" Nullable="true" MaxLength="100" />
+          <Property Type="DateTime" Name="Delito_FecCaptu" Nullable="true" Precision="23" />
+          <Property Type="Int32" Name="Dias_Diferencia" Nullable="true" />
+        </ComplexType>
+        <EntityType Name="Nom_perso">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="NOMBRE" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="AP_PATERNO" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="AP_MATERNO" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="CLAVE_PERSO" Type="Int32" Nullable="false" />
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Fec_Captu" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="rowguid" Type="Guid" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Persona">
+          <Key>
+            <PropertyRef Name="CLAVE_PERSO" />
+          </Key>
+          <Property Name="CLAVE_PERSO" Type="Int32" Nullable="false" />
+          <Property Name="NUM_FICH" Type="String" Nullable="false" MaxLength="9" FixedLength="false" Unicode="true" />
+          <Property Name="NUM_FILIA" Type="String" Nullable="false" MaxLength="9" FixedLength="false" Unicode="true" />
+          <Property Name="CLA_CALLE" Type="Int32" Nullable="false" />
+          <Property Name="NUM_CASA" Type="String" Nullable="false" MaxLength="16" FixedLength="true" Unicode="false" />
+          <Property Name="ESTATURA" Type="String" Nullable="false" MaxLength="4" FixedLength="true" Unicode="false" />
+          <Property Name="DIES_SINIES" Type="String" Nullable="false" MaxLength="1" FixedLength="true" Unicode="false" />
+          <Property Name="CLA_OCUPA" Type="Int32" Nullable="false" />
+          <Property Name="LTRABAJO" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="FEC_NAC" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="OBSERVA" Type="String" Nullable="false" MaxLength="250" FixedLength="false" Unicode="true" />
+          <Property Name="PESO" Type="String" Nullable="false" MaxLength="3" FixedLength="true" Unicode="false" />
+          <Property Name="EDAD" Type="String" Nullable="false" MaxLength="3" FixedLength="true" Unicode="false" />
+          <Property Name="CLA_EDO" Type="String" Nullable="false" MaxLength="3" FixedLength="true" Unicode="false" />
+          <Property Name="SEXO" Type="String" Nullable="false" MaxLength="1" FixedLength="true" Unicode="false" />
+          <Property Name="FORMULA" Type="String" Nullable="false" MaxLength="11" FixedLength="true" Unicode="false" />
+          <Property Name="FEC_FILI" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="C_PIEL" Type="Int32" Nullable="false" />
+          <Property Name="C_PELO" Type="Int32" Nullable="false" />
+          <Property Name="CARAC_PEL" Type="Int32" Nullable="false" />
+          <Property Name="C_OJOS" Type="Int32" Nullable="false" />
+          <Property Name="COMPLEXI" Type="Int32" Nullable="false" />
+          <Property Name="CEJAS" Type="Int32" Nullable="false" />
+          <Property Name="LABIOS" Type="Int32" Nullable="false" />
+          <Property Name="BOCA" Type="Int32" Nullable="false" />
+          <Property Name="NARIZ1" Type="Int32" Nullable="false" />
+          <Property Name="NARIZ2" Type="Int32" Nullable="false" />
+          <Property Name="NARIZ3" Type="Int32" Nullable="false" />
+          <Property Name="FRENTE" Type="Int32" Nullable="false" />
+          <Property Name="MENTON1" Type="Int32" Nullable="false" />
+          <Property Name="MENTON2" Type="Int32" Nullable="false" />
+          <Property Name="TIPCARA" Type="Int32" Nullable="false" />
+          <Property Name="ESPANAZO" Type="Int32" Nullable="false" />
+          <Property Name="INSEPEL" Type="Int32" Nullable="false" />
+          <Property Name="CALVICIE" Type="Int32" Nullable="false" />
+          <Property Name="NCP" Type="String" Nullable="false" MaxLength="16" FixedLength="false" Unicode="true" />
+          <Property Name="IDECRIM" Type="String" Nullable="false" MaxLength="15" FixedLength="false" Unicode="true" />
+          <Property Name="PAISNAC" Type="Int32" Nullable="false" />
+          <Property Name="MUNINAC" Type="Int32" Nullable="false" />
+          <Property Name="NACIONALIDAD" Type="Int32" Nullable="false" />
+          <Property Name="CIVIL" Type="String" Nullable="false" MaxLength="2" FixedLength="false" Unicode="true" />
+          <Property Name="TELEFONO" Type="String" Nullable="false" MaxLength="20" FixedLength="true" Unicode="false" />
+          <Property Name="LENTES" Type="Int32" Nullable="false" />
+          <Property Name="FECHANCP" Type="DateTime" Precision="3" />
+          <Property Name="Verificador" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Ubi_Lu_Trabajo" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="true" />
+          <Property Name="Telefono_Trabajo" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="Tipo_Casa" Type="Int32" Nullable="false" />
+          <Property Name="Nombre_Esposa" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="Paterno_Esposa" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="Materno_Esposa" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="Nombre_Padre" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="Paterno_Padre" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="Materno_Padre" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="Vivo_Padre" Type="Int32" Nullable="false" />
+          <Property Name="Domicilio_Padre" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="true" />
+          <Property Name="Nombre_Madre" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="Paterno_Madre" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="Materno_Madre" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="Vivo_Madre" Type="Int32" Nullable="false" />
+          <Property Name="Domicilio_Madre" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="true" />
+          <Property Name="Avisar_Telefono" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="Avisar_Nombre_Persona" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="Avisar_Paterno_Persona" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="Avisar_Materno_Persona" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="Avisar_Domicilio" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="true" />
+          <Property Name="Fec_Captu" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="rowguid" Type="Guid" Nullable="false" />
+          <Property Name="Cla_Calle_Anterior" Type="Int32" />
+          <Property Name="Cla_Calle_Nuevo" Type="Int32" />
+          <Property Name="Cla_Ocupa_Anterior" Type="Int32" />
+          <Property Name="Cla_Ocupa_Nuevo" Type="Int32" />
+          <Property Name="Cla_Edo_Anterior" Type="String" MaxLength="3" FixedLength="true" Unicode="false" />
+          <Property Name="Cla_Edo_Nuevo" Type="String" MaxLength="3" FixedLength="true" Unicode="false" />
+          <Property Name="MuniNac_Anterior" Type="Int32" />
+          <Property Name="MuniNac_Nuevo" Type="Int32" />
+          <Property Name="Nacionalidad_Anterior" Type="Int32" />
+          <Property Name="Nacionalidad_Nuevo" Type="Int32" />
+          <Property Name="PaisNac_Anterior" Type="Int32" />
+          <Property Name="PaisNac_Nuevo" Type="Int32" />
+          <Property Name="Vivo_Det" Type="Int32" Nullable="false" />
+          <Property Name="CoordX" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="true" />
+          <Property Name="CoordY" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="true" />
+          <Property Name="MapaLogin" Type="String" Nullable="false" MaxLength="15" FixedLength="false" Unicode="true" />
+          <Property Name="MapaCve_Usuario" Type="Int32" Nullable="false" />
+          <Property Name="MapaFechaAct" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="MapaHoraAct" Type="String" Nullable="false" MaxLength="5" FixedLength="false" Unicode="true" />
+          <Property Name="MapaLogin_Red" Type="String" Nullable="false" MaxLength="15" FixedLength="false" Unicode="true" />
+        </EntityType>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="FiliacionModelStoreContainer" CdmEntityContainer="FiliacionEntities" >
+          <FunctionImportMapping FunctionImportName="SP_ObjPri_getFiliObjetivoInfo" FunctionName="FiliacionModel.Store.SP_ObjPri_getFiliObjetivoInfo">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="FiliacionModel.SP_ObjPri_getFiliObjetivoInfo_Result">
+                <ScalarProperty Name="CLAVE_PERSO" ColumnName="CLAVE_PERSO" />
+                <ScalarProperty Name="NUM_FILIA" ColumnName="NUM_FILIA" />
+                <ScalarProperty Name="NUM_FICH" ColumnName="NUM_FICH" />
+                <ScalarProperty Name="NOMBRES_COMPLETOS" ColumnName="NOMBRES_COMPLETOS" />
+                <ScalarProperty Name="DELITOS" ColumnName="DELITOS" />
+                <ScalarProperty Name="NUM_AVP" ColumnName="NUM_AVP" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="SP_ObjPri_getFiliObjetivoClavePersona" FunctionName="FiliacionModel.Store.SP_ObjPri_getFiliObjetivoClavePersona">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="FiliacionModel.SP_ObjPri_getFiliObjetivoClavePersona_Result">
+                <ScalarProperty Name="CLAVE_PERSO" ColumnName="CLAVE_PERSO" />
+                <ScalarProperty Name="FE_INGRE" ColumnName="FE_INGRE" />
+                <ScalarProperty Name="FEC_DET" ColumnName="FEC_DET" />
+                <ScalarProperty Name="HORA_DET" ColumnName="HORA_DET" />
+                <ScalarProperty Name="LU_DETEN" ColumnName="LU_DETEN" />
+                <ScalarProperty Name="NUM_AVP" ColumnName="NUM_AVP" />
+                <ScalarProperty Name="Fec_Captu" ColumnName="Fec_Captu" />
+                <ScalarProperty Name="Ingreso_FecCaptu" ColumnName="Ingreso_FecCaptu" />
+                <ScalarProperty Name="IngresoId" ColumnName="IngresoId" />
+                <ScalarProperty Name="CLA_DELITO" ColumnName="CLA_DELITO" />
+                <ScalarProperty Name="DELITO_DESCRIP" ColumnName="DELITO_DESCRIP" />
+                <ScalarProperty Name="Delito_FecCaptu" ColumnName="Delito_FecCaptu" />
+                <ScalarProperty Name="Dias_Diferencia" ColumnName="Dias_Diferencia" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <EntitySetMapping Name="Nom_perso">
+            <EntityTypeMapping TypeName="FiliacionModel.Nom_perso">
+              <MappingFragment StoreEntitySet="Nom_perso">
+                <ScalarProperty Name="rowguid" ColumnName="rowguid" />
+                <ScalarProperty Name="Fec_Captu" ColumnName="Fec_Captu" />
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="CLAVE_PERSO" ColumnName="CLAVE_PERSO" />
+                <ScalarProperty Name="AP_MATERNO" ColumnName="AP_MATERNO" />
+                <ScalarProperty Name="AP_PATERNO" ColumnName="AP_PATERNO" />
+                <ScalarProperty Name="NOMBRE" ColumnName="NOMBRE" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Persona">
+            <EntityTypeMapping TypeName="FiliacionModel.Persona">
+              <MappingFragment StoreEntitySet="Persona">
+                <ScalarProperty Name="MapaLogin_Red" ColumnName="MapaLogin_Red" />
+                <ScalarProperty Name="MapaHoraAct" ColumnName="MapaHoraAct" />
+                <ScalarProperty Name="MapaFechaAct" ColumnName="MapaFechaAct" />
+                <ScalarProperty Name="MapaCve_Usuario" ColumnName="MapaCve_Usuario" />
+                <ScalarProperty Name="MapaLogin" ColumnName="MapaLogin" />
+                <ScalarProperty Name="CoordY" ColumnName="CoordY" />
+                <ScalarProperty Name="CoordX" ColumnName="CoordX" />
+                <ScalarProperty Name="Vivo_Det" ColumnName="Vivo_Det" />
+                <ScalarProperty Name="PaisNac_Nuevo" ColumnName="PaisNac_Nuevo" />
+                <ScalarProperty Name="PaisNac_Anterior" ColumnName="PaisNac_Anterior" />
+                <ScalarProperty Name="Nacionalidad_Nuevo" ColumnName="Nacionalidad_Nuevo" />
+                <ScalarProperty Name="Nacionalidad_Anterior" ColumnName="Nacionalidad_Anterior" />
+                <ScalarProperty Name="MuniNac_Nuevo" ColumnName="MuniNac_Nuevo" />
+                <ScalarProperty Name="MuniNac_Anterior" ColumnName="MuniNac_Anterior" />
+                <ScalarProperty Name="Cla_Edo_Nuevo" ColumnName="Cla_Edo_Nuevo" />
+                <ScalarProperty Name="Cla_Edo_Anterior" ColumnName="Cla_Edo_Anterior" />
+                <ScalarProperty Name="Cla_Ocupa_Nuevo" ColumnName="Cla_Ocupa_Nuevo" />
+                <ScalarProperty Name="Cla_Ocupa_Anterior" ColumnName="Cla_Ocupa_Anterior" />
+                <ScalarProperty Name="Cla_Calle_Nuevo" ColumnName="Cla_Calle_Nuevo" />
+                <ScalarProperty Name="Cla_Calle_Anterior" ColumnName="Cla_Calle_Anterior" />
+                <ScalarProperty Name="rowguid" ColumnName="rowguid" />
+                <ScalarProperty Name="Fec_Captu" ColumnName="Fec_Captu" />
+                <ScalarProperty Name="Avisar_Domicilio" ColumnName="Avisar_Domicilio" />
+                <ScalarProperty Name="Avisar_Materno_Persona" ColumnName="Avisar_Materno_Persona" />
+                <ScalarProperty Name="Avisar_Paterno_Persona" ColumnName="Avisar_Paterno_Persona" />
+                <ScalarProperty Name="Avisar_Nombre_Persona" ColumnName="Avisar_Nombre_Persona" />
+                <ScalarProperty Name="Avisar_Telefono" ColumnName="Avisar_Telefono" />
+                <ScalarProperty Name="Domicilio_Madre" ColumnName="Domicilio_Madre" />
+                <ScalarProperty Name="Vivo_Madre" ColumnName="Vivo_Madre" />
+                <ScalarProperty Name="Materno_Madre" ColumnName="Materno_Madre" />
+                <ScalarProperty Name="Paterno_Madre" ColumnName="Paterno_Madre" />
+                <ScalarProperty Name="Nombre_Madre" ColumnName="Nombre_Madre" />
+                <ScalarProperty Name="Domicilio_Padre" ColumnName="Domicilio_Padre" />
+                <ScalarProperty Name="Vivo_Padre" ColumnName="Vivo_Padre" />
+                <ScalarProperty Name="Materno_Padre" ColumnName="Materno_Padre" />
+                <ScalarProperty Name="Paterno_Padre" ColumnName="Paterno_Padre" />
+                <ScalarProperty Name="Nombre_Padre" ColumnName="Nombre_Padre" />
+                <ScalarProperty Name="Materno_Esposa" ColumnName="Materno_Esposa" />
+                <ScalarProperty Name="Paterno_Esposa" ColumnName="Paterno_Esposa" />
+                <ScalarProperty Name="Nombre_Esposa" ColumnName="Nombre_Esposa" />
+                <ScalarProperty Name="Tipo_Casa" ColumnName="Tipo_Casa" />
+                <ScalarProperty Name="Telefono_Trabajo" ColumnName="Telefono_Trabajo" />
+                <ScalarProperty Name="Ubi_Lu_Trabajo" ColumnName="Ubi_Lu_Trabajo" />
+                <ScalarProperty Name="Verificador" ColumnName="Verificador" />
+                <ScalarProperty Name="FECHANCP" ColumnName="FECHANCP" />
+                <ScalarProperty Name="LENTES" ColumnName="LENTES" />
+                <ScalarProperty Name="TELEFONO" ColumnName="TELEFONO" />
+                <ScalarProperty Name="CIVIL" ColumnName="CIVIL" />
+                <ScalarProperty Name="NACIONALIDAD" ColumnName="NACIONALIDAD" />
+                <ScalarProperty Name="MUNINAC" ColumnName="MUNINAC" />
+                <ScalarProperty Name="PAISNAC" ColumnName="PAISNAC" />
+                <ScalarProperty Name="IDECRIM" ColumnName="IDECRIM" />
+                <ScalarProperty Name="NCP" ColumnName="NCP" />
+                <ScalarProperty Name="CALVICIE" ColumnName="CALVICIE" />
+                <ScalarProperty Name="INSEPEL" ColumnName="INSEPEL" />
+                <ScalarProperty Name="ESPANAZO" ColumnName="ESPANAZO" />
+                <ScalarProperty Name="TIPCARA" ColumnName="TIPCARA" />
+                <ScalarProperty Name="MENTON2" ColumnName="MENTON2" />
+                <ScalarProperty Name="MENTON1" ColumnName="MENTON1" />
+                <ScalarProperty Name="FRENTE" ColumnName="FRENTE" />
+                <ScalarProperty Name="NARIZ3" ColumnName="NARIZ3" />
+                <ScalarProperty Name="NARIZ2" ColumnName="NARIZ2" />
+                <ScalarProperty Name="NARIZ1" ColumnName="NARIZ1" />
+                <ScalarProperty Name="BOCA" ColumnName="BOCA" />
+                <ScalarProperty Name="LABIOS" ColumnName="LABIOS" />
+                <ScalarProperty Name="CEJAS" ColumnName="CEJAS" />
+                <ScalarProperty Name="COMPLEXI" ColumnName="COMPLEXI" />
+                <ScalarProperty Name="C_OJOS" ColumnName="C_OJOS" />
+                <ScalarProperty Name="CARAC_PEL" ColumnName="CARAC_PEL" />
+                <ScalarProperty Name="C_PELO" ColumnName="C_PELO" />
+                <ScalarProperty Name="C_PIEL" ColumnName="C_PIEL" />
+                <ScalarProperty Name="FEC_FILI" ColumnName="FEC_FILI" />
+                <ScalarProperty Name="FORMULA" ColumnName="FORMULA" />
+                <ScalarProperty Name="SEXO" ColumnName="SEXO" />
+                <ScalarProperty Name="CLA_EDO" ColumnName="CLA_EDO" />
+                <ScalarProperty Name="EDAD" ColumnName="EDAD" />
+                <ScalarProperty Name="PESO" ColumnName="PESO" />
+                <ScalarProperty Name="OBSERVA" ColumnName="OBSERVA" />
+                <ScalarProperty Name="FEC_NAC" ColumnName="FEC_NAC" />
+                <ScalarProperty Name="LTRABAJO" ColumnName="LTRABAJO" />
+                <ScalarProperty Name="CLA_OCUPA" ColumnName="CLA_OCUPA" />
+                <ScalarProperty Name="DIES_SINIES" ColumnName="DIES_SINIES" />
+                <ScalarProperty Name="ESTATURA" ColumnName="ESTATURA" />
+                <ScalarProperty Name="NUM_CASA" ColumnName="NUM_CASA" />
+                <ScalarProperty Name="CLA_CALLE" ColumnName="CLA_CALLE" />
+                <ScalarProperty Name="NUM_FILIA" ColumnName="NUM_FILIA" />
+                <ScalarProperty Name="NUM_FICH" ColumnName="NUM_FICH" />
+                <ScalarProperty Name="CLAVE_PERSO" ColumnName="CLAVE_PERSO" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="false" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="Ninguno" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

@@ -1,0 +1,252 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="CatalogosModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="Calles">
+          <Key>
+            <PropertyRef Name="Cve_Calle" />
+          </Key>
+          <Property Name="Cve_Calle" Type="numeric" Precision="18" Scale="0" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Calle" Type="nvarchar" MaxLength="50" />
+          <Property Name="Cve_Col" Type="decimal" Precision="18" Scale="0" />
+          <Property Name="Correcto" Type="int" Nullable="false" />
+          <Property Name="rowguid" Type="uniqueidentifier" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Colonia">
+          <Key>
+            <PropertyRef Name="Cve_col" />
+          </Key>
+          <Property Name="Cve_col" Type="decimal" Precision="18" Scale="0" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Colonia" Type="nvarchar" MaxLength="100" />
+          <Property Name="Cve_mun" Type="int" />
+          <Property Name="CP" Type="nvarchar" MaxLength="7" />
+          <Property Name="Cve_colonia_ARC" Type="int" Nullable="false" />
+          <Property Name="SecParti" Type="int" Nullable="false" />
+          <Property Name="Sedeso" Type="bit" Nullable="false" />
+          <Property Name="Colonia_Doctos" Type="nvarchar" MaxLength="100" />
+          <Property Name="Sector" Type="int" Nullable="false" />
+          <Property Name="rowguid" Type="uniqueidentifier" Nullable="false" />
+        </EntityType>
+        <!--Errores durante la generación:
+advertencia 6002: La tabla o vista 'Catalogos.dbo.Estado' no tiene definida ninguna clave principal. Se ha inferido la clave y la definición se creado como una vista o tabla de solo lectura.-->
+        <EntityType Name="Estado">
+          <Key>
+            <PropertyRef Name="Cve_Edo" />
+            <PropertyRef Name="rowguid" />
+            <PropertyRef Name="ID_Estado" />
+          </Key>
+          <Property Name="Cve_Edo" Type="nvarchar" MaxLength="4" Nullable="false" />
+          <Property Name="Estado" Type="nvarchar" MaxLength="30" />
+          <Property Name="Siglas" Type="nvarchar" MaxLength="5" />
+          <Property Name="SNSP_Cla_Edo" Type="int" />
+          <Property Name="rowguid" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="Cve_Edo_Exhorto" Type="nvarchar" MaxLength="2" />
+          <Property Name="ID_Estado" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Municipio">
+          <Key>
+            <PropertyRef Name="Cve_mun" />
+          </Key>
+          <Property Name="Cve_mun" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Municipio" Type="nvarchar" MaxLength="40" />
+          <Property Name="Cve_edo" Type="nvarchar" MaxLength="4" />
+          <Property Name="SNSP_Cla_Mpio" Type="int" Nullable="false" />
+          <Property Name="rowguid" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="FK_Estado" Type="int" />
+        </EntityType>
+        <Association Name="FK_Calles_Colonia">
+          <End Role="Colonia" Type="Self.Colonia" Multiplicity="0..1" />
+          <End Role="Calles" Type="Self.Calles" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Colonia">
+              <PropertyRef Name="Cve_col" />
+            </Principal>
+            <Dependent Role="Calles">
+              <PropertyRef Name="Cve_Col" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="CatalogosModelStoreContainer">
+          <EntitySet Name="Calles" EntityType="Self.Calles" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Colonia" EntityType="Self.Colonia" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Municipio" EntityType="Self.Municipio" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Estado" EntityType="Self.Estado" store:Type="Tables" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [Estado].[Cve_Edo] AS [Cve_Edo], 
+    [Estado].[Estado] AS [Estado], 
+    [Estado].[Siglas] AS [Siglas], 
+    [Estado].[SNSP_Cla_Edo] AS [SNSP_Cla_Edo], 
+    [Estado].[rowguid] AS [rowguid], 
+    [Estado].[Cve_Edo_Exhorto] AS [Cve_Edo_Exhorto], 
+    [Estado].[ID_Estado] AS [ID_Estado]
+    FROM [dbo].[Estado] AS [Estado]</DefiningQuery>
+          </EntitySet>
+          <AssociationSet Name="FK_Calles_Colonia" Association="Self.FK_Calles_Colonia">
+            <End Role="Colonia" EntitySet="Colonia" />
+            <End Role="Calles" EntitySet="Calles" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="CatalogosModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="Calles">
+          <Key>
+            <PropertyRef Name="Cve_Calle" />
+          </Key>
+          <Property Name="Cve_Calle" Type="Decimal" Precision="18" Scale="0" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Calle" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Cve_Col" Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="Correcto" Type="Int32" Nullable="false" />
+          <Property Name="rowguid" Type="Guid" Nullable="false" />
+          <NavigationProperty Name="Colonia" Relationship="Self.FK_Calles_Colonia" FromRole="Calles" ToRole="Colonia" />
+        </EntityType>
+        <EntityType Name="Colonia">
+          <Key>
+            <PropertyRef Name="Cve_col" />
+          </Key>
+          <Property Name="Cve_col" Type="Decimal" Precision="18" Scale="0" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Colonia1" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="Cve_mun" Type="Int32" />
+          <Property Name="CP" Type="String" MaxLength="7" FixedLength="false" Unicode="true" />
+          <Property Name="Cve_colonia_ARC" Type="Int32" Nullable="false" />
+          <Property Name="SecParti" Type="Int32" Nullable="false" />
+          <Property Name="Sedeso" Type="Boolean" Nullable="false" />
+          <Property Name="Colonia_Doctos" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="Sector" Type="Int32" Nullable="false" />
+          <Property Name="rowguid" Type="Guid" Nullable="false" />
+          <NavigationProperty Name="Calles" Relationship="Self.FK_Calles_Colonia" FromRole="Colonia" ToRole="Calles" />
+        </EntityType>
+        <EntityType Name="Municipio">
+          <Key>
+            <PropertyRef Name="Cve_mun" />
+          </Key>
+          <Property Name="Cve_mun" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Municipio1" Type="String" MaxLength="40" FixedLength="false" Unicode="true" />
+          <Property Name="Cve_edo" Type="String" MaxLength="4" FixedLength="false" Unicode="true" />
+          <Property Name="SNSP_Cla_Mpio" Type="Int32" Nullable="false" />
+          <Property Name="rowguid" Type="Guid" Nullable="false" />
+          <Property Name="FK_Estado" Type="Int32" />
+        </EntityType>
+        <EntityType Name="Estado">
+          <Key>
+            <PropertyRef Name="Cve_Edo" />
+            <PropertyRef Name="rowguid" />
+            <PropertyRef Name="ID_Estado" />
+          </Key>
+          <Property Name="Cve_Edo" Type="String" MaxLength="4" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Estado1" Type="String" MaxLength="30" FixedLength="false" Unicode="true" />
+          <Property Name="Siglas" Type="String" MaxLength="5" FixedLength="false" Unicode="true" />
+          <Property Name="SNSP_Cla_Edo" Type="Int32" />
+          <Property Name="rowguid" Type="Guid" Nullable="false" />
+          <Property Name="Cve_Edo_Exhorto" Type="String" MaxLength="2" FixedLength="false" Unicode="true" />
+          <Property Name="ID_Estado" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+        </EntityType>
+        <Association Name="FK_Calles_Colonia">
+          <End Role="Colonia" Type="Self.Colonia" Multiplicity="0..1" />
+          <End Role="Calles" Type="Self.Calles" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Colonia">
+              <PropertyRef Name="Cve_col" />
+            </Principal>
+            <Dependent Role="Calles">
+              <PropertyRef Name="Cve_Col" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="CatalogosEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Calles" EntityType="Self.Calles" />
+          <EntitySet Name="Colonia" EntityType="Self.Colonia" />
+          <EntitySet Name="Municipio" EntityType="Self.Municipio" />
+          <EntitySet Name="Estado" EntityType="Self.Estado" />
+          <AssociationSet Name="FK_Calles_Colonia" Association="Self.FK_Calles_Colonia">
+            <End Role="Colonia" EntitySet="Colonia" />
+            <End Role="Calles" EntitySet="Calles" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="CatalogosModelStoreContainer" CdmEntityContainer="CatalogosEntities">
+          <EntitySetMapping Name="Calles">
+            <EntityTypeMapping TypeName="CatalogosModel.Calles">
+              <MappingFragment StoreEntitySet="Calles">
+                <ScalarProperty Name="Cve_Calle" ColumnName="Cve_Calle" />
+                <ScalarProperty Name="Calle" ColumnName="Calle" />
+                <ScalarProperty Name="Cve_Col" ColumnName="Cve_Col" />
+                <ScalarProperty Name="Correcto" ColumnName="Correcto" />
+                <ScalarProperty Name="rowguid" ColumnName="rowguid" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Colonia">
+            <EntityTypeMapping TypeName="CatalogosModel.Colonia">
+              <MappingFragment StoreEntitySet="Colonia">
+                <ScalarProperty Name="Cve_col" ColumnName="Cve_col" />
+                <ScalarProperty Name="Colonia1" ColumnName="Colonia" />
+                <ScalarProperty Name="Cve_mun" ColumnName="Cve_mun" />
+                <ScalarProperty Name="CP" ColumnName="CP" />
+                <ScalarProperty Name="Cve_colonia_ARC" ColumnName="Cve_colonia_ARC" />
+                <ScalarProperty Name="SecParti" ColumnName="SecParti" />
+                <ScalarProperty Name="Sedeso" ColumnName="Sedeso" />
+                <ScalarProperty Name="Colonia_Doctos" ColumnName="Colonia_Doctos" />
+                <ScalarProperty Name="Sector" ColumnName="Sector" />
+                <ScalarProperty Name="rowguid" ColumnName="rowguid" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Municipio">
+            <EntityTypeMapping TypeName="CatalogosModel.Municipio">
+              <MappingFragment StoreEntitySet="Municipio">
+                <ScalarProperty Name="Cve_mun" ColumnName="Cve_mun" />
+                <ScalarProperty Name="Municipio1" ColumnName="Municipio" />
+                <ScalarProperty Name="Cve_edo" ColumnName="Cve_edo" />
+                <ScalarProperty Name="SNSP_Cla_Mpio" ColumnName="SNSP_Cla_Mpio" />
+                <ScalarProperty Name="rowguid" ColumnName="rowguid" />
+                <ScalarProperty Name="FK_Estado" ColumnName="FK_Estado" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Estado">
+            <EntityTypeMapping TypeName="CatalogosModel.Estado">
+              <MappingFragment StoreEntitySet="Estado">
+                <ScalarProperty Name="Cve_Edo" ColumnName="Cve_Edo" />
+                <ScalarProperty Name="Estado1" ColumnName="Estado" />
+                <ScalarProperty Name="Siglas" ColumnName="Siglas" />
+                <ScalarProperty Name="SNSP_Cla_Edo" ColumnName="SNSP_Cla_Edo" />
+                <ScalarProperty Name="rowguid" ColumnName="rowguid" />
+                <ScalarProperty Name="Cve_Edo_Exhorto" ColumnName="Cve_Edo_Exhorto" />
+                <ScalarProperty Name="ID_Estado" ColumnName="ID_Estado" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="false" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="Ninguno" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

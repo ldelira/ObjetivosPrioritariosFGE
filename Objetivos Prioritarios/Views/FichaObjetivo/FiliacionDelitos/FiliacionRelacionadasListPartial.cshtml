@@ -1,0 +1,191 @@
+﻿<div class="row">
+    <div class="col-md-2">
+        <label class="control-label">Estado:</label>
+    </div>
+    <div class="col-md-4">
+        <select class="form-control" id="estadoFiliacion">
+            <option value="1" id="1" @((bool)ViewBag.Actives ? "selected" : "")>Activo</option>
+            <option value="0" id="0" @(!(bool)ViewBag.Actives ? "selected" : "")>Inactivo</option>
+        </select>
+    </div>
+</div>
+
+<br />
+
+<div class="row">
+    <table id="listaFiliacionesAgregadasDataTable" class="dataTable table table-striped" style="width:100%"></table>
+</div>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        FillGridListaFiliacion();
+    });
+
+    $("#estadoFiliacion").change(function () {
+        var valor = $("#estadoFiliacion").val();
+        if (valor == "1") {
+            refreshFiliacionAgregadasList(true);
+        } else {
+            refreshFiliacionAgregadasList(false);
+        }
+    });
+
+    var filiacionColumns = [
+        {
+            title: "ID",
+            data: "int_id_detenido",
+            visible: false
+        },
+        {
+            title: "NumAvp",
+            data: "numavp",
+            orderable: true
+        },
+        {
+            title: "Delito",
+            data: "Delito",
+            orderable: true
+        },
+
+        {
+            title: "Fec_Detencion",
+            data: "fecha_detencion", render: $.fn.dataTable.render.moment(undefined, 'DD-MM-YYYY', 'en'),
+            orderable: true,
+            IsFiltered: false
+        },
+
+        {
+            title: "Hora_Detencion",
+            data: "hora_detencion", render: $.fn.dataTable.render.moment(undefined, 'HH:mm', 'en'),
+            orderable: true,
+            IsFiltered: false
+        },
+       
+        {
+            title: "Acciones",
+            data: "int_id_detenido", render: function (data, type, full, meta) {
+                var action;
+                if ('@ViewBag.Actives'.toUpperCase() == 'TRUE') {
+                    action = [
+                        {
+                            divId: 'div_DisableFiliacion_' + data,
+                            data: data,
+                            functionToExec: 'DisableFiliacion',
+                            toolTip: 'Desactivar',
+                            icon: 'fa fa-trash'
+                        }
+                    ];
+                } else {
+                    action = [
+                        {
+                            divId: 'div_ActivateFiliacion_' + data,
+                            data: data,
+                            functionToExec: 'ActivateFiliacion',
+                            toolTip: 'Activar',
+                            icon: 'fa fa-power-off'
+                        }
+                    ];
+                }
+                return AddActionsToGrid(action);
+            }
+        }
+    ];
+
+    function FillGridListaFiliacion() {
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("FillFiliacionRelacionadasList", "FichaObjetivo")', // ✅ Nuevo método en FiliacionController
+            data: {
+                active: @Json.Encode(ViewBag.Actives),
+                int_id_ficha_objetivo: $("#int_id_ficha_objetivo").val()
+            },
+            success: function (data) {
+                $('#listaFiliacionesAgregadasDataTable').DataTable({
+                    destroy: true,
+                    searching: true,
+                    responsive: true,
+                    scrollX: true,
+                    data: data,
+                    columns: filiacionColumns,
+                    language: {
+                        "sProcessing": "Procesando...",
+                        "sLengthMenu": "Mostrar _MENU_ registros",
+                        "sZeroRecords": "No se encontraron resultados",
+                        "sEmptyTable": "Ningún dato disponible en esta tabla",
+                        "sInfo": "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                        "sInfoEmpty": "Mostrando registros del 0 al 0 de un total de 0 registros",
+                        "sInfoFiltered": "(filtrado de un total de _MAX_ registros)",
+                        "sSearch": "Buscar:",
+                        "sLoadingRecords": "Cargando...",
+                        "oPaginate": {
+                            "sFirst": "Primero",
+                            "sLast": "Último",
+                            "sNext": "Siguiente",
+                            "sPrevious": "Anterior"
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    function DisableFiliacion(int_id_detenido) {
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("DisableFiliacion", "FichaObjetivo")', // ✅ Nuevo método
+            data: { int_id_detenido: int_id_detenido },
+            success: function (data) {
+                if (data.IsSuccess) {
+                    swal({
+                        title: "",
+                        text: data.Message,
+                        type: 'success',
+                        confirmButtonText: "Continuar",
+                        closeOnConfirm: true,
+                    }, function (isConfirm) {
+                        if (isConfirm) {
+                            swal.close();
+                            refreshFiliacionAgregadasList();
+                        }
+                    });
+                } else {
+                    swal({
+                        title: "Error",
+                        text: "No tienes permisos para esta acción.",
+                        type: 'error'
+                    });
+                }
+            }
+        });
+    }
+
+    function ActivateFiliacion(int_id_detenido) {
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("ActivateFiliacion", "FichaObjetivo")', // ✅ Nuevo método
+            data: { int_id_detenido: int_id_detenido },
+            success: function (data) {
+                if (data.IsSuccess) {
+                    swal({
+                        title: "",
+                        text: data.Message,
+                        type: 'success',
+                        confirmButtonText: "Continuar",
+                        closeOnConfirm: true,
+                    }, function () {
+                        swal.close();
+                        refreshFiliacionAgregadasList();
+                    });
+                } else {
+                    swal({
+                        title: "Error",
+                        text: "No tienes permisos para esta acción.",
+                        type: 'error'
+                    });
+                }
+            }
+        });
+    }
+
+</script>

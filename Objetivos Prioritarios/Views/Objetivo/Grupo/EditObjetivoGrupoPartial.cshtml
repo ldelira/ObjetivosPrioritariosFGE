@@ -1,0 +1,115 @@
+﻿@model Objetivos_Prioritarios.Models.tb_ObjetivoGrupo
+
+<div class="modal" id="modalEditObjetivoGrupo" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Editar Grupo del Objetivo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+
+                <input id="int_id_objetivo_grupo" value="@Model.int_id_objetivo_grupo" type="hidden" />
+                <input id="int_id_objetivo" value="@Model.int_id_objetivo" type="hidden" />
+
+                <div class="row mb-2">
+                    <div class="col-sm-4 col-md-4"><label class="control-label">Grupo Delictivo:</label></div>
+                    <div class="col-sm-8 col-md-8">
+                        <select class="form-control" id="ddlGrupoDelictivo"></select>
+                    </div>
+                </div>
+
+                <div class="row mb-2">
+                    <div class="col-sm-4 col-md-4"><label class="control-label">Fecha Ingreso:</label></div>
+                    <div class="col-sm-8 col-md-8">
+                        <input type="date" class="form-control" id="txtFechaIngreso" value="@(Model.date_fecha_ingreso?.ToString("yyyy-MM-dd"))" />
+                    </div>
+                </div>
+
+                <div class="row mb-2">
+                    <div class="col-sm-4 col-md-4"><label class="control-label">Fecha Salida:</label></div>
+                    <div class="col-sm-8 col-md-8">
+                        <input type="date" class="form-control" id="txtFechaSalida" value="@(Model.date_fecha_salida?.ToString("yyyy-MM-dd"))" />
+                    </div>
+                </div>
+
+                <div class="row mb-2">
+                    <div class="col-sm-4 col-md-4"><label class="control-label">Observaciones:</label></div>
+                    <div class="col-sm-8 col-md-8">
+                        <textarea class="form-control" id="txtObservaciones" rows="3">@Model.nvarchar_observaciones</textarea>
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="closeModal">CERRAR</button>
+                <button type="button" class="btn btn-primary" id="btnUpdateGrupo">GUARDAR</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#modalEditObjetivoGrupo").modal("show");
+
+        // 🔹 Llenar lista de grupos delictivos
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("GetGrupoDelictivoNotinObjetivoListEdit", "Objetivo")',
+            data: { int_id_objetivo: $("#int_id_objetivo").val(), int_grupo_actual: '@Model.int_id_grupo' },
+            success: function (data) {
+                $("#ddlGrupoDelictivo").empty();
+                data.forEach(function (item) {
+                    $("#ddlGrupoDelictivo").append(
+                        `<option value="${item.int_id_grupo}">${item.nvarchar_grupo}</option>`
+                    );
+                });
+
+                // Preseleccionar el valor actual del modelo
+                $("#ddlGrupoDelictivo").val("@Model.int_id_grupo");
+            }
+        });
+
+        // 🔹 Guardar cambios
+        $("#btnUpdateGrupo").click(function () {
+            var datas = {
+                int_id_objetivo_grupo: $("#int_id_objetivo_grupo").val(),
+                int_id_objetivo: $("#int_id_objetivo").val(),
+                int_id_grupo: $("#ddlGrupoDelictivo").val(),
+                date_fecha_ingreso: $("#txtFechaIngreso").val(),
+                date_fecha_salida: $("#txtFechaSalida").val(),
+                nvarchar_observaciones: $("#txtObservaciones").val()
+            };
+
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("EditObjetivoGrupo", "Objetivo")',
+                data: datas,
+                success: function (data) {
+                    if (data.IsSuccess) {
+                        swal({
+                            title: "",
+                            text: data.Message,
+                            type: 'success',
+                            confirmButtonText: "Continuar",
+                            closeOnConfirm: true,
+                        },
+                        function () {
+                            $('#closeModal').trigger('click');
+                            refreshGrupoList(); // refresca la lista en la vista principal
+                        });
+                    } else {
+                        swal({
+                            title: "Error",
+                            text: data.Message || "No tienes permisos para esta acción",
+                            type: 'error',
+                            confirmButtonText: "Continuar",
+                            closeOnConfirm: true,
+                        });
+                    }
+                }
+            });
+        });
+    });
+</script>

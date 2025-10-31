@@ -1,0 +1,78 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="SIPJModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <Function Name="Sp_ObjPri_getCarpetasList" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="movimiento" Type="int" Mode="In" />
+          <Parameter Name="nombre" Type="nvarchar" Mode="In" />
+          <Parameter Name="paterno" Type="nvarchar" Mode="In" />
+          <Parameter Name="materno" Type="nvarchar" Mode="In" />
+          <Parameter Name="numavp" Type="nvarchar" Mode="In" />
+        </Function>
+        <EntityContainer Name="SIPJModelStoreContainer" />
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="SIPJModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityContainer Name="SIPJEntities" annotation:LazyLoadingEnabled="true" >
+          <FunctionImport Name="Sp_ObjPri_getCarpetasList" ReturnType="Collection(SIPJModel.Sp_ObjPri_getCarpetasList_Result)">
+            <Parameter Name="movimiento" Mode="In" Type="Int32" />
+            <Parameter Name="nombre" Mode="In" Type="String" />
+            <Parameter Name="paterno" Mode="In" Type="String" />
+            <Parameter Name="materno" Mode="In" Type="String" />
+            <Parameter Name="numavp" Mode="In" Type="String" />
+          </FunctionImport>
+        </EntityContainer>
+        <ComplexType Name="Sp_ObjPri_getCarpetasList_Result">
+          <Property Type="String" Name="CarpetaInvestigacion" Nullable="false" MaxLength="50" />
+          <Property Type="DateTime" Name="FechaAlta" Nullable="true" Precision="23" />
+          <Property Type="String" Name="Nombre" Nullable="true" MaxLength="152" />
+          <Property Type="String" Name="Cve_Delito" Nullable="false" MaxLength="3" />
+          <Property Type="String" Name="Delito" Nullable="true" MaxLength="150" />
+          <Property Type="String" Name="Obs" Nullable="true" />
+        </ComplexType>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="SIPJModelStoreContainer" CdmEntityContainer="SIPJEntities" >
+          <FunctionImportMapping FunctionImportName="Sp_ObjPri_getCarpetasList" FunctionName="SIPJModel.Store.Sp_ObjPri_getCarpetasList">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="SIPJModel.Sp_ObjPri_getCarpetasList_Result">
+                <ScalarProperty Name="CarpetaInvestigacion" ColumnName="CarpetaInvestigacion" />
+                <ScalarProperty Name="FechaAlta" ColumnName="FechaAlta" />
+                <ScalarProperty Name="Nombre" ColumnName="Nombre" />
+                <ScalarProperty Name="Cve_Delito" ColumnName="Cve_Delito" />
+                <ScalarProperty Name="Delito" ColumnName="Delito" />
+                <ScalarProperty Name="Obs" ColumnName="Obs" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="false" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="Ninguno" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

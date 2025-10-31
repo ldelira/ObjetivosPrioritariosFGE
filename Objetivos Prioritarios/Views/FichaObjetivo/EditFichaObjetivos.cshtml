@@ -1,0 +1,436 @@
+﻿@model Objetivos_Prioritarios.Models.tb_FichaObjetivo
+
+
+<input type="text" id="int_id_ficha_objetivo" value="@(Model!=null?Model.int_id_ficha_objetivo:0)" style="display:none" />
+
+<input type="text" id="int_id_objetivo" value="@(Model!=null?Model.int_id_objetivo:0)" style="display:none" />
+
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title">Default Tabs</h5>
+
+        <!-- Default Tabs -->
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">Carpetas de Investigación</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="false" tabindex="-1">Ordenes de Aprehensión</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact" type="button" role="tab" aria-controls="contact" aria-selected="false" tabindex="-1">Detenidos</button>
+            </li>
+        </ul>
+        <div class="tab-content pt-2" id="myTabContent">
+            <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+                <section class="section">
+
+                    <div class="row">
+
+                        <div class="col-lg-6">
+
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Búsqueda de Carpeta</h5>
+
+                                    <!-- Radios de tipo de búsqueda -->
+                                    <div class="mb-3">
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="tipoBusqueda" id="radioNombre" value="1" checked>
+                                            <label class="form-check-label" for="radioNombre">Por Nombre</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="tipoBusqueda" id="radioCarpeta" value="2">
+                                            <label class="form-check-label" for="radioCarpeta">Por Carpeta de Investigación</label>
+                                        </div>
+                                    </div>
+
+                                    <!-- Campos de búsqueda por nombre -->
+                                    <div id="busquedaPorNombre">
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <label for="searchName" class="form-label">Nombre</label>
+                                                <input type="text" class="form-control" id="searchName" placeholder="Nombre">
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label for="searchPaterno" class="form-label">Apellido Paterno</label>
+                                                <input type="text" class="form-control" id="searchPaterno" placeholder="Paterno">
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label for="searchMaterno" class="form-label">Apellido Materno</label>
+                                                <input type="text" class="form-control" id="searchMaterno" placeholder="Materno">
+                                            </div>
+                                        </div>
+                                    <br>
+                                    </div>
+
+                                    <!-- Campo de búsqueda por carpeta -->
+                                    <div class="mb-3 d-none" id="busquedaPorCarpeta">
+                                        <label for="numavp" class="form-label">Carpeta de Investigación</label>
+                                        <input type="text" class="form-control" id="numavp" placeholder="Número de carpeta">
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <button type="button" id="btnBuscar" class="btn btn-primary w-100">
+                                            🔍 Buscar
+                                        </button>
+                                    </div>
+
+                                    <div id="busquedaCarpetas"></div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Carpetas Relacionadas</h5>
+
+                                    <div id="carpetasRelacionadas"></div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                       
+
+                    </div>
+                  
+                </section>
+            </div>
+            <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+                <section class="section">
+
+                    <div class="row">
+
+                        <div class="col-lg-6">
+
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Búsqueda de Ordenes de Aprehensión</h5>
+
+                                    <!-- Radios de tipo de búsqueda -->
+                                    <div class="mb-3">
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="tipoBusqueda2" id="radioNombreOrd" value="1" checked>
+                                            <label class="form-check-label" for="radioNombreOrd">Por Nombre</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="tipoBusqueda2" id="radioCarpetaOrd" value="2">
+                                            <label class="form-check-label" for="radioCarpetaOrd">Por Carpeta de Investigación</label>
+                                        </div>
+                                    </div>
+
+                                    <!-- Campos de búsqueda por nombre -->
+                                    <div id="busquedaPorNombreOrd">
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <label for="searchName" class="form-label">Nombre</label>
+                                                <input type="text" class="form-control" id="searchNameOrd" placeholder="Nombre">
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label for="searchPaterno" class="form-label">Apellido Paterno</label>
+                                                <input type="text" class="form-control" id="searchPaternoOrd" placeholder="Paterno">
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label for="searchMaterno" class="form-label">Apellido Materno</label>
+                                                <input type="text" class="form-control" id="searchMaternoOrd" placeholder="Materno">
+                                            </div>
+                                        </div>
+                                        <br>
+                                    </div>
+
+                                    <!-- Campo de búsqueda por carpeta -->
+                                    <div class="mb-3 d-none" id="busquedaPorCarpetaOrd">
+                                        <label for="numavp" class="form-label">Carpeta de Investigación</label>
+                                        <input type="text" class="form-control" id="numavpOrd" placeholder="Número de carpeta">
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <button type="button" id="btnBuscarOrd" class="btn btn-primary w-100">
+                                            🔍 Buscar
+                                        </button>
+                                    </div>
+
+                                    <div id="busquedaOrdenes"></div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Ordenes Aprehensión</h5>
+
+                                    <div id="ordenesRelacionadas"></div>
+
+                                </div>
+                            </div>
+                        </div>
+
+
+
+                    </div>
+
+                </section>
+            </div>
+            <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">
+                <section class="section">
+
+                    <div class="row">
+
+                        <div class="col-lg-6">
+
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Búsqueda de Detenidos</h5>
+
+                                    <!-- Radios de tipo de búsqueda -->
+                                    <div class="mb-3">
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="tipoBusqueda3" id="radioNombreFili" value="1" checked>
+                                            <label class="form-check-label" for="radioNombreFili">Por Nombre</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="tipoBusqueda3" id="radioCarpetaFili" value="2">
+                                            <label class="form-check-label" for="radioCarpetaFili">Por Carpeta de Investigación</label>
+                                        </div>
+                                    </div>
+
+                                    <!-- Campos de búsqueda por nombre -->
+                                    <div id="busquedaPorNombreFili">
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <label for="searchName" class="form-label">Nombre</label>
+                                                <input type="text" class="form-control" id="searchNameFili" placeholder="Nombre">
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label for="searchPaterno" class="form-label">Apellido Paterno</label>
+                                                <input type="text" class="form-control" id="searchPaternoFili" placeholder="Paterno">
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label for="searchMaterno" class="form-label">Apellido Materno</label>
+                                                <input type="text" class="form-control" id="searchMaternoFili" placeholder="Materno">
+                                            </div>
+                                        </div>
+                                        <br>
+                                    </div>
+
+                                    <!-- Campo de búsqueda por carpeta -->
+                                    <div class="mb-3 d-none" id="busquedaPorCarpetaFili">
+                                        <label for="numavp" class="form-label">Carpeta de Investigación</label>
+                                        <input type="text" class="form-control" id="numavpFili" placeholder="Número de carpeta">
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <button type="button" id="btnBuscarFili" class="btn btn-primary w-100">
+                                            🔍 Buscar
+                                        </button>
+                                    </div>
+
+                                    <div id="busquedafiliacion"></div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Delitos Detenido</h5>
+
+                                    <div id="filiacionRelacionadas"></div>
+
+                                </div>
+                            </div>
+                        </div>
+
+
+
+                    </div>
+
+                </section>
+            </div>
+        </div><!-- End Default Tabs -->
+
+    </div>
+</div>
+
+
+
+<div id="divModalNombre"></div>
+
+<script>
+    $(document).ready(function () {
+        refreshCarpetasAgregadasList();
+        refreshOrdenesAgregadasList();
+        refreshFiliacionAgregadasList();
+    })
+
+
+    $("#btnBuscar").click(function () {
+        refreshCarpetasBusquedaList();
+
+    });
+
+     function refreshCarpetasBusquedaList() {
+
+         $("#busquedaCarpetas").empty();
+         $("#busquedaCarpetas").load("@Url.Action("BusquedaCarpetasListPartial", "FichaObjetivo")");
+   }
+
+
+    // Alternar entre búsqueda por nombre y por carpeta
+    $("input[name='tipoBusqueda']").change(function () {
+        const tipo = $(this).val();
+        if (tipo === "1") {
+            $("#busquedaPorNombre").removeClass("d-none");
+            $("#busquedaPorCarpeta").addClass("d-none");
+        } else {
+            $("#busquedaPorNombre").addClass("d-none");
+            $("#busquedaPorCarpeta").removeClass("d-none");
+        }
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const radioNombre = document.getElementById("radioNombre");
+        const radioCarpeta = document.getElementById("radioCarpeta");
+        const campoNombre = document.getElementById("busquedaPorNombre");
+        const campoCarpeta = document.getElementById("busquedaPorCarpeta");
+
+        radioNombre.addEventListener("change", function () {
+            campoNombre.classList.remove("d-none");
+            campoCarpeta.classList.add("d-none");
+        });
+
+        radioCarpeta.addEventListener("change", function () {
+            campoCarpeta.classList.remove("d-none");
+            campoNombre.classList.add("d-none");
+        });
+    });
+
+     function refreshCarpetasAgregadasList(active) {
+     var datos = {
+         actives: active,
+         int_id_ficha_objetivo:$("#int_id_ficha_objetivo").val()
+     };
+     $("#carpetasRelacionadas").empty();
+     $("#carpetasRelacionadas").load("@Url.Action("CarpetasRelacionadasListPartial", "FichaObjetivo")", datos);
+    }
+
+
+
+    $("#btnBuscarOrd").click(function () {
+        refreshOrdenesList();
+
+    });
+
+
+    function refreshOrdenesList() {
+
+        $("#busquedaOrdenes").empty();
+        $("#busquedaOrdenes").load("@Url.Action("BusquedaOrdenesListPartial", "FichaObjetivo")");
+    }
+
+
+    // Alternar entre búsqueda por nombre y por carpeta
+    $("input[name='tipoBusqueda2']").change(function () {
+        const tipo = $(this).val();
+        if (tipo === "1") {
+            $("#busquedaPorNombreOrd").removeClass("d-none");
+            $("#busquedaPorCarpetaOrd").addClass("d-none");
+        } else {
+            $("#busquedaPorNombreOrd").addClass("d-none");
+            $("#busquedaPorCarpetaOrd").removeClass("d-none");
+        }
+    });
+
+    document.addEventListener("DOMContentLoaded2", function () {
+        const radioNombre = document.getElementById("radioNombreOrd");
+        const radioCarpeta = document.getElementById("radioCarpetaOrd");
+        const campoNombre = document.getElementById("busquedaPorNombreOrd");
+        const campoCarpeta = document.getElementById("busquedaPorCarpetaOrd");
+
+        radioNombre.addEventListener("change", function () {
+            campoNombre.classList.remove("d-none");
+            campoCarpeta.classList.add("d-none");
+        });
+
+        radioCarpeta.addEventListener("change", function () {
+            campoCarpeta.classList.remove("d-none");
+            campoNombre.classList.add("d-none");
+        });
+    });
+
+     function refreshOrdenesAgregadasList(active) {
+     var datos = {
+         actives: active,
+         int_id_ficha_objetivo:$("#int_id_ficha_objetivo").val()
+     };
+         $("#ordenesRelacionadas").empty();
+         $("#ordenesRelacionadas").load("@Url.Action("OrdenesRelacionadasListPartial", "FichaObjetivo")", datos);
+    }
+
+
+      $("#btnBuscarFili").click(function () {
+          refreshFiliacionsList();
+
+        });
+
+
+  function refreshFiliacionsList() {
+
+      $("#busquedafiliacion").empty();
+      $("#busquedafiliacion").load("@Url.Action("BusquedaFiliacionListPartial", "FichaObjetivo")");
+  }
+
+
+  // Alternar entre búsqueda por nombre y por carpeta
+  $("input[name='tipoBusqueda3']").change(function () {
+      const tipo = $(this).val();
+      if (tipo === "1") {
+          $("#busquedaPorNombreFili").removeClass("d-none");
+          $("#busquedaPorCarpetaFili").addClass("d-none");
+      } else {
+          $("#busquedaPorNombreFili").addClass("d-none");
+          $("#busquedaPorCarpetaFili").removeClass("d-none");
+      }
+  });
+
+  document.addEventListener("DOMContentLoaded", function () {
+      const radioNombre = document.getElementById("radioNombreFili");
+      const radioCarpeta = document.getElementById("radioCarpetaFili");
+      const campoNombre = document.getElementById("busquedaPorNombreFili");
+      const campoCarpeta = document.getElementById("busquedaPorCarpetaFili");
+
+      radioNombre.addEventListener("change", function () {
+          campoNombre.classList.remove("d-none");
+          campoCarpeta.classList.add("d-none");
+      });
+
+      radioCarpeta.addEventListener("change", function () {
+          campoCarpeta.classList.remove("d-none");
+          campoNombre.classList.add("d-none");
+      });
+  });
+
+   function refreshFiliacionAgregadasList(active) {
+   var datos = {
+       actives: active,
+       int_id_ficha_objetivo:$("#int_id_ficha_objetivo").val()
+   };
+       $("#filiacionRelacionadas").empty();           
+       $("#filiacionRelacionadas").load("@Url.Action("FiliacionRelacionadasListPartial", "FichaObjetivo")", datos);
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+</script>

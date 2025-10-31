@@ -1,0 +1,317 @@
+/*
+Boostre-intro
+page
+*/
+@import url(https://fonts.googleapis.com/css?family=Raleway:400,900,800,700,600,500);
+
+@font-face {
+    font-family: 'raleway_regular';
+    src: url('../fonts/raleway_regular.eot');
+    src: url('../fonts/raleway_regular.eot') format('embedded-opentype'),
+         url('../fonts/raleway_regular.woff2') format('woff2'),
+         url('../fonts/raleway_regular.woff') format('woff'),
+         url('../fonts/raleway_regular.ttf') format('truetype'),
+         url('../fonts/raleway_regular.svg#raleway_regular') format('svg');
+}
+@font-face {
+  font-family: 'Raleway-Medium';
+  src: url('../fonts/Raleway-Medium.eot');
+  src: url('../fonts/Raleway-Medium.woff2') format('woff2'),
+       url('../fonts/Raleway-Medium.woff') format('woff'),
+       url('../fonts/Raleway-Medium.ttf') format('truetype'),
+       url('../fonts/Raleway-Medium.svg#Raleway-Medium') format('svg'),
+       url('../fonts/Raleway-Medium.eot?#iefix') format('embedded-opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Raleway-Bold';
+  src: url('../fonts/Raleway-Bold.eot');
+  src: url('../fonts/Raleway-Bold.woff2') format('woff2'),
+       url('../fonts/Raleway-Bold.woff') format('woff'),
+       url('../fonts/Raleway-Bold.ttf') format('truetype'),
+       url('../fonts/Raleway-Bold.svg#Raleway-Bold') format('svg'),
+       url('../fonts/Raleway-Bold.eot?#iefix') format('embedded-opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+body{
+    background:#fff;
+    color:#333;
+    font-size:14px;
+    margin:0px;
+    padding:0px;
+    font-family: 'Raleway', sans-serif;
+    font-size:14px;
+    font-weight:normal;
+    line-height:22px;
+    max-width:1600px;
+    margin:0 auto;}
+
+/*---------default  css start here----------*/
+
+h1{ 
+    font-size:2.5em;
+    color:#222;
+    margin:0px;
+    padding:0px;
+    font-family: 'Raleway', sans-serif;
+    font-weight:normal;}
+
+h2{ 
+    font-size:2.225em;
+    color:#222;
+    margin:0px;
+    padding:0px;
+    font-family: 'Raleway', sans-serif;
+    font-weight:normal;}
+
+h3{ 
+    font-size:2em;
+    color:#222;
+    margin:0px;
+    padding:0px;
+    font-family: 'Raleway', sans-serif;
+    font-weight:normal;}
+
+
+h4{ 
+    font-size:1.5em;
+    color:#222;
+    margin:0px;
+    padding:0px;
+      font-family: 'Raleway', sans-serif;
+    font-weight:normal;}
+
+h5{ 
+    font-size:1.225em;
+    color:#222;
+    margin:0px;
+    padding:0px;
+      font-family: 'Raleway', sans-serif;
+    font-weight:normal;}
+
+h6{ 
+    font-size:1em;
+    color:#222;
+    margin:0px;
+    padding:0px;
+      font-family: 'Raleway', sans-serif;
+    font-weight:normal;}
+
+a{
+    color:#9fd354;
+    text-decoration:none;}	
+
+a:hover{
+    color:#ff6163;
+    text-decoration:none;}
+
+a:focus{
+    outline:none;}
+
+.no-padding{
+    padding:0!important;
+}
+
+.row{
+    margin:0px;}
+	
+	
+	
+/*--index-page--*/
+
+.navbar-default {
+  background-color: #fff;
+  border: 0px;
+  margin: 0px;
+  position: relative;}
+
+.navbar-default .navbar-nav > li > a {
+  color: #000;
+  font-weight: 700;
+  position: relative;
+  padding-top: 35px;
+  padding-bottom: 35px; }
+
+.navbar-default .navbar-nav > li.active > a:after {
+  content: "";
+  width: 7px;
+  height: 30px;
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  margin-left: -4px;
+  background: url(../image/v1-active.png) no-repeat; }
+
+.navbar-default .navbar-nav > .active > a, .navbar-default .navbar-nav > .active > a:focus, .navbar-default .navbar-nav > .active > a:hover, .navbar-default .navbar-nav > .open > a, .navbar-default .navbar-nav > .open > a:focus, .navbar-default .navbar-nav > .open > a:hover {
+  color: #000;
+  background-color: transparent; }
+
+.navbar-brand {
+  padding: 20px 15px; }
+
+.top-search {
+  width: 250px;
+  padding: 10px 15px; }
+  
+  
+ .banner-default {
+  background: url("../images/banner.jpg") no-repeat top center;
+    height: 400px;
+	padding-top:150px; }
+ 
+  .banner-default h1 {
+    color: #060c17; 
+	font-weight: 600;
+	font-size: 32px;
+	}
+        .banner-default p{
+           font-size: 20px; 
+            color: #060c17; 
+	font-weight: 600;
+        }
+  .banner-default h1{
+    text-transform: uppercase;
+    font-weight: 900;
+    font-size: 44px;
+    line-height: 50px; 
+	
+	float:left;}
+
+.banner-default span{
+font-size: 36px;
+text-transform:none;
+font-weight: normal;
+}
+label{
+    font-size: 18px;
+    font-family: 'Raleway-Medium';
+        color: #060c17;
+        margin-bottom: 25px;
+}
+
+.maincontainer{
+float:left;
+width:100%;}
+
+.welcome{
+padding: 100px 0px 60px;}
+
+.gallery.text-center img {
+    margin: 0 auto;
+}
+.head-title{
+text-align:center;}
+
+.head-title h2{
+font-size:1.4em; 
+font-weight:800;
+color:#060c17;
+padding-bottom: 30px;
+}
+
+.gallery {
+padding-bottom:30px;
+}
+
+.gallery-title{
+text-align:center;}
+
+.gallery-title span{
+    padding: 0px;
+    color: #808080;
+    font-size: 1em;
+    font-weight: 600;}
+	.footer{
+    padding: 50px 0;
+    background-color: #060c17;
+}
+.footer p{
+    color: #647188;
+}
+.footer h3{
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 20px;
+    font-size: 18px;
+    color: #fff;
+}
+.footer ul.f-nav li a{
+    display: block;
+    color: #fff;
+}
+.footer ul.f-nav li a:before{
+    content: "\f101";
+    font-family: 'FontAwesome';
+    margin-right: 6px;
+}
+.news-list li img{
+    border-radius: 5px;
+    box-shadow: 0px 2px 5px rgba(0,0,0,0.5);
+    float: left;
+    margin-right: 15px;
+}
+.news-list h5{
+    margin: 0px;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+.news-list p{
+    margin-bottom: 0px;
+    font-size: 14px;
+    line-height: 16px;
+}
+.news-list span{
+    font-size: 12px;
+    color: #333f55;
+}
+.news-list li{
+    padding-bottom: 20px;
+}
+.footer-bottom{
+    padding: 20px 0;
+    background-color: #fff;
+    box-shadow: 0px 3px 6px rgba(0,0,0,0.5);
+}
+.footer-bottom ul{
+    margin: 0;
+    padding: 0;
+}
+.footer-bottom ul li a{
+    color: #999;
+    font-size: 20px;
+}
+.footer-bottom ul li a:hover{
+    color:  #333f55;
+}
+.footer .col-md-3{
+    margin-bottom: 30px; 
+}.news-list h5 {
+    margin: 0px;
+    font-weight: 700;
+    margin-bottom: 5px;
+	color: #7b7b7b;
+}
+.footer .form-control {
+    border-radius: 0px;
+    height: 40px;
+    box-shadow: none;
+    border: 0px;
+}
+.footer form {
+    position: relative;
+    margin-bottom: 20px;
+}
+.footer form button {
+    position: absolute;
+    right: 0;
+    top: 0;
+    border: 0px;
+    background-color: #e8ca00;
+    height: 40px;
+    line-height: 40px;
+    padding: 0px 20px;
+    color: #000;
+    font-size: 14px;
+}

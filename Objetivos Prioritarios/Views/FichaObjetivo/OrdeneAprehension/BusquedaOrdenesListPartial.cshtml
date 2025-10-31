@@ -1,0 +1,144 @@
+﻿
+
+<div class="row">
+    <table id="objetivoDataTable" class="dataTable table table-striped" style="width:100%"></table>
+</div>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        FillGridOrdenObjetivo();
+    });
+
+
+    var ordenesBusColumns = [
+        {
+            title: "id",
+            data: "id",
+            orderable: true
+        },
+        {
+            title: "NumAvp",
+            data: "numero_expediente",
+            orderable: true
+        },
+        {
+            title: "nombre",
+            data: "nombre",
+            orderable: true
+        },
+        {
+            title: "paterno",
+            data: "paterno",
+            orderable: true
+        },
+        {
+            title: "materno",
+            data: "materno",
+            orderable: true
+        },
+        {
+            title: "principal",
+            data: "principal",
+            orderable: true
+        },
+        {
+            title: "tipo",
+            data: "tipo",
+            orderable: true
+        },
+        {
+            title: "delito",
+            data: "delito",
+            orderable: true
+        },
+        {
+            title: "Acciones",
+            data: "id", render: function (data, type, full, meta) {
+                var action = [
+                        { divId: 'div_ActivateCarpetaObjetivo_' + data, data: data, functionToExec: 'AgregarOrden', toolTip: 'Activar', icon: 'fa fa-check' }
+                    ];
+                
+                return AddActionsToGrid(action);
+            }
+        }
+    ];
+
+    function FillGridOrdenObjetivo() {
+
+        var movimiento = $("input[name='tipoBusqueda2']:checked").val();
+
+        var datos = {
+            movimiento: movimiento,
+            nombre: $("#searchNameOrd").val(),
+            paterno: $("#searchPaternoOrd").val(),
+            materno: $("#searchMaternoOrd").val(),
+            numavp: $("#numavpOrd").val()
+        };
+
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("FillOrdenesList", "FichaObjetivo")',
+            data: datos,
+            success: function (data) {
+                $('#objetivoDataTable').DataTable({
+                    destroy: true,
+                    searching: true,
+                    responsive: true,
+                    scrollX: true,
+                    data: data,
+                    columns: ordenesBusColumns,
+                    language: {
+                        "sProcessing": "Procesando...",
+                        "sLengthMenu": "Mostrar _MENU_ registros",
+                        "sZeroRecords": "No se encontraron resultados",
+                        "sEmptyTable": "Ningún dato disponible en esta tabla",
+                        "sInfo": "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                        "sInfoEmpty": "Mostrando registros del 0 al 0 de un total de 0 registros",
+                        "sInfoFiltered": "(filtrado de un total de _MAX_ registros)",
+                        "sSearch": "Buscar:",
+                        "sLoadingRecords": "Cargando...",
+                        "oPaginate": {
+                            "sFirst": "Primero",
+                            "sLast": "Último",
+                            "sNext": "Siguiente",
+                            "sPrevious": "Anterior"
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    function AgregarOrden(id_mandamiento) {
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("AddOrdenesObjetivo", "FichaObjetivo")',
+            data: { int_id_ficha_objetivo: $('#int_id_ficha_objetivo').val(), id_mandamiento: id_mandamiento },
+            success: function (data) {
+                if (data.IsSuccess) {
+                    swal({
+                        title: "",
+                        text: data.Message,
+                        type: 'success',
+                        confirmButtonText: "Continuar",
+                        closeOnConfirm: true,
+                    }, function (isConfirm) {
+                        if (isConfirm) {
+                            swal.close();
+                            refreshOrdenesAgregadasList();
+                        }
+                    });
+                } else {
+                    swal({
+                        title: "Error",
+                        text: data.Message,
+                        type: 'error'
+                    });
+                }
+            }
+        });
+    }
+
+   
+</script>

@@ -1,0 +1,375 @@
+/*common css*/
+@import url(https://fonts.googleapis.com/css?family=Raleway:400,500italic,400italic,500,300,600,700,800);
+body {
+  color: #7b7b7b;
+  font-family: 'Raleway', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 24px; }
+
+a {
+  text-decoration: none;
+  transition: all 0.3s;
+  -webkit-transition: all 0.3s; }
+
+a:hover, a:focus {
+  text-decoration: none;
+  outline: 0 !important; }
+
+h1, h2, h3, h4, h5 {
+  color: #363636;
+  margin-top: 0px; }
+
+h1 {
+  font-weight: 800;
+  color: #000;
+  font-size: 45px;
+  line-height: 45px; }
+
+.margin-b-30 {
+  margin-bottom: 30px; }
+
+.o-hidden {
+  overflow: hidden; }
+
+.top-bar {
+  background-color: #060c17;
+  color: #fff;
+  padding: 5px 0; }
+
+.top-bar ul {
+  margin: 0px;
+  padding: 0px; }
+
+.top-bar ul li a {
+  color: #fff; }
+
+.top-bar ul li a:hover {
+  color: #999; }
+
+.navbar-default.transparent-header {
+
+  border: 0px;
+  margin: 0px;
+  position: relative;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%; }
+
+.navbar-default .navbar-nav > li > a {
+  color: #000;
+  font-weight: 700;
+  position: relative;
+  padding-top: 35px;
+  padding-bottom: 35px; }
+
+.navbar-default .navbar-nav > li.active > a:after {
+  content: "";
+  width: 7px;
+  height: 30px;
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  margin-left: -4px;
+  background: url(../images/v1-active.png) no-repeat; }
+
+.navbar-default .navbar-nav > .active > a, .navbar-default .navbar-nav > .active > a:focus, .navbar-default .navbar-nav > .active > a:hover, .navbar-default .navbar-nav > .open > a, .navbar-default .navbar-nav > .open > a:focus, .navbar-default .navbar-nav > .open > a:hover {
+  color: #000;
+  background-color: transparent; }
+
+.navbar-brand {
+  padding: 20px 15px; }
+
+.top-search {
+  width: 250px;
+  padding: 10px 15px; }
+
+.clients {
+  padding: 30px 0;
+  margin: 0px; }
+
+.clients li {
+  vertical-align: middle;
+  padding: 10px 20px; }
+
+.footer {
+  padding: 50px 0;
+  background-color: #060c17; }
+
+.footer p {
+  color: #647188; }
+
+.footer h3 {
+  text-transform: uppercase;
+  font-weight: 700;
+  margin-bottom: 20px;
+  font-size: 18px;
+  color: #fff; }
+
+.footer ul.f-nav li a {
+  display: block;
+  color: #fff; }
+
+.footer ul.f-nav li a:before {
+  content: "\f101";
+  font-family: 'FontAwesome';
+  margin-right: 6px; }
+
+.news-list li img {
+  border-radius: 5px;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.5);
+  float: left;
+  margin-right: 15px; }
+
+.news-list h5 {
+  margin: 0px;
+  font-weight: 700;
+  margin-bottom: 5px; }
+
+.news-list p {
+  margin-bottom: 0px;
+  font-size: 14px;
+  line-height: 16px; }
+
+.news-list span {
+  font-size: 12px;
+  color: #333f55; }
+
+.news-list li {
+  padding-bottom: 20px; }
+
+.footer-bottom {
+  padding: 20px 0;
+  background-color: #fff;
+  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.5); }
+
+.footer-bottom ul {
+  margin: 0;
+  padding: 0; }
+
+.footer-bottom ul li a {
+  color: #999;
+  font-size: 20px; }
+
+.footer-bottom ul li a:hover {
+  color: #333f55; }
+
+.footer .col-md-3 {
+  margin-bottom: 30px; }
+
+.footer form {
+  position: relative;
+  margin-bottom: 20px; }
+
+.footer form button {
+  position: absolute;
+  right: 0;
+  top: 0;
+  border: 0px;
+  background-color: #e8ca00;
+  height: 40px;
+  line-height: 40px;
+  padding: 0px 20px;
+  color: #000;
+  font-size: 14px; }
+
+.footer .form-control {
+  border-radius: 0px;
+  height: 40px;
+  box-shadow: none;
+  border: 0px; }
+
+.banner {
+  position: relative; }
+  .banner .banner-overlay {
+    position: absolute;
+    left: 0;
+    bottom: 150px;
+    width: 100%; }
+    .banner .banner-overlay h1 {
+      text-transform: capitalize;
+      margin-top: 30px; }
+    .banner .banner-overlay p {
+      font-size: 18px;
+      line-height: 27px;
+      font-weight: 500; }
+
+.about-agency {
+  padding: 70px 0; }
+
+.w-image-section {
+  position: relative;
+  padding: 100px 0;
+  border-top: 1px dashed #ddd;
+  border-bottom: 1px dashed #ddd; }
+  .w-image-section .w-image {
+    width: 50%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    background-color: #f5f5f5; }
+    .w-image-section .w-image img {
+      position: absolute;
+      right: 0;
+      bottom: 0; }
+
+.our-modals {
+  padding: 90px 0; }
+
+.modal-box {
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 30px; }
+  .modal-box .modal-overlay {
+    position: absolute;
+    left: 0;
+    bottom: -100%;
+    width: 100%;
+    height: auto;
+    padding: 8px;
+    background: #e8ca00;
+    transition: all 0.2s ease-in-out;
+    -webkit-transition: all 0.2s ease-in-out; }
+    .modal-box .modal-overlay h4 {
+      color: #000;
+      margin-bottom: 0px; }
+    .modal-box .modal-overlay span {
+      font-size: 12px;
+      color: #222;
+      font-weight: 500; }
+  .modal-box:hover .modal-overlay {
+    bottom: 0; }
+
+.testimonials {
+  padding: 150px 0;
+  background: url(../images/fashion/bg1.jpg) no-repeat;
+  overflow: hidden;
+  background-size: cover; }
+
+.t-slider {
+  position: relative; }
+  .t-slider .flex-direction-nav .flex-prev {
+    left: 0; }
+  .t-slider .flex-direction-nav .flex-next {
+    right: 0px;
+    text-align: center; }
+  .t-slider .flex-direction-nav a {
+    opacity: 1; }
+  .t-slider .flex-direction-nav a:before {
+    content: "\f104";
+    font-family: "FontAwesome";
+    width: 40px;
+    height: 40px;
+    text-align: center;
+    text-shadow: none;
+    color: #fff; }
+  .t-slider .flex-direction-nav a.flex-next:before {
+    content: "\f105"; }
+  .t-slider p {
+    color: #fff;
+    font-size: 15px; }
+  .t-slider .divide-line {
+    display: block;
+    margin: 0 auto;
+    width: 100px;
+    height: 2px;
+    background: #00c1e3;
+    margin-top: 20px;
+    margin-bottom: 15px; }
+  .t-slider h5 {
+    color: #fff;
+    margin-bottom: 0px; }
+  .t-slider span {
+    color: #eee;
+    font-size: 12px; }
+
+.best-designs {
+  padding: 90px 0;
+  padding-bottom: 60px; }
+
+.work-col-3 .project-post {
+  width: 33.33%;
+  padding: 0px 15px;
+  float: left;
+  margin-bottom: 30px; }
+
+.work-box {
+  position: relative;
+  display: block;
+  overflow: hidden; }
+  .work-box .work-overlay {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: #0078ff;
+    /* Old browsers */
+    background: -moz-linear-gradient(left, #0078ff 2%, #00c2ff 55%);
+    /* FF3.6-15 */
+    background: -webkit-linear-gradient(left, #0078ff 2%, #00c2ff 55%);
+    /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(to right, #0078ff 2%, #00c2ff 55%);
+    /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#0078ff', endColorstr='#00c2ff',GradientType=1 );
+    /* IE6-9 */
+    transition: all 0.3s;
+    -webkit-transition: all 0.3s;
+    -moz-transition: all 0.3s;
+    -o-transition: all 0.3s;
+    -ms-transition: all 0.3s;
+    opacity: 0; }
+    .work-box .work-overlay span {
+      display: block;
+      background-image: url(../images/personal/plus.png);
+      background-repeat: no-repeat;
+      width: 108px;
+      height: 100px;
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      margin-left: -50px;
+      margin-top: -54px;
+      z-index: 1; }
+  .work-box:hover .work-overlay {
+    opacity: 1; }
+
+.filter {
+  margin-bottom: 40px;
+  text-align: center; }
+  .filter li a {
+    display: block;
+    padding: 12px 25px;
+    background: #f5f5f5;
+    text-transform: uppercase;
+    font-size: 12px;
+    font-weight: 600;
+    color: #363636; }
+    .filter li a.active {
+      color: #fff;
+      background: #f06eaa; 
+    }
+.text7.homev6 {
+    color: #000;
+    font-size:35px !important;
+    font-style: italic;
+    font-weight: 900;
+    margin-left: 11% !important;
+}
+.text6.homev6 {
+    color: #000;
+    float: left !important;
+    font-size:14px !important;
+    line-height: 25px !important;
+    margin-left: 11% !important;
+    margin-top: 50px !important;
+    text-align: left;
+}
+
+.master-slider a {
+    margin-left: -19% !important;
+    transition: none 0s ease 0s;
+}
+/*# sourceMappingURL=style-fashion.css.map */

@@ -1,0 +1,197 @@
+﻿<div class="row">
+    <div class="col-md-2">
+        <label class="control-label">Estado:</label>
+    </div>
+    <div class="col-md-4">
+        <select class="form-control" id="estadoObjetivoAlias">
+            <option value="1" id="1" @((bool)ViewBag.Actives ? "selected" : "")>Activo</option>
+            <option value="0" id="0" @(!(bool)ViewBag.Actives ? "selected" : "")>Inactivo</option>
+        </select>
+    </div>
+    <div class="col-md-6" style="text-align:right">
+        <button class="btn btn-primary" onclick="AddObjetivoAliasModal()">Agregar Alias</button>
+    </div>
+</div>
+<br />
+<div class="row">
+    <table id="objetivoAliasDataTable" class="dataTable table table-striped" style="width:100%">
+    </table>
+</div>
+
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        FillGridObjetivoAlias();
+    });
+
+    $("#estadoObjetivoAlias").change(function () {
+        var valor = $("#estadoObjetivoAlias").val();
+        if (valor == "1") {
+            refreshAliasList(true);
+        } else {
+            refreshAliasList(false);
+        }
+    });
+
+    var objetivoAliasColumns = [
+        {
+            title: "Id",
+            data: "id_alias",
+            orderable: true,
+            IsFiltered: false,
+            visible:false
+        },
+        {
+            title: "Alias",
+            data: "alias",
+            orderable: true,
+            IsFiltered: false
+        },
+        {
+            title: "Acciones",
+            data: "id_alias", render: function (data, type, full, meta) {
+                var action;
+                if ('@ViewBag.Actives'.toUpperCase() == 'TRUE') {
+                    action = [
+                        { divId: 'div_EditObjetivoAlias_' + data, data: data, functionToExec: 'EditObjetivoAlias', toolTip: 'Editar', icon: 'fa fa-edit' },
+                        { divId: 'div_DisableObjetivoAlias_' + data, data: data, functionToExec: 'DisableObjetivoAlias', toolTip: 'Desactivar', icon: 'fa fa-trash' },
+                    ];
+                }
+                else {
+                    action = [
+                        { divId: 'div_ActivateObjetivoAlias_' + data, data: data, functionToExec: 'ActivateObjetivoAlias', toolTip: 'Activar', icon: 'fa fa-power-off' }
+                    ];
+                }
+                return AddActionsToGrid(action);
+            }
+        }
+    ];
+
+    function FillGridObjetivoAlias() {
+       
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("FillObjetivoAliasList", "Objetivo")',
+            data: { active: @Json.Encode(ViewBag.Actives), int_id_objetivo: $("#int_id_objetivo").val() },
+            success: function (data) {
+                var table = $('#objetivoAliasDataTable').DataTable({
+                    searching: true,
+                    responsive: true,
+                    scrollX: true,
+                    data: data,
+                    columns: objetivoAliasColumns,
+                    language: {
+                        "sProcessing": "Procesando...",
+                        "sLengthMenu": "Mostrar _MENU_ registros",
+                        "sZeroRecords": "No se encontraron resultados",
+                        "sEmptyTable": "Ningún dato disponible en esta tabla",
+                        "sInfo": "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                        "sInfoEmpty": "Mostrando registros del 0 al 0 de un total de 0 registros",
+                        "sInfoFiltered": "(filtrado de un total de _MAX_ registros)",
+                        "sSearch": "Buscar:",
+                        "sLoadingRecords": "Cargando...",
+                        "oPaginate": {
+                            "sFirst": "Primero",
+                            "sLast": "Último",
+                            "sNext": "Siguiente",
+                            "sPrevious": "Anterior"
+                        }
+                    },
+                    initComplete: function (oSettings) {
+                        this.api().columns().every(function () {
+                            var column = this;
+                            var nameColumn = column.header().textContent;
+                            var columnDef = oSettings.aoColumns.find(column => {
+                                return column.sTitle === nameColumn;
+                            });
+                            if (columnDef.IsFiltered) {
+                                $('<input type="text" placeholder="buscar" />')
+                                    .appendTo($(column.header()))
+                                    .on('click', function (e) { e.stopPropagation(); })
+                            }
+                            $('input', column.header()).on('keyup change clear', function () {
+                                if (column.search !== this.value) {
+                                    column
+                                        .column($(this).parent().index() + ':visible')
+                                        .search(this.value)
+                                        .draw();
+                                }
+                            });
+                        });
+                        $($.fn.dataTable.tables(true)).DataTable().columns.adjust();
+                    }
+                });
+            }
+        });
+    }
+
+
+    function DisableObjetivoAlias(int_id_alias) {
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("DesactivarObjetivoAlias", "Objetivo")',
+            data: { int_id_alias: int_id_alias },
+            success: function (data) {
+                if (data.IsSuccess) {
+                    swal({
+                        title: "",
+                        text: data.Message,
+                        type: 'success',
+                        confirmButtonText: "Continuar",
+                        closeOnConfirm: true,
+                    },
+                        function (isConfirm) {
+                            if (isConfirm) {
+                                swal.close();
+                                refreshAliasList();
+                            }
+                        });
+                } else {
+                    swal({
+                        title: "Error",
+                        text: "No tienes permisos para esta acción. Contacta al administrador.",
+                        type: 'error',
+                        confirmButtonText: "Continuar",
+                        closeOnConfirm: true,
+                    },
+                        function () { window.location.href = '@Url.Action("Index", "ObjetivoAlias")'; });
+                }
+            }
+        });
+    }
+
+
+    function ActivateObjetivoAlias(int_id_alias) {
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("ReactivarObjetivoAlias", "Objetivo")',
+            data: { int_id_alias: int_id_alias },
+            success: function (data) {
+                if (data.IsSuccess) {
+                    swal({
+                        title: "",
+                        text: data.Message,
+                        type: 'success',
+                        confirmButtonText: "Continuar",
+                        closeOnConfirm: true,
+                    },
+                        function () {
+                            swal.close();
+                            refreshAliasList();
+                        });
+                } else {
+                    swal({
+                        title: "Error",
+                        text: "No tienes permisos para esta acción. Contacta al administrador.",
+                        type: 'error',
+                        confirmButtonText: "Continuar",
+                        closeOnConfirm: true,
+                    },
+                        function () { window.location.href = '@Url.Action("Index", "ObjetivoAlias")'; });
+                }
+            }
+        });
+    }
+
+</script>

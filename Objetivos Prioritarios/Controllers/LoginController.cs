@@ -16,7 +16,7 @@ namespace Objetivos_Prioritarios.Controllers
             return View(new LoginUser());
         }
 
-        //[HttpPost] poncho LEO
+        //[HttpPost] poncho LEO 2
         //[ValidateAntiForgeryToken]
         //public ActionResult Index([Bind(Include = "UserName,Password")] LoginUser user)
         //{

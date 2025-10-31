@@ -15,6 +15,7 @@ namespace Objetivos_Prioritarios.Controllers
             ViewBag.Error = false;
             return View(new LoginUser());
         }
+
         //[HttpPost]
         //[ValidateAntiForgeryToken]
         //public ActionResult Index([Bind(Include = "UserName,Password")] LoginUser user)

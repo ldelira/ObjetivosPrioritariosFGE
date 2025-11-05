@@ -504,6 +504,86 @@ namespace Objetivos_Prioritarios.ControllersServices
             }
         }
 
+        public BasicOperationResponse ReactivarVictima(int id ,int id_victima, int id_asunto_relacionado)
+        {
+            var response = new BasicOperationResponse();
+            string msg = "";
+
+            try
+            {
+                using (var transaction = db.Database.BeginTransaction())
+                {
+                    if (id == 1)
+                    {
+                        try
+                        {
+                            // Buscar la víctima por ID
+                            var victima = db.tb_Victimas
+                                .FirstOrDefault(x => x.int_id_victima == id_victima);
+
+                            if (victima != null)
+                            {
+                                if (victima.bit_estatus == false)
+                                {
+                                    // Reactivar víctima
+                                    victima.bit_estatus = true;
+                                    db.SaveChanges();
+
+                                    transaction.Commit();
+                                    msg = "Se reactivó la víctima exitosamente.";
+                                    response.IsSuccess = true;
+                                }
+                                else
+                                {
+                                    msg = "La víctima ya está activa.";
+                                    response.IsSuccess = false;
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            transaction.Rollback();
+                            msg = "Error al intentar reactivar la víctima: " + ex.Message;
+                            response.IsSuccess = false;
+                        }
+                    }
+                    else
+                    {
+                        // Buscar la víctima por ID
+                        var victima = db.tb_Victimas
+                            .FirstOrDefault(x => x.int_id_victima == id_victima);
+
+                        if (victima != null)
+                        {
+                            if (victima.bit_estatus == true)
+                            {
+                                // Reactivar víctima
+                                victima.bit_estatus = false;
+                                db.SaveChanges();
+
+                                transaction.Commit();
+                                msg = "Se desactivo la víctima exitosamente.";
+                                response.IsSuccess = true;
+                            }
+                            else
+                            {
+                                msg = "La víctima ya está inactiva.";
+                                response.IsSuccess = false;
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                msg = "Error general al procesar la reactivación: " + ex.Message;
+                response.IsSuccess = false;
+            }
+
+            response.Message = msg;
+            return response;
+        }
+
         public BasicOperationResponse AddVictimaVictima(int id_victima, int id_asunto_relacionado)
         {
             try
@@ -623,6 +703,74 @@ namespace Objetivos_Prioritarios.ControllersServices
                 {
                     IsSuccess = false,
                     Message = "Ocurrió un error al agregar la víctima: " + ex.Message
+                };
+            }
+        }
+
+        public BasicOperationResponse SaveVictimaService(string nombre, string paterno, string materno, string fotoBase64, int idllamada, int idasunto)
+        {
+            try
+            {
+                using (var transaction = db.Database.BeginTransaction())
+                {
+                    try
+                    {
+                        var nuevaVictima = new tb_Victimas
+                        {
+                            nvarchar_nombre = nombre,
+                            nvarchar_paterno = paterno,
+                            nvarchar_materno = materno,
+                            nvarchar_foto = fotoBase64,
+                            bit_estatus = true,
+                            date_fecha_creacion = DateTime.Now
+                        };
+
+                        db.tb_Victimas.Add(nuevaVictima);
+                        db.SaveChanges();
+
+                        if (idllamada == 1)
+                        {
+                            int nuevoIdVictima = (db.tb_Victimas.Max(x => (int?)x.int_id_victima) ?? 0);
+
+                            var VictimaAsunto = new tb_AsuntoVictimas
+                            {
+                                int_id_asunto_relacionado = idasunto,
+                                int_id_victima = nuevoIdVictima,
+                                bit_estatus = true,
+                                date_fecha_creacion = DateTime.Now
+                            };
+                            db.tb_AsuntoVictimas.Add(VictimaAsunto);
+                            db.SaveChanges();
+
+                        }
+
+
+                        transaction.Commit();
+
+                        return new BasicOperationResponse
+                        {
+                            IsSuccess = true,
+                            Message = "✅ Víctima guardada correctamente."
+                        };
+                    }
+                    catch (Exception exTrans)
+                    {
+                        transaction.Rollback();
+
+                        return new BasicOperationResponse
+                        {
+                            IsSuccess = false,
+                            Message = "❌ Error durante la transacción: " + exTrans.Message
+                        };
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return new BasicOperationResponse
+                {
+                    IsSuccess = false,
+                    Message = "❌ Error al guardar la víctima: " + ex.Message
                 };
             }
         }

@@ -21,9 +21,19 @@ else
                     <tr>
                         <td>@item.NOMBRES_COMPLETOS</td>
                         <td class="text-center">
-                            <button class="btn btn-success btn-sm" onclick="addObjetivoVictima(@item.int_id_objetivo)">
-                                <i class="fa fa-check"></i>
-                            </button>
+
+                            @if (ViewBag.opcion == 2)
+                            {
+                                <button class="btn btn-success btn-sm" onclick="addObjetivoVictima(@item.int_id_objetivo)">
+                                    <i class="fa fa-check"></i>
+                                </button>
+                            }
+                            else
+                            {
+                                <button class="btn btn-success btn-sm" onclick="addObjetivoAsunto(@item.int_id_objetivo)">
+                                    <i class="fa fa-check"></i>
+                                </button>
+                            }
                         </td>
                     </tr>
                 }
@@ -82,7 +92,7 @@ else
   // ✅ Llamado desde el botón ✔️ del DataTable
     function addObjetivoVictima(int_id_objetivo) {
         clavePersonaSeleccionada = int_id_objetivo;
-      debugger;
+
       // Limpia el select antes de cargar
       $("#selectNombreObjetivo").empty()
           .append('<option value="">Cargando nombres...</option>');
@@ -155,6 +165,31 @@ else
       });
 
 
-  }
+    }
+
+
+    function addObjetivoAsunto(int_id_objetivo) {
+
+        debugger;
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("addObjetivoAsunto", "Asuntos")',
+            data: { int_id_objetivo: int_id_objetivo, int_id_asunto_relacionado: $("#int_id_asunto_relacionado").val() },
+            success: function (resp) {
+                if (resp.IsSuccess) {
+                    swal("", resp.Message, "success");
+                    //refreshVictimasRelacionadasList();
+                } else {
+                    swal("Error", resp.Message, "error");
+                }
+            }
+        });
+
+
+      
+
+
+    }
+
 
 </script>

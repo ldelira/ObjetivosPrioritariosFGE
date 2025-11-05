@@ -230,6 +230,9 @@
     <Compile Include="Models\getListObjetivosPrioritarios_Result.cs">
       <DependentUpon>ObjetivosPrioritarios.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\getListObjetivosRelacionadoAsunto_Result.cs">
+      <DependentUpon>ObjetivosPrioritarios.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\getListVictimasByNombre_Result.cs">
       <DependentUpon>ObjetivosPrioritarios.tt</DependentUpon>
     </Compile>
@@ -3196,6 +3199,7 @@
     <Content Include="Views\Objetivo\BusquedaInfoGeneralListPartial.cshtml" />
     <Content Include="Views\Asuntos\Victimas\AddEditVictimaPartial.cshtml" />
     <Content Include="Views\Objetivo\BusquedaFotosDetenidosListPartial.cshtml" />
+    <Content Include="Views\Asuntos\ObjetivoRelacionadoAsuntoListPartial.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -1,0 +1,386 @@
+﻿@* Partial view: Objetivos Relacionados en el Asunto (ajustada a getListObjetivosRelacionadoAsunto_Result) *@
+
+<div class="row">
+    <div class="col-md-2">
+        <label class="control-label">Estado:</label>
+    </div>
+    <div class="col-md-4">
+        <select class="form-control" id="estadoObjetivoAsunto">
+            <option value="1" id="1" @((bool)ViewBag.Actives ? "selected" : "")>Activo</option>
+            <option value="0" id="0" @(!(bool)ViewBag.Actives ? "selected" : "")>Inactivo</option>
+        </select>
+    </div>
+</div>
+
+<br />
+
+<div class="row">
+    <table id="listaObjetivosRelacionadosDataTable" class="dataTable table table-striped" style="width:100%"></table>
+</div>
+
+<div class="modal fade" id="modalFotoAsuntoObjetivo" tabindex="-1" role="dialog" aria-labelledby="modalFotoTitulo2" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="modalFotoTitulo">Fotografía</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+
+            </div>
+            <div class="modal-body text-center">
+                <img id="modalFotoImagen2" src="" alt="Fotografía" class="img-fluid rounded shadow-sm" style="max-height: 450px;">
+            </div>
+            <div class="modal-footer">
+                @*<a id="modalDescargar" href="#" class="btn btn-outline-secondary" style="display:none;">Descargar</a>*@
+                <button type="button" class="btn btn-secondary" id="closeModal" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+    $("#closeModal").click(function () {
+        $("#modalFotoAsuntoObjetivo").modal('hide');
+    });
+
+    $(document).ready(function () {
+        FillGridListaObjetivoRelacionado();
+    });
+
+    // Cambio de estado (Activo / Inactivo)
+    $("#estadoObjetivoAsunto").change(function () {
+        var valor = $("#estadoObjetivoAsunto").val();
+        if (valor == "1") {
+            refreshObjetivoRelacionadoAsuntoList(true);
+        } else {
+            refreshObjetivoRelacionadoAsuntoList(false);
+        }
+    });
+
+    // Columnas para DataTable (mapeadas al Result real)
+    var objetivoRelacionadoColumns = [
+        {
+            title: "ID",
+            data: "int_id_ficha_asunto",
+            visible: false
+        },
+        {
+            title: "ID Objetivo",
+            data: "int_id_ficha_objetivo",
+            visible: false
+        },
+        {
+            title: "Nombre",
+            data: "Nombres",
+            orderable: true,
+            render: function (data, type, full) {
+                return data || "";
+            }
+        },
+        {
+            title: "Aliases",
+            data: "Aliases",
+            orderable: true,
+            render: function (data, type, full) {
+                return data || "";
+            }
+        },
+        {
+            title: "Grupos",
+            data: "GruposDelictivos",
+            orderable: true,
+            render: function (data, type, full) {
+                return data || "";
+            }
+        },
+        {
+            title: "Estatus Proceso",
+            data: "nvarchar_descripcion_estatus",
+            orderable: true,
+            render: function (data, type, full) {
+                return data || (full.bit_estatus ? "Activo" : "Inactivo");
+            }
+        },
+        {
+            title: "Obs",
+            data: "nvarchar_observaciones",
+            orderable: true,
+            render: function (data, type, full) {
+                return data || "";
+            }
+        },
+        {
+            title: "Fotografía",
+            data: "nvarchar_foto",
+            orderable: false,
+            render: function (data, type, full, meta) {
+                if (data) {
+                    return '<img src="data:image/jpeg;base64,' + data + '" class="img-thumbnail" style="width:60px;height:60px;object-fit:cover;" />';
+                } else {
+                    return '<span class="text-muted">Sin foto</span>';
+                }
+            }
+        },
+        {
+            title: "Acciones",
+            data: null,
+            orderable: false,
+            render: function (data, type, full, meta) {
+                var id = full.int_id_ficha_asunto;
+
+                // usa nvarchar_foto (o cambia a full.FotoBase63 si es necesario)
+                var fotoBase64 = full.nvarchar_foto || "";
+
+                // encode para evitar problemas con caracteres y longitud
+                var fotoEncoded = fotoBase64 ? encodeURIComponent(fotoBase64) : '';
+
+                var btnView = `
+            <button class="btn btn-sm btn-primary ver-foto2"
+                data-id="${id}"
+                data-foto="${fotoEncoded}"
+                title="Ver Fotografía">
+                <i class="fa fa-eye"></i>
+            </button>`;
+
+                var btnDelete = `
+            <button class="btn btn-sm btn-danger eliminar-objetivo" onclick="DisableObjetivoAsunto(${id})"
+                data-id="${id}"
+                title="Desactivar Objetivo">
+                <i class="fa fa-trash"></i>
+            </button>`;
+
+                var btnActivate = `
+            <button class="btn btn-sm btn-success activar-objetivo" onclick="ActivateObjetivoAsunto(${id})"
+                data-id="${id}"
+                title="Activar Objetivo">
+                <i class="fa fa-power-off"></i>
+            </button>`;
+
+                // input hidden con la foto (valor urlencoded) — más fiable que attribute largo
+                var hidden = `<input type="hidden" class="foto-base64-hidden" value="${fotoEncoded}" />`;
+
+                if ('@ViewBag.Actives'.toUpperCase() === 'TRUE') {
+                    return `<div class="btn-group">${btnView}${btnDelete}${hidden}</div>`;
+                } else {
+                    return `<div class="btn-group">${btnActivate}${hidden}</div>`;
+                }
+            }
+        }
+
+
+
+        @*{
+            title: "Acciones",
+            data: "int_id_ficha_asunto",
+            render: function (data, type, full, meta) {
+                var action;
+                if ('@ViewBag.Actives'.toUpperCase() == 'TRUE') {
+                    action = [
+                        { divId: 'div_DisableObjetivoAsunto_' + data, data: data, functionToExec: 'DisableObjetivoAsunto', toolTip: 'Desactivar', icon: 'fa fa-trash' }
+                    ];
+                } else {
+                    action = [
+                        { divId: 'div_ActivateObjetivoAsunto_' + data, data: data, functionToExec: 'ActivateObjetivoAsunto', toolTip: 'Activar', icon: 'fa fa-power-off' }
+                    ];
+                }
+                return AddActionsToGrid(action);
+            }
+        }*@
+    ];
+
+
+
+    // Llenar la grilla (llama al action FillObjetivoRelacionadoAsuntoList)
+    function FillGridListaObjetivoRelacionado() {
+
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("FillObjetivoRelacionadoAsuntoList")',
+            data: { int_id_asunto_relacionado: $("#int_id_asunto_relacionado").val(), active: @Html.Raw(Json.Encode(ViewBag.Actives)) },
+            success: function (data) {
+                $('#listaObjetivosRelacionadosDataTable').DataTable({
+                    destroy: true,
+                    searching: true,
+                    responsive: true,
+                    scrollX: true,
+                    data: data,
+                    columns: objetivoRelacionadoColumns,
+                    language: {
+                        "sProcessing": "Procesando...",
+                        "sLengthMenu": "Mostrar _MENU_ registros",
+                        "sZeroRecords": "No se encontraron resultados",
+                        "sEmptyTable": "Ningún dato disponible en esta tabla",
+                        "sInfo": "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                        "sInfoEmpty": "Mostrando registros del 0 al 0 de un total de 0 registros",
+                        "sInfoFiltered": "(filtrado de un total de _MAX_ registros)",
+                        "sSearch": "Buscar:",
+                        "sLoadingRecords": "Cargando...",
+                        "oPaginate": {
+                            "sFirst": "Primero",
+                            "sLast": "Último",
+                            "sNext": "Siguiente",
+                            "sPrevious": "Anterior"
+                        }
+                    }
+                });
+            },
+            error: function (xhr, status, error) {
+                console.error("Error al llenar la lista de Objetivos relacionados:", error);
+            }
+        });
+    }
+
+    // Función para refrescar (con parámetro opcional)
+    function refreshObjetivosRelacionadosList(active) {
+        if (typeof active === "undefined") {
+            active = ($("#estadoObjetivoAsunto").val() == "1");
+        }
+
+
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("FillObjetivoRelacionadoAsuntoList")',
+            data: { int_id_asunto_relacionado: $("#int_id_asunto_relacionado").val(), active: active },
+            success: function (data) {
+                var table = $('#listaObjetivosRelacionadosDataTable').DataTable();
+                table.clear();
+                table.rows.add(data);
+                table.draw();
+            },
+            error: function (xhr, status, error) {
+                console.error("Error al refrescar la lista:", error);
+            }
+        });
+    }
+
+    // Desactivar objetivo (llama a DisableObjetivoAsunto)
+    function DisableObjetivoAsunto(id) {
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("DisableObjetivoAsunto")',
+            data: { int_id_ficha_asunto: id },
+            success: function (data) {
+                if (data.IsSuccess) {
+                    swal({
+                        title: "",
+                        text: data.Message,
+                        type: 'success',
+                        confirmButtonText: "Continuar",
+                        closeOnConfirm: true,
+                    }, function (isConfirm) {
+                        if (isConfirm) {
+                            swal.close();
+                            refreshObjetivosRelacionadosList();
+                        }
+                    });
+                } else {
+                    swal({
+                        title: "Error",
+                        text: data.Message || "No tienes permisos para esta acción.",
+                        type: 'error'
+                    });
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error("Error al desactivar objetivo:", error);
+            }
+        });
+    }
+
+    // Activar objetivo (llama a ActivateObjetivoAsunto)
+    function ActivateObjetivoAsunto(id) {
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("ActivateObjetivoAsunto")',
+            data: { int_id_ficha_asunto: id },
+            success: function (data) {
+                if (data.IsSuccess) {
+                    swal({
+                        title: "",
+                        text: data.Message,
+                        type: 'success',
+                        confirmButtonText: "Continuar",
+                        closeOnConfirm: true,
+                    }, function () {
+                        swal.close();
+                        refreshObjetivosRelacionadosList();
+                    });
+                } else {
+                    swal({
+                        title: "Error",
+                        text: data.Message || "No tienes permisos para esta acción.",
+                        type: 'error'
+                    });
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error("Error al activar objetivo:", error);
+            }
+        });
+    }
+
+
+    // click handler para ver la foto en el modal #modalFotoAsuntoObjetivo
+    $(document).on('click', '.ver-foto2', function (e) {
+        e.preventDefault();
+
+        var $btn = $(this);
+        // intentamos primero buscar el input hidden dentro de la celda
+        var $cell = $btn.closest('td, .btn-group'); // por seguridad buscamos td o el grupo de botones
+        var encoded = $cell.find('.foto-base64-hidden').val();
+
+        // fallback: si no lo encontramos en el hidden, leemos el atributo data-foto del botón
+        if (!encoded || encoded === 'undefined') {
+            encoded = $btn.attr('data-foto') || $btn.data('foto') || '';
+        }
+
+        // debug (opcional)
+        // console.log('encoded slice:', (encoded || '').substr(0, 120));
+
+        if (!encoded) {
+            // no hay imagen: mostramos modal con mensaje o sin imagen
+            $('#modalFotoTitulo').text("Sin fotografía disponible");
+            $('#modalFotoImagen2').attr('src', '');
+            // si tienes elemento de descargar, lo escondes:
+            $('#modalDescargar').hide && $('#modalDescargar').hide();
+            $('#modalFotoAsuntoObjetivo').modal('show');
+            return;
+        }
+
+        // decodeURIComponent protegido
+        var fotoBase64;
+        try {
+            fotoBase64 = decodeURIComponent(encoded);
+        } catch (err) {
+            // si falla el decode, asumimos que ya viene sin encode
+            console.warn('decodeURIComponent falló, usando valor tal cual:', err);
+            fotoBase64 = encoded;
+        }
+
+        // si la cadena ya trae prefijo data:image/... la usamos tal cual; si no, asumimos jpeg
+        var src = (fotoBase64 && fotoBase64.indexOf('data:image') === 0)
+            ? fotoBase64
+            : ('data:image/jpeg;base64,' + fotoBase64);
+
+        // asignar título y src en el modal correcto
+        $('#modalFotoTitulo').text("Fotografía del registro");
+        $('#modalFotoImagen2').attr('src', src);
+
+        // si tienes enlace de descarga en la plantilla:
+        if ($('#modalDescargar').length) {
+            $('#modalDescargar').attr('href', src);
+            $('#modalDescargar').attr('download', 'foto_' + ($btn.data('id') || 'img') + '.jpg');
+            $('#modalDescargar').show();
+        }
+
+        // abrir modal (si usas Bootstrap 4 con jQuery)
+        $('#modalFotoAsuntoObjetivo').modal('show');
+
+        // Si en tu proyecto usas Bootstrap 5 sin el plugin jQuery, usa esto en su lugar:
+        // var modalEl = document.getElementById('modalFotoAsuntoObjetivo');
+        // var modal = new bootstrap.Modal(modalEl);
+        // modal.show();
+    });
+
+
+</script>

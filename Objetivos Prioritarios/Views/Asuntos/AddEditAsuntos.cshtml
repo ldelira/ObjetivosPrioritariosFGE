@@ -15,6 +15,9 @@
                     <button class="nav-link active" id="datos-tab" data-bs-toggle="tab" data-bs-target="#datos" type="button" role="tab">Datos del Asunto</button>
                 </li>
                 <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="objetivo-tab" data-bs-toggle="tab" data-bs-target="#objetivo" type="button" role="tab">Objetvos Prioritarios Relacionados</button>
+                </li>
+                <li class="nav-item" role="presentation">
                     <button class="nav-link" id="victimas-tab" data-bs-toggle="tab" data-bs-target="#victimas" type="button" role="tab">Víctimas</button>
                 </li>
             </ul>
@@ -22,67 +25,131 @@
             <div class="tab-content pt-3" id="asuntoTabsContent">
                 <!-- 🧩 TAB 1: Datos del Asunto -->
                 <div class="tab-pane fade show active" id="datos" role="tabpanel" aria-labelledby="datos-tab">
-                    
-                        @Html.HiddenFor(m => m.int_id_asunto_relacionado)
 
-                   
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="nvarchar_alias" class="form-label">Alias <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id="nvarchar_alias" name="nvarchar_alias"
-                                           value="@(Model != null ? Model.nvarchar_alias : String.Empty)" maxlength="300" />
-                                </div>
+                    @Html.HiddenFor(m => m.int_id_asunto_relacionado)
 
-                                <div class="mb-3">
-                                    <label for="numavp" class="form-label">Num AVP</label>
-                                    <input type="text" class="form-control" id="numavp" name="numavp"
-                                           value="@(Model != null ? Model.numavp : String.Empty)" maxlength="50" />
-                                </div>
 
-                                <div class="mb-3">
-                                    <label for="date_fecha_asunto" class="form-label">Fecha del Asunto</label>
-                                    <input type="datetime-local" class="form-control" id="date_fecha_asunto" name="date_fecha_asunto"
-                                           value="@(Model?.date_fecha_asunto.HasValue == true ? Model.date_fecha_asunto.Value.ToString("yyyy-MM-ddTHH:mm") : "")" />
-                                </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="nvarchar_alias" class="form-label">Alias <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="nvarchar_alias" name="nvarchar_alias"
+                                       value="@(Model != null ? Model.nvarchar_alias : String.Empty)" maxlength="300" />
+                            </div>
 
-                                <div class="mb-3">
-                                    <label for="int_id_estatus_asunto" class="form-label">Estatus</label>
-                                    <select id="int_id_estatus_asunto" name="int_id_estatus_asunto" class="form-control">
-                                        <option value="">-- Seleccionar --</option>
-                                        @* Si tienes lista de cat_EstatusAsunto en ViewBag, la puedes poblar así *@
-                                        @if (ViewBag.EstatusAsuntoList != null)
+                            <div class="mb-3">
+                                <label for="numavp" class="form-label">Num AVP</label>
+                                <input type="text" class="form-control" id="numavp" name="numavp"
+                                       value="@(Model != null ? Model.numavp : String.Empty)" maxlength="50" />
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="date_fecha_asunto" class="form-label">Fecha del Asunto</label>
+                                <input type="datetime-local" class="form-control" id="date_fecha_asunto" name="date_fecha_asunto"
+                                       value="@(Model?.date_fecha_asunto.HasValue == true ? Model.date_fecha_asunto.Value.ToString("yyyy-MM-ddTHH:mm") : "")" />
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="int_id_estatus_asunto" class="form-label">Estatus</label>
+                                <select id="int_id_estatus_asunto" name="int_id_estatus_asunto" class="form-control">
+                                    <option value="">-- Seleccionar --</option>
+                                    @* Si tienes lista de cat_EstatusAsunto en ViewBag, la puedes poblar así *@
+                                    @if (ViewBag.EstatusAsuntoList != null)
+                                    {
+                                        foreach (var e in (List<Objetivos_Prioritarios.Models.cat_EstatusAsunto>)ViewBag.EstatusAsuntoList)
                                         {
-                                            foreach (var e in (List<Objetivos_Prioritarios.Models.cat_EstatusAsunto>)ViewBag.EstatusAsuntoList)
-                                            {
-                                           
-                                                <option value="@e.int_id_estatus_asunto" @(e.int_id_estatus_asunto==Model.int_id_estatus_asunto?"selected":"")  >@e.nvarchar_estatus</option>
-                                            }
+
+                                            <option value="@e.int_id_estatus_asunto" @(e.int_id_estatus_asunto == Model.int_id_estatus_asunto ? "selected" : "")>@e.nvarchar_estatus</option>
                                         }
-                                    </select>
-                                </div>
-
+                                    }
+                                </select>
                             </div>
 
-                            <div class="col-md-6">
-                                <div class="mb-3 h-100">
-                                    <label for="nvarchar_descripcion" class="form-label">Descripción</label>
-                                    <textarea class="form-control" id="nvarchar_descripcion" name="nvarchar_descripcion" rows="10"
-                                              maxlength="max">@Html.Raw(Model != null ? Model.nvarchar_descripcion : String.Empty)</textarea>
-                                </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="mb-3 h-100">
+                                <label for="nvarchar_descripcion" class="form-label">Descripción</label>
+                                <textarea class="form-control" id="nvarchar_descripcion" name="nvarchar_descripcion" rows="10"
+                                          maxlength="max">@Html.Raw(Model != null ? Model.nvarchar_descripcion : String.Empty)</textarea>
                             </div>
                         </div>
+                    </div>
 
-                        <div class="mt-3 d-flex gap-2">
-                            <button type="button" id="btnSaveAsunto" class="btn btn-primary">Guardar</button>
-                            <a href="@Url.Action("Index", "Asuntos")" class="btn btn-secondary">Cancelar</a>
-                            <span id="saveSpinner" style="display:none; align-self:center;"><i class="fa fa-spinner fa-spin"></i> Guardando...</span>
-                        </div>
+                    <div class="mt-3 d-flex gap-2">
+                        <button type="button" id="btnSaveAsunto" class="btn btn-primary">Guardar</button>
+                        <a href="@Url.Action("Index", "Asuntos")" class="btn btn-secondary">Cancelar</a>
+                        <span id="saveSpinner" style="display:none; align-self:center;"><i class="fa fa-spinner fa-spin"></i> Guardando...</span>
+                    </div>
 
 
-                    
+
                 </div>
 
+
+                <!-- 🧩 TAB 2: Objetivo -->
+                <div class="tab-pane fade" id="objetivo" role="tabpanel" aria-labelledby="objetivo-tab">
+
+                    <div class="row">
+
+                        <div class="col-lg-6">
+
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Búsqueda de Objetivo Prioritario</h5>
+
+                                    <!-- Campos de búsqueda por nombre -->
+                                    <div id="busquedaPorNombre">
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <label for="searchName" class="form-label">Nombre</label>
+                                                <input type="text" class="form-control" id="txtNombreObjAsunto" placeholder="Nombre">
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label for="searchPaterno" class="form-label">Apellido Paterno</label>
+                                                <input type="text" class="form-control" id="txtPaternoObjAsunto" placeholder="Paterno">
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label for="searchMaterno" class="form-label">Apellido Materno</label>
+                                                <input type="text" class="form-control" id="txtMaternoObjAsunto" placeholder="Materno">
+                                            </div>
+                                        </div>
+                                        <br>
+                                    </div>
+
+                                
+                                    <div class="mb-3">
+                                        <button type="button" id="btnBuscarObjetivoAsunto" class="btn btn-primary w-100">
+                                            🔍 Buscar
+                                        </button>
+                                    </div>
+
+                                    <div id="busquedaObjetivoAsunto"></div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Objetivos Prioritarios Relacionados al Asunto</h5>
+
+                                    <div id="ObjetivoRelacionadoAsunto"></div>
+
+                                </div>
+                            </div>
+                        </div>
+
+
+
+                    </div>
+
+
+
+
+
+
+                </div> <!-- Fin pestaña Víctimas -->
                 <!-- 🧩 TAB 2: Víctimas -->
                 <div class="tab-pane fade" id="victimas" role="tabpanel" aria-labelledby="victimas-tab">
 
@@ -206,7 +273,7 @@
 
 
 
-                    
+
                 </div> <!-- Fin pestaña Víctimas -->
             </div>
         </div>
@@ -227,6 +294,7 @@
         $(document).ready(function () {
             // Cargar lista inicial de víctimas relacionadas
             refreshVictimasRelacionadasList();
+            refreshObjetivoRelacionadoAsuntoList();
             refreshListaVictimas(true);
             // 🔍 Buscar víctimas
             $("#btnBuscarVictima").click(function () {
@@ -243,7 +311,22 @@
                 refreshObjetivo();
                 refreshVictimas();
             });
+            $("#btnBuscarObjetivoAsunto").click(function () {
+                debugger;
+                let nombre = $("#txtNombreObjAsunto").val().trim();
+                let paterno = $("#txtPaternoObjAsunto").val().trim();
+                let materno = $("#txtMaternoObjAsunto").val().trim();
+
+                if (nombre.length < 2) {
+                    swal("Atención", "Escribe al menos 2 caracteres para buscar.", "info");
+                    return;
+                }
+
+                refreshObjetivoRelacionadoAsunto();
+            });
         });
+
+
 
 
 
@@ -257,11 +340,26 @@
             $("#busquedaDetenidos").load("@Url.Action("DetenidoListPartial", "Asuntos")", datos);
 
         }
+
+        function refreshObjetivoRelacionadoAsunto() {
+            var datos = {
+                nombre: $("#txtNombreVictima").val().trim(),
+                paterno: $("#txtPaterno").val().trim(),
+                materno: $("#txtMaterno").val().trim(),
+                opcion:1
+            };
+            $("#busquedaObjetivoAsunto").empty();
+            $("#busquedaObjetivoAsunto").load("@Url.Action("ObjetivoPrioritarioListPartial", "Asuntos")", datos);
+        }
+
+
         function refreshObjetivo() {
             var datos = {
                 nombre: $("#txtNombreVictima").val().trim(),
                 paterno: $("#txtPaterno").val().trim(),
-                materno: $("#txtMaterno").val().trim()
+                materno: $("#txtMaterno").val().trim(),
+                opcion:2
+
             };
             $("#busquedaObjetivos").empty();
             $("#busquedaObjetivos").load("@Url.Action("ObjetivoPrioritarioListPartial", "Asuntos")", datos);
@@ -298,6 +396,16 @@
             $("#listaVictimasDataTable").empty();
             $("#listaVictimasDataTable").load("@Url.Action("VictimasListPartial", "Asuntos")", datos);
         }
+
+
+        function refreshObjetivoRelacionadoAsuntoList(actives) {
+            var datos = {
+                actives: actives
+            };
+            $("#ObjetivoRelacionadoAsunto").html('<div class="text-center p-3"><div class="spinner-border text-primary"></div></div>');
+            $("#ObjetivoRelacionadoAsunto").load("@Url.Action("ObjetivoRelacionadoAsuntoListPartial", "Asuntos")", datos);
+        }
+
 
 
     $(function () {
@@ -456,8 +564,8 @@
             });
         }
 
-     
-        
+
+
 
 
     </script>

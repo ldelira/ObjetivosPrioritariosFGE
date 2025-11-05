@@ -149,6 +149,7 @@ namespace Objetivos_Prioritarios.Controllers
 
             var model = AsuntoService.GetVictimasNamePhotoList(nombre, paterno, materno).ToList();
 
+          
             return SubView("Victimas", "ObjetivoPrioritarioListPartial", model);
         }
         [HttpPost]
@@ -256,6 +257,48 @@ namespace Objetivos_Prioritarios.Controllers
             return SubView("Victimas", "AddEditVictimaPartial",model);
         }
 
+
+        #region ObjetivosRelacionadoAsunto
+        [HttpPost]
+        public JsonResult addObjetivoAsunto(int int_id_objetivo, int int_id_asunto_relacionado)
+        {
+            return Json(AsuntoService.addObjetivoAsunto(int_id_objetivo, int_id_asunto_relacionado));
+
+
+        }
+
+        public PartialViewResult ObjetivoRelacionadoAsuntoListPartial(bool? actives)
+        {
+            if (actives == null) actives = true;
+            ViewBag.Actives = actives;
+            return PartialView();
+        }
+
+
+        [HttpPost]
+        public JsonResult FillObjetivoRelacionadoAsuntoList(int int_id_asunto_relacionado,bool? active)
+        {
+            var lista = AsuntoService.getListObjetivosRelacionadoAsunto(int_id_asunto_relacionado, (bool)active).ToList();
+
+            return Json(lista, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpPost]
+        public JsonResult ActivateObjetivoAsunto(int int_id_ficha_asunto)
+        {
+            var resp = AsuntoService.ActivateObjetivoAsunto(int_id_ficha_asunto);
+            return Json(resp);
+        }
+
+        [HttpPost]
+        public JsonResult DisableObjetivoAsunto(int int_id_ficha_asunto)
+        {
+            var resp = AsuntoService.DisableObjetivoAsunto(int_id_ficha_asunto);
+            return Json(resp);
+        }
+
+
+        #endregion
 
     }
 }

@@ -12,6 +12,39 @@ namespace Objetivos_Prioritarios.ControllersServices
 {
     public class ObjetivoService : BaseService
     {
+
+        public tb_Objetivo addObjetivoFicha()
+        {
+            try
+            {
+                var objetivo = new tb_Objetivo
+                {
+                    date_fecha_creacion = DateTime.Now,
+                    nvarchar_usuario_creacion = "delira",
+                    bit_estatus = true
+                };
+
+                var ficha = new tb_FichaObjetivo
+                {
+                    tb_Objetivo = objetivo, // se asocia directamente la entidad
+                    bit_estatus = true
+                };
+
+                db.tb_Objetivo.Add(objetivo);
+                db.tb_FichaObjetivo.Add(ficha);
+                db.SaveChanges();
+
+                return objetivo;
+            }
+            catch (Exception ex)
+            {
+                // Aquí puedes registrar el error en un log si tienes una función personalizada
+                // EscribirLog("Error en addObjetivoFicha: " + ex.Message);
+
+                throw new Exception("Ocurrió un error al agregar el objetivo y la ficha.", ex);
+            }
+        }
+
         public List<getListObjetivosPrioritarios_Result> getObjetivosList(bool? actives)
         {
             return db.getListObjetivosPrioritarios(actives).ToList();

@@ -56,15 +56,7 @@ namespace Objetivos_Prioritarios.Controllers
             }
             else
             {
-                tb_Objetivo objetivo = new tb_Objetivo
-                {
-                    date_fecha_creacion = DateTime.Now,
-                    nvarchar_usuario_creacion = "delira",
-                    bit_estatus = true
-                };
-                ObjetivoService.db.tb_Objetivo.Add(objetivo);
-                ObjetivoService.db.SaveChanges();
-                return View(objetivo);
+                return View(ObjetivoService.addObjetivoFicha());
             }
         }
 

@@ -627,6 +627,102 @@ namespace Objetivos_Prioritarios.ControllersServices
             }
         }
 
+        public BasicOperationResponse addObjetivoAsunto(int int_id_objetivo, int int_id_asunto_relacionado)
+        {
+            try
+            {
+                string msg = "";
+                var busFicha = db.tb_FichaObjetivo.FirstOrDefault(x => x.int_id_objetivo == int_id_objetivo);
+
+                var id_ficha = busFicha.int_id_ficha_objetivo;
+
+                var busFichaAsunto = db.tb_FichaAsunto.Where(x => x.int_id_asunto_relacionado == int_id_asunto_relacionado && x.int_id_ficha_objetivo == id_ficha).FirstOrDefault();
+
+
+                if (busFichaAsunto != null)
+                {
+                    if (busFichaAsunto.bit_estatus == false)
+                    {
+                        busFichaAsunto.bit_estatus = true;
+                        msg = "Se activo objetivo ya existente en la relación.";
+
+                    }
+                    else
+                    {
+                        msg = "Objetivo ya existente en la relación.";
+                    }
+
+                }
+                else
+                {
+
+                    // Insertar relación con el asunto
+                    busFichaAsunto = new tb_FichaAsunto
+                    {
+                        int_id_asunto_relacionado = int_id_asunto_relacionado,
+                        int_id_ficha_objetivo = id_ficha,
+                        date_fecha_creacion = DateTime.Now,
+                        bit_estatus = true
+                    };
+
+                    db.tb_FichaAsunto.Add(busFichaAsunto);
+                    msg = "Objetivo agregado correctamente al asunto.";
+                }
+                db.SaveChanges();
+
+
+                return new BasicOperationResponse
+                {
+                    IsSuccess = true,
+                    Message = msg
+                };
+            }
+            catch (Exception e)
+            {
+                return new BasicOperationResponse { IsSuccess = false, Message = "Ocurrió un error al activar el objetivo (" + e.Message + ")" };
+            }
+        }
+
+
+        public List<getListObjetivosRelacionadoAsunto_Result> getListObjetivosRelacionadoAsunto(int int_id_asunto_relacionado, bool activo)
+        {
+            return db.getListObjetivosRelacionadoAsunto(activo, int_id_asunto_relacionado).ToList();
+        }
+        public BasicOperationResponse ActivateObjetivoAsunto(int int_id_ficha_asunto)
+        {
+            try
+            {
+                var entidad = db.tb_FichaAsunto.FirstOrDefault(x => x.int_id_ficha_asunto == int_id_ficha_asunto);
+                if (entidad == null) return new BasicOperationResponse { IsSuccess = false, Message = "Ficha asunto no encontrado." };
+
+                entidad.bit_estatus = true;
+                db.SaveChanges();
+                return new BasicOperationResponse { IsSuccess = true, Message = "Se activó el objetivo en el asunto satisfactoriamente." };
+            }
+            catch (Exception e)
+            {
+                return new BasicOperationResponse { IsSuccess = false, Message = "Ocurrió un error al activar el asunto (" + e.Message + ")" };
+            }
+        }
+
+        // Desactivar
+        public BasicOperationResponse DisableObjetivoAsunto(int int_id_ficha_asunto)
+        {
+            try
+            {
+                var entidad = db.tb_FichaAsunto.FirstOrDefault(x => x.int_id_ficha_asunto == int_id_ficha_asunto);
+                if (entidad == null) return new BasicOperationResponse { IsSuccess = false, Message = "Ficha asunto no encontrado." };
+
+                entidad.bit_estatus = false;
+                db.SaveChanges();
+                return new BasicOperationResponse { IsSuccess = true, Message = "Se desactivó el objetivo en el asunto satisfactoriamente." };
+            }
+            catch (Exception e)
+            {
+                return new BasicOperationResponse { IsSuccess = false, Message = "Ocurrió un error al desactivar el asunto (" + e.Message + ")" };
+            }
+        }
+
 
 
     }

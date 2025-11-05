@@ -11,14 +11,21 @@ namespace Objetivos_Prioritarios.Models
 {
     using System;
     
-    public partial class getListObjetivosPrioritarios_Result
+    public partial class getListObjetivosRelacionadoAsunto_Result
     {
-        public int int_id_objetivo { get; set; }
+        public int int_id_ficha_asunto { get; set; }
+        public int int_id_ficha_objetivo { get; set; }
+        public int int_id_asunto_relacionado { get; set; }
+        public bool estatus_ficha { get; set; }
+        public Nullable<int> int_id_estatus_proceso { get; set; }
+        public string nvarchar_descripcion_estatus { get; set; }
+        public string nvarchar_observaciones { get; set; }
+        public Nullable<int> int_id_objetivo { get; set; }
         public string Nombres { get; set; }
         public string Aliases { get; set; }
         public string GruposDelictivos { get; set; }
         public System.DateTime FechaNacimiento { get; set; }
-        public bool bit_estatus { get; set; }
+        public Nullable<bool> estatus_objetivo { get; set; }
         public string nvarchar_foto { get; set; }
     }
 }

@@ -71,15 +71,6 @@ namespace Objetivos_Prioritarios.Models
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<getInfoObjetivoListById_Result>("getInfoObjetivoListById", int_id_informacionParameter);
         }
     
-        public virtual ObjectResult<getListObjetivosPrioritarios_Result> getListObjetivosPrioritarios(Nullable<bool> bit_estatus)
-        {
-            var bit_estatusParameter = bit_estatus.HasValue ?
-                new ObjectParameter("bit_estatus", bit_estatus) :
-                new ObjectParameter("bit_estatus", typeof(bool));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<getListObjetivosPrioritarios_Result>("getListObjetivosPrioritarios", bit_estatusParameter);
-        }
-    
         public virtual ObjectResult<getListFiliacionRelacionada_Result> getListFiliacionRelacionada(Nullable<int> int_id_ficha_objetivo, Nullable<bool> active)
         {
             var int_id_ficha_objetivoParameter = int_id_ficha_objetivo.HasValue ?
@@ -133,6 +124,28 @@ namespace Objetivos_Prioritarios.Models
                 new ObjectParameter("bit_status", typeof(bool));
     
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<getListVictimasByNombre_Result>("getListVictimasByNombre", nombreParameter, paternoParameter, maternoParameter, opcionParameter, bit_statusParameter);
+        }
+    
+        public virtual ObjectResult<getListObjetivosPrioritarios_Result> getListObjetivosPrioritarios(Nullable<bool> bit_estatus)
+        {
+            var bit_estatusParameter = bit_estatus.HasValue ?
+                new ObjectParameter("bit_estatus", bit_estatus) :
+                new ObjectParameter("bit_estatus", typeof(bool));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<getListObjetivosPrioritarios_Result>("getListObjetivosPrioritarios", bit_estatusParameter);
+        }
+    
+        public virtual ObjectResult<getListObjetivosRelacionadoAsunto_Result> getListObjetivosRelacionadoAsunto(Nullable<bool> bit_estatus, Nullable<int> int_id_asunto_relacionado)
+        {
+            var bit_estatusParameter = bit_estatus.HasValue ?
+                new ObjectParameter("bit_estatus", bit_estatus) :
+                new ObjectParameter("bit_estatus", typeof(bool));
+    
+            var int_id_asunto_relacionadoParameter = int_id_asunto_relacionado.HasValue ?
+                new ObjectParameter("int_id_asunto_relacionado", int_id_asunto_relacionado) :
+                new ObjectParameter("int_id_asunto_relacionado", typeof(int));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<getListObjetivosRelacionadoAsunto_Result>("getListObjetivosRelacionadoAsunto", bit_estatusParameter, int_id_asunto_relacionadoParameter);
         }
     }
 }

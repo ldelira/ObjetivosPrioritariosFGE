@@ -179,7 +179,7 @@ else
             success: function (resp) {
                 if (resp.IsSuccess) {
                     swal("", resp.Message, "success");
-                    //refreshVictimasRelacionadasList();
+                    refreshObjetivoRelacionadoAsuntoList();
                 } else {
                     swal("Error", resp.Message, "error");
                 }

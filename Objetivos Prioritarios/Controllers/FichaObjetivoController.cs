@@ -36,8 +36,17 @@ namespace Objetivos_Prioritarios.Controllers
         public JsonResult FillFichaObjetivosList(bool? active)
         {
             var general = ObjetivoService.getObjetivosList(active);
-
-            return Json(general, JsonRequestBehavior.AllowGet);
+            var generalResult = general
+            .Select(x => new {
+                x.int_id_objetivo,
+                x.Nombres,
+                x.Aliases,
+                x.GruposDelictivos,
+                x.FechaNacimiento,
+                x.bit_estatus,
+                TieneFoto = (!string.IsNullOrEmpty(x.nvarchar_foto)) == true ? "CON FOTO" : "SIN FOTO"
+            }).ToList();
+            return Json(generalResult, JsonRequestBehavior.AllowGet);
         }
 
 

@@ -92,6 +92,7 @@ else
   // ✅ Llamado desde el botón ✔️ del DataTable
     function addObjetivoVictima(int_id_objetivo) {
         clavePersonaSeleccionada = int_id_objetivo;
+       
 
       // Limpia el select antes de cargar
       $("#selectNombreObjetivo").empty()
@@ -154,7 +155,7 @@ else
 
   // 🧩 Función para agregar el seleccionado a otra tabla
     function agregarObjetivoSeleccionado(id_nombre) {
-        debugger;
+         
         $.post("@Url.Action("addObjetivoVictima", "Asuntos")", { id_asunto_relacionado: $("#int_id_asunto_relacionado").val(), id_nombre: id_nombre }, function (resp) {
            if (resp.IsSuccess) {
                swal("", resp.Message, "success");

@@ -378,7 +378,7 @@
         }
 
         function refreshListaVictimas(active) {
-            debugger;
+             
             var band = true;
             if (active=="0" || active=="1") {
                 band = active == "1" ? true : false;
@@ -558,11 +558,37 @@
         }*@
 
         function abrirModalVictima(id) {
-            $.get('@Url.Action("AddEditVictimaPartial", "Asuntos")', { id: id }, function (html) {
+            var int_id_asunto_relacionado = $("#int_id_asunto_relacionado").val();
+            var idllamada = 0;
+            var idasunto = int_id_asunto_relacionado;
+
+            $.get('@Url.Action("AddEditVictimaPartial", "Asuntos")', {
+                id: id,
+                idllamada: idllamada,
+                idasunto: idasunto
+            }, function (html) {
                 $("#ModalGenericoContent").html(html);
                 $("#ModalGenerico").modal("show");
             });
         }
+
+
+
+        @*function AddVictimaRelacionada(id) {
+    var int_id_asunto_relacionado = $("#int_id_asunto_relacionado").val();
+
+$.get('@Url.Action("AddEditVictimaPartial", "Asuntos")',
+    {
+        id: id,
+        idllamada: 1,
+        idasunto: int_id_asunto_relacionado
+    },
+    function (html) {
+        $("#ModalGenericoContent").html(html);
+        $("#ModalGenerico").modal("show");
+    }
+
+);*@
 
 
 

@@ -21,7 +21,7 @@
                             <div class="col-md-2"></div>
                             <div class="col-md-7 text-end">
                                 <button type="button" class="btn btn-primary"
-                                        onclick="AddVictimaRelacionada()">
+                                        onclick="AddVictimaRelacionada(0)">
                                     Agregar Víctima
                                 </button>
                             </div>
@@ -259,11 +259,27 @@
     // ============================
     //   ACCIONES
     // ============================
-    function AddVictimaRelacionada() {
-        // Aquí iría tu modal o redirección para agregar víctima
-        swal("Agregar Víctima", "Función no implementada aún.", "info");
-    }
+    //function AddVictimaRelacionada() {
+    //    // Aquí iría tu modal o redirección para agregar víctima
+    //    swal("Agregar Víctima", "Función no implementada aún.", "info");
+    //}
 
+    function AddVictimaRelacionada(id) {
+        var int_id_asunto_relacionado = $("#int_id_asunto_relacionado").val();
+
+    $.get('@Url.Action("AddEditVictimaPartial", "Asuntos")', 
+        { 
+            id: id, 
+            idllamada: 1, 
+            idasunto: int_id_asunto_relacionado 
+        }, 
+        function (html) {
+            $("#ModalGenericoContent").html(html);
+            $("#ModalGenerico").modal("show");
+        }
+
+    );
+}
 
 
     function DisableVictimaRelacionada(id) {
@@ -290,7 +306,7 @@
     }
 
     function ActivateVictimaRelacionada(id) {
-        debugger;
+         
         $.ajax({
             type: 'POST',
             url: '@Url.Action("ActivateVictimaRelacionada", "Asuntos")',

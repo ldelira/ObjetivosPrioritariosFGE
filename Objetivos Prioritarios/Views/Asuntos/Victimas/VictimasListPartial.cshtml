@@ -40,13 +40,13 @@ else
                                     <button class="btn btn-primary btn-sm" onclick="abrirModalVictima(@item.int_id_victima)">
                                         <i class="fa fa-edit"></i>
                                     </button>
-                                    <button class="btn btn-danger btn-sm" onclick="agregarVictimaSeleccionado(@item.int_id_victima)">
+                                    <button class="btn btn-danger btn-sm" onclick="ReactivarDesactivarVictimaSeleccionado(@item.int_id_victima, 0)">
                                         <i class="fa fa-trash"></i>
                                     </button>
                                 }
                                 else
                                 {
-                                    <button class="btn btn-success btn-sm" onclick="agregarVictimaSeleccionado(@item.int_id_victima)">
+                                    <button class="btn btn-success btn-sm" onclick="ReactivarDesactivarVictimaSeleccionado(@item.int_id_victima, 1)">
                                         <i class="fa fa-power-off"></i>
                                     </button>
                                 }
@@ -90,8 +90,26 @@ else
                 swal("Error", resp.Message, "error");
             }
         });
+    }
 
+    function ReactivarDesactivarVictimaSeleccionado(idvictima, id) {
+        $.post("@Url.Action("ReactivarVictima", "Asuntos")", {
+            id_asunto_relacionado: $("#int_id_asunto_relacionado").val(),
+            id_victima: idvictima,
+            id: id
+        }, function (resp) {
+            if (resp.IsSuccess) {
+                swal("", resp.Message, "success");
+                refreshListaVictimas(id);
+            } else {
+                swal("Error", resp.Message, "error");
+            }
+        });
+    }
 
+    function rechargepage() {
+        $("#busquedaVictimas").html('<div class="text-center p-3"><div class="spinner-border text-primary"></div></div>');
+        $("#busquedaVictimas").load("@Url.Action("VictimasListPartial", "Asuntos")");
     }
 
 </script>

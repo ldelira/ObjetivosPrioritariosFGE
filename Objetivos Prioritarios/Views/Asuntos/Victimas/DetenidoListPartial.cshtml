@@ -82,7 +82,7 @@ else
     // ✅ Llamado desde el botón ✔️ del DataTable
     function addDetenidoVictima(clave_persona) {
         clavePersonaSeleccionada = clave_persona;
-        debugger;
+         
         // Limpia el select antes de cargar
         $("#selectNombreDetenido").empty()
             .append('<option value="">Cargando nombres...</option>');
@@ -141,7 +141,7 @@ else
 
     // 🧩 Función para agregar el seleccionado a otra tabla
     function agregarDetenidoSeleccionado(id) {
-        debugger;
+         
         $.post("@Url.Action("addDetenidoVictima", "Asuntos")", { id_asunto_relacionado: $("#int_id_asunto_relacionado").val(),id:id }, function (resp) {
              if (resp.IsSuccess) {
                  swal("", resp.Message, "success");

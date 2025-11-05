@@ -1,9 +1,11 @@
-﻿using Objetivos_Prioritarios.ControllersServices;
+﻿using Newtonsoft.Json;
+using Objetivos_Prioritarios.ControllersServices;
 using Objetivos_Prioritarios.Models;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.DirectoryServices.AccountManagement;
+using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -198,6 +200,12 @@ namespace Objetivos_Prioritarios.Controllers
 
         }
 
+
+        [HttpPost]
+        public JsonResult ReactivarVictima(int id, int id_victima, int id_asunto_relacionado)
+        {
+            return Json(AsuntoService.ReactivarVictima(id, id_victima, id_asunto_relacionado));
+        }
         #endregion
 
 
@@ -245,8 +253,10 @@ namespace Objetivos_Prioritarios.Controllers
 
 
         
-        public PartialViewResult AddEditVictimaPartial(int? id)
+        public PartialViewResult AddEditVictimaPartial(int? id, int? idllamada, int? idasunto)
         {
+            ViewBag.llamada = idllamada;
+            ViewBag.idasunto = idasunto;
             tb_Victimas model = new tb_Victimas();
 
             if (id != null && id > 0)
@@ -299,6 +309,57 @@ namespace Objetivos_Prioritarios.Controllers
 
 
         #endregion
+
+        [HttpPost]
+        public JsonResult SaveVictima()
+        {
+            try
+            {
+                var file = Request.Files["foto"];
+                string nombre = Request.Form["nvarchar_nombre"]?.Trim();
+                string paterno = Request.Form["nvarchar_paterno"]?.Trim();
+                string materno = Request.Form["nvarchar_materno"]?.Trim();
+                int idllamada = Convert.ToInt32(Request.Form["llamada"]);
+                int idasunto = Convert.ToInt32(Request.Form["asunto"]);
+
+                // 🧾 Depuración opcional (para revisar en consola del servidor)
+                //System.Diagnostics.Debug.WriteLine("---- DATOS RECIBIDOS ----");
+                //System.Diagnostics.Debug.WriteLine($"Nombre: {nombre}");
+                //System.Diagnostics.Debug.WriteLine($"Paterno: {paterno}");
+                //System.Diagnostics.Debug.WriteLine($"Materno: {materno}");
+                //System.Diagnostics.Debug.WriteLine($"idllamada: {idllamada}");
+                //System.Diagnostics.Debug.WriteLine($"idasunto: {idasunto}");
+                //System.Diagnostics.Debug.WriteLine($"Archivo: {(file != null ? file.FileName : "Ninguno")}");
+
+                string base64Foto = null;
+                if (file != null && file.ContentLength > 0)
+                {
+                    using (var ms = new MemoryStream())
+                    {
+                        file.InputStream.CopyTo(ms);
+                        base64Foto = Convert.ToBase64String(ms.ToArray());
+                    }
+                }
+                var resultado = AsuntoService.SaveVictimaService(nombre, paterno, materno, base64Foto, idllamada, idasunto);
+
+                return Json(new
+                {
+                    success = resultado.IsSuccess,
+                    message = resultado.Message
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = $"Error al procesar la solicitud: {ex.Message}"
+                });
+            }
+        }
+
+
+
 
     }
 }

@@ -125,6 +125,7 @@
           <Property Name="int_id_asunto_relacionado" Type="int" Nullable="false" />
           <Property Name="date_fecha_creacion" Type="datetime" Nullable="false" />
           <Property Name="bit_estatus" Type="bit" Nullable="false" />
+          <Property Name="nvarchar_observaciones" Type="nvarchar(max)" />
         </EntityType>
         <EntityType Name="tb_FichaObjetivo">
           <Key>
@@ -626,6 +627,25 @@
             <Parameter Name="int_id_ficha_objetivo" Mode="In" Type="Int32" />
             <Parameter Name="active" Mode="In" Type="Boolean" />
           </FunctionImport>
+          <FunctionImport Name="getNamePhotoList" ReturnType="Collection(Objetivos_PrioritariosModel.getNamePhotoList_Result)">
+            <Parameter Name="nombre" Mode="In" Type="String" />
+            <Parameter Name="paterno" Mode="In" Type="String" />
+            <Parameter Name="materno" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="getListVictimasByNombre" ReturnType="Collection(Objetivos_PrioritariosModel.getListVictimasByNombre_Result)">
+            <Parameter Name="nombre" Mode="In" Type="String" />
+            <Parameter Name="paterno" Mode="In" Type="String" />
+            <Parameter Name="materno" Mode="In" Type="String" />
+            <Parameter Name="opcion" Mode="In" Type="Int32" />
+            <Parameter Name="bit_status" Mode="In" Type="Boolean" />
+          </FunctionImport>
+          <FunctionImport Name="getListObjetivosPrioritarios" ReturnType="Collection(Objetivos_PrioritariosModel.getListObjetivosPrioritarios_Result)">
+          <Parameter Name="bit_estatus" Mode="In" Type="Boolean" />
+          </FunctionImport>
+          <FunctionImport Name="getListObjetivosRelacionadoAsunto" ReturnType="Collection(Objetivos_PrioritariosModel.getListObjetivosRelacionadoAsunto_Result)">
+            <Parameter Name="bit_estatus" Mode="In" Type="Boolean" />
+            <Parameter Name="int_id_asunto_relacionado" Mode="In" Type="Int32" />
+          </FunctionImport>
           <EntitySet Name="cat_EstatusAsunto" EntityType="Objetivos_PrioritariosModel.cat_EstatusAsunto" />
           <EntitySet Name="cat_EstatusProceso" EntityType="Objetivos_PrioritariosModel.cat_EstatusProceso" />
           <EntitySet Name="cat_TipoActividadDelictiva" EntityType="Objetivos_PrioritariosModel.cat_TipoActividadDelictiva" />
@@ -723,25 +743,6 @@
             <End Role="tb_Objetivo" EntitySet="tb_Objetivo" />
             <End Role="tb_ObjetivoGrupo" EntitySet="tb_ObjetivoGrupo" />
           </AssociationSet>
-          <FunctionImport Name="getNamePhotoList" ReturnType="Collection(Objetivos_PrioritariosModel.getNamePhotoList_Result)">
-            <Parameter Name="nombre" Mode="In" Type="String" />
-            <Parameter Name="paterno" Mode="In" Type="String" />
-            <Parameter Name="materno" Mode="In" Type="String" />
-          </FunctionImport>
-          <FunctionImport Name="getListVictimasByNombre" ReturnType="Collection(Objetivos_PrioritariosModel.getListVictimasByNombre_Result)">
-            <Parameter Name="nombre" Mode="In" Type="String" />
-            <Parameter Name="paterno" Mode="In" Type="String" />
-            <Parameter Name="materno" Mode="In" Type="String" />
-            <Parameter Name="opcion" Mode="In" Type="Int32" />
-            <Parameter Name="bit_status" Mode="In" Type="Boolean" />
-          </FunctionImport>
-          <FunctionImport Name="getListObjetivosPrioritarios" ReturnType="Collection(Objetivos_PrioritariosModel.getListObjetivosPrioritarios_Result)">
-          <Parameter Name="bit_estatus" Mode="In" Type="Boolean" />
-          </FunctionImport>
-          <FunctionImport Name="getListObjetivosRelacionadoAsunto" ReturnType="Collection(Objetivos_PrioritariosModel.getListObjetivosRelacionadoAsunto_Result)">
-            <Parameter Name="bit_estatus" Mode="In" Type="Boolean" />
-            <Parameter Name="int_id_asunto_relacionado" Mode="In" Type="Int32" />
-          </FunctionImport>
           </EntityContainer>
         <ComplexType Name="getInfoObjetivoList_Result">
           <Property Type="Int32" Name="int_id_informacion" Nullable="false" />
@@ -793,6 +794,43 @@
           <Property Type="Int32" Name="Cve_Delito" Nullable="false" />
           <Property Type="String" Name="Delito" Nullable="false" MaxLength="150" />
           <Property Type="Boolean" Name="Expr1" Nullable="false" />
+        </ComplexType>
+        <ComplexType Name="getNamePhotoList_Result">
+          <Property Type="String" Name="NOMBRES_COMPLETOS" Nullable="true" />
+          <Property Type="Int32" Name="int_id_objetivo" Nullable="false" />
+          <Property Type="String" Name="nvarchar_foto" Nullable="true" />
+        </ComplexType>
+        <ComplexType Name="getListVictimasByNombre_Result">
+          <Property Type="Int32" Name="int_id_victima" Nullable="false" />
+          <Property Type="String" Name="NombreCompleto" Nullable="false" MaxLength="352" />
+          <Property Type="String" Name="nvarchar_foto" Nullable="true" />
+          <Property Type="DateTime" Name="date_fecha_creacion" Nullable="false" Precision="23" />
+          <Property Type="Boolean" Name="bit_estatus" Nullable="false" />
+        </ComplexType>
+        <ComplexType Name="getListObjetivosPrioritarios_Result">
+          <Property Type="Int32" Name="int_id_objetivo" Nullable="false" />
+          <Property Type="String" Name="Nombres" Nullable="false" MaxLength="4000" />
+          <Property Type="String" Name="Aliases" Nullable="false" MaxLength="4000" />
+          <Property Type="String" Name="GruposDelictivos" Nullable="false" MaxLength="4000" />
+          <Property Type="DateTime" Name="FechaNacimiento" Nullable="false" Precision="23" />
+          <Property Type="Boolean" Name="bit_estatus" Nullable="false" />
+          <Property Type="String" Name="nvarchar_foto" Nullable="true" />
+        </ComplexType>
+        <ComplexType Name="getListObjetivosRelacionadoAsunto_Result">
+          <Property Type="Int32" Name="int_id_ficha_asunto" Nullable="false" />
+          <Property Type="Int32" Name="int_id_ficha_objetivo" Nullable="false" />
+          <Property Type="Int32" Name="int_id_asunto_relacionado" Nullable="false" />
+          <Property Type="Boolean" Name="estatus_ficha" Nullable="false" />
+          <Property Type="Int32" Name="int_id_estatus_proceso" Nullable="true" />
+          <Property Type="String" Name="nvarchar_descripcion_estatus" Nullable="true" MaxLength="400" />
+          <Property Type="String" Name="nvarchar_observaciones" Nullable="true" MaxLength="400" />
+          <Property Type="Int32" Name="int_id_objetivo" Nullable="true" />
+          <Property Type="String" Name="Nombres" Nullable="false" MaxLength="4000" />
+          <Property Type="String" Name="Aliases" Nullable="false" MaxLength="4000" />
+          <Property Type="String" Name="GruposDelictivos" Nullable="false" MaxLength="4000" />
+          <Property Type="DateTime" Name="FechaNacimiento" Nullable="false" Precision="23" />
+          <Property Type="Boolean" Name="estatus_objetivo" Nullable="true" />
+          <Property Type="String" Name="nvarchar_foto" Nullable="true" />
         </ComplexType>
         <EntityType Name="cat_EstatusAsunto">
           <Key>
@@ -928,6 +966,7 @@
           <Property Name="int_id_asunto_relacionado" Type="Int32" Nullable="false" />
           <Property Name="date_fecha_creacion" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="bit_estatus" Type="Boolean" Nullable="false" />
+          <Property Name="nvarchar_observaciones" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="tb_AsuntoRelacionado" Relationship="Objetivos_PrioritariosModel.FK_tb_FichaAsunto_tb_AsuntoRelacionado" FromRole="tb_FichaAsunto" ToRole="tb_AsuntoRelacionado" />
           <NavigationProperty Name="tb_FichaObjetivo" Relationship="Objetivos_PrioritariosModel.FK_tb_FichaAsunto_tb_FichaObjetivo" FromRole="tb_FichaAsunto" ToRole="tb_FichaObjetivo" />
         </EntityType>
@@ -1308,43 +1347,6 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <ComplexType Name="getNamePhotoList_Result">
-          <Property Type="String" Name="NOMBRES_COMPLETOS" Nullable="true" />
-          <Property Type="Int32" Name="int_id_objetivo" Nullable="false" />
-          <Property Type="String" Name="nvarchar_foto" Nullable="true" />
-        </ComplexType>
-        <ComplexType Name="getListVictimasByNombre_Result">
-          <Property Type="Int32" Name="int_id_victima" Nullable="false" />
-          <Property Type="String" Name="NombreCompleto" Nullable="false" MaxLength="352" />
-          <Property Type="String" Name="nvarchar_foto" Nullable="true" />
-          <Property Type="DateTime" Name="date_fecha_creacion" Nullable="false" Precision="23" />
-          <Property Type="Boolean" Name="bit_estatus" Nullable="false" />
-        </ComplexType>
-        <ComplexType Name="getListObjetivosPrioritarios_Result">
-          <Property Type="Int32" Name="int_id_objetivo" Nullable="false" />
-          <Property Type="String" Name="Nombres" Nullable="false" MaxLength="4000" />
-          <Property Type="String" Name="Aliases" Nullable="false" MaxLength="4000" />
-          <Property Type="String" Name="GruposDelictivos" Nullable="false" MaxLength="4000" />
-          <Property Type="DateTime" Name="FechaNacimiento" Nullable="false" Precision="23" />
-          <Property Type="Boolean" Name="bit_estatus" Nullable="false" />
-          <Property Type="String" Name="nvarchar_foto" Nullable="true" />
-        </ComplexType>
-        <ComplexType Name="getListObjetivosRelacionadoAsunto_Result">
-          <Property Type="Int32" Name="int_id_ficha_asunto" Nullable="false" />
-          <Property Type="Int32" Name="int_id_ficha_objetivo" Nullable="false" />
-          <Property Type="Int32" Name="int_id_asunto_relacionado" Nullable="false" />
-          <Property Type="Boolean" Name="estatus_ficha" Nullable="false" />
-          <Property Type="Int32" Name="int_id_estatus_proceso" Nullable="true" />
-          <Property Type="String" Name="nvarchar_descripcion_estatus" Nullable="true" MaxLength="400" />
-          <Property Type="String" Name="nvarchar_observaciones" Nullable="true" MaxLength="400" />
-          <Property Type="Int32" Name="int_id_objetivo" Nullable="true" />
-          <Property Type="String" Name="Nombres" Nullable="false" MaxLength="4000" />
-          <Property Type="String" Name="Aliases" Nullable="false" MaxLength="4000" />
-          <Property Type="String" Name="GruposDelictivos" Nullable="false" MaxLength="4000" />
-          <Property Type="DateTime" Name="FechaNacimiento" Nullable="false" Precision="23" />
-          <Property Type="Boolean" Name="estatus_objetivo" Nullable="true" />
-          <Property Type="String" Name="nvarchar_foto" Nullable="true" />
-        </ComplexType>
         </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -1411,6 +1413,59 @@
                 <ScalarProperty Name="Cve_Delito" ColumnName="Cve_Delito" />
                 <ScalarProperty Name="Delito" ColumnName="Delito" />
                 <ScalarProperty Name="Expr1" ColumnName="Expr1" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="getNamePhotoList" FunctionName="Objetivos_PrioritariosModel.Store.getNamePhotoList">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="Objetivos_PrioritariosModel.getNamePhotoList_Result">
+                <ScalarProperty Name="NOMBRES_COMPLETOS" ColumnName="NOMBRES_COMPLETOS" />
+                <ScalarProperty Name="int_id_objetivo" ColumnName="int_id_objetivo" />
+                <ScalarProperty Name="nvarchar_foto" ColumnName="nvarchar_foto" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="getListVictimasByNombre" FunctionName="Objetivos_PrioritariosModel.Store.getListVictimasByNombre">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="Objetivos_PrioritariosModel.getListVictimasByNombre_Result">
+                <ScalarProperty Name="int_id_victima" ColumnName="int_id_victima" />
+                <ScalarProperty Name="NombreCompleto" ColumnName="NombreCompleto" />
+                <ScalarProperty Name="nvarchar_foto" ColumnName="nvarchar_foto" />
+                <ScalarProperty Name="date_fecha_creacion" ColumnName="date_fecha_creacion" />
+                <ScalarProperty Name="bit_estatus" ColumnName="bit_estatus" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="getListObjetivosPrioritarios" FunctionName="Objetivos_PrioritariosModel.Store.getListObjetivosPrioritarios">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="Objetivos_PrioritariosModel.getListObjetivosPrioritarios_Result">
+                <ScalarProperty Name="int_id_objetivo" ColumnName="int_id_objetivo" />
+                <ScalarProperty Name="Nombres" ColumnName="Nombres" />
+                <ScalarProperty Name="Aliases" ColumnName="Aliases" />
+                <ScalarProperty Name="GruposDelictivos" ColumnName="GruposDelictivos" />
+                <ScalarProperty Name="FechaNacimiento" ColumnName="FechaNacimiento" />
+                <ScalarProperty Name="bit_estatus" ColumnName="bit_estatus" />
+                <ScalarProperty Name="nvarchar_foto" ColumnName="nvarchar_foto" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="getListObjetivosRelacionadoAsunto" FunctionName="Objetivos_PrioritariosModel.Store.getListObjetivosRelacionadoAsunto">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="Objetivos_PrioritariosModel.getListObjetivosRelacionadoAsunto_Result">
+                <ScalarProperty Name="int_id_ficha_asunto" ColumnName="int_id_ficha_asunto" />
+                <ScalarProperty Name="int_id_ficha_objetivo" ColumnName="int_id_ficha_objetivo" />
+                <ScalarProperty Name="int_id_asunto_relacionado" ColumnName="int_id_asunto_relacionado" />
+                <ScalarProperty Name="estatus_ficha" ColumnName="estatus_ficha" />
+                <ScalarProperty Name="int_id_estatus_proceso" ColumnName="int_id_estatus_proceso" />
+                <ScalarProperty Name="nvarchar_descripcion_estatus" ColumnName="nvarchar_descripcion_estatus" />
+                <ScalarProperty Name="nvarchar_observaciones" ColumnName="nvarchar_observaciones" />
+                <ScalarProperty Name="int_id_objetivo" ColumnName="int_id_objetivo" />
+                <ScalarProperty Name="Nombres" ColumnName="Nombres" />
+                <ScalarProperty Name="Aliases" ColumnName="Aliases" />
+                <ScalarProperty Name="GruposDelictivos" ColumnName="GruposDelictivos" />
+                <ScalarProperty Name="FechaNacimiento" ColumnName="FechaNacimiento" />
+                <ScalarProperty Name="estatus_objetivo" ColumnName="estatus_objetivo" />
+                <ScalarProperty Name="nvarchar_foto" ColumnName="nvarchar_foto" />
               </ComplexTypeMapping>
             </ResultMapping>
           </FunctionImportMapping>
@@ -1538,6 +1593,7 @@
           <EntitySetMapping Name="tb_FichaAsunto">
             <EntityTypeMapping TypeName="Objetivos_PrioritariosModel.tb_FichaAsunto">
               <MappingFragment StoreEntitySet="tb_FichaAsunto">
+                <ScalarProperty Name="nvarchar_observaciones" ColumnName="nvarchar_observaciones" />
                 <ScalarProperty Name="bit_estatus" ColumnName="bit_estatus" />
                 <ScalarProperty Name="date_fecha_creacion" ColumnName="date_fecha_creacion" />
                 <ScalarProperty Name="int_id_asunto_relacionado" ColumnName="int_id_asunto_relacionado" />
@@ -1683,59 +1739,6 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <FunctionImportMapping FunctionImportName="getNamePhotoList" FunctionName="Objetivos_PrioritariosModel.Store.getNamePhotoList">
-            <ResultMapping>
-              <ComplexTypeMapping TypeName="Objetivos_PrioritariosModel.getNamePhotoList_Result">
-                <ScalarProperty Name="NOMBRES_COMPLETOS" ColumnName="NOMBRES_COMPLETOS" />
-                <ScalarProperty Name="int_id_objetivo" ColumnName="int_id_objetivo" />
-                <ScalarProperty Name="nvarchar_foto" ColumnName="nvarchar_foto" />
-              </ComplexTypeMapping>
-            </ResultMapping>
-          </FunctionImportMapping>
-          <FunctionImportMapping FunctionImportName="getListVictimasByNombre" FunctionName="Objetivos_PrioritariosModel.Store.getListVictimasByNombre">
-            <ResultMapping>
-              <ComplexTypeMapping TypeName="Objetivos_PrioritariosModel.getListVictimasByNombre_Result">
-                <ScalarProperty Name="int_id_victima" ColumnName="int_id_victima" />
-                <ScalarProperty Name="NombreCompleto" ColumnName="NombreCompleto" />
-                <ScalarProperty Name="nvarchar_foto" ColumnName="nvarchar_foto" />
-                <ScalarProperty Name="date_fecha_creacion" ColumnName="date_fecha_creacion" />
-                <ScalarProperty Name="bit_estatus" ColumnName="bit_estatus" />
-              </ComplexTypeMapping>
-            </ResultMapping>
-          </FunctionImportMapping>
-          <FunctionImportMapping FunctionImportName="getListObjetivosPrioritarios" FunctionName="Objetivos_PrioritariosModel.Store.getListObjetivosPrioritarios">
-            <ResultMapping>
-              <ComplexTypeMapping TypeName="Objetivos_PrioritariosModel.getListObjetivosPrioritarios_Result">
-                <ScalarProperty Name="int_id_objetivo" ColumnName="int_id_objetivo" />
-                <ScalarProperty Name="Nombres" ColumnName="Nombres" />
-                <ScalarProperty Name="Aliases" ColumnName="Aliases" />
-                <ScalarProperty Name="GruposDelictivos" ColumnName="GruposDelictivos" />
-                <ScalarProperty Name="FechaNacimiento" ColumnName="FechaNacimiento" />
-                <ScalarProperty Name="bit_estatus" ColumnName="bit_estatus" />
-                <ScalarProperty Name="nvarchar_foto" ColumnName="nvarchar_foto" />
-              </ComplexTypeMapping>
-            </ResultMapping>
-          </FunctionImportMapping>
-          <FunctionImportMapping FunctionImportName="getListObjetivosRelacionadoAsunto" FunctionName="Objetivos_PrioritariosModel.Store.getListObjetivosRelacionadoAsunto">
-            <ResultMapping>
-              <ComplexTypeMapping TypeName="Objetivos_PrioritariosModel.getListObjetivosRelacionadoAsunto_Result">
-                <ScalarProperty Name="int_id_ficha_asunto" ColumnName="int_id_ficha_asunto" />
-                <ScalarProperty Name="int_id_ficha_objetivo" ColumnName="int_id_ficha_objetivo" />
-                <ScalarProperty Name="int_id_asunto_relacionado" ColumnName="int_id_asunto_relacionado" />
-                <ScalarProperty Name="estatus_ficha" ColumnName="estatus_ficha" />
-                <ScalarProperty Name="int_id_estatus_proceso" ColumnName="int_id_estatus_proceso" />
-                <ScalarProperty Name="nvarchar_descripcion_estatus" ColumnName="nvarchar_descripcion_estatus" />
-                <ScalarProperty Name="nvarchar_observaciones" ColumnName="nvarchar_observaciones" />
-                <ScalarProperty Name="int_id_objetivo" ColumnName="int_id_objetivo" />
-                <ScalarProperty Name="Nombres" ColumnName="Nombres" />
-                <ScalarProperty Name="Aliases" ColumnName="Aliases" />
-                <ScalarProperty Name="GruposDelictivos" ColumnName="GruposDelictivos" />
-                <ScalarProperty Name="FechaNacimiento" ColumnName="FechaNacimiento" />
-                <ScalarProperty Name="estatus_objetivo" ColumnName="estatus_objetivo" />
-                <ScalarProperty Name="nvarchar_foto" ColumnName="nvarchar_foto" />
-              </ComplexTypeMapping>
-            </ResultMapping>
-          </FunctionImportMapping>
           </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>

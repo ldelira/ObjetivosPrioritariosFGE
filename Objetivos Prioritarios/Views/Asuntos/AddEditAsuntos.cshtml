@@ -343,9 +343,9 @@
 
         function refreshObjetivoRelacionadoAsunto() {
             var datos = {
-                nombre: $("#txtNombreVictima").val().trim(),
-                paterno: $("#txtPaterno").val().trim(),
-                materno: $("#txtMaterno").val().trim(),
+                nombre: $("#txtNombreObjAsunto").val().trim(),
+                paterno: $("#txtPaternoObjAsunto").val().trim(),
+                materno: $("#txtMaternoObjAsunto").val().trim(),
                 opcion:1
             };
             $("#busquedaObjetivoAsunto").empty();
@@ -366,10 +366,10 @@
         }
         function refreshVictimas() {
             var datos = {
+                opcion: 1,
                 nombre: $("#txtNombreVictima").val().trim(),
                 paterno: $("#txtPaterno").val().trim(),
                 materno: $("#txtMaterno").val().trim(),
-                opcion: 1,
                 active: true
 
             };

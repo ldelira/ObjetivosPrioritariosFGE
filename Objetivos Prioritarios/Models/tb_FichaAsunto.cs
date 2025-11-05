@@ -19,6 +19,7 @@ namespace Objetivos_Prioritarios.Models
         public int int_id_asunto_relacionado { get; set; }
         public System.DateTime date_fecha_creacion { get; set; }
         public bool bit_estatus { get; set; }
+        public string nvarchar_observaciones { get; set; }
     
         public virtual tb_AsuntoRelacionado tb_AsuntoRelacionado { get; set; }
         public virtual tb_FichaObjetivo tb_FichaObjetivo { get; set; }

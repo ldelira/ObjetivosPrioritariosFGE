@@ -556,6 +556,197 @@ namespace Objetivos_Prioritarios.ControllersServices
         }
 
 
+        public BasicOperationResponse addEditAlbumFicha(tb_AlbumFichaObjetivo albumFicha)
+        {
+            try
+            {
+
+                if (albumFicha.int_id_album_ficha_objetivo == 0)
+                {
+                    albumFicha.date_fecha_creacion = DateTime.Now;
+                    albumFicha.bit_estatus = true;
+                    db.tb_AlbumFichaObjetivo.Add(albumFicha);
+                }
+                else
+                {
+
+                    var busqueda = db.tb_AlbumFichaObjetivo.Where(x => x.int_id_album_ficha_objetivo == albumFicha.int_id_album_ficha_objetivo).FirstOrDefault();
+                    busqueda.nvarchar_nombre_album = albumFicha.nvarchar_nombre_album;
+                    busqueda.nvarchar_descripcion_album = albumFicha.nvarchar_descripcion_album;
+                }
+
+                db.SaveChanges();
+
+                return new BasicOperationResponse()
+                {
+                    IsSuccess = true,
+                    Message = "Album guardado correctamente "
+                };
+            }
+            catch (Exception e)
+            {
+                return new BasicOperationResponse()
+                {
+                    IsSuccess = false,
+                    Message = "Error al agregar la carpeta (" + e.Message + ")"
+                };
+            }
+        }
+
+
+        public BasicOperationResponse DisableAlbum(int id)
+        {
+            try
+            {
+                var registro = db.tb_AlbumFichaObjetivo.FirstOrDefault(x => x.int_id_album_ficha_objetivo == id);
+                if (registro == null)
+                    return new BasicOperationResponse() { IsSuccess = false, Message = "No se encontró el registro" };
+
+                registro.bit_estatus = false;
+                db.SaveChanges();
+
+                return new BasicOperationResponse()
+                {
+                    IsSuccess = true,
+                    Message = "Se desactivó el album correctamente."
+                };
+            }
+            catch (Exception e)
+            {
+                return new BasicOperationResponse()
+                {
+                    IsSuccess = false,
+                    Message = "Error al desactivar (" + e.Message + ")"
+                };
+            }
+        }
+
+        // Activar
+        public BasicOperationResponse ActivateAlbum(int id)
+        {
+            try
+            {
+                var registro = db.tb_AlbumFichaObjetivo.FirstOrDefault(x => x.int_id_album_ficha_objetivo == id);
+                if (registro == null)
+                    return new BasicOperationResponse() { IsSuccess = false, Message = "No se encontró el registro" };
+
+                registro.bit_estatus = true;
+                db.SaveChanges();
+
+                return new BasicOperationResponse()
+                {
+                    IsSuccess = true,
+                    Message = "Se activó el album correctamente."
+                };
+            }
+            catch (Exception e)
+            {
+                return new BasicOperationResponse()
+                {
+                    IsSuccess = false,
+                    Message = "Error al activar (" + e.Message + ")"
+                };
+            }
+        }
+
+
+        public BasicOperationResponse addObjetivoAlbum(int int_id_objetivo, int int_id_album)
+        {
+            try
+            {
+                string msg = "";
+                var busFicha = db.tb_FichaObjetivo.FirstOrDefault(x => x.int_id_objetivo == int_id_objetivo);
+
+                var id_ficha = busFicha.int_id_ficha_objetivo;
+
+                var busFichaAsunto = db.tb_AlbumFichaObjetivoDetalle.Where(x => x.int_id_album_ficha_objetivo == int_id_album && x.int_id_ficha_objetivo == id_ficha).FirstOrDefault();
+
+
+                if (busFichaAsunto != null)
+                {
+                    if (busFichaAsunto.bit_estatus == false)
+                    {
+                        busFichaAsunto.bit_estatus = true;
+                        msg = "Se activo objetivo ya existente en la relación.";
+
+                    }
+                    else
+                    {
+                        msg = "Objetivo ya existente en la relación.";
+                    }
+
+                }
+                else
+                {
+
+                    // Insertar relación con el asunto
+                    busFichaAsunto = new tb_AlbumFichaObjetivoDetalle
+                    {
+                        int_id_album_ficha_objetivo = int_id_album,
+                        int_id_ficha_objetivo = id_ficha,
+                        date_fecha_creacion = DateTime.Now,
+                        bit_estatus = true
+                    };
+
+                    db.tb_AlbumFichaObjetivoDetalle.Add(busFichaAsunto);
+                    msg = "Objetivo agregado correctamente al Grupo.";
+                }
+                db.SaveChanges();
+
+
+                return new BasicOperationResponse
+                {
+                    IsSuccess = true,
+                    Message = msg
+                };
+            }
+            catch (Exception e)
+            {
+                return new BasicOperationResponse { IsSuccess = false, Message = "Ocurrió un error al activar el objetivo (" + e.Message + ")" };
+            }
+        }
+
+        public List<getListObjetivosRelacionadoGrupo_Result> getListObjetivosRelacionadoGrupo(int int_id_grupo, bool activo)
+        {
+            return db.getListObjetivosRelacionadoGrupo(activo, int_id_grupo).ToList();
+        }
+        public BasicOperationResponse ActivateObjetivoGrupo(int int_id_album_detalle)
+        {
+            try
+            {
+                var entidad = db.tb_AlbumFichaObjetivoDetalle.FirstOrDefault(x => x.int_id_album_detalle == int_id_album_detalle);
+                if (entidad == null) return new BasicOperationResponse { IsSuccess = false, Message = "Ficha asunto no encontrado." };
+
+                entidad.bit_estatus = true;
+                db.SaveChanges();
+                return new BasicOperationResponse { IsSuccess = true, Message = "Se activó el objetivo en el grupo satisfactoriamente." };
+            }
+            catch (Exception e)
+            {
+                return new BasicOperationResponse { IsSuccess = false, Message = "Ocurrió un error al activar el asunto (" + e.Message + ")" };
+            }
+        }
+
+        // Desactivar
+        public BasicOperationResponse DisableObjetivoGrupo(int int_id_album_detalle)
+        {
+            try
+            {
+                var entidad = db.tb_AlbumFichaObjetivoDetalle.FirstOrDefault(x => x.int_id_album_detalle == int_id_album_detalle);
+                if (entidad == null) return new BasicOperationResponse { IsSuccess = false, Message = "Ficha asunto no encontrado." };
+
+                entidad.bit_estatus = false;
+                db.SaveChanges();
+                return new BasicOperationResponse { IsSuccess = true, Message = "Se desactivó el objetivo en el grupo satisfactoriamente." };
+            }
+            catch (Exception e)
+            {
+                return new BasicOperationResponse { IsSuccess = false, Message = "Ocurrió un error al desactivar el asunto (" + e.Message + ")" };
+            }
+        }
+
+
+
         public object AddEstatusObservaciones(int idFicha, int idEstatus, string descripcion, string observaciones)
         {
             try

@@ -70,7 +70,7 @@ else
                                     <i class="fa fa-check"></i>
                                 </button>
                             }
-                            else
+                            else if (ViewBag.opcion == 1)
                             {
                                 @*<button class="btn btn-success btn-sm" onclick="addObjetivoAsunto(@item.int_id_objetivo)">
                 <i class="fa fa-check"></i>
@@ -81,6 +81,12 @@ else
                                 </button>
 
 
+                            }
+                            else if (ViewBag.opcion == 3)
+                            {
+                                <button class="btn btn-success btn-sm" onclick="addObjetivoAlbum(@item.int_id_objetivo)">
+                                    <i class="fa fa-check"></i>
+                                </button>
                             }
                         </td>
                     </tr>
@@ -235,6 +241,7 @@ else
         });
     }*@
 
+    }
 
     function addObjetivoAsunto(int_id_objetivo, observaciones) {
 

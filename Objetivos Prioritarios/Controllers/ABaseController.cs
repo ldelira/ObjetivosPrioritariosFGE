@@ -61,5 +61,16 @@ namespace Objetivos_Prioritarios.Controllers
             }
         }
 
+        private ReporteService reporteService = null;
+        public ReporteService ReporteService
+        {
+            get
+            {
+                if (reporteService == null)
+                    reporteService = new ReporteService();
+                return reporteService;
+            }
+        }
+
     }
 }

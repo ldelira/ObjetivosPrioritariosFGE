@@ -1,0 +1,129 @@
+﻿
+@{
+    ViewBag.Title = "OBJETIVOS PRIORITARIOS";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<input value="@ViewBag.int_id_album" id="int_id_album" style="display:none" />
+<div class="row">
+    <div class="col-md-6"></div>
+    <div class="col-md-3">
+        <a href="@Url.Action("GenerarPpt2", "FichaObjetivo", new { int_id_album_ficha_objetivo = ViewBag.int_id_album })" class="btn btn-success">
+            Descargar Ficha Objetivos Prioritarios Visefiscalia
+        </a>
+
+    </div>
+
+    <div class="col-md-3">
+        @*<input type="button" class="btn btn-success" value="Descargar Ficha Objetivos Prioritarios" />*@
+        <a href="@Url.Action("GenerarPpt", "FichaObjetivo", new { int_id_album_ficha_objetivo = ViewBag.int_id_album })" class="btn btn-success">
+            Descargar Ficha Objetivos Prioritarios
+        </a>
+    </div>
+
+
+
+</div>
+<br />
+<div class="row">
+
+    <div class="col-lg-6">
+
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Búsqueda de Objetivo Prioritario</h5>
+
+                <!-- Campos de búsqueda por nombre -->
+                <div id="busquedaPorNombre">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <label for="searchName" class="form-label">Nombre</label>
+                            <input type="text" class="form-control" id="txtNombreObjAsunto" placeholder="Nombre">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="searchPaterno" class="form-label">Apellido Paterno</label>
+                            <input type="text" class="form-control" id="txtPaternoObjAsunto" placeholder="Paterno">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="searchMaterno" class="form-label">Apellido Materno</label>
+                            <input type="text" class="form-control" id="txtMaternoObjAsunto" placeholder="Materno">
+                        </div>
+                    </div>
+                    <br>
+                </div>
+
+
+                <div class="mb-3">
+                    <button type="button" id="btnBuscarObjetivoAsunto" class="btn btn-primary w-100">
+                        🔍 Buscar
+                    </button>
+                </div>
+
+                <div id="busquedaObjetivoAsunto"></div>
+            </div>
+        </div>
+
+    </div>
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Objetivos Prioritarios Relacionados al Album</h5>
+
+                <div id="ObjetivoRelacionadoAsunto"></div>
+
+            </div>
+        </div>
+    </div>
+
+
+
+</div>
+
+
+
+
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        refreshGrupoList();
+
+
+
+    });
+
+
+    $("#btnBuscarObjetivoAsunto").click(function () {
+        debugger;
+        let nombre = $("#txtNombreObjAsunto").val().trim();
+        let paterno = $("#txtPaternoObjAsunto").val().trim();
+        let materno = $("#txtMaternoObjAsunto").val().trim();
+
+       
+
+        refreshObjetivoRelacionadoAsunto()
+    });
+
+
+   function refreshObjetivoRelacionadoAsunto() {
+     var datos = {
+         nombre: $("#txtNombreObjAsunto").val().trim(),
+         paterno: $("#txtPaternoObjAsunto").val().trim(),
+         materno: $("#txtMaternoObjAsunto").val().trim(),
+         opcion:3
+     };
+     $("#busquedaObjetivoAsunto").empty();
+     $("#busquedaObjetivoAsunto").load("@Url.Action("ObjetivoPrioritarioListPartial", "Asuntos")", datos);
+ }
+
+
+  function refreshGrupoList(actives) {
+     var datos = {
+         actives: actives
+     };
+     $("#ObjetivoRelacionadoAsunto").html('<div class="text-center p-3"><div class="spinner-border text-primary"></div></div>');
+     $("#ObjetivoRelacionadoAsunto").load("@Url.Action("GrupoFichasListPartial", "FichaObjetivo")", datos);
+ }
+
+</script>
+

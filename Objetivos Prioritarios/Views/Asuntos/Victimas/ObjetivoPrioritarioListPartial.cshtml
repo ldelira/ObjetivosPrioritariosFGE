@@ -317,4 +317,23 @@ else
         addObjetivoAsunto(objetivoSeleccionado, observaciones);
     }
 
+    function addObjetivoAlbum(int_id_objetivo) {
+
+
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("addObjetivoAlbum", "FichaObjetivo")',
+            data: { int_id_objetivo: int_id_objetivo, int_id_album: $("#int_id_album").val() },
+            success: function (resp) {
+                if (resp.IsSuccess) {
+                    swal("", resp.Message, "success");
+                    refreshObjetivoRelacionadoAsuntoList();
+                } else {
+                    swal("Error", resp.Message, "error");
+                }
+            }
+        });
+
+    }
+
 </script>

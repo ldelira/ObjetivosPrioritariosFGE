@@ -28,9 +28,15 @@ else
                                     <i class="fa fa-check"></i>
                                 </button>
                             }
-                            else
+                            else if (ViewBag.opcion == 1)
                             {
                                 <button class="btn btn-success btn-sm" onclick="addObjetivoAsunto(@item.int_id_objetivo)">
+                                    <i class="fa fa-check"></i>
+                                </button>
+                            }
+                            else if (ViewBag.opcion == 3)
+                            {
+                                <button class="btn btn-success btn-sm" onclick="addObjetivoAlbum(@item.int_id_objetivo)">
                                     <i class="fa fa-check"></i>
                                 </button>
                             }
@@ -92,7 +98,7 @@ else
   // ✅ Llamado desde el botón ✔️ del DataTable
     function addObjetivoVictima(int_id_objetivo) {
         clavePersonaSeleccionada = int_id_objetivo;
-       
+
 
       // Limpia el select antes de cargar
       $("#selectNombreObjetivo").empty()
@@ -155,7 +161,7 @@ else
 
   // 🧩 Función para agregar el seleccionado a otra tabla
     function agregarObjetivoSeleccionado(id_nombre) {
-         
+
         $.post("@Url.Action("addObjetivoVictima", "Asuntos")", { id_asunto_relacionado: $("#int_id_asunto_relacionado").val(), id_nombre: id_nombre }, function (resp) {
            if (resp.IsSuccess) {
                swal("", resp.Message, "success");
@@ -186,11 +192,25 @@ else
             }
         });
 
-
-      
-
-
     }
 
+    function addObjetivoAlbum(int_id_objetivo) {
+
+
+    $.ajax({
+        type: 'POST',
+        url: '@Url.Action("addObjetivoAlbum", "FichaObjetivo")',
+        data: { int_id_objetivo: int_id_objetivo, int_id_album: $("#int_id_album").val() },
+        success: function (resp) {
+            if (resp.IsSuccess) {
+                swal("", resp.Message, "success");
+                refreshObjetivoRelacionadoAsuntoList();
+            } else {
+                swal("Error", resp.Message, "error");
+            }
+        }
+    });
+
+}
 
 </script>

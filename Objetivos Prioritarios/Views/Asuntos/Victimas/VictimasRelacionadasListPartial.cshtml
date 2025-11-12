@@ -43,20 +43,19 @@
 </div>
 
 
-<div class="modal fade" id="modalFoto" tabindex="-1" role="dialog" aria-labelledby="modalFotoTitulo" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
+<div class="modal fade" id="modalFotoVictima" tabindex="-1" aria-labelledby="modalFotoTituloVictima" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title" id="modalFotoTitulo">Fotografía</h5>
+                <h5 class="modal-title" id="modalFotoTituloVictima">Fotografía</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-            
             </div>
             <div class="modal-body text-center">
-                <img id="modalFotoImagen" src="" alt="Fotografía" class="img-fluid rounded shadow-sm" style="max-height: 450px;">
+                <img id="modalFotoImagenVictima" src="" alt="Fotografía víctima" class="img-fluid rounded shadow-sm" style="max-height: 450px;">
             </div>
             <div class="modal-footer">
-                @*<a id="modalDescargar" href="#" class="btn btn-outline-secondary" style="display:none;">Descargar</a>*@
-                <button type="button" class="btn btn-secondary" id="closeModal" data-dismiss="modal">Cerrar</button>
+                @*<a id="modalDescargarVictima" href="#" class="btn btn-outline-secondary" style="display:none;">Descargar</a>*@
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
             </div>
         </div>
     </div>
@@ -107,60 +106,59 @@
         },
         {
             title: "Fotografía",
-            data: "FotoBase63",
-            orderable: false,
-            render: function (data, type, full, meta) {
-                if (data) {
-                    return '<img src="data:image/jpeg;base64,' + data + '" class="img-thumbnail" style="width:60px;height:60px;object-fit:cover;" />';
-                } else {
-                    return '<span class="text-muted">Sin foto</span>';
-                }
-            }
+            data: "Isfoto",
+            orderable: true,
+            IsFiltered: false
         },
+        //{
+        //    title: "Fotografía",
+        //    data: "FotoBase63",
+        //    orderable: false,
+        //    render: function (data, type, full, meta) {
+        //        if (data) {
+        //            return '<img src="data:image/jpeg;base64,' + data + '" class="img-thumbnail" style="width:60px;height:60px;object-fit:cover;" />';
+        //        } else {
+        //            return '<span class="text-muted">Sin foto</span>';
+        //        }
+        //    }
+        //},
         {
             title: "Acciones",
             data: null,
             orderable: false,
             render: function (data, type, full, meta) {
                 var id = full.int_id_asunto_victima;
-
-                var fotoBase64 = full.FotoBase63;
-
-                // no usar directamente la cadena cruda en un atributo si es muy larga:
-                // guardamos también en un input hidden dentro del cell para mayor fiabilidad.
-                var fotoEncoded = fotoBase64 ? encodeURIComponent(fotoBase64) : '';
+                var int_id_victima = full.int_id_victima;
 
                 var btnView = `
-            <button class="btn btn-sm btn-primary ver-foto"
-                data-id="${id}"
-                title="Ver Fotografía">
-                <i class="fa fa-eye"></i>
-            </button>`;
+        <button class="btn btn-sm btn-primary ver-foto-victima"
+            data-id="${int_id_victima}"
+            title="Ver Fotografía">
+            <i class="fa fa-eye"></i>
+        </button>`;
 
                 var btnDelete = `
-            <button class="btn btn-sm btn-danger eliminar-victima" onclick="DisableVictimaRelacionada(${id})"
-                data-id="${id}"
-                title="Eliminar Víctima">
-                <i class="fa fa-trash"></i>
-            </button>`;
+        <button class="btn btn-sm btn-danger eliminar-victima" onclick="DisableVictimaRelacionada(${id})"
+            data-id="${id}"
+            title="Eliminar Víctima">
+            <i class="fa fa-trash"></i>
+        </button>`;
 
                 var btnActivate = `
-            <button class="btn btn-sm btn-success activar-victima" onclick="ActivateVictimaRelacionada(${id})"
-                data-id="${id}"
-                title="Activar Víctima">
-                <i class="fa fa-power-off"></i>
-            </button>`;
-
-                // input hidden con la foto (valor urlencoded) — más fiable que attribute largo
-                var hidden = `<input type="hidden" class="foto-base64-hidden" value="${fotoEncoded}" />`;
+        <button class="btn btn-sm btn-success activar-victima" onclick="ActivateVictimaRelacionada(${id})"
+            data-id="${id}"
+            title="Activar Víctima">
+            <i class="fa fa-power-off"></i>
+        </button>`;
 
                 if ('@ViewBag.Actives'.toUpperCase() === 'TRUE') {
-                    return `<div class="btn-group">${btnView}${btnDelete}${hidden}</div>`;
+                    return `<div class="btn-group">${btnView}${btnDelete}</div>`;
                 } else {
-                    return `<div class="btn-group">${btnActivate}${hidden}</div>`;
+                    return `<div class="btn-group">${btnView}${btnActivate}</div>`;
                 }
             }
         }
+
 
 
     ];
@@ -267,12 +265,12 @@
     function AddVictimaRelacionada(id) {
         var int_id_asunto_relacionado = $("#int_id_asunto_relacionado").val();
 
-    $.get('@Url.Action("AddEditVictimaPartial", "Asuntos")', 
-        { 
-            id: id, 
-            idllamada: 1, 
-            idasunto: int_id_asunto_relacionado 
-        }, 
+    $.get('@Url.Action("AddEditVictimaPartial", "Asuntos")',
+        {
+            id: id,
+            idllamada: 1,
+            idasunto: int_id_asunto_relacionado
+        },
         function (html) {
             $("#ModalGenericoContent").html(html);
             $("#ModalGenerico").modal("show");
@@ -306,7 +304,7 @@
     }
 
     function ActivateVictimaRelacionada(id) {
-         
+
         $.ajax({
             type: 'POST',
             url: '@Url.Action("ActivateVictimaRelacionada", "Asuntos")',
@@ -331,60 +329,57 @@
 
 
 
-    $(document).on('click', '.ver-foto', function () {
-        // 1) intentar leer el valor del input hidden (preferible)
-        var $btn = $(this);
-        var $cell = $btn.closest('.btn-group'); // o .closest('td') según tu render
-        var encoded = $cell.find('.foto-base64-hidden').val();
+$(document).on('click', '.ver-foto-victima', function (e) {
+    e.preventDefault();
 
-        // 2) fallback: intentar leer el atributo data-foto (por si lo tuvieras)
-        if (!encoded) {
-            encoded = $btn.attr('data-foto') || $btn.data('foto') || '';
+    var id = $(this).data('id'); // este es int_id_victima
+
+    // Mostrar modal y estado de carga
+    $('#modalFotoTituloVictima').text('Cargando...');
+    $('#modalFotoImagenVictima').attr('src', '');
+    $('#modalDescargarVictima').hide();
+
+    var modal = new bootstrap.Modal(document.getElementById('modalFotoVictima'));
+    modal.show();
+
+    // Llamada AJAX POST
+    $.ajax({
+        url: '@Url.Action("GetFotoAjaxVictimas", "Asuntos")',
+        method: 'POST',
+        dataType: 'json',
+        data: { id: id },
+        success: function (resp) {
+            if (resp && resp.success && resp.foto) {
+                var foto = resp.foto;
+                var src = (foto.indexOf('data:image') === 0)
+                    ? foto
+                    : ('data:image/jpeg;base64,' + foto);
+
+                $('#modalFotoTituloVictima').text('Fotografía de la víctima');
+                $('#modalFotoImagenVictima').attr('src', src);
+
+                if ($('#modalDescargarVictima').length) {
+                    $('#modalDescargarVictima').attr('href', src);
+                    $('#modalDescargarVictima').attr('download', 'foto_victima_' + id + '.jpg');
+                    $('#modalDescargarVictima').show();
+                }
+            } else {
+                $('#modalFotoTituloVictima').text(resp && resp.message ? resp.message : 'Sin fotografía disponible');
+                $('#modalFotoImagenVictima').attr('src', '');
+                $('#modalDescargarVictima').hide();
+            }
+        },
+        error: function (xhr, status, err) {
+            console.error('Error al obtener foto víctima:', err);
+            $('#modalFotoTituloVictima').text('Error al cargar la imagen');
+            $('#modalFotoImagenVictima').attr('src', '');
+            $('#modalDescargarVictima').hide();
         }
-
-        // debug: qué valor recibimos (no mostrar todo en producción si es muy grande)
-        console.log('valor encoded recibido (slice):', (encoded || '').substr(0, 100));
-
-        if (!encoded) {
-            console.warn('No se encontró imagen en el registro.');
-            $('#modalFotoTitulo').text("Sin fotografía disponible");
-            $('#modalFotoImagen').attr('src', '');
-            $('#modalDescargar').hide && $('#modalDescargar').hide();
-            $('#modalFoto').modal('show');
-            return;
-        }
-
-        // decodeURIComponent puede lanzar si la cadena no está encoded; protegemos con try/catch
-        var fotoBase64;
-        try {
-            fotoBase64 = decodeURIComponent(encoded);
-        } catch (e) {
-            console.warn('decodeURIComponent falló, usando valor tal cual');
-            fotoBase64 = encoded;
-        }
-
-        console.log('fotoBase64 startsWith data:image?:', fotoBase64.startsWith('data:image'));
-
-        // preparar src: si ya trae el prefijo "data:image/..." lo usamos; si no, asumimos jpeg
-        var src = fotoBase64.startsWith('data:image')
-            ? fotoBase64
-            : 'data:image/jpeg;base64,' + fotoBase64;
-
-        // para verificar visualmente en consola (evitar impresión gigante)
-        console.log('src slice:', src.substr(0, 80));
-
-        $('#modalFotoTitulo').text("Fotografía del registro");
-        $('#modalFotoImagen').attr('src', src);
-
-        // preparar link de descarga si quieres
-        if ($('#modalDescargar').length) {
-            $('#modalDescargar').attr('href', src);
-            $('#modalDescargar').attr('download', 'foto_' + ($btn.data('id') || 'img') + '.jpg');
-            $('#modalDescargar').show();
-        }
-
-        $('#modalFoto').modal('show');
     });
+});
+
+
+
 
 
 

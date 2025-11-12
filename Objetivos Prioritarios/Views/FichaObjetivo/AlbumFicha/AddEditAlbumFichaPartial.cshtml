@@ -1,0 +1,99 @@
+﻿@model Objetivos_Prioritarios.Models.tb_AlbumFichaObjetivo
+
+<div class="modal fade" id="albumCreateModal" tabindex="-1" role="dialog" aria-labelledby="albumCreateModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="albumCreateModalLabel">Agregar Álbum de Fichas</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+
+            <div class="modal-body">
+                <div id="albumCreateErrors" style="display:none;" class="alert alert-danger"></div>
+
+                <div class="form-group">
+                    <label for="nvarchar_nombre_album">Nombre del Álbum <span class="text-danger">*</span></label>
+                    @Html.TextBoxFor(m => m.nvarchar_nombre_album, new { @class = "form-control", id = "nvarchar_nombre_album", name = "nvarchar_nombre_album", maxlength = 200, required = "required" })
+                    <span class="text-danger field-validation-valid" data-valmsg-for="nvarchar_nombre_album" data-valmsg-replace="true"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="nvarchar_descripcion_album">Descripción (opcional)</label>
+                    @Html.TextAreaFor(m => m.nvarchar_descripcion_album, new { @class = "form-control", id = "nvarchar_descripcion_album", name = "nvarchar_descripcion_album", rows = 3, maxlength = 500 })
+                    <span class="text-danger field-validation-valid" data-valmsg-for="nvarchar_descripcion_album" data-valmsg-replace="true"></span>
+                </div>
+
+                @Html.HiddenFor(m => m.int_id_album_ficha_objetivo, new { id = "int_id_album_ficha_objetivo", name = "int_id_album_ficha_objetivo" })
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="closeModal2" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" id="btnSaveAlbum" class="btn btn-primary">Guardar</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#albumCreateModal").modal("show");
+
+
+
+        $("#btnSaveAlbum").click(function () {
+            var datas = {
+                int_id_album_ficha_objetivo: $("#int_id_album_ficha_objetivo").val() == '' ? 0 : $("#int_id_album_ficha_objetivo").val(),
+                nvarchar_nombre_album: $("#nvarchar_nombre_album").val(),
+                nvarchar_descripcion_album: $("#nvarchar_descripcion_album").val()
+            };
+              $.ajax({
+                  type: 'POST',
+                  url: '@Url.Action("addEditAlbumFicha", "FichaObjetivo")',
+                  data: datas,
+                  success: function (data) {
+                      if (data.IsSuccess) {
+                          swal({
+                              title: "",
+                              text: data.Message,
+                              type: 'success',
+                              showCancelButton: false,
+                              confirmButtonText: "Continuar",
+                              closeOnConfirm: true,
+                          },
+                             function (isConfirm) {
+                                 //swal.close();
+
+                                 refresfichaobjetivosList();
+                                 window.location.reload();
+                             });
+                      }
+                      if (data.IsSuccess == undefined) {
+                          swal({
+                                title: "Error",
+                                text: "No tienes permisos para llevar a cabo esta acción favor de contactar al administrador",
+                                type: 'error',
+                                showCancelButton: false,
+                                confirmButtonText: "Continuar",
+                                closeOnConfirm: true,
+                            },
+                                function (isConfirm) {
+                                    if (isConfirm) {
+                                        swal.close();
+                                    }
+                                });
+                      }
+                  },
+                  complete: function () {
+                  }
+              });
+
+        });
+
+
+    });
+</script>
+
+

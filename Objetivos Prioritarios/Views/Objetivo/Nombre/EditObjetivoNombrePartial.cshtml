@@ -11,21 +11,21 @@
                 <div class="row">
                     <input id="int_id_nombre" value="@Model.int_id_nombre" style="display:none" />
                     <div class="row">
+                        <div class="col-sm-2 col-md-2"><label class="control-label">Nombre: </label></div>
+                        <div class="col-sm-10 col-md-10">
+                            <input type="text" class="form-control" id="txtNombreEdit" value="@Model.nvarchar_nombre" />
+                        </div>
+                    </div>
+                    <div class="row">
                         <div class="col-sm-2 col-md-2"><label class="control-label">Paterno: </label></div>
                         <div class="col-sm-10 col-md-10">
-                            <input type="text" class="form-control" id="txtPaterno" value="@Model.nvarchar_paterno" />
+                            <input type="text" class="form-control" id="txtPaternoEdit" value="@Model.nvarchar_paterno" />
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-sm-2 col-md-2"><label class="control-label">Materno: </label></div>
                         <div class="col-sm-10 col-md-10">
-                            <input type="text" class="form-control" id="txtMaterno" value="@Model.nvarchar_materno" />
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-2 col-md-2"><label class="control-label">Nombre: </label></div>
-                        <div class="col-sm-10 col-md-10">
-                            <input type="text" class="form-control" id="txtNombre" value="@Model.nvarchar_nombre" />
+                            <input type="text" class="form-control" id="txtMaternoEdit" value="@Model.nvarchar_materno" />
                         </div>
                     </div>
                 </div>
@@ -48,9 +48,9 @@
         $("#btnSave").click(function () {
             var datas = {
                 int_id_nombre: $('#int_id_nombre').val(),
-                nvarchar_nombre: $("#txtNombre").val(),
-                nvarchar_paterno: $("#txtPaterno").val(),
-                nvarchar_materno: $("#txtMaterno").val(),
+                nvarchar_nombre: $("#txtNombreEdit").val(),
+                nvarchar_paterno: $("#txtPaternoEdit").val(),
+                nvarchar_materno: $("#txtMaternoEdit").val(),
                 int_id_objetivo: $("#int_id_objetivo").val()
             };
               $.ajax({

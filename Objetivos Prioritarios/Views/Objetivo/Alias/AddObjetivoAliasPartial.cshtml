@@ -1,486 +1,73 @@
-﻿@model Objetivos_Prioritarios.Models.tb_Objetivo
-
-
-<!-- Botón para abrir el modal -->
-<!-- Botón para abrir el modal -->
-<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalBusquedaInfoGeneral">
-    🔍 Buscar Información General
-</button>
-
-<!-- Modal -->
-<div class="modal fade" id="modalBusquedaInfoGeneral" tabindex="-1" aria-labelledby="modalBusquedaInfoGeneralLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
+﻿<div class="modal" id="modalAddAlias" tabindex="-1">
+    <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header bg-info text-white">
-                <h5 class="modal-title" id="modalBusquedaInfoGeneralLabel">Búsqueda de Información General</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            <div class="modal-header">
+                <h5 class="modal-title">Agregar Alias Objetivo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <!-- Campos de búsqueda por nombre -->
-                <div id="busquedaPorNombreInfo">
-                    <div class="row">
-                        <div class="col-md-4">
-                            <label for="searchNameOrd" class="form-label">Nombre</label>
-                            <input type="text" class="form-control" id="searchNameOrd" placeholder="Nombre">
-                        </div>
-                        <div class="col-md-4">
-                            <label for="searchPaternoOrd" class="form-label">Apellido Paterno</label>
-                            <input type="text" class="form-control" id="searchPaternoOrd" placeholder="Paterno">
-                        </div>
-                        <div class="col-md-4">
-                            <label for="searchMaternoOrd" class="form-label">Apellido Materno</label>
-                            <input type="text" class="form-control" id="searchMaternoOrd" placeholder="Materno">
-                        </div>
+                <div class="row">
+                    <div class="col-sm-2 col-md-2"><label class="control-label">Alias: </label></div>
+                    <div class="col-sm-10 col-md-10">
+                        <input type="text" class="form-control" id="txtAlias" />
                     </div>
-                    <br>
                 </div>
-
-                <!-- Botón de búsqueda -->
-                <div class="mb-3">
-                    <button type="button" id="btnBuscarInfoGeneral" class="btn btn-primary w-100">
-                        🔍 Buscar
-                    </button>
-                </div>
-
-                <!-- Contenedor para resultados -->
-                <div id="busquedaInfoGeneral"></div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="closeModal">CERRAR</button>
+                <button type="button" class="btn btn-primary" id="btnSave">GUARDAR</button>
             </div>
         </div>
     </div>
 </div>
 
 
-
-<input type="text" id="int_id_objetivo" value="@(Model!=null?Model.int_id_objetivo:0)" style="display:none" />
-<section class="section">
-
-    <div class="row">
-
-        <div class="col-lg-4">
-
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Nombre(s) del Objetivo</h5>
-
-                    <div id="listaNombrePersona"></div>
-
-                </div>
-            </div>
-
-        </div>
-        <div class="col-lg-3">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Alias</h5>
-
-                    <div id="listaAliasObjetivo"></div>
-
-
-                </div>
-            </div>
-        </div>
-
-        <div class="col-lg-5">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Fecha Nacimiento y Fotografía</h5>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <label for="fechaNacimiento" class="form-label">Fecha de nacimiento</label>
-                            <input type="date" id="fechaNacimiento" name="fechaNacimiento" class="form-control" value="@(Model!=null?(Model.date_fecha_nacimiento!=null?Convert.ToDateTime(Model.date_fecha_nacimiento).ToString("yyyy-MM-dd"):""):"")">
-                            <label for="fotoInput" class="form-label">Fotografía</label>
-                            <input type="file" id="fotoInput" name="foto" accept="image/*" class="form-control">
-                            <br />
-                            <button class="btn btn-primary" id="savePhoto">Guardar Fecha y Foto</button>
-                        </div>
-                        <!-- Subir imagen -->
-                        <div class="col-md-6">
-                            <!-- Vista previa -->
-                            <div id="previewContainer" class="mt-2" @(Model != null ? (Model.nvarchar_foto != null ? "" : "style=display:none;") : "style=display:none;")>
-                                <img id="previewImage" src="data:image/jpg;base64,@(Model!=null?(Model.nvarchar_foto!=null?Model.nvarchar_foto:""):"")" class="img-thumbnail mb-2" style="max-width: 200px;">
-                                <br>
-                                <button type="button" id="removeImage" class="btn btn-danger btn-sm">
-                                    Quitar imagen
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    </div>
-    <div class="row">
-        <div class="col-lg-8">
-
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Domicilio Objetivo</h5>
-
-                    <div id="listaDomicilioObjetivo"></div>
-
-                </div>
-            </div>
-
-
-        </div>
-        <div class="col-lg-4">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">GrupoDelictivo</h5>
-
-                    <div id="listaGrupoDelictivo"></div>
-
-
-                </div>
-            </div>
-        </div>
-    </div>
-
-</section>
-
-
-
-
-
-<div id="divModalNombre"></div>
-
-<script>
+<script type="text/javascript">
     $(document).ready(function () {
-        refreshNombresList();
-        refreshAliasList();
-        refreshDomicilioList();
-        refreshGrupoList();
+        $("#modalAddAlias").modal("show");
 
+        $("#btnSave").click(function () {
+            var datas = {
+                nvarchar_alias: $("#txtAlias").val(),
+                int_id_objetivo: $("#int_id_objetivo").val()
+            };
 
-        // Mostrar u ocultar campos según el tipo de búsqueda
-        $("input[name='tipoBusqueda2']").change(function () {
-            if ($("#radioNombreOrd").is(":checked")) {
-                $("#busquedaPorNombreOrd").removeClass("d-none");
-                $("#busquedaPorCarpetaOrd").addClass("d-none");
-            } else {
-                $("#busquedaPorNombreOrd").addClass("d-none");
-                $("#busquedaPorCarpetaOrd").removeClass("d-none");
-            }
-        });
-
-        // Ejecutar búsqueda al hacer clic
-        $("#btnBuscarOrd").click(function () {
-            refreshOrdenesList();
-        });
-
-        $("#btnBuscarInfoGeneral").click(function () {
-            refreshInfoGeneralList("#modalBusquedaInfoGeneral");
-        });
-
-
-
-    })
-
-            function refreshOrdenesList() {
-                const tipoBusqueda = $("input[name='tipoBusqueda2']:checked").val();
-                const nombre = $("#searchNameOrd").val();
-                const paterno = $("#searchPaternoOrd").val();
-                const materno = $("#searchMaternoOrd").val();
-                const numavp = $("#numavpOrd").val();
-
-                const parametros = {
-                    tipoBusqueda: tipoBusqueda,
-                    nombre: nombre,
-                    paterno: paterno,
-                    materno: materno,
-                    numavp: numavp
-                };
-
-                $("#busquedaOrdenes").empty();
-                $("#busquedaOrdenes").load('@Url.Action("BusquedaOrdenesListPartial", "FichaObjetivo")', parametros);
-            }
-
-    function refreshInfoGeneralList(modalId) {
-    const $modal = $(modalId);
-    const nombre = $modal.find("#searchNameOrd").val();
-    const paterno = $modal.find("#searchPaternoOrd").val();
-    const materno = $modal.find("#searchMaternoOrd").val();
-
-        console.log("Datos a enviar al Partial:");
-        console.log("Nombre:", nombre);
-        console.log("Paterno:", paterno);
-        console.log("Materno:", materno);
-
-    const parametros = { nombre, paterno, materno };
-    $modal.find("#busquedaInfoGeneral").empty().load(
-        '@Url.Action("InfoGeneralListPartial", "Objetivo")',
-        parametros,
-        function(response, status, xhr) {
-            console.log("Partial cargado:", status);
-            if (status === "error") {
-                console.error("Error al cargar Partial:", xhr.status, xhr.statusText);
-            }
-        }
-    );
-}
-
-
-
-  function refreshNombresList(active) {
-      var datos = {
-          actives: active
-      };
-      $("#listaNombrePersona").empty();
-      $("#listaNombrePersona").load("@Url.Action("ObjetivoNombreListPartial", "Objetivo")",datos);
-    }
-
-    function AddObjetivoNombreModal() {
-
-       $("#divModalNombre").empty();
-       $("#divModalNombre").load("@Url.Action("AddObjetivoNombrePartial", "Objetivo")");
-
-    }
-    function EditObjetivoNombre(int_id_nombre) {
-         var data = {
-             int_id_nombre: int_id_nombre
-         };
-        $("#divModalNombre").empty();
-        $("#divModalNombre").load("@Url.Action("EditObjetivoNombrePartial", "Objetivo")",data);
-
-     }
-    function refreshAliasList(active) {
-     var datos = {
-         actives: active
-     };
-        $("#listaAliasObjetivo").empty();
-        $("#listaAliasObjetivo").load("@Url.Action("ObjetivoAliasListPartial", "Objetivo")",datos);
-   }
-
-    function AddObjetivoAliasModal() {
-
-      $("#divModalNombre").empty();
-      $("#divModalNombre").load("@Url.Action("AddObjetivoAliasPartial", "Objetivo")");
-
-   }
-    function EditObjetivoAlias(int_id_alias) {
-
-        var data = {
-            int_id_alias: int_id_alias
-        };
-       $("#divModalNombre").empty();
-       $("#divModalNombre").load("@Url.Action("EditObjetivoAliasPartial", "Objetivo")",data);
-
-    }
-
-    function refreshDomicilioList(active) {
-        var datos = {
-            actives: active
-        };
-        $("#listaDomicilioObjetivo").empty();
-        $("#listaDomicilioObjetivo").load("@Url.Action("ObjetivoDomicilioListPartial", "Objetivo")", datos);
-    }
-
-    function AddObjetivoDomicilioModal() {
-
-        $("#divModalNombre").empty();
-        $("#divModalNombre").load("@Url.Action("AddObjetivoDomicilioPartial", "Objetivo")");
-
-
-    }
-
-    function AddObjetivoInfoGeneralModal() {
-
-    $("#divModalNombre").empty();
-    $("#divModalNombre").load("@Url.Action("AddObjetivoDomicilioPartial", "Objetivo")");
-
-
-}
-
-    function EditObjetivoDomicilio(int_id_informacion) {
-
-        var data = {
-            int_id_informacion: int_id_informacion
-        };
-        $("#divModalNombre").empty();
-        $("#divModalNombre").load("@Url.Action("EditObjetivoDomicilioPartial", "Objetivo")", data);
-
-    }
-
-
-    function refreshGrupoList(active) {
-        var datos = {
-            actives: active
-        };
-        $("#listaGrupoDelictivo").empty();
-        $("#listaGrupoDelictivo").load("@Url.Action("ObjetivoGrupoListPartial", "Objetivo")", datos);
-    }
-
-    function AddObjetivoGrupoModal() {
-
-     $("#divModalNombre").empty();
-     $("#divModalNombre").load("@Url.Action("AddObjetivoGrupoPartial", "Objetivo")");
-
-  }
-    function EditObjetivoGrupo(int_id_objetivo_grupo) {
-       var data = {
-           int_id_objetivo_grupo: int_id_objetivo_grupo
-       };
-      $("#divModalNombre").empty();
-      $("#divModalNombre").load("@Url.Action("EditObjetivoGrupoPartial", "Objetivo")",data);
-
-    }
-
-    const fotoInput = document.getElementById('fotoInput');
-    const previewContainer = document.getElementById('previewContainer');
-    const previewImage = document.getElementById('previewImage');
-    const removeImage = document.getElementById('removeImage');
-
-    // Cuando selecciona archivo
-    fotoInput.addEventListener('change', function () {
-        const file = this.files[0];
-        if (file) {
-            const reader = new FileReader();
-
-            reader.addEventListener("load", function () {
-                previewImage.setAttribute("src", this.result);
-                previewContainer.style.display = "block";
-            });
-
-            reader.readAsDataURL(file);
-        }
-    });
-
-    // Botón para quitar imagen
-    removeImage.addEventListener('click', function () {
-        fotoInput.value = "";
-        previewImage.setAttribute("src", "");
-        previewContainer.style.display = "none";
-    });
-
-    $("#savePhoto2333").click(function () {
-        var formData = new FormData();
-
-        // obtener archivo seleccionado
-        var foto = $("#fotoInput")[0].files[0];
-        var fechaNacimiento = $("#fechaNacimiento").val();
-
-        if (!fechaNacimiento) {
-            swal({
-                title: "Campo requerido",
-                text: "Por favor selecciona tu fecha de nacimiento.",
-                type: "warning",
-                confirmButtonText: "Aceptar"
-            });
-            return; // detener ejecución
-        }
-
-        formData.append("foto", foto);
-        formData.append("fechaNacimiento", fechaNacimiento);
-        formData.append("int_id_objetivo", $("#int_id_objetivo").val());
-        $.ajax({
-            url: '@Url.Action("AddOrEditFoto", "Objetivo")',
-            type: 'POST',
-            data: formData,
-            processData: false, // evita que jQuery procese los datos
-            contentType: false, // evita que jQuery asigne content-type
-            success: function (response) {
-                if (data.IsSuccess) {
-                    swal({
-                        title: "",
-                        text: data.Message,
-                        type: 'success',
-                        confirmButtonText: "Continuar",
-                        closeOnConfirm: true,
-                    },
-                        function () {
-
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("AddObjetivoAlias", "Objetivo")',
+                data: datas,
+                success: function (data) {
+                    if (data.IsSuccess) {
+                        swal({
+                            title: "",
+                            text: data.Message,
+                            type: 'success',
+                            showCancelButton: false,
+                            confirmButtonText: "Continuar",
+                            closeOnConfirm: true,
+                        },
+                        function (isConfirm) {
+                            $('#closeModal').trigger('click');
+                            refreshAliasList();
                         });
-                } else {
-                    swal({
-                        title: "Error",
-                        text: data.Message || "No tienes permisos para esta acción",
-                        type: 'error',
-                        confirmButtonText: "Continuar",
-                        closeOnConfirm: true,
-                    });
-                }
-            },
-            error: function (xhr, status, error) {
-                alert("Error: " + error);
-            }
-        });
-    });
-
-    $("#savePhoto").click(function () {
-        var formData = new FormData();
-        var file = $("#fotoInput")[0].files[0];
-        var fechaNacimiento = $("#fechaNacimiento").val();
-        if (!fechaNacimiento) {
-            swal({
-                title: "Campo requerido",
-                text: "Por favor selecciona tu fecha de nacimiento.",
-                type: "warning",
-                confirmButtonText: "Aceptar"
-            });
-            return;
-        }
-
-        if (file) {
-            // si el usuario subió foto
-            formData.append("foto", file);
-            enviarDatos(formData, fechaNacimiento);
-        } else {
-            // si NO subió, usamos la de Nodisponible.png
-            fetch('/images/Nodisponible.png')
-                .then(res => res.blob())
-                .then(blob => {
-                    formData.append("foto", blob, "Nodisponible.png");
-                    enviarDatos(formData, fechaNacimiento);
-                })
-                .catch(err => {
-                    alert("No se pudo cargar la imagen por defecto.");
-                });
-        }
-    });
-
-    function enviarDatos(formData, fechaNacimiento) {
-        formData.append("fechaNacimiento", fechaNacimiento);
-        formData.append("int_id_objetivo", $("#int_id_objetivo").val());
-
-        $.ajax({
-            url: '@Url.Action("AddOrEditFoto", "Objetivo")',
-            type: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-            success: function (data) {
-                if (data.IsSuccess) {
-                    swal({
-                        title: "",
-                        text: data.Message,
-                        type: 'success',
-                        confirmButtonText: "Continuar",
-                        closeOnConfirm: true,
-                    },
-                        function () {
-                            location.reload();
+                    }
+                    if (data.IsSuccess == undefined) {
+                        swal({
+                            title: "Error",
+                            text: "No tienes permisos para llevar a cabo esta acción. Favor de contactar al administrador",
+                            type: 'error',
+                            showCancelButton: false,
+                            confirmButtonText: "Continuar",
+                            closeOnConfirm: true,
+                        },
+                        function (isConfirm) {
+                            if (isConfirm) {
+                                swal.close();
+                            }
                         });
-                } else {
-                    swal({
-                        title: "Error",
-                        text: data.Message || "No tienes permisos para esta acción",
-                        type: 'error',
-                        confirmButtonText: "Continuar",
-                        closeOnConfirm: true,
-                    });
+                    }
                 }
-            },
-            error: function (xhr, status, error) {
-                swal("Error", "No se pudieron guardar los datos.", "error");
-            }
+            });
         });
-    }
-
-
-
-
+    });
 </script>

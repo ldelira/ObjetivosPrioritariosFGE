@@ -17,6 +17,7 @@ namespace Objetivos_Prioritarios.Models
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public tb_FichaObjetivo()
         {
+            this.tb_AlbumFichaObjetivoDetalle = new HashSet<tb_AlbumFichaObjetivoDetalle>();
             this.tb_CarpetasObjetivo = new HashSet<tb_CarpetasObjetivo>();
             this.tb_Detenido = new HashSet<tb_Detenido>();
             this.tb_FichaAsunto = new HashSet<tb_FichaAsunto>();
@@ -31,6 +32,8 @@ namespace Objetivos_Prioritarios.Models
         public Nullable<bool> bit_estatus { get; set; }
     
         public virtual cat_EstatusProceso cat_EstatusProceso { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<tb_AlbumFichaObjetivoDetalle> tb_AlbumFichaObjetivoDetalle { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<tb_CarpetasObjetivo> tb_CarpetasObjetivo { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]

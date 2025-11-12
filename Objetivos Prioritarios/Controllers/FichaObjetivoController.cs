@@ -1,5 +1,8 @@
-﻿using System;
+﻿using Objetivos_Prioritarios.Models;
+using Objetivos_Prioritarios.Utils;
+using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -269,5 +272,174 @@ namespace Objetivos_Prioritarios.Controllers
         #endregion
 
 
+        #region "Album Ficha Objetivo"
+        public ActionResult IndexAlbum()
+        {
+            ViewBag.title = "";
+            return SubView("AlbumFicha", "IndexAlbum");
+        }
+
+        [HttpPost]
+        public PartialViewResult AlbumFichaListPartial(bool? actives)
+        {
+            if (actives == null)
+                actives = true;
+
+            ViewBag.Actives = actives;
+            return SubView("AlbumFicha", "AlbumFichaListPartial");
+        }
+        public JsonResult FillAlbumFichaObjetivosList(bool? active)
+        {
+            var general = ObjetivoService.getAlbumFichaObjetivo((bool)active);
+            var generalResult = general
+            .Select(x => new {
+                x.int_id_album_ficha_objetivo,
+                x.nvarchar_nombre_album,
+                x.nvarchar_descripcion_album,
+                x.bit_estatus
+            }).ToList();
+            return Json(generalResult, JsonRequestBehavior.AllowGet);
+        }
+
+
+        public PartialViewResult AddEditAlbumFichaPartial(int? int_id_album)
+        {
+            if (int_id_album != null)
+            {
+                var busquedaFicha = FichaObjetivoService.db.tb_AlbumFichaObjetivo.Where(x=>x.int_id_album_ficha_objetivo==int_id_album).FirstOrDefault();
+
+                return SubView("AlbumFicha", "AddEditAlbumFichaPartial", busquedaFicha);
+            }
+            else
+            {
+                return SubView("AlbumFicha", "AddEditAlbumFichaPartial");
+            }
+        }
+
+
+        public JsonResult addEditAlbumFicha(tb_AlbumFichaObjetivo albumFicha)
+        {
+            var general = FichaObjetivoService.addEditAlbumFicha(albumFicha);
+
+
+            return Json(general, JsonRequestBehavior.AllowGet);
+        }
+
+
+        [HttpPost]
+        public JsonResult DisableAlbum(int int_id_ficha)
+        {
+            var res = FichaObjetivoService.DisableAlbum(int_id_ficha);
+            return Json(res, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpPost]
+        public JsonResult ActivateAlbum(int int_id_ficha)
+        {
+            var res = FichaObjetivoService.ActivateAlbum(int_id_ficha);
+            return Json(res, JsonRequestBehavior.AllowGet);
+        }
+
+        #endregion
+
+
+        #region "Album Ficha Objetivo Grupos"
+        public ActionResult IndexGrupo(int int_id_album)
+        {
+            ViewBag.title = "";
+            ViewBag.int_id_album=int_id_album;
+            return SubView("AlbumFichaGrupo", "IndexGrupo");
+        }
+
+        [HttpPost]
+        public JsonResult addObjetivoAlbum(int int_id_objetivo, int int_id_album)
+        {
+            return Json(FichaObjetivoService.addObjetivoAlbum(int_id_objetivo, int_id_album));
+
+
+        }
+        public PartialViewResult GrupoFichasListPartial(bool? actives)
+        {
+            if (actives == null) actives = true;
+            ViewBag.Actives = actives;
+            return SubView("AlbumFichaGrupo", "GrupoFichasListPartial");
+        }
+
+
+        [HttpPost]
+        public JsonResult FillGrupoFichaoList(int int_id_album_ficha_objetivo, bool? active)
+        {
+            var lista = FichaObjetivoService.getListObjetivosRelacionadoGrupo(int_id_album_ficha_objetivo, (bool)active).ToList();
+
+            var lista2 = lista.Select(x => new
+            {
+                x.int_id_album_detalle,
+                x.int_id_ficha_objetivo,
+                x.int_id_album_ficha_objetivo,
+                x.estatus_ficha,
+                x.int_id_estatus_proceso,
+                x.nvarchar_descripcion_estatus,
+                x.nvarchar_observaciones,
+                x.int_id_objetivo,
+                x.Nombres,
+                x.Aliases,
+                x.GruposDelictivos,
+                x.FechaNacimiento,
+                x.estatus_objetivo,
+                isFoto=x.nvarchar_foto==null?"SIN FOTO":"CON FOTO"
+            }).ToList();
+
+            return Json(lista2, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpPost]
+        public JsonResult ActivateObjetivoGrupo(int int_id_album_detalle)
+        {
+            var resp = FichaObjetivoService.ActivateObjetivoGrupo(int_id_album_detalle);
+            return Json(resp);
+        }
+
+        [HttpPost]
+        public JsonResult DisableObjetivoGrupo(int int_id_album_detalle)
+        {
+            var resp = FichaObjetivoService.DisableObjetivoGrupo(int_id_album_detalle);
+            return Json(resp);
+        }
+
+
+
+        public ActionResult GenerarPpt(int int_id_album_ficha_objetivo)
+        {
+            var detenidos = ReporteService.ObtenerDatosDeTuBaseDeDatos(int_id_album_ficha_objetivo); // tu lógica propia
+
+            string plantilla = Server.MapPath("~/Plantillas/plantilla_base.pptx");
+            string salida = Server.MapPath("~/Salidas/informe_detenidos.pptx");
+            string defaultImg = Server.MapPath("~/Content/imagenes/Nodisponible.jpg");
+            string fondo = Server.MapPath("~/Content/imagenes/FONDO.jpg");
+
+
+            
+            PowerPointGeneratorNoImagePartType.GenerarPresentacion(detenidos, plantilla, salida, defaultImg, fondo);
+
+            return File(salida, "application/vnd.openxmlformats-officedocument.presentationml.presentation", "informe_detenidos.pptx");
+        }
+        public ActionResult GenerarPpt2(int int_id_album_ficha_objetivo)
+        {
+            var detenidos = ReporteService.ObtenerDatosDeTuBaseDeDatos(int_id_album_ficha_objetivo); // tu lógica propia
+
+            string plantilla = Server.MapPath("~/Plantillas/plantilla_base_vicefiscalia.pptx");
+            string salida = Server.MapPath("~/Salidas/informe_detenidos_vicefiscalia.pptx");
+            string defaultImg = Server.MapPath("~/Content/imagenes/Nodisponible.jpg");
+            string fondo = Server.MapPath("~/Content/imagenes/FONDO2.png");
+
+
+
+            PowerPointGeneratorNoImagePartType.GenerarPresentacion2(detenidos, plantilla, salida, defaultImg, fondo);
+
+            return File(salida, "application/vnd.openxmlformats-officedocument.presentationml.presentation", "informe_detenidos.pptx");
+        }
+
+
+        #endregion
     }
 }

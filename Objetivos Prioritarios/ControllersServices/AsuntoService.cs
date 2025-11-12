@@ -707,7 +707,7 @@ namespace Objetivos_Prioritarios.ControllersServices
             }
         }
 
-        public BasicOperationResponse SaveVictimaService(string nombre, string paterno, string materno, string fotoBase64, int idllamada, int idasunto)
+        public BasicOperationResponse SaveVictimaService(tb_Victimas victima, int idllamada, int idasunto)
         {
             try
             {
@@ -715,43 +715,70 @@ namespace Objetivos_Prioritarios.ControllersServices
                 {
                     try
                     {
-                        var nuevaVictima = new tb_Victimas
+                        if (victima == null)
                         {
-                            nvarchar_nombre = nombre,
-                            nvarchar_paterno = paterno,
-                            nvarchar_materno = materno,
-                            nvarchar_foto = fotoBase64,
-                            bit_estatus = true,
-                            date_fecha_creacion = DateTime.Now
-                        };
-
-                        db.tb_Victimas.Add(nuevaVictima);
-                        db.SaveChanges();
-
-                        if (idllamada == 1)
-                        {
-                            int nuevoIdVictima = (db.tb_Victimas.Max(x => (int?)x.int_id_victima) ?? 0);
-
-                            var VictimaAsunto = new tb_AsuntoVictimas
+                            return new BasicOperationResponse
                             {
-                                int_id_asunto_relacionado = idasunto,
-                                int_id_victima = nuevoIdVictima,
-                                bit_estatus = true,
-                                date_fecha_creacion = DateTime.Now
+                                IsSuccess = false,
+                                Message = "❌ Datos de víctima inválidos."
                             };
-                            db.tb_AsuntoVictimas.Add(VictimaAsunto);
-                            db.SaveChanges();
-
                         }
-
-
-                        transaction.Commit();
-
-                        return new BasicOperationResponse
+                        else
                         {
-                            IsSuccess = true,
-                            Message = "✅ Víctima guardada correctamente."
-                        };
+
+                            if (victima.int_id_victima != 0)
+                            {
+                                var existente = db.tb_Victimas.FirstOrDefault(x => x.int_id_victima == victima.int_id_victima);
+                                if (existente != null)
+                                {
+                                    existente.nvarchar_nombre = victima.nvarchar_nombre;
+                                    existente.nvarchar_paterno = victima.nvarchar_paterno;
+                                    existente.nvarchar_materno = victima.nvarchar_materno;
+                                    existente.nvarchar_foto = victima.nvarchar_foto;
+                                    db.SaveChanges();
+                                    transaction.Commit();
+                                    return new BasicOperationResponse
+                                    {
+                                        IsSuccess = true,
+                                        Message = "✅ Víctima actualizada correctamente."
+                                    };
+                                }
+                            }
+                            else
+                            {
+                                victima.date_fecha_creacion = DateTime.Now;
+                                victima.bit_estatus = true;
+                                db.tb_Victimas.Add(victima);
+                                db.SaveChanges();
+                            }
+
+                           
+
+                            if (idllamada == 1)
+                            {
+                                int nuevoIdVictima = (db.tb_Victimas.Max(x => (int?)x.int_id_victima) ?? 0);
+
+                                var VictimaAsunto = new tb_AsuntoVictimas
+                                {
+                                    int_id_asunto_relacionado = idasunto,
+                                    int_id_victima = nuevoIdVictima,
+                                    bit_estatus = true,
+                                    date_fecha_creacion = DateTime.Now
+                                };
+                                db.tb_AsuntoVictimas.Add(VictimaAsunto);
+                                db.SaveChanges();
+
+                            }
+
+
+                            transaction.Commit();
+
+                            return new BasicOperationResponse
+                            {
+                                IsSuccess = true,
+                                Message = "✅ Víctima guardada correctamente."
+                            };
+                        }
                     }
                     catch (Exception exTrans)
                     {

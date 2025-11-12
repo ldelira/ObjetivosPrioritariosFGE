@@ -31,6 +31,8 @@ namespace Objetivos_Prioritarios.Models
         public virtual DbSet<cat_EstatusProceso> cat_EstatusProceso { get; set; }
         public virtual DbSet<cat_TipoActividadDelictiva> cat_TipoActividadDelictiva { get; set; }
         public virtual DbSet<cat_TipoAgrupacion> cat_TipoAgrupacion { get; set; }
+        public virtual DbSet<tb_AlbumFichaObjetivo> tb_AlbumFichaObjetivo { get; set; }
+        public virtual DbSet<tb_AlbumFichaObjetivoDetalle> tb_AlbumFichaObjetivoDetalle { get; set; }
         public virtual DbSet<tb_AliasObjetivo> tb_AliasObjetivo { get; set; }
         public virtual DbSet<tb_AsuntoRelacionado> tb_AsuntoRelacionado { get; set; }
         public virtual DbSet<tb_AsuntoVictimas> tb_AsuntoVictimas { get; set; }
@@ -146,6 +148,19 @@ namespace Objetivos_Prioritarios.Models
                 new ObjectParameter("int_id_asunto_relacionado", typeof(int));
     
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<getListObjetivosRelacionadoAsunto_Result>("getListObjetivosRelacionadoAsunto", bit_estatusParameter, int_id_asunto_relacionadoParameter);
+        }
+    
+        public virtual ObjectResult<getListObjetivosRelacionadoGrupo_Result> getListObjetivosRelacionadoGrupo(Nullable<bool> bit_estatus, Nullable<int> int_id_album_ficha_objetivo)
+        {
+            var bit_estatusParameter = bit_estatus.HasValue ?
+                new ObjectParameter("bit_estatus", bit_estatus) :
+                new ObjectParameter("bit_estatus", typeof(bool));
+    
+            var int_id_album_ficha_objetivoParameter = int_id_album_ficha_objetivo.HasValue ?
+                new ObjectParameter("int_id_album_ficha_objetivo", int_id_album_ficha_objetivo) :
+                new ObjectParameter("int_id_album_ficha_objetivo", typeof(int));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<getListObjetivosRelacionadoGrupo_Result>("getListObjetivosRelacionadoGrupo", bit_estatusParameter, int_id_album_ficha_objetivoParameter);
         }
     }
 }

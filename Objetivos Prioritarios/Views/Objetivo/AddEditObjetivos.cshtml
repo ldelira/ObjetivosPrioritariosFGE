@@ -120,7 +120,7 @@
         <div class="col-lg-5">
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title" style="text-align:center">Nombre Objetivo: @ViewBag.nombreprincipal</h5>
+                    <h5 class="card-title" style="text-align:center" id="nombrePrincipal">Nombre Objetivo: @ViewBag.nombreprincipal </h5>
                     <h4 class="card-title">Fecha Nacimiento y Fotografía</h4>
                     <div class="row">
                         <div class="col-md-6">
@@ -182,6 +182,8 @@
 
 
 <div id="divModalNombre"></div>
+<div id="divModalAlias"></div>
+
 
 <script>
     $(document).ready(function () {
@@ -287,10 +289,10 @@
         $("#listaAliasObjetivo").load("@Url.Action("ObjetivoAliasListPartial", "Objetivo")",datos);
    }
 
-    function AddObjetivoAliasModal() {
-
-      $("#divModalNombre").empty();
-      $("#divModalNombre").load("@Url.Action("AddObjetivoAliasPartial", "Objetivo")");
+    function AddObjetivoAliasModal2() {
+        debugger;
+        $("#divModalAlias").empty();
+        $("#divModalAlias").load("@Url.Action("AddObjetivoAliasPartial", "Objetivo")");
 
    }
     function EditObjetivoAlias(int_id_alias) {
@@ -298,8 +300,8 @@
         var data = {
             int_id_alias: int_id_alias
         };
-       $("#divModalNombre").empty();
-       $("#divModalNombre").load("@Url.Action("EditObjetivoAliasPartial", "Objetivo")",data);
+        $("#divModalAlias").empty();
+        $("#divModalAlias").load("@Url.Action("EditObjetivoAliasPartial", "Objetivo")",data);
 
     }
 
@@ -368,6 +370,7 @@
 
     // Cuando selecciona archivo
     fotoInput.addEventListener('change', function () {
+        debugger;
         const file = this.files[0];
         if (file) {
             const reader = new FileReader();
@@ -383,6 +386,7 @@
 
     // Botón para quitar imagen
     removeImage.addEventListener('click', function () {
+        debugger;
         fotoInput.value = "";
         previewImage.setAttribute("src", "");
         previewContainer.style.display = "none";

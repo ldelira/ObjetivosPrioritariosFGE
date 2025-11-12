@@ -100,7 +100,9 @@ namespace Objetivos_Prioritarios.ControllersServices
                 nombreObjetivo.bit_principal = primerRegistro;
                 db.tb_NombreObjetivo.Add(nombreObjetivo);
                 db.SaveChanges();
-                return new BasicOperationResponse() { IsSuccess = true, Message = "Se agrego la nombre satisfactoriamente" };
+
+                var contNombre = db.tb_NombreObjetivo.Where(x => x.int_id_objetivo == nombreObjetivo.int_id_objetivo).Count();
+                return new BasicOperationResponse() { IsSuccess = true, Message = "Se agrego la nombre satisfactoriamente", ExtraData=nombreObjetivo.NombreCompleto,Id= contNombre };
             }
             catch (Exception e)
             {
@@ -667,7 +669,8 @@ namespace Objetivos_Prioritarios.ControllersServices
                 return new BasicOperationResponse
                 {
                     IsSuccess = true,
-                    Message = "Se marcó como principal correctamente."
+                    Message = "Se marcó como principal correctamente.",
+                    ExtraData= PrincipalObjetivo.NombreCompleto
                 };
             }
             catch (Exception e)
@@ -715,6 +718,12 @@ namespace Objetivos_Prioritarios.ControllersServices
                 .Select(x => x.nvarchar_nombre + " " + x.nvarchar_paterno + " " + x.nvarchar_materno)
                 .FirstOrDefault();
         }
+
+        public List<tb_AlbumFichaObjetivo> getAlbumFichaObjetivo(bool active)
+        {
+            return db.tb_AlbumFichaObjetivo.AsNoTracking().Where(x => x.bit_estatus == active).ToList();
+        }
+
 
     }
 }

@@ -41,6 +41,26 @@
           <Property Name="date_fecha_creacion" Type="datetime" Nullable="false" />
           <Property Name="bit_estatus" Type="bit" Nullable="false" />
         </EntityType>
+        <EntityType Name="tb_AlbumFichaObjetivo">
+          <Key>
+            <PropertyRef Name="int_id_album_ficha_objetivo" />
+          </Key>
+          <Property Name="int_id_album_ficha_objetivo" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="nvarchar_nombre_album" Type="nvarchar" MaxLength="250" Nullable="false" />
+          <Property Name="nvarchar_descripcion_album" Type="nvarchar" MaxLength="500" Nullable="false" />
+          <Property Name="date_fecha_creacion" Type="datetime" Nullable="false" />
+          <Property Name="bit_estatus" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="tb_AlbumFichaObjetivoDetalle">
+          <Key>
+            <PropertyRef Name="int_id_album_detalle" />
+          </Key>
+          <Property Name="int_id_album_detalle" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="int_id_album_ficha_objetivo" Type="int" Nullable="false" />
+          <Property Name="int_id_ficha_objetivo" Type="int" Nullable="false" />
+          <Property Name="date_fecha_creacion" Type="datetime" Nullable="false" />
+          <Property Name="bit_estatus" Type="bit" Nullable="false" />
+        </EntityType>
         <EntityType Name="tb_AliasObjetivo">
           <Key>
             <PropertyRef Name="int_id_alias" />
@@ -254,6 +274,30 @@
           <Property Name="date_fecha_creacion" Type="datetime" Nullable="false" />
           <Property Name="bit_estatus" Type="bit" Nullable="false" />
         </EntityType>
+        <Association Name="FK_AlbumFichaDetalle_AlbumFicha">
+          <End Role="tb_AlbumFichaObjetivo" Type="Self.tb_AlbumFichaObjetivo" Multiplicity="1" />
+          <End Role="tb_AlbumFichaObjetivoDetalle" Type="Self.tb_AlbumFichaObjetivoDetalle" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tb_AlbumFichaObjetivo">
+              <PropertyRef Name="int_id_album_ficha_objetivo" />
+            </Principal>
+            <Dependent Role="tb_AlbumFichaObjetivoDetalle">
+              <PropertyRef Name="int_id_album_ficha_objetivo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_AlbumFichaDetalle_FichaObjetivo">
+          <End Role="tb_FichaObjetivo" Type="Self.tb_FichaObjetivo" Multiplicity="1" />
+          <End Role="tb_AlbumFichaObjetivoDetalle" Type="Self.tb_AlbumFichaObjetivoDetalle" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tb_FichaObjetivo">
+              <PropertyRef Name="int_id_ficha_objetivo" />
+            </Principal>
+            <Dependent Role="tb_AlbumFichaObjetivoDetalle">
+              <PropertyRef Name="int_id_ficha_objetivo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_tb_AliasObjetivo_tb_Objetivo">
           <End Role="tb_Objetivo" Type="Self.tb_Objetivo" Multiplicity="1" />
           <End Role="tb_AliasObjetivo" Type="Self.tb_AliasObjetivo" Multiplicity="*" />
@@ -500,6 +544,10 @@
           <Parameter Name="bit_estatus" Type="bit" Mode="In" />
           <Parameter Name="int_id_asunto_relacionado" Type="int" Mode="In" />
         </Function>
+        <Function Name="getListObjetivosRelacionadoGrupo" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="bit_estatus" Type="bit" Mode="In" />
+          <Parameter Name="int_id_album_ficha_objetivo" Type="int" Mode="In" />
+        </Function>
         <Function Name="getListVictimasByNombre" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
           <Parameter Name="nombre" Type="nvarchar" Mode="In" />
           <Parameter Name="paterno" Type="nvarchar" Mode="In" />
@@ -517,6 +565,8 @@
           <EntitySet Name="cat_EstatusProceso" EntityType="Self.cat_EstatusProceso" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="cat_TipoActividadDelictiva" EntityType="Self.cat_TipoActividadDelictiva" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="cat_TipoAgrupacion" EntityType="Self.cat_TipoAgrupacion" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tb_AlbumFichaObjetivo" EntityType="Self.tb_AlbumFichaObjetivo" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tb_AlbumFichaObjetivoDetalle" EntityType="Self.tb_AlbumFichaObjetivoDetalle" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="tb_AliasObjetivo" EntityType="Self.tb_AliasObjetivo" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="tb_AsuntoRelacionado" EntityType="Self.tb_AsuntoRelacionado" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="tb_AsuntoVictimas" EntityType="Self.tb_AsuntoVictimas" Schema="dbo" store:Type="Tables" />
@@ -534,6 +584,14 @@
           <EntitySet Name="tb_OrdenAprehension" EntityType="Self.tb_OrdenAprehension" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="tb_Usuarios" EntityType="Self.tb_Usuarios" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="tb_Victimas" EntityType="Self.tb_Victimas" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_AlbumFichaDetalle_AlbumFicha" Association="Self.FK_AlbumFichaDetalle_AlbumFicha">
+            <End Role="tb_AlbumFichaObjetivo" EntitySet="tb_AlbumFichaObjetivo" />
+            <End Role="tb_AlbumFichaObjetivoDetalle" EntitySet="tb_AlbumFichaObjetivoDetalle" />
+          </AssociationSet>
+          <AssociationSet Name="FK_AlbumFichaDetalle_FichaObjetivo" Association="Self.FK_AlbumFichaDetalle_FichaObjetivo">
+            <End Role="tb_FichaObjetivo" EntitySet="tb_FichaObjetivo" />
+            <End Role="tb_AlbumFichaObjetivoDetalle" EntitySet="tb_AlbumFichaObjetivoDetalle" />
+          </AssociationSet>
           <AssociationSet Name="FK_tb_AliasObjetivo_tb_Objetivo" Association="Self.FK_tb_AliasObjetivo_tb_Objetivo">
             <End Role="tb_Objetivo" EntitySet="tb_Objetivo" />
             <End Role="tb_AliasObjetivo" EntitySet="tb_AliasObjetivo" />
@@ -650,6 +708,8 @@
           <EntitySet Name="cat_EstatusProceso" EntityType="Objetivos_PrioritariosModel.cat_EstatusProceso" />
           <EntitySet Name="cat_TipoActividadDelictiva" EntityType="Objetivos_PrioritariosModel.cat_TipoActividadDelictiva" />
           <EntitySet Name="cat_TipoAgrupacion" EntityType="Objetivos_PrioritariosModel.cat_TipoAgrupacion" />
+          <EntitySet Name="tb_AlbumFichaObjetivo" EntityType="Objetivos_PrioritariosModel.tb_AlbumFichaObjetivo" />
+          <EntitySet Name="tb_AlbumFichaObjetivoDetalle" EntityType="Objetivos_PrioritariosModel.tb_AlbumFichaObjetivoDetalle" />
           <EntitySet Name="tb_AliasObjetivo" EntityType="Objetivos_PrioritariosModel.tb_AliasObjetivo" />
           <EntitySet Name="tb_AsuntoRelacionado" EntityType="Objetivos_PrioritariosModel.tb_AsuntoRelacionado" />
           <EntitySet Name="tb_AsuntoVictimas" EntityType="Objetivos_PrioritariosModel.tb_AsuntoVictimas" />
@@ -682,6 +742,14 @@
           <AssociationSet Name="FK_tb_Grupo_Delictivo_cat_TipoAgrupacion" Association="Objetivos_PrioritariosModel.FK_tb_Grupo_Delictivo_cat_TipoAgrupacion">
             <End Role="cat_TipoAgrupacion" EntitySet="cat_TipoAgrupacion" />
             <End Role="tb_Grupo_Delictivo" EntitySet="tb_Grupo_Delictivo" />
+          </AssociationSet>
+          <AssociationSet Name="FK_AlbumFichaDetalle_AlbumFicha" Association="Objetivos_PrioritariosModel.FK_AlbumFichaDetalle_AlbumFicha">
+            <End Role="tb_AlbumFichaObjetivo" EntitySet="tb_AlbumFichaObjetivo" />
+            <End Role="tb_AlbumFichaObjetivoDetalle" EntitySet="tb_AlbumFichaObjetivoDetalle" />
+          </AssociationSet>
+          <AssociationSet Name="FK_AlbumFichaDetalle_FichaObjetivo" Association="Objetivos_PrioritariosModel.FK_AlbumFichaDetalle_FichaObjetivo">
+            <End Role="tb_FichaObjetivo" EntitySet="tb_FichaObjetivo" />
+            <End Role="tb_AlbumFichaObjetivoDetalle" EntitySet="tb_AlbumFichaObjetivoDetalle" />
           </AssociationSet>
           <AssociationSet Name="FK_tb_AliasObjetivo_tb_Objetivo" Association="Objetivos_PrioritariosModel.FK_tb_AliasObjetivo_tb_Objetivo">
             <End Role="tb_Objetivo" EntitySet="tb_Objetivo" />
@@ -743,6 +811,10 @@
             <End Role="tb_Objetivo" EntitySet="tb_Objetivo" />
             <End Role="tb_ObjetivoGrupo" EntitySet="tb_ObjetivoGrupo" />
           </AssociationSet>
+          <FunctionImport Name="getListObjetivosRelacionadoGrupo" ReturnType="Collection(Objetivos_PrioritariosModel.getListObjetivosRelacionadoGrupo_Result)">
+            <Parameter Name="bit_estatus" Mode="In" Type="Boolean" />
+            <Parameter Name="int_id_album_ficha_objetivo" Mode="In" Type="Int32" />
+          </FunctionImport>
           </EntityContainer>
         <ComplexType Name="getInfoObjetivoList_Result">
           <Property Type="Int32" Name="int_id_informacion" Nullable="false" />
@@ -872,6 +944,29 @@
           <Property Name="bit_estatus" Type="Boolean" Nullable="false" />
           <NavigationProperty Name="tb_Grupo_Delictivo" Relationship="Objetivos_PrioritariosModel.FK_tb_Grupo_Delictivo_cat_TipoAgrupacion" FromRole="cat_TipoAgrupacion" ToRole="tb_Grupo_Delictivo" />
         </EntityType>
+        <EntityType Name="tb_AlbumFichaObjetivo">
+          <Key>
+            <PropertyRef Name="int_id_album_ficha_objetivo" />
+          </Key>
+          <Property Name="int_id_album_ficha_objetivo" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="nvarchar_nombre_album" Type="String" Nullable="false" MaxLength="250" FixedLength="false" Unicode="true" />
+          <Property Name="nvarchar_descripcion_album" Type="String" Nullable="false" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="date_fecha_creacion" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="bit_estatus" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="tb_AlbumFichaObjetivoDetalle" Relationship="Objetivos_PrioritariosModel.FK_AlbumFichaDetalle_AlbumFicha" FromRole="tb_AlbumFichaObjetivo" ToRole="tb_AlbumFichaObjetivoDetalle" />
+        </EntityType>
+        <EntityType Name="tb_AlbumFichaObjetivoDetalle">
+          <Key>
+            <PropertyRef Name="int_id_album_detalle" />
+          </Key>
+          <Property Name="int_id_album_detalle" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="int_id_album_ficha_objetivo" Type="Int32" Nullable="false" />
+          <Property Name="int_id_ficha_objetivo" Type="Int32" Nullable="false" />
+          <Property Name="date_fecha_creacion" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="bit_estatus" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="tb_AlbumFichaObjetivo" Relationship="Objetivos_PrioritariosModel.FK_AlbumFichaDetalle_AlbumFicha" FromRole="tb_AlbumFichaObjetivoDetalle" ToRole="tb_AlbumFichaObjetivo" />
+          <NavigationProperty Name="tb_FichaObjetivo" Relationship="Objetivos_PrioritariosModel.FK_AlbumFichaDetalle_FichaObjetivo" FromRole="tb_AlbumFichaObjetivoDetalle" ToRole="tb_FichaObjetivo" />
+        </EntityType>
         <EntityType Name="tb_AliasObjetivo">
           <Key>
             <PropertyRef Name="int_id_alias" />
@@ -981,6 +1076,7 @@
           <Property Name="nvarchar_observaciones" Type="String" MaxLength="400" FixedLength="false" Unicode="true" />
           <Property Name="bit_estatus" Type="Boolean" />
           <NavigationProperty Name="cat_EstatusProceso" Relationship="Objetivos_PrioritariosModel.FK_tb_FichaObjetivo_cat_EstatusProceso" FromRole="tb_FichaObjetivo" ToRole="cat_EstatusProceso" />
+          <NavigationProperty Name="tb_AlbumFichaObjetivoDetalle" Relationship="Objetivos_PrioritariosModel.FK_AlbumFichaDetalle_FichaObjetivo" FromRole="tb_FichaObjetivo" ToRole="tb_AlbumFichaObjetivoDetalle" />
           <NavigationProperty Name="tb_CarpetasObjetivo" Relationship="Objetivos_PrioritariosModel.FK_tb_CarpetasObjetivo_tb_FichaObjetivo" FromRole="tb_FichaObjetivo" ToRole="tb_CarpetasObjetivo" />
           <NavigationProperty Name="tb_Detenido" Relationship="Objetivos_PrioritariosModel.FK_tb_Detenido_tb_FichaObjetivo" FromRole="tb_FichaObjetivo" ToRole="tb_Detenido" />
           <NavigationProperty Name="tb_FichaAsunto" Relationship="Objetivos_PrioritariosModel.FK_tb_FichaAsunto_tb_FichaObjetivo" FromRole="tb_FichaObjetivo" ToRole="tb_FichaAsunto" />
@@ -1167,6 +1263,30 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_AlbumFichaDetalle_AlbumFicha">
+          <End Type="Objetivos_PrioritariosModel.tb_AlbumFichaObjetivo" Role="tb_AlbumFichaObjetivo" Multiplicity="1" />
+          <End Type="Objetivos_PrioritariosModel.tb_AlbumFichaObjetivoDetalle" Role="tb_AlbumFichaObjetivoDetalle" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tb_AlbumFichaObjetivo">
+              <PropertyRef Name="int_id_album_ficha_objetivo" />
+            </Principal>
+            <Dependent Role="tb_AlbumFichaObjetivoDetalle">
+              <PropertyRef Name="int_id_album_ficha_objetivo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_AlbumFichaDetalle_FichaObjetivo">
+          <End Type="Objetivos_PrioritariosModel.tb_FichaObjetivo" Role="tb_FichaObjetivo" Multiplicity="1" />
+          <End Type="Objetivos_PrioritariosModel.tb_AlbumFichaObjetivoDetalle" Role="tb_AlbumFichaObjetivoDetalle" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tb_FichaObjetivo">
+              <PropertyRef Name="int_id_ficha_objetivo" />
+            </Principal>
+            <Dependent Role="tb_AlbumFichaObjetivoDetalle">
+              <PropertyRef Name="int_id_ficha_objetivo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_tb_AliasObjetivo_tb_Objetivo">
           <End Type="Objetivos_PrioritariosModel.tb_Objetivo" Role="tb_Objetivo" Multiplicity="1" />
           <End Type="Objetivos_PrioritariosModel.tb_AliasObjetivo" Role="tb_AliasObjetivo" Multiplicity="*" />
@@ -1347,6 +1467,22 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <ComplexType Name="getListObjetivosRelacionadoGrupo_Result">
+          <Property Type="Int32" Name="int_id_album_detalle" Nullable="false" />
+          <Property Type="Int32" Name="int_id_ficha_objetivo" Nullable="false" />
+          <Property Type="Int32" Name="int_id_album_ficha_objetivo" Nullable="false" />
+          <Property Type="Boolean" Name="estatus_ficha" Nullable="false" />
+          <Property Type="Int32" Name="int_id_estatus_proceso" Nullable="true" />
+          <Property Type="String" Name="nvarchar_descripcion_estatus" Nullable="true" MaxLength="400" />
+          <Property Type="String" Name="nvarchar_observaciones" Nullable="true" MaxLength="400" />
+          <Property Type="Int32" Name="int_id_objetivo" Nullable="true" />
+          <Property Type="String" Name="Nombres" Nullable="false" MaxLength="4000" />
+          <Property Type="String" Name="Aliases" Nullable="false" MaxLength="4000" />
+          <Property Type="String" Name="GruposDelictivos" Nullable="false" MaxLength="4000" />
+          <Property Type="DateTime" Name="FechaNacimiento" Nullable="false" Precision="23" />
+          <Property Type="Boolean" Name="estatus_objetivo" Nullable="true" />
+          <Property Type="String" Name="nvarchar_foto" Nullable="true" />
+        </ComplexType>
         </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -1506,6 +1642,28 @@
                 <ScalarProperty Name="date_fecha_creacion" ColumnName="date_fecha_creacion" />
                 <ScalarProperty Name="nvarchar_agrupacion" ColumnName="nvarchar_agrupacion" />
                 <ScalarProperty Name="int_id_tipo_agrupacion" ColumnName="int_id_tipo_agrupacion" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tb_AlbumFichaObjetivo">
+            <EntityTypeMapping TypeName="Objetivos_PrioritariosModel.tb_AlbumFichaObjetivo">
+              <MappingFragment StoreEntitySet="tb_AlbumFichaObjetivo">
+                <ScalarProperty Name="bit_estatus" ColumnName="bit_estatus" />
+                <ScalarProperty Name="date_fecha_creacion" ColumnName="date_fecha_creacion" />
+                <ScalarProperty Name="nvarchar_descripcion_album" ColumnName="nvarchar_descripcion_album" />
+                <ScalarProperty Name="nvarchar_nombre_album" ColumnName="nvarchar_nombre_album" />
+                <ScalarProperty Name="int_id_album_ficha_objetivo" ColumnName="int_id_album_ficha_objetivo" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tb_AlbumFichaObjetivoDetalle">
+            <EntityTypeMapping TypeName="Objetivos_PrioritariosModel.tb_AlbumFichaObjetivoDetalle">
+              <MappingFragment StoreEntitySet="tb_AlbumFichaObjetivoDetalle">
+                <ScalarProperty Name="bit_estatus" ColumnName="bit_estatus" />
+                <ScalarProperty Name="date_fecha_creacion" ColumnName="date_fecha_creacion" />
+                <ScalarProperty Name="int_id_ficha_objetivo" ColumnName="int_id_ficha_objetivo" />
+                <ScalarProperty Name="int_id_album_ficha_objetivo" ColumnName="int_id_album_ficha_objetivo" />
+                <ScalarProperty Name="int_id_album_detalle" ColumnName="int_id_album_detalle" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -1739,6 +1897,26 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="getListObjetivosRelacionadoGrupo" FunctionName="Objetivos_PrioritariosModel.Store.getListObjetivosRelacionadoGrupo">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="Objetivos_PrioritariosModel.getListObjetivosRelacionadoGrupo_Result">
+                <ScalarProperty Name="int_id_album_detalle" ColumnName="int_id_album_detalle" />
+                <ScalarProperty Name="int_id_ficha_objetivo" ColumnName="int_id_ficha_objetivo" />
+                <ScalarProperty Name="int_id_album_ficha_objetivo" ColumnName="int_id_album_ficha_objetivo" />
+                <ScalarProperty Name="estatus_ficha" ColumnName="estatus_ficha" />
+                <ScalarProperty Name="int_id_estatus_proceso" ColumnName="int_id_estatus_proceso" />
+                <ScalarProperty Name="nvarchar_descripcion_estatus" ColumnName="nvarchar_descripcion_estatus" />
+                <ScalarProperty Name="nvarchar_observaciones" ColumnName="nvarchar_observaciones" />
+                <ScalarProperty Name="int_id_objetivo" ColumnName="int_id_objetivo" />
+                <ScalarProperty Name="Nombres" ColumnName="Nombres" />
+                <ScalarProperty Name="Aliases" ColumnName="Aliases" />
+                <ScalarProperty Name="GruposDelictivos" ColumnName="GruposDelictivos" />
+                <ScalarProperty Name="FechaNacimiento" ColumnName="FechaNacimiento" />
+                <ScalarProperty Name="estatus_objetivo" ColumnName="estatus_objetivo" />
+                <ScalarProperty Name="nvarchar_foto" ColumnName="nvarchar_foto" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
           </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>

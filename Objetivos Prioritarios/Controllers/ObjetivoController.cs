@@ -56,19 +56,22 @@ namespace Objetivos_Prioritarios.Controllers
             return Json(generalResult, JsonRequestBehavior.AllowGet);
         }
 
+
+        public ActionResult AddObjetivo()
+        {
+            var result = ObjetivoService.addObjetivoFicha();
+
+            return RedirectToAction("AddEditObjetivos", new { int_id_objetivo = result.int_id_objetivo });
+        }
+
         public ActionResult AddEditObjetivos(int? int_id_objetivo)
         {
             ViewBag.title = "OBJETIVOS PRIORITARIOS";
+
             ViewBag.nombreprincipal = ObjetivoService.ObtenerNombreCompletoPrincipal(int_id_objetivo);
-            if (int_id_objetivo != null)
-            {
-                var busqueda = ObjetivoService.getObjetivoById((int)int_id_objetivo);
-                return View(busqueda);
-            }
-            else
-            {
-                return View(ObjetivoService.addObjetivoFicha());
-            }
+            var busqueda = ObjetivoService.getObjetivoById((int)int_id_objetivo);
+            return View(busqueda);
+            
         }
 
 
@@ -552,11 +555,7 @@ namespace Objetivos_Prioritarios.Controllers
             {
                 var resultado = ObjetivoService.MarcarNombreComoPrincipal(int_id_nombre);
 
-                return Json(new
-                {
-                    IsSuccess = resultado.IsSuccess,
-                    Message = resultado.Message
-                });
+                return Json(resultado);
             }
             catch (Exception ex)
             {

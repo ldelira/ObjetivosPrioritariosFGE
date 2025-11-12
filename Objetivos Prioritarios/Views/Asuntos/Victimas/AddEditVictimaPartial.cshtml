@@ -167,45 +167,52 @@
     });
 
 
-       $(document).off("click", "#btnGuardarVictima").on("click", "#btnGuardarVictima", function () {
-           const form = document.getElementById("formVictima");
-           const formData = new FormData(form);
-           const fotoInput = document.getElementById("fotoInput").files[0];
-           const idllamada = '@ViewBag.llamada';
-           const idasunto = '@ViewBag.idasunto';
+     $(document).off("click", "#btnGuardarVictima").on("click", "#btnGuardarVictima", function () {
+    const form = document.getElementById("formVictima");
+    const formData = new FormData(form);
+    const fotoInput = document.getElementById("fotoInput") ? document.getElementById("fotoInput").files[0] : null;
+    const idllamada = '@ViewBag.llamada';
+    const idasunto = '@ViewBag.idasunto';
 
+   
 
-           if (fotoInput) {
-               formData.append("foto", fotoInput);
-           }
-           formData.append("llamada", idllamada);
-           formData.append("asunto", idasunto);
-            $.ajax({
-                url: '/Asuntos/SaveVictima',
-                type: 'POST',
-                data: formData,
-                processData: false,  
-                contentType: false,  
-                success: function (response) {
-                    if (response.success) {
-                        swal({
-                            title: "Éxito",
-                            text: response.message,
-                            type: "success"
-                        }, function () {
-                            refreshListaVictimas(1);
-                            $("#ModalGenerico").modal("hide");
-                            
-                        });
-                    } else {
-                        swal("Error", response.message, "error");
-                    }
-                },
-                error: function (xhr, status, error) {
-                    swal("Error", "Ocurrió un problema al guardar los datos.", "error");
-                    console.error(error);
-                }
-            });
-        });
+    // si foto existe la anexamos
+    if (fotoInput) {
+        formData.append("foto", fotoInput);
+    }
+
+    formData.append("llamada", idllamada);
+    formData.append("asunto", idasunto);
+    // siempre manda como string; en el server lo parseamos con TryParse
+    formData.append("int_id_victima2", '@(Model.int_id_victima==null?0:Model.int_id_victima)');
+
+         debugger;
+
+    $.ajax({
+        url: '/Asuntos/SaveVictima',
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function (response) {
+            if (response.success) {
+                swal({
+                    title: "Éxito",
+                    text: response.message,
+                    type: "success"
+                }, function () {
+                    refreshListaVictimas(1);
+                    $("#ModalGenerico").modal("hide");
+                });
+            } else {
+                swal("Error", response.message, "error");
+            }
+        },
+        error: function (xhr, status, error) {
+            swal("Error", "Ocurrió un problema al guardar los datos.", "error");
+            console.error(error);
+        }
+    });
+});
 
 </script>

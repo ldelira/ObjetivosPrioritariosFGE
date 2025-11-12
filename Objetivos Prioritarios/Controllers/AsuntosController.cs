@@ -146,9 +146,9 @@ namespace Objetivos_Prioritarios.Controllers
         #region ParcialObjetivoPrioritario
 
 
-        public PartialViewResult ObjetivoPrioritarioListPartial(string nombre, string paterno, string materno)
+        public PartialViewResult ObjetivoPrioritarioListPartial(string nombre, string paterno, string materno,int opcion)
         {
-
+            ViewBag.opcion = opcion;
             var model = AsuntoService.GetVictimasNamePhotoList(nombre, paterno, materno).ToList();
 
           
@@ -229,7 +229,8 @@ namespace Objetivos_Prioritarios.Controllers
                     v.int_id_asunto_victima,
                     v.tb_Victimas.int_id_victima,
                     NombreCompleto = v.tb_Victimas.nvarchar_nombre + " " + v.tb_Victimas.nvarchar_paterno + " " + v.tb_Victimas.nvarchar_materno,
-                    FotoBase63=v.tb_Victimas.nvarchar_foto
+                    //FotoBase63 = v.tb_Victimas.nvarchar_foto,
+                    Isfoto = v.tb_Victimas.nvarchar_foto == null ? "SIN FOTO" : "CON FOTO"
                 })
                 .ToList();
 
@@ -290,7 +291,25 @@ namespace Objetivos_Prioritarios.Controllers
         {
             var lista = AsuntoService.getListObjetivosRelacionadoAsunto(int_id_asunto_relacionado, (bool)active).ToList();
 
-            return Json(lista, JsonRequestBehavior.AllowGet);
+            var lista2 = lista.Select(x => new
+            {
+                x.int_id_ficha_asunto,
+                x.int_id_ficha_objetivo,
+                x.int_id_asunto_relacionado,
+                x.estatus_ficha,
+                x.int_id_estatus_proceso,
+                x.nvarchar_descripcion_estatus,
+                x.nvarchar_observaciones,
+                x.int_id_objetivo,
+                x.Nombres,
+                x.Aliases,
+                x.GruposDelictivos,
+                x.FechaNacimiento,
+                x.estatus_objetivo,
+                isFoto = x.nvarchar_foto == null ? "SIN FOTO" : "CON FOTO"
+            }).ToList();
+
+            return Json(lista2, JsonRequestBehavior.AllowGet);
         }
 
         [HttpPost]
@@ -321,6 +340,13 @@ namespace Objetivos_Prioritarios.Controllers
                 string materno = Request.Form["nvarchar_materno"]?.Trim();
                 int idllamada = Convert.ToInt32(Request.Form["llamada"]);
                 int idasunto = Convert.ToInt32(Request.Form["asunto"]);
+                int int_id_victima = 0;
+                var sIdVictima = Request.Form["int_id_victima2"]?.ToString().Trim();
+                if (!string.IsNullOrEmpty(sIdVictima))
+                {
+                    int.TryParse(sIdVictima, out int_id_victima);
+                }
+
 
                 // 🧾 Depuración opcional (para revisar en consola del servidor)
                 //System.Diagnostics.Debug.WriteLine("---- DATOS RECIBIDOS ----");
@@ -340,7 +366,17 @@ namespace Objetivos_Prioritarios.Controllers
                         base64Foto = Convert.ToBase64String(ms.ToArray());
                     }
                 }
-                var resultado = AsuntoService.SaveVictimaService(nombre, paterno, materno, base64Foto, idllamada, idasunto);
+
+                tb_Victimas victima= new tb_Victimas
+                {
+                    int_id_victima = int_id_victima,
+                    nvarchar_nombre = nombre,
+                    nvarchar_paterno = paterno,
+                    nvarchar_materno = materno,
+                    nvarchar_foto = base64Foto
+                };
+
+                var resultado = AsuntoService.SaveVictimaService(victima, idllamada, idasunto);
 
                 return Json(new
                 {
@@ -358,6 +394,68 @@ namespace Objetivos_Prioritarios.Controllers
             }
         }
 
+        [HttpPost]
+        public JsonResult GetFotoAjax(int id)
+        {
+            if (id <= 0)
+                return Json(new { success = false, message = "Id inválido." });
+
+            try
+            {
+                // Obtén el base64 desde base de datos
+                var busqueda= FichaObjetivoService.db.tb_FichaObjetivo.FirstOrDefault(x => x.int_id_ficha_objetivo == id);
+                if (busqueda == null)
+                {
+                    return Json(new { success = false, message = "No existe fotografía." });
+
+                }
+                else
+                {
+
+                    string fotoBase64 = busqueda.tb_Objetivo.nvarchar_foto;
+
+                    if (string.IsNullOrEmpty(fotoBase64))
+                        return Json(new { success = false, message = "No existe fotografía." });
+
+                    return Json(new { success = true, foto = fotoBase64 });
+                }
+            }
+            catch (Exception ex)
+            {
+                // Aquí puedes loguear el error
+                return Json(new { success = false, message = "Error en el servidor." });
+            }
+        }
+
+
+
+        [HttpPost]
+        public JsonResult GetFotoAjaxVictimas(int id)
+        {
+            if (id <= 0)
+                return Json(new { success = false, message = "Id inválido." });
+
+            try
+            {
+                // Ajusta la siguiente línea al contexto/servicio que uses
+                var victima = FichaObjetivoService.db.tb_Victimas.FirstOrDefault(x => x.int_id_victima == id);
+
+                if (victima == null)
+                    return Json(new { success = false, message = "No existe fotografía." });
+
+                string fotoBase64 = victima.nvarchar_foto; // o el nombre de campo real
+
+                if (string.IsNullOrEmpty(fotoBase64))
+                    return Json(new { success = false, message = "No existe fotografía." });
+
+                return Json(new { success = true, foto = fotoBase64 });
+            }
+            catch (Exception ex)
+            {
+                // loguea ex si quieres
+                return Json(new { success = false, message = "Error en el servidor." });
+            }
+        }
 
 
 

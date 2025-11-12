@@ -214,6 +214,9 @@
             $.post('@Url.Action("MarcarComoPrincipal", "Objetivo")', { int_id_nombre: id }, function (data) {
                 if (data.IsSuccess) {
                     refreshNombresList();
+                    debugger;
+                    $("#nombrePrincipal").text("Nombre Objetivo: " + data.ExtraData)
+
                 } else {
                     swal("Error", data.Message, "error");
                     checkbox.checked = !wasChecked;

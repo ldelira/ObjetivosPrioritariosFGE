@@ -158,5 +158,18 @@ namespace Objetivos_Prioritarios.Models
     
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<getListFichaObjetivos_Result>("getListFichaObjetivos", bit_estatusParameter);
         }
+    
+        public virtual ObjectResult<getListObjetivosRelacionadoGrupo_Result> getListObjetivosRelacionadoGrupo(Nullable<bool> bit_estatus, Nullable<int> int_id_album_ficha_objetivo)
+        {
+            var bit_estatusParameter = bit_estatus.HasValue ?
+                new ObjectParameter("bit_estatus", bit_estatus) :
+                new ObjectParameter("bit_estatus", typeof(bool));
+    
+            var int_id_album_ficha_objetivoParameter = int_id_album_ficha_objetivo.HasValue ?
+                new ObjectParameter("int_id_album_ficha_objetivo", int_id_album_ficha_objetivo) :
+                new ObjectParameter("int_id_album_ficha_objetivo", typeof(int));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<getListObjetivosRelacionadoGrupo_Result>("getListObjetivosRelacionadoGrupo", bit_estatusParameter, int_id_album_ficha_objetivoParameter);
+        }
     }
 }

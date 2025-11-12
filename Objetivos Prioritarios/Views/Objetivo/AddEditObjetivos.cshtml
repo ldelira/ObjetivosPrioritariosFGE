@@ -2,6 +2,9 @@
 
 
 <div class="d-flex justify-content-end">
+    <button type="button" class="btn btn-primary" onclick="abrirFichaObjetivo()">
+        📄 IR A FICHA OBJETIVO
+    </button>
     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalBusquedaInfoGeneral">
         🔍 Buscar Información General
     </button>
@@ -211,6 +214,10 @@
             refreshInfoGeneralList("#modalBusquedaInfoGeneral");
         });
 
+        $("#btnBuscarInfoGeneral").click(function () {
+            refreshInfoGeneralList("#modalBusquedaInfoGeneral");
+        });
+
 
 
     })
@@ -256,7 +263,20 @@
             }
         }
     );
-}
+    }
+
+    function abrirFichaObjetivo() {
+        var int_id_objetivo = $("#int_id_objetivo").val();
+
+        if (!int_id_objetivo) {
+            swal("Error", "No se encontró el ID del objetivo.", "error");
+            return;
+        }
+
+        location.href = '@Url.Action("EditFichaObjetivos","FichaObjetivo")?int_id_objetivo=' + int_id_objetivo;
+    }
+
+
   function refreshNombresList(active) {
       var datos = {
           actives: active

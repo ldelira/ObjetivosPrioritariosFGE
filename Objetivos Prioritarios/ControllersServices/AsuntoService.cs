@@ -775,7 +775,7 @@ namespace Objetivos_Prioritarios.ControllersServices
             }
         }
 
-        public BasicOperationResponse addObjetivoAsunto(int int_id_objetivo, int int_id_asunto_relacionado)
+        public BasicOperationResponse addObjetivoAsunto(int int_id_objetivo, int int_id_asunto_relacionado,/* int estatusId,*/ string observaciones)
         {
             try
             {
@@ -784,20 +784,23 @@ namespace Objetivos_Prioritarios.ControllersServices
 
                 var id_ficha = busFicha.int_id_ficha_objetivo;
 
+                //busFicha.int_id_estatus_proceso = estatusId;
+
                 var busFichaAsunto = db.tb_FichaAsunto.Where(x => x.int_id_asunto_relacionado == int_id_asunto_relacionado && x.int_id_ficha_objetivo == id_ficha).FirstOrDefault();
-
-
+                
+                
                 if (busFichaAsunto != null)
                 {
                     if (busFichaAsunto.bit_estatus == false)
                     {
+                        busFichaAsunto.nvarchar_observaciones = observaciones;
                         busFichaAsunto.bit_estatus = true;
-                        msg = "Se activo objetivo ya existente en la relación.";
-
+                        msg = "Se activo objetivo ya existente en la relación, se actualizo la observación..";
                     }
                     else
                     {
-                        msg = "Objetivo ya existente en la relación.";
+                        busFichaAsunto.nvarchar_observaciones = observaciones;
+                        msg = "Objetivo ya existente en la relación, se actualizo la observación.";
                     }
 
                 }
@@ -809,11 +812,13 @@ namespace Objetivos_Prioritarios.ControllersServices
                     {
                         int_id_asunto_relacionado = int_id_asunto_relacionado,
                         int_id_ficha_objetivo = id_ficha,
+                        nvarchar_observaciones = observaciones,
                         date_fecha_creacion = DateTime.Now,
                         bit_estatus = true
                     };
-
                     db.tb_FichaAsunto.Add(busFichaAsunto);
+
+
                     msg = "Objetivo agregado correctamente al asunto.";
                 }
                 db.SaveChanges();
@@ -871,7 +876,14 @@ namespace Objetivos_Prioritarios.ControllersServices
             }
         }
 
-
-
+        public List<cat_EstatusProceso> GetEstatusProcesos(bool? actives)
+        {
+            bool activo = actives ?? true;
+            return db.cat_EstatusProceso
+                     .AsNoTracking()
+                     .Where(x => x.bit_estatus == activo)
+                     .OrderByDescending(x => x.date_fecha_creacion)
+                     .ToList();
+        }
     }
 }

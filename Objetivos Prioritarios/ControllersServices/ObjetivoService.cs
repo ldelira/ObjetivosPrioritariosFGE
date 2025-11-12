@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.IO;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Web;
 using System.Web.Mvc;
 
@@ -48,6 +49,10 @@ namespace Objetivos_Prioritarios.ControllersServices
         public List<getListObjetivosPrioritarios_Result> getObjetivosList(bool? actives)
         {
             return db.getListObjetivosPrioritarios(actives).ToList();
+        }
+        public List<getListFichaObjetivos_Result> getFichaObjetivosList(bool? actives)
+        {
+            return db.getListFichaObjetivos(actives).ToList();
         }
         public tb_Objetivo getObjetivoById(int int_id_objetivo)
         {
@@ -195,11 +200,25 @@ namespace Objetivos_Prioritarios.ControllersServices
 
         public List<tb_AliasObjetivo> getAliasObjetivoList(bool? active, int? int_id_objetivo)
         {
-            return db.tb_AliasObjetivo
+            var lista = db.tb_AliasObjetivo
                 .AsNoTracking()
                 .Where(x => x.int_id_objetivo == int_id_objetivo && x.bit_estatus == active)
                 .ToList();
+
+            if (lista == null || lista.Count == 0)
+            {
+                return new List<tb_AliasObjetivo>
+        {
+            new tb_AliasObjetivo
+            {
+                nvarchar_alias = "No hay alias asignados"
+            }
+        };
+            }
+
+            return lista;
         }
+
 
         public BasicOperationResponse addAliasObjetivo(tb_AliasObjetivo aliasObjetivo)
         {
@@ -714,6 +733,117 @@ namespace Objetivos_Prioritarios.ControllersServices
                 .Where(x => x.int_id_objetivo == idObjetivo && x.bit_principal == true)
                 .Select(x => x.nvarchar_nombre + " " + x.nvarchar_paterno + " " + x.nvarchar_materno)
                 .FirstOrDefault();
+        }
+
+        public List<string> ObtenerNombreCompletoSecundarios(int? idObjetivo)
+        {
+            var nombres = db.tb_NombreObjetivo
+                .Where(x => x.int_id_objetivo == idObjetivo && x.bit_principal == false)
+                .Select(x => x.nvarchar_nombre + " " + x.nvarchar_paterno + " " + x.nvarchar_materno)
+                .ToList();
+
+            if (nombres == null || nombres.Count == 0)
+            {
+                return new List<string> { "No hay más nombres asignados" };
+            }
+
+            return nombres;
+        }
+
+
+        public int GetIdFichaObjetivo(int idobjetivo)
+        {
+            var idficha = db.tb_FichaObjetivo
+                            .AsNoTracking()
+                            .Where(x => x.int_id_objetivo == idobjetivo)
+                            .OrderByDescending(x => x.int_id_ficha_objetivo)
+                            .Select(x => (int?)x.int_id_ficha_objetivo)
+                            .FirstOrDefault() ?? 0;
+            return idficha;
+        }
+
+        public string GetEstatusObjetivo(int? idficha)
+        {
+            var idestatus = db.tb_FichaObjetivo
+                            .AsNoTracking()
+                            .Where(x => x.int_id_ficha_objetivo == idficha)
+                            .OrderByDescending(x => x.int_id_ficha_objetivo)
+                            .Select(x => (int?)x.int_id_estatus_proceso)
+                            .FirstOrDefault() ?? 0;
+
+            var estatus = db.cat_EstatusProceso
+                            .AsNoTracking()
+                            .Where(x => x.int_id_estatus_proceso == idestatus)
+                            .OrderByDescending(x => x.int_id_estatus_proceso)
+                            .Select(x => x.nvarchar_estatus)
+                            .FirstOrDefault() ?? "";
+            return estatus;
+        }
+
+        public string GetObservacionObjetivo(int? idficha)
+        {
+            var observacion = db.tb_FichaObjetivo
+                     .AsNoTracking()
+                     .Where(x => x.int_id_ficha_objetivo == idficha)
+                     .OrderByDescending(x => x.int_id_ficha_objetivo)
+                     .Select(x => x.nvarchar_observaciones)
+                     .FirstOrDefault() ?? "";
+
+            return observacion;
+        }
+
+        public string GetDescripcionEstatusObjetivo(int? idficha)
+        {
+            var descripcion = db.tb_FichaObjetivo
+                     .AsNoTracking()
+                     .Where(x => x.int_id_ficha_objetivo == idficha)
+                     .OrderByDescending(x => x.int_id_ficha_objetivo)
+                     .Select(x => x.nvarchar_descripcion_estatus)
+                     .FirstOrDefault() ?? "";
+
+            return descripcion;
+        }
+
+
+        public List<string> GetGruposDelictivosObjetivo(int? idobjetivo)
+        {
+            if (idobjetivo == null)
+                return new List<string> { "No hay grupos asignados" };
+
+            // 1. Obtener todos los IDs de grupos asociados al objetivo
+            var idsGrupo = db.tb_ObjetivoGrupo
+                .AsNoTracking()
+                .Where(x => x.int_id_objetivo == idobjetivo)
+                .Select(x => x.int_id_grupo)
+                .ToList();
+
+            if (idsGrupo == null || idsGrupo.Count == 0)
+                return new List<string> { "No hay grupos asignados" };
+
+            // 2. Obtener los nombres de los grupos
+            var nombresGrupos = db.tb_Grupo_Delictivo
+                .AsNoTracking()
+                .Where(g => idsGrupo.Contains(g.int_id_grupo))
+                .OrderBy(g => g.nvarchar_grupo)
+                .Select(g => g.nvarchar_grupo)
+                .ToList();
+
+            if (nombresGrupos == null || nombresGrupos.Count == 0)
+                return new List<string> { "No hay grupos asignados" };
+
+            return nombresGrupos;
+        }
+
+
+        public string GetFotoObjetivo(int? idObjetivo)
+        {
+            var foto = db.tb_Objetivo
+                     .AsNoTracking()
+                     .Where(x => x.int_id_objetivo == idObjetivo)
+                     .Select(x => x.nvarchar_foto)
+                     .FirstOrDefault() ?? "";
+
+            return foto;
         }
 
     }

@@ -154,6 +154,21 @@ namespace Objetivos_Prioritarios.Controllers
           
             return SubView("Victimas", "ObjetivoPrioritarioListPartial", model);
         }
+
+        [HttpPost]
+        public JsonResult GetEstatusProcesos()
+        {
+            var estatus = AsuntoService.GetEstatusProcesos(true).ToList();
+
+            var estatusResult = estatus.Select(x => new
+            {
+                x.int_id_estatus_proceso,
+                x.nvarchar_estatus
+               
+            }).ToList();
+            return Json(estatusResult, JsonRequestBehavior.AllowGet);
+        }
+
         [HttpPost]
         public JsonResult getListNombresObjetivo(int id_objetivo)
         {
@@ -270,13 +285,11 @@ namespace Objetivos_Prioritarios.Controllers
 
         #region ObjetivosRelacionadoAsunto
         [HttpPost]
-        public JsonResult addObjetivoAsunto(int int_id_objetivo, int int_id_asunto_relacionado)
+        public JsonResult addObjetivoAsunto(int int_id_objetivo, int int_id_asunto_relacionado/*, int estatusid*/, string observaciones)
         {
-            return Json(AsuntoService.addObjetivoAsunto(int_id_objetivo, int_id_asunto_relacionado));
-
-
+            return Json(AsuntoService.addObjetivoAsunto(int_id_objetivo, int_id_asunto_relacionado/*,  estatusid*/, observaciones));
         }
-
+        
         public PartialViewResult ObjetivoRelacionadoAsuntoListPartial(bool? actives)
         {
             if (actives == null) actives = true;
@@ -289,6 +302,7 @@ namespace Objetivos_Prioritarios.Controllers
         public JsonResult FillObjetivoRelacionadoAsuntoList(int int_id_asunto_relacionado,bool? active)
         {
             var lista = AsuntoService.getListObjetivosRelacionadoAsunto(int_id_asunto_relacionado, (bool)active).ToList();
+            
 
             return Json(lista, JsonRequestBehavior.AllowGet);
         }

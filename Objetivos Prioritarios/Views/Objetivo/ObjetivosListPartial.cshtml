@@ -135,7 +135,7 @@
 
     function FillGrid(estado = null) {
 
-        debugger;
+         
 
         $.ajax({
             type: 'POST',
@@ -143,7 +143,7 @@
             data: { active: @Json.Encode(ViewBag.Actives)},
 
             success: function (data) {
-                debugger;
+                 
                 if ($.fn.dataTable.isDataTable('#generalDataTable')) {
                     $('#generalDataTable').DataTable().clear().destroy();
                 }

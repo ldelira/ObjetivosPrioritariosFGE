@@ -556,6 +556,45 @@ namespace Objetivos_Prioritarios.ControllersServices
         }
 
 
+        public object AddEstatusObservaciones(int idFicha, int idEstatus, string descripcion, string observaciones)
+        {
+            try
+            {
+                var registro = db.tb_FichaObjetivo
+                                 .FirstOrDefault(x => x.int_id_ficha_objetivo == idFicha);
+
+                if (registro == null)
+                {
+                    return new
+                    {
+                        success = false,
+                        message = "No se encontró el registro del objetivo para actualizar."
+                    };
+                }
+
+                registro.int_id_estatus_proceso = idEstatus;
+                registro.nvarchar_descripcion_estatus = descripcion;
+                registro.nvarchar_observaciones = observaciones;
+
+                db.SaveChanges();
+
+                return new
+                {
+                    success = true,
+                    message = "Datos actualizados correctamente."
+                };
+            }
+            catch (Exception ex)
+            {
+                return new
+                {
+                    success = false,
+                    message = "Error al actualizar: " + ex.Message
+                };
+            }
+        }
+
+
     }
 
 

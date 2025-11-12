@@ -224,6 +224,9 @@
     <Compile Include="Models\getInfoObjetivoList_Result.cs">
       <DependentUpon>ObjetivosPrioritarios.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\getListFichaObjetivos_Result.cs">
+      <DependentUpon>ObjetivosPrioritarios.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\getListFiliacionRelacionada_Result.cs">
       <DependentUpon>ObjetivosPrioritarios.tt</DependentUpon>
     </Compile>
@@ -307,6 +310,12 @@
     </Compile>
     <Compile Include="Models\sp_ObjPri_getObjetivoInfo_Result.cs">
       <DependentUpon>Mandamientos.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\tb_AlbumFichaObjetivo.cs">
+      <DependentUpon>ObjetivosPrioritarios.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\tb_AlbumFichaObjetivoDetalle.cs">
+      <DependentUpon>ObjetivosPrioritarios.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\tb_AliasObjetivo.cs">
       <DependentUpon>ObjetivosPrioritarios.tt</DependentUpon>

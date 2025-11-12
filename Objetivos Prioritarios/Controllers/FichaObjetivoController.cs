@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Antlr.Runtime.Misc;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -35,16 +37,13 @@ namespace Objetivos_Prioritarios.Controllers
         }
         public JsonResult FillFichaObjetivosList(bool? active)
         {
-            var general = ObjetivoService.getObjetivosList(active);
+            var general = ObjetivoService.getFichaObjetivosList(active);
             var generalResult = general
             .Select(x => new {
                 x.int_id_objetivo,
                 x.Nombres,
-                x.Aliases,
-                x.GruposDelictivos,
-                x.FechaNacimiento,
-                x.bit_estatus,
-                TieneFoto = (!string.IsNullOrEmpty(x.nvarchar_foto)) == true ? "CON FOTO" : "SIN FOTO"
+                x.Carpetas,
+                x.Delitos
             }).ToList();
             return Json(generalResult, JsonRequestBehavior.AllowGet);
         }
@@ -53,8 +52,82 @@ namespace Objetivos_Prioritarios.Controllers
         public ActionResult EditFichaObjetivos(int int_id_objetivo)
         {
             var busquedaFicha = FichaObjetivoService.addorgetFichObjetivo(int_id_objetivo);
+
+            // 1. Obtener catálogo de estatus
+            var catestatus = AsuntoService.GetEstatusProcesos(true).ToList();
+
+            ViewBag.CatalogoEstatus = AsuntoService.GetEstatusProcesos(true).ToList();
+            var idficha = ObjetivoService.GetIdFichaObjetivo(int_id_objetivo);
+
+            ViewBag.EstatusActual = ObjetivoService.GetEstatusObjetivo(idficha);
+
+            ViewBag.Nombre = ObjetivoService.ObtenerNombreCompletoPrincipal(int_id_objetivo);
+
+            ViewBag.Nombress = ObjetivoService.ObtenerNombreCompletoSecundarios(int_id_objetivo);
+
+            var alias = ObjetivoService.getAliasObjetivoList(true, int_id_objetivo);
+            ViewBag.Alias = alias.Select(x => x.nvarchar_alias).ToList();
+
+            var grupos = ObjetivoService.GetGruposDelictivosObjetivo(int_id_objetivo);
+            ViewBag.GruposDelictivos = grupos;
+
+            ViewBag.Observacion = ObjetivoService.GetObservacionObjetivo(idficha);
+            ViewBag.DescripcionEstatus = ObjetivoService.GetDescripcionEstatusObjetivo(idficha);
+
+            ViewBag.fotobase64 = ObjetivoService.GetFotoObjetivo(int_id_objetivo);
+
             return View(busquedaFicha);
         }
+
+
+        //[HttpPost]
+        //public JsonResult GetEstatusProcesos(int idficha)
+        //{
+        //    var catestatus = AsuntoService.GetEstatusProcesos(true).ToList();
+
+        //    var estatusResult = catestatus.Select(x => new
+        //    {
+        //        x.int_id_estatus_proceso,
+        //        x.nvarchar_estatus
+        //    }).ToList();
+
+        //    var estatusobjetivo = ObjetivoService.GetEstatusObjetivo(idficha);
+
+        //    var idobjetivo = ObjetivoService.GetIdObjetivo(idficha);
+
+        //    var nombre = ObjetivoService.ObtenerNombreCompletoPrincipal(idobjetivo);
+        //    var alias = ObjetivoService.getAliasObjetivoList(true, idobjetivo);
+        //    var grupodelictivo = ObjetivoService.GetObjetivoGrupoList(true, idobjetivo);
+        //    var observacion = ObjetivoService.GetObservacionObjetivo(idficha);
+        //    var descripcionestatus = ObjetivoService.GetDescripcionEstatusObjetivo(idficha);
+
+        //    return Json(new
+        //    {
+        //        catalogo = estatusResult,
+        //        estatusActual = estatusobjetivo,
+        //        nombre = nombre,
+        //        alias = alias,
+        //        grupodelictivo = grupodelictivo,
+        //        observacion = observacion,
+        //        descripcionestatus = descripcionestatus
+        //    }, JsonRequestBehavior.AllowGet);
+        //}
+
+
+
+        [HttpPost]
+        public JsonResult AddEstatusObservaciones(int idestatus, string descripcion, string observaciones, int idficha)
+        {
+            var result = FichaObjetivoService.AddEstatusObservaciones(
+                idficha,
+                idestatus,
+                descripcion,
+                observaciones
+            );
+            return Json(result, JsonRequestBehavior.AllowGet);
+        }
+
+
 
         #endregion
 

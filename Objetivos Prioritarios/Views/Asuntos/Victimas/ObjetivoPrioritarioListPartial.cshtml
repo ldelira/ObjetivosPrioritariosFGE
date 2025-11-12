@@ -8,6 +8,48 @@ else
 {
     if (Model.Count > 0)
     {
+        <div class="modal fade" id="modalObjetivo" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content">
+
+                    <div class="modal-header">
+                        <h5 class="modal-title">Información del objetivo</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row mt-3">
+                            <div class="mb-3">
+                                <label for="observaciones" class="form-label">Observaciones:</label>
+                                <textarea class="form-control" id="observaciones" rows="4"></textarea>
+                            </div>
+                            @*<div class="mb-3">
+                                <div class="mb-3">
+                                    <label for="estatusProceso" class="form-label">Estatus del proceso:</label>
+
+                                    <select id="selectEstatus" class="form-control">
+                                        <option value="">Cargando...</option>
+                                    </select>
+                                </div>
+                            </div>*@
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" data-bs-dismiss="modal">
+                        Cerrar
+                        </button>
+                        <button class="btn btn-success" onclick="guardarObjetivoModal()">
+                            Aceptar
+                        </button>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+
+
         <table class="table table-bordered table-sm align-middle" id="tblobjetivo">
             <thead class="table-light">
                 <tr>
@@ -30,9 +72,15 @@ else
                             }
                             else
                             {
-                                <button class="btn btn-success btn-sm" onclick="addObjetivoAsunto(@item.int_id_objetivo)">
+                                @*<button class="btn btn-success btn-sm" onclick="addObjetivoAsunto(@item.int_id_objetivo)">
+                <i class="fa fa-check"></i>
+            </button>*@
+
+                                <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#modalObjetivo" onclick="setObjetivo(@item.int_id_objetivo)">
                                     <i class="fa fa-check"></i>
                                 </button>
+
+
                             }
                         </td>
                     </tr>
@@ -88,11 +136,11 @@ else
 
 
       let clavePersonaSeleccionada = null;
-
+    let objetivoSeleccionado = null
   // ✅ Llamado desde el botón ✔️ del DataTable
     function addObjetivoVictima(int_id_objetivo) {
         clavePersonaSeleccionada = int_id_objetivo;
-       
+
 
       // Limpia el select antes de cargar
       $("#selectNombreObjetivo").empty()
@@ -155,7 +203,7 @@ else
 
   // 🧩 Función para agregar el seleccionado a otra tabla
     function agregarObjetivoSeleccionado(id_nombre) {
-         
+
         $.post("@Url.Action("addObjetivoVictima", "Asuntos")", { id_asunto_relacionado: $("#int_id_asunto_relacionado").val(), id_nombre: id_nombre }, function (resp) {
            if (resp.IsSuccess) {
                swal("", resp.Message, "success");
@@ -169,9 +217,9 @@ else
     }
 
 
-    function addObjetivoAsunto(int_id_objetivo) {
+    @*function addObjetivoAsunto(int_id_objetivo) {
 
-        debugger;
+
         $.ajax({
             type: 'POST',
             url: '@Url.Action("addObjetivoAsunto", "Asuntos")',
@@ -185,12 +233,81 @@ else
                 }
             }
         });
+    }*@
 
 
-      
+    function addObjetivoAsunto(int_id_objetivo, observaciones) {
 
-
+    if (!int_id_objetivo) {
+        swal("Error", "No se recibió el ID del objetivo.", "error");
+        return;
     }
 
+    $.ajax({
+        type: 'POST',
+        url: '@Url.Action("addObjetivoAsunto", "Asuntos")',
+        data: {
+            int_id_objetivo: int_id_objetivo,
+            int_id_asunto_relacionado: $("#int_id_asunto_relacionado").val(),
+            observaciones: observaciones
+        },
+        success: function (resp) {
+            if (resp.IsSuccess) {
+                swal({
+                    title: "Éxito",
+                    text: resp.Message,
+                    type: "success"
+                }, function () {
+                    location.reload(); // ✅ Se ejecuta tras cerrar el mensaje
+                });
+
+            } else {
+                swal("Error", resp.Message, "error");
+            }
+        }
+    });
+}
+
+
+    // ✅ Cuando el modal #modalObjetivo se abre
+    @*$('#modalObjetivo').on('shown.bs.modal', function () {
+
+        console.log("Modal abierto → cargando estatus...");
+
+        $.ajax({
+            url: '@Url.Action("GetEstatusProcesos", "Asuntos")',
+            type: 'POST',
+            success: function (data) {
+
+                console.log("Estatus recibidos:", data);
+
+                const ddl = $("#selectEstatus");
+                ddl.empty();
+                ddl.append('<option value="">-- Seleccione --</option>');
+
+                data.forEach(est => {
+                    ddl.append(
+                        `<option value="${est.int_id_estatus_proceso}">
+                            ${est.nvarchar_estatus}
+                        </option>`
+                    );
+                });
+            },
+            error: function (xhr) {
+                console.error("Error al cargar estatus:", xhr);
+            }
+        });
+    });*@
+
+    function setObjetivo(id) {
+        objetivoSeleccionado = id;
+    }
+
+    function guardarObjetivoModal() {
+        //const estatusId = document.getElementById("selectEstatus").value;
+        const observaciones = document.getElementById("observaciones").value;
+
+        addObjetivoAsunto(objetivoSeleccionado, observaciones);
+    }
 
 </script>

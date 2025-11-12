@@ -7,8 +7,130 @@
 
 <div class="card">
     <div class="card-body">
-        <h5 class="card-title">Default Tabs</h5>
+        <div class="row align-items-center mb-3">
+            <!-- Título -->
+            <div class="col-md-10">
+                <h2>Detalles Objetivo</h2>
+            </div>
+        </div>
+        <input type="hidden" id="int_id_ficha_objetivo" value="@Model.int_id_ficha_objetivo" />
+        <div class="modal-body">
+            <!-- Fila que contiene ambas columnas (izquierda y derecha) -->
+            <div class="row">
+                <!-- Columna izquierda -->
+                <div class="col-md-8">
+                    <div class="row">
+                        <!-- Nombres -->
+                        <div class="col-md-4 mb-3 d-flex flex-column">
+                            <h5 class="form-label fw-bold">Nombres:</h5>
+                            <div class="border rounded p-2 bg-light" style="height: 135px; overflow-y: auto; ">
+                                @if (ViewBag.Nombress != null && ((IEnumerable<string>)ViewBag.Nombress).Any())
+                                {
+                                    foreach (string n in (IEnumerable<string>)ViewBag.Nombress)
+                                    {
+                                        <div>@n.</div>
+                                    }
+                                }
+                                else
+                                {
+                                    <div class="text-muted">No hay más nombres asignados.</div>
+                                }
+                            </div>
+                            <!-- Observaciones -->
+                            <div style="margin-top: 25px">
+                                <h5 class="form-label fw-bold">Observaciones objetivo:</h5>
+                                <textarea placeholder="No se ha capturado ninguna observación" id="observacionobjetivo" class="form-control form-control-lg" rows="4">@ViewBag.Observacion</textarea>
+                            </div>
+                        </div>
+                        <!-- Grupo Delictivo -->
+                        <div class="col-md-4 mb-3 d-flex flex-column">
+                            <h5 class="form-label fw-bold">Grupo Delictivo:</h5>
+                            <div class="border rounded p-2 bg-light" style="height: 135px; overflow-y: auto; ">
+                                @if (ViewBag.GruposDelictivos != null && ((IEnumerable<string>)ViewBag.GruposDelictivos).Any())
+                                {
+                                    foreach (string g in (IEnumerable<string>)ViewBag.GruposDelictivos)
+                                    {
+                                        <div>@g.</div>
+                                    }
+                                }
+                                else
+                                {
+                                    <div class="text-muted">No hay grupos asignados.</div>
+                                }
+                            </div>
+                            <!-- Estatus Actual -->
+                            <div>
+                                <div style="margin-top: 25px">
+                                    <h5 class="form-label fw-bold">Estatus actual:</h5>
+                                    <div class="border rounded p-2 bg-light">
+                                        @(string.IsNullOrWhiteSpace(ViewBag.EstatusActual)
+                                                            ? "No se ha capturado ningún estatus"
+                                                            : ViewBag.EstatusActual)
+                                    </div>
+                                </div>
+                                <div style="margin-top: 25px">
+                                    <!-- Nuevo Actual -->
+                                    <h5 for="selectEstatus" class="form-label fw-bold">Estatus del proceso:</h5>
+                                    <select id="selectEstatus" class="form-control form-control-lg">
+                                        <option value="">-- Seleccione --</option>
+                                        @foreach (var est in ViewBag.CatalogoEstatus)
+                                        {
+                                            <option value="@est.int_id_estatus_proceso">@est.nvarchar_estatus</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Alias -->
+                        <div class="col-md-4 mb-3 d-flex flex-column">
+                            <h5 class="form-label fw-bold">Alias:</h5>
+                            <div class="border rounded p-2 bg-light" style="height: 135px; overflow-y: auto;">
+                                @if (ViewBag.Alias != null && ((IEnumerable<string>)ViewBag.Alias).Any())
+                                {
+                                    foreach (string a in (IEnumerable<string>)ViewBag.Alias)
+                                    {
+                                        <div>@a.</div>
+                                    }
+                                }
+                                else
+                                {
+                                    <div class="text-muted">No hay alias asignados.</div>
+                                }
+                            </div>
+                            <!-- Descripción Estatus (ocupa todo el espacio restante) -->
+                            <div style="margin-top: 25px">
+                                <h5 for="descripcionEstatus" class="form-label fw-bold">Descripción estatus:</h5>
+                                <textarea placeholder="No se ha capturado ninguna descripción" id="descripcionEstatus" class="form-control form-control-lg" rows="4">@ViewBag.DescripcionEstatus</textarea>
+                            </div>
+                            <!-- Botón guardar alineado a la derecha -->
+                            <div class="d-flex justify-content-end" style="margin-top: 15px;">
+                                <button type="button" class="btn btn-primary btn-lg px-4" onclick="guardarEstatusProceso()">
+                                    Guardar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Columna derecha (¡alineada correctamente!) -->
+                <div class="col-md-2 d-flex flex-column align-items-center mx-auto pt-0 mt-0">
+                    <!-- Foto -->
+                    <div class="border rounded p-2 bg-light mb-3 text-center">
+                        <img src="data:image/*;base64,@ViewBag.fotobase64"
+                             alt="Foto"
+                             class="img-thumbnail"
+                             style="max-width:350px; max-height:350px; object-fit:contain;" />
+                    </div>
+                    <div class="text-center card-title" style="margin-top:0  !important; padding-top:0 !important">
+                        <label>@ViewBag.Nombre</label>
+                    </div>
 
+                    <button type="button" class="btn btn-primary btn-lg px-4" onclick="ObjetivoPrioritario()">
+                        Redireccionar a objetivo
+                    </button>
+                </div>
+            </div>
+        </div>
+        <h5 class="card-title">Ficha Objetivo</h5>
         <!-- Default Tabs -->
         <ul class="nav nav-tabs" id="myTab" role="tablist">
             <li class="nav-item" role="presentation">
@@ -24,15 +146,11 @@
         <div class="tab-content pt-2" id="myTabContent">
             <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
                 <section class="section">
-
                     <div class="row">
-
                         <div class="col-lg-6">
-
                             <div class="card">
                                 <div class="card-body">
                                     <h5 class="card-title">Búsqueda de Carpeta</h5>
-
                                     <!-- Radios de tipo de búsqueda -->
                                     <div class="mb-3">
                                         <div class="form-check form-check-inline">
@@ -44,7 +162,6 @@
                                             <label class="form-check-label" for="radioCarpeta">Por Carpeta de Investigación</label>
                                         </div>
                                     </div>
-
                                     <!-- Campos de búsqueda por nombre -->
                                     <div id="busquedaPorNombre">
                                         <div class="row">
@@ -61,54 +178,40 @@
                                                 <input type="text" class="form-control" id="searchMaterno" placeholder="Materno">
                                             </div>
                                         </div>
-                                    <br>
+                                        <br>
                                     </div>
-
                                     <!-- Campo de búsqueda por carpeta -->
                                     <div class="mb-3 d-none" id="busquedaPorCarpeta">
                                         <label for="numavp" class="form-label">Carpeta de Investigación</label>
                                         <input type="text" class="form-control" id="numavp" placeholder="Número de carpeta">
                                     </div>
-
                                     <div class="mb-3">
                                         <button type="button" id="btnBuscar" class="btn btn-primary w-100">
                                             🔍 Buscar
                                         </button>
                                     </div>
-
                                     <div id="busquedaCarpetas"></div>
                                 </div>
                             </div>
-
                         </div>
                         <div class="col-lg-6">
                             <div class="card">
                                 <div class="card-body">
                                     <h5 class="card-title">Carpetas Relacionadas</h5>
-
                                     <div id="carpetasRelacionadas"></div>
-
                                 </div>
                             </div>
                         </div>
-
-                       
-
                     </div>
-                  
                 </section>
             </div>
             <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
                 <section class="section">
-
                     <div class="row">
-
                         <div class="col-lg-6">
-
                             <div class="card">
                                 <div class="card-body">
                                     <h5 class="card-title">Búsqueda de Ordenes de Aprehensión</h5>
-
                                     <!-- Radios de tipo de búsqueda -->
                                     <div class="mb-3">
                                         <div class="form-check form-check-inline">
@@ -120,7 +223,6 @@
                                             <label class="form-check-label" for="radioCarpetaOrd">Por Carpeta de Investigación</label>
                                         </div>
                                     </div>
-
                                     <!-- Campos de búsqueda por nombre -->
                                     <div id="busquedaPorNombreOrd">
                                         <div class="row">
@@ -139,23 +241,19 @@
                                         </div>
                                         <br>
                                     </div>
-
                                     <!-- Campo de búsqueda por carpeta -->
                                     <div class="mb-3 d-none" id="busquedaPorCarpetaOrd">
                                         <label for="numavp" class="form-label">Carpeta de Investigación</label>
                                         <input type="text" class="form-control" id="numavpOrd" placeholder="Número de carpeta">
                                     </div>
-
                                     <div class="mb-3">
                                         <button type="button" id="btnBuscarOrd" class="btn btn-primary w-100">
                                             🔍 Buscar
                                         </button>
                                     </div>
-
                                     <div id="busquedaOrdenes"></div>
                                 </div>
                             </div>
-
                         </div>
                         <div class="col-lg-6">
                             <div class="card">
@@ -167,24 +265,16 @@
                                 </div>
                             </div>
                         </div>
-
-
-
                     </div>
-
                 </section>
             </div>
             <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">
                 <section class="section">
-
                     <div class="row">
-
                         <div class="col-lg-6">
-
                             <div class="card">
                                 <div class="card-body">
                                     <h5 class="card-title">Búsqueda de Detenidos</h5>
-
                                     <!-- Radios de tipo de búsqueda -->
                                     <div class="mb-3">
                                         <div class="form-check form-check-inline">
@@ -196,7 +286,6 @@
                                             <label class="form-check-label" for="radioCarpetaFili">Por Carpeta de Investigación</label>
                                         </div>
                                     </div>
-
                                     <!-- Campos de búsqueda por nombre -->
                                     <div id="busquedaPorNombreFili">
                                         <div class="row">
@@ -215,23 +304,19 @@
                                         </div>
                                         <br>
                                     </div>
-
                                     <!-- Campo de búsqueda por carpeta -->
                                     <div class="mb-3 d-none" id="busquedaPorCarpetaFili">
                                         <label for="numavp" class="form-label">Carpeta de Investigación</label>
                                         <input type="text" class="form-control" id="numavpFili" placeholder="Número de carpeta">
                                     </div>
-
                                     <div class="mb-3">
                                         <button type="button" id="btnBuscarFili" class="btn btn-primary w-100">
                                             🔍 Buscar
                                         </button>
                                     </div>
-
                                     <div id="busquedafiliacion"></div>
                                 </div>
                             </div>
-
                         </div>
                         <div class="col-lg-6">
                             <div class="card">
@@ -243,17 +328,14 @@
                                 </div>
                             </div>
                         </div>
-
-
-
                     </div>
-
                 </section>
             </div>
-        </div><!-- End Default Tabs -->
-
+        </div>
     </div>
 </div>
+
+
 
 
 
@@ -264,7 +346,85 @@
         refreshCarpetasAgregadasList();
         refreshOrdenesAgregadasList();
         refreshFiliacionAgregadasList();
+        //refreshEstatusObjetivo();
     })
+
+        @*function refreshEstatusObjetivo() {
+
+    $.ajax({
+        url: '@Url.Action("GetEstatusProcesos", "FichaObjetivo")',
+        type: 'POST',
+        data: {
+            idficha: $("#int_id_ficha_objetivo").val()
+        },
+        success: function (data) {
+
+            // ============================
+            // 1. LLENAR EL SELECT
+            // ============================
+            const ddl = $("#selectEstatus");
+            ddl.empty();
+            ddl.append('<option value="">-- Seleccione --</option>');
+
+            data.catalogo.forEach(est => {
+                ddl.append(
+                    `<option value="${est.int_id_estatus_proceso}">${est.nvarchar_estatus}</option>`
+                );
+            });
+
+            if (data.estatusActual) {
+                ddl.val(data.estatusActual);
+            }
+
+            // ============================
+            // 2. LLENAR TEXTAREA DE DESCRIPCIÓN
+            // ============================
+            if (data.descripcionestatus) {
+                $("#descripcionEstatus").val(data.descripcionestatus);
+            }
+
+            // ============================
+            // 3. LLENAR TEXTAREA DE OBSERVACIONES
+            // ============================
+            if (data.observacion) {
+                $("#observacionesObjetivo").val(data.observacion);
+            }
+
+            // ============================
+            // 4. NOMBRE DEL OBJETIVO (si lo usas)
+            // ============================
+            if (data.nombre) {
+                $("#lblNombreObjetivo").text(data.nombre);
+            }
+
+            // ============================
+            // 5. ALIAS (si quieres mostrarlos en lista)
+            // ============================
+            if (data.alias) {
+                let htmlAlias = "";
+                data.alias.forEach(a => {
+                    htmlAlias += `<span class="badge bg-secondary me-2">${a.nvarchar_alias}</span>`;
+                });
+                $("#divAlias").html(htmlAlias);
+            }
+
+            // ============================
+            // 6. GRUPO DELICTIVO
+            // ============================
+            if (data.grupodelictivo) {
+                let htmlGrupo = "";
+                data.grupodelictivo.forEach(g => {
+                    htmlGrupo += `<span class="badge bg-dark me-2">${g.nvarchar_grupodelictivo}</span>`;
+                });
+                $("#divGrupoDelictivo").html(htmlGrupo);
+            }
+
+        },
+        error: function (xhr) {
+            console.error("Error al cargar estatus:", xhr);
+        }
+    });
+}*@
 
 
     $("#btnBuscar").click(function () {
@@ -418,19 +578,59 @@
        actives: active,
        int_id_ficha_objetivo:$("#int_id_ficha_objetivo").val()
    };
-       $("#filiacionRelacionadas").empty();           
+       $("#filiacionRelacionadas").empty();
        $("#filiacionRelacionadas").load("@Url.Action("FiliacionRelacionadasListPartial", "FichaObjetivo")", datos);
   }
+    var idobjetivo = $("#int_id_objetivo").val();
+        function RefreshEditFichaObjetivos() {
+            location.href = '@Url.Action("EditFichaObjetivos","FichaObjetivo")?int_id_objetivo=' + idobjetivo;
+        }
 
+        function ObjetivoPrioritario() {
+            location.href = '@Url.Action("AddEditObjetivos","Objetivo")?int_id_objetivo=' + idobjetivo;
+        }
 
+        function guardarEstatusProceso() {
 
+            let estatus = $("#selectEstatus").val();
+            let descripcion = $("#descripcionEstatus").val();
+            let observaciones = $("#observacionobjetivo").val();
+            let idficha = $("#int_id_ficha_objetivo").val();
 
+            // Validaciones simples
+            if (estatus === "" || estatus == null) {
+                alert("Debes seleccionar un estatus del proceso.");
+                return;
+            }
 
+            // Construcción del objeto que enviarás
+            let data = {
+                idestatus: estatus,
+                descripcion: descripcion,
+                observaciones: observaciones,
+                idficha: idficha
+            };
 
+            $.ajax({
+                url: "/FichaObjetivo/AddEstatusObservaciones",
+                type: "POST",
+                data: data,
+                success: function (response) {
 
-
-
-
+                    swal({
+                        title: "Éxito",
+                        text: response.message,
+                        type: "success"
+                    }, function () {
+                        RefreshEditFichaObjetivos();
+                    });
+                },
+                error: function (xhr, status, error) {
+                    console.log(xhr.responseText);
+                    alert("Error de comunicación con el servidor.");
+                }
+            });
+        }
 
 
 </script>

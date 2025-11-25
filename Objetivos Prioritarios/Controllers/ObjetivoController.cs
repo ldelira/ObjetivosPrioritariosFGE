@@ -586,17 +586,16 @@ namespace Objetivos_Prioritarios.Controllers
                 int clavePerso = rowData.CLAVE_PERSO;
 
                 string foto = AsuntoService.getFotosDetenidosBase(clavePerso);
+
                 if (string.IsNullOrEmpty(foto))
                 {
-                    return Json(new
-                    {
-                        IsSuccess = false,
-                        Message = "No existe una fotografía del objetivo."
-                    });
+                    ViewBag.FotoBase64 = Url.Content("~/Content/imagenes/Nodisponible.jpg");
+                }
+                else
+                {
+                    ViewBag.FotoBase64 = foto;
                 }
 
-
-                ViewBag.FotoBase64 = string.IsNullOrEmpty(foto) ? null : foto;
                 ViewBag.RowData = rowData;
 
                 // Retornar la partial view
@@ -628,6 +627,21 @@ namespace Objetivos_Prioritarios.Controllers
                 if (string.IsNullOrEmpty(fotoBase64))
                     return Json(new { IsSuccess = false, Message = "La foto está vacía." });
 
+                // ✅ Si la foto es una ruta dentro de /Content, se convierte a base64
+                if (fotoBase64.StartsWith("/Content", StringComparison.OrdinalIgnoreCase))
+                {
+                    string rutaFisica = Server.MapPath(fotoBase64);
+                    if (System.IO.File.Exists(rutaFisica))
+                    {
+                        byte[] bytes = System.IO.File.ReadAllBytes(rutaFisica);
+                        fotoBase64 = Convert.ToBase64String(bytes);
+                    }
+                    else
+                    {
+                        return Json(new { IsSuccess = false, Message = "No se encontró el archivo en la ruta especificada." });
+                    }
+                }
+
                 var foto = ObjetivoService.GuardarNuevaFoto(idObjetivo, fotoBase64);
 
                 return Json(new { IsSuccess = foto.IsSuccess, Message = foto.Message });
@@ -637,6 +651,7 @@ namespace Objetivos_Prioritarios.Controllers
                 return Json(new { IsSuccess = false, Message = $"Error: {ex.Message}" });
             }
         }
+
 
 
     }

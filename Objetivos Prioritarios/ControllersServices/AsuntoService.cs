@@ -333,7 +333,20 @@ namespace Objetivos_Prioritarios.ControllersServices
             var fili = dbFili.Persona.AsNoTracking().Where(x => x.CLAVE_PERSO == clave_persona).FirstOrDefault();
             if (fili != null)
             {
-                var numFili = fili.NUM_FILIA.Replace("/", "");
+                var numFili = fili.NUM_FILIA == null ? "" : fili.NUM_FILIA.Replace("/", "").Trim();
+
+                if (string.IsNullOrEmpty(numFili) || numFili == "*")
+                {
+                    fotoBase64 = "/Content/imagenes/Nodisponible.jpg";
+                    return fotoBase64;
+                }
+
+                if (fili.NUM_FILIA == null || fili.NUM_FILIA.Length < 2)
+                {
+                    fotoBase64 = "/Content/imagenes/Nodisponible.jpg";
+                    return fotoBase64;
+                }
+
                 var anio = fili.NUM_FILIA.Substring(0, 2);
                 string path = "";
                 var file1 = new byte[] { 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20 };
@@ -355,8 +368,14 @@ namespace Objetivos_Prioritarios.ControllersServices
                     fotoBase64 = Convert.ToBase64String(file1);
                 });
             }
+            else
+            {
+                fotoBase64 = Url.Content("~/Content/image/Nodisponible.png");
+            }
+
             return fotoBase64;
         }
+
 
 
         public BasicOperationResponse AddObjetivoVictima(int id_nombre, int id_asunto_relacionado)

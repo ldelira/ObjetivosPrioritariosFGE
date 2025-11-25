@@ -19,6 +19,14 @@
                 {
                     <div class="text-muted" style="font-style: italic;">Cargando Fotografía</div>
                 }
+                else if (ViewBag.FotoBase64.StartsWith("/Content"))
+                {
+                    <img id="previewFoto"
+                         src="@ViewBag.FotoBase64"
+                         alt="Foto del detenido"
+                         class="img-thumbnail mb-3"
+                         style="width: 250px; height: 250px; object-fit: cover;">
+                }
                 else
                 {
                     <img id="previewFoto"
@@ -28,6 +36,8 @@
                          style="width: 250px; height: 250px; object-fit: cover;">
                 }
             </div>
+
+        </div>
             <input type="hidden" id="fotoBase64Hidden" value="@ViewBag.FotoBase64" />
             <button id="btnGuardarFoto" class="btn btn-success px-4">✅ Aceptar / Guardar foto</button>
         </div>
@@ -43,7 +53,11 @@
     if (!fotoBase64) {
         swal("Atención", "No hay foto disponible para guardar.", "warning");
         return;
-    }
+       }
+
+       console.log("Foto Base64:", fotoBase64);
+       console.log("Clave Perso:", clavePerso);
+       console.log("ID Objetivo:", idObjetivo);
 
     const datos = {
         IdObjetivo: idObjetivo,

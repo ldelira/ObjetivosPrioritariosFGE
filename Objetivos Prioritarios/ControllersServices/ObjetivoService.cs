@@ -120,9 +120,9 @@ namespace Objetivos_Prioritarios.ControllersServices
             try
             {
                 string base64String = null;
+
                 if (foto != null && foto.ContentLength > 0)
                 {
-
                     using (var ms = new MemoryStream())
                     {
                         foto.InputStream.CopyTo(ms);
@@ -132,20 +132,64 @@ namespace Objetivos_Prioritarios.ControllersServices
                         base64String = Convert.ToBase64String(fileBytes);
                     }
 
-                    var busqueda = db.tb_Objetivo.Where(x => x.int_id_objetivo == int_id_objetivo).FirstOrDefault();
-                    busqueda.date_fecha_nacimiento = fechaNacimiento;
-                    busqueda.nvarchar_foto = base64String;
+                    var busqueda = db.tb_Objetivo.FirstOrDefault(x => x.int_id_objetivo == int_id_objetivo);
+
+                    bool cambioFecha = false;
+                    bool cambioFoto = false;
+
+                    if (busqueda != null)
+                    {
+                        // Solo actualiza la fecha si es diferente
+                        if (busqueda.date_fecha_nacimiento != fechaNacimiento)
+                        {
+                            busqueda.date_fecha_nacimiento = fechaNacimiento;
+                            cambioFecha = true;
+                        }
+
+                        // Solo actualiza la foto si es diferente y no es "Nodisponible.png"
+                        if (busqueda.nvarchar_foto != base64String && foto.FileName != "Nodisponible.png")
+                        {
+                            busqueda.nvarchar_foto = base64String;
+                            cambioFoto = true;
+                        }
+                    }
+
+                    db.SaveChanges();
+
+                    // Crear mensaje dinámico
+                    string mensaje = "";
+
+                    if (cambioFecha && cambioFoto)
+                        mensaje = "Se guardaron la foto y la fecha de nacimiento correctamente.";
+                    else if (cambioFecha)
+                        mensaje = "Se actualizó la fecha de nacimiento correctamente.";
+                    else if (cambioFoto)
+                        mensaje = "Se actualizó la foto correctamente.";
+                    else
+                        mensaje = "No hubo cambios para guardar.";
+
+                    return new BasicOperationResponse()
+                    {
+                        IsSuccess = true,
+                        Message = mensaje
+                    };
                 }
-
-
-                db.SaveChanges();
-                return new BasicOperationResponse() { IsSuccess = true, Message = "Se guardo la foto y fecha de nacimiento satisfactoriamente" };
+                return new BasicOperationResponse()
+                {
+                    IsSuccess = false,
+                    Message = "No se recibió ninguna foto válida."
+                };
             }
             catch (Exception e)
             {
-                return new BasicOperationResponse() { IsSuccess = false, Message = "A ocurrido un error al guardar la foto y fecha de nacimiento (" + e.Message + ")" };
+                return new BasicOperationResponse()
+                {
+                    IsSuccess = false,
+                    Message = "Ha ocurrido un error al guardar la foto y fecha de nacimiento (" + e.Message + ")"
+                };
             }
         }
+
 
 
         public tb_NombreObjetivo getNombreById(int int_id_nombre)

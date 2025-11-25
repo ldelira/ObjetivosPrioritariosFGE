@@ -302,7 +302,8 @@ namespace Objetivos_Prioritarios.ControllersServices
                         Victimas = listaVictimas.Any() ? listaVictimas : new List<Victima> { new Victima { Nombre = "", Foto = "" } },
                         FechaNacimiento=ficha.tb_Objetivo?.date_fecha_nacimiento==null?"SIN FECHA NACIMIENTO": ficha.tb_Objetivo.date_fecha_nacimiento.Value.ToString("dd/MM/yyyy"),
                         Edad= edadTexto,
-                        Alias= aliasPrincipalTexto
+                        Alias= aliasPrincipalTexto,
+                        observacionObjetivo= ficha.nvarchar_observaciones?? "",
                     };
 
                     listaObjetivosPrioritarios.Add(objDetenido);

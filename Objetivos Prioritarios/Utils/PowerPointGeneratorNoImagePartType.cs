@@ -152,6 +152,7 @@ namespace Objetivos_Prioritarios.Utils
                     ReplaceText(newSlide, "[C10]", detenido.Alias);
                     ReplaceText(newSlide, "[C11]", detenido.FechaNacimiento);
                     ReplaceText(newSlide, "[C12]", detenido.Edad);
+                    ReplaceText(newSlide, "[C13]", detenido.observacionObjetivo);
 
 
                     // Reemplazar foto principal (placeholder en alt text: {{foto}})

@@ -21,7 +21,7 @@ namespace Objetivos_Prioritarios.Utils
         public string FechaNacimiento { get; set; }
         public string Edad { get; set; }
         public string Alias { get; set; }
-
+        public  string observacionObjetivo { get; set; }
 
     }
 

@@ -317,7 +317,7 @@
       <DependentUpon>Filiacion.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\SP_ObjPri_getListinfogeneral_Result.cs">
-      <DependentUpon>Mandamientos.tt</DependentUpon>
+      <DependentUpon>Filiacion.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\sp_ObjPri_getObjetivoInfo_Result.cs">
       <DependentUpon>Mandamientos.tt</DependentUpon>

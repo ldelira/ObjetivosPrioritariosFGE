@@ -56,22 +56,5 @@ namespace Objetivos_Prioritarios.Models
     
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<sp_ObjPri_getObjetivoInfo_Result>("sp_ObjPri_getObjetivoInfo", movimientoParameter, nombreParameter, paternoParameter, maternoParameter, numavpParameter, id_mandamientoParameter);
         }
-    
-        public virtual ObjectResult<SP_ObjPri_getListinfogeneral_Result> SP_ObjPri_getListinfogeneral(string nombre, string paterno, string materno)
-        {
-            var nombreParameter = nombre != null ?
-                new ObjectParameter("nombre", nombre) :
-                new ObjectParameter("nombre", typeof(string));
-    
-            var paternoParameter = paterno != null ?
-                new ObjectParameter("paterno", paterno) :
-                new ObjectParameter("paterno", typeof(string));
-    
-            var maternoParameter = materno != null ?
-                new ObjectParameter("materno", materno) :
-                new ObjectParameter("materno", typeof(string));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<SP_ObjPri_getListinfogeneral_Result>("SP_ObjPri_getListinfogeneral", nombreParameter, paternoParameter, maternoParameter);
-        }
     }
 }

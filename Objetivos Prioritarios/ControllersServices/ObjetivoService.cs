@@ -610,7 +610,7 @@ namespace Objetivos_Prioritarios.ControllersServices
 
         public List<SP_ObjPri_getListinfogeneral_Result> GetInfoGeneralList(string nombre, string paterno, string materno)
         {
-            return dbMand.SP_ObjPri_getListinfogeneral(nombre, paterno, materno).ToList();
+            return dbFili.SP_ObjPri_getListinfogeneral(nombre, paterno, materno).ToList();
         }
 
         public BasicOperationResponse addInfoGeneralObjetivo(tb_InformacionObjetivo infoGeneralObjetivo)

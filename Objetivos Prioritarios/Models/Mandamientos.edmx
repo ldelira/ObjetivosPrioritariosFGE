@@ -5,11 +5,6 @@
     <!-- SSDL content -->
     <edmx:StorageModels>
     <Schema Namespace="Mandamientos_JudicialesModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
-        <Function Name="SP_ObjPri_getListinfogeneral" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
-          <Parameter Name="nombre" Type="nvarchar" Mode="In" />
-          <Parameter Name="paterno" Type="nvarchar" Mode="In" />
-          <Parameter Name="materno" Type="nvarchar" Mode="In" />
-        </Function>
         <Function Name="sp_ObjPri_getObjetivoInfo" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
           <Parameter Name="movimiento" Type="int" Mode="In" />
           <Parameter Name="nombre" Type="nvarchar" Mode="In" />
@@ -32,11 +27,6 @@
             <Parameter Name="numavp" Mode="In" Type="String" />
             <Parameter Name="id_mandamiento" Mode="In" Type="Int32" />
           </FunctionImport>
-          <FunctionImport Name="SP_ObjPri_getListinfogeneral" ReturnType="Collection(Mandamientos_JudicialesModel.SP_ObjPri_getListinfogeneral_Result)">
-            <Parameter Name="nombre" Mode="In" Type="String" />
-            <Parameter Name="paterno" Mode="In" Type="String" />
-            <Parameter Name="materno" Mode="In" Type="String" />
-          </FunctionImport>
         </EntityContainer>
         <ComplexType Name="sp_ObjPri_getObjetivoInfo_Result">
           <Property Type="Int32" Name="id" Nullable="false" />
@@ -53,30 +43,6 @@
           <Property Type="Int32" Name="id_delito" Nullable="false" />
           <Property Type="String" Name="delito" Nullable="true" MaxLength="200" />
           <Property Type="Int32" Name="delito_principal" Nullable="true" />
-        </ComplexType>
-        <ComplexType Name="SP_ObjPri_getListinfogeneral_Result">
-          <Property Type="Int32" Name="CLAVE_PERSO" Nullable="false" />
-          <Property Type="Int32" Name="id" Nullable="true" />
-          <Property Type="String" Name="id_concat" Nullable="true" MaxLength="8000" />
-          <Property Type="String" Name="nombre" Nullable="true" MaxLength="4000" />
-          <Property Type="String" Name="paterno" Nullable="true" MaxLength="4000" />
-          <Property Type="String" Name="materno" Nullable="true" MaxLength="4000" />
-          <Property Type="String" Name="alias" Nullable="true" MaxLength="4000" />
-          <Property Type="Int32" Name="Cla_Calle" Nullable="true" />
-          <Property Type="String" Name="Cla_Calle_concat" Nullable="true" MaxLength="8000" />
-          <Property Type="String" Name="Calle" Nullable="true" MaxLength="4000" />
-          <Property Type="String" Name="Num_Casa" Nullable="true" MaxLength="4000" />
-          <Property Type="Int32" Name="Cve_mun" Nullable="true" />
-          <Property Type="String" Name="Cve_mun_concat" Nullable="true" MaxLength="8000" />
-          <Property Type="String" Name="Municipio" Nullable="true" MaxLength="4000" />
-          <Property Type="Decimal" Name="Cve_col" Nullable="true" Precision="18" Scale="0" />
-          <Property Type="String" Name="Cve_col_concat" Nullable="true" MaxLength="8000" />
-          <Property Type="String" Name="Colonia" Nullable="true" MaxLength="4000" />
-          <Property Type="String" Name="Cve_Edo" Nullable="true" MaxLength="4" />
-          <Property Type="String" Name="Cve_Edo_concat" Nullable="true" MaxLength="8000" />
-          <Property Type="String" Name="Estado" Nullable="true" MaxLength="4000" />
-          <Property Type="DateTime" Name="Fec_Captu" Nullable="true" Precision="16" />
-          <Property Type="String" Name="Fec_Captu_concat" Nullable="true" MaxLength="8000" />
         </ComplexType>
       </Schema>
     </edmx:ConceptualModels>
@@ -101,34 +67,6 @@
                 <ScalarProperty Name="id_delito" ColumnName="id_delito" />
                 <ScalarProperty Name="delito" ColumnName="delito" />
                 <ScalarProperty Name="delito_principal" ColumnName="delito_principal" />
-              </ComplexTypeMapping>
-            </ResultMapping>
-          </FunctionImportMapping>
-          <FunctionImportMapping FunctionImportName="SP_ObjPri_getListinfogeneral" FunctionName="Mandamientos_JudicialesModel.Store.SP_ObjPri_getListinfogeneral">
-            <ResultMapping>
-              <ComplexTypeMapping TypeName="Mandamientos_JudicialesModel.SP_ObjPri_getListinfogeneral_Result">
-                <ScalarProperty Name="CLAVE_PERSO" ColumnName="CLAVE_PERSO" />
-                <ScalarProperty Name="id" ColumnName="id" />
-                <ScalarProperty Name="id_concat" ColumnName="id_concat" />
-                <ScalarProperty Name="nombre" ColumnName="nombre" />
-                <ScalarProperty Name="paterno" ColumnName="paterno" />
-                <ScalarProperty Name="materno" ColumnName="materno" />
-                <ScalarProperty Name="alias" ColumnName="alias" />
-                <ScalarProperty Name="Cla_Calle" ColumnName="Cla_Calle" />
-                <ScalarProperty Name="Cla_Calle_concat" ColumnName="Cla_Calle_concat" />
-                <ScalarProperty Name="Calle" ColumnName="Calle" />
-                <ScalarProperty Name="Num_Casa" ColumnName="Num_Casa" />
-                <ScalarProperty Name="Cve_mun" ColumnName="Cve_mun" />
-                <ScalarProperty Name="Cve_mun_concat" ColumnName="Cve_mun_concat" />
-                <ScalarProperty Name="Municipio" ColumnName="Municipio" />
-                <ScalarProperty Name="Cve_col" ColumnName="Cve_col" />
-                <ScalarProperty Name="Cve_col_concat" ColumnName="Cve_col_concat" />
-                <ScalarProperty Name="Colonia" ColumnName="Colonia" />
-                <ScalarProperty Name="Cve_Edo" ColumnName="Cve_Edo" />
-                <ScalarProperty Name="Cve_Edo_concat" ColumnName="Cve_Edo_concat" />
-                <ScalarProperty Name="Estado" ColumnName="Estado" />
-                <ScalarProperty Name="Fec_Captu" ColumnName="Fec_Captu" />
-                <ScalarProperty Name="Fec_Captu_concat" ColumnName="Fec_Captu_concat" />
               </ComplexTypeMapping>
             </ResultMapping>
           </FunctionImportMapping>

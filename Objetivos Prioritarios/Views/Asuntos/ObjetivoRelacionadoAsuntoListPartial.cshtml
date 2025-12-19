@@ -95,7 +95,7 @@
             }
         },
         {
-            title: "Estatus Proceso",
+            title: "Estatus Proceso1",
             data: "nvarchar_descripcion_estatus",
             orderable: true,
             render: function (data, type, full) {
@@ -111,53 +111,45 @@
             }
         },
         {
-            title: "Fotografía",
-            data: "isFoto",
-            orderable: true,
-            render: function (data, type, full) {
-                return data || "";
-            }
-        },
-        //{
-        //    title: "Fotografía",
-        //    data: "nvarchar_foto",
-        //    orderable: false,
-        //    render: function (data, type, full, meta) {
-        //        if (data) {
-        //            return '<img src="data:image/jpeg;base64,' + data + '" class="img-thumbnail" style="width:60px;height:60px;object-fit:cover;" />';
-        //        } else {
-        //            return '<span class="text-muted">Sin foto</span>';
-        //        }
-        //    }
-        //},
-        {
             title: "Acciones",
-            data: null,
-            orderable: false,
-            render: function (data, type, full, meta) {
-                var id = full.int_id_ficha_asunto;
-                var id_ficha = full.int_id_ficha_objetivo;
-                var btnView = `
-        <button class="btn btn-sm btn-primary ver-foto2"
-            data-id="${id_ficha}"
-            title="Ver Fotografía">
-            <i class="fa fa-eye"></i>
-        </button>`;
+data: null,
+orderable: false,
+render: function (data, type, full, meta) {
 
-                var btnDelete = `
-        <button class="btn btn-sm btn-danger eliminar-objetivo" onclick="DisableObjetivoAsunto(${id})"
-            data-id="${id}"
-            title="Desactivar Objetivo">
-            <i class="fa fa-trash"></i>
-        </button>`;
+    var id = full.int_id_ficha_asunto;
+    var id_ficha = full.int_id_ficha_objetivo;
 
-                if ('@ViewBag.Actives'.toUpperCase() === 'TRUE') {
-                    return `<div class="btn-group">${btnView}${btnDelete}</div>`;
-                } else {
-                    var btnActivate = `<button class="btn btn-sm btn-success activar-objetivo" onclick="ActivateObjetivoAsunto(${id})" data-id="${id}" title="Activar Objetivo"><i class="fa fa-power-off"></i></button>`;
-                    return `<div class="btn-group">${btnView}${btnActivate}</div>`;
-                }
-            }
+    var iconView = `
+<i class="fa fa-eye text-primary ver-foto2"
+    data-id="${id_ficha}"
+    title="Ver Fotografía"
+    style="cursor:pointer; font-size:18px; margin-right:8px;">
+</i>`;
+
+    var iconDelete = `
+<i class="fa fa-trash text-danger eliminar-objetivo"
+    onclick="DisableObjetivoAsunto(${id})"
+    data-id="${id}"
+    title="Desactivar Objetivo"
+    style="cursor:pointer; font-size:18px;">
+</i>`;
+
+    if ('@ViewBag.Actives'.toUpperCase() === 'TRUE') {
+        return `<div>${iconView}${iconDelete}</div>`;
+    } else {
+
+        var iconActivate = `
+<i class="fa fa-power-off text-success activar-objetivo"
+    onclick="ActivateObjetivoAsunto(${id})"
+    data-id="${id}"
+    title="Activar Objetivo"
+    style="cursor:pointer; font-size:18px;">
+</i>`;
+
+        return `<div>${iconView}${iconActivate}</div>`;
+    }
+}
+
         }
 
 
@@ -314,7 +306,7 @@
 
 
     $(document).on('click', '.ver-foto2', function (e) {
-       
+
     e.preventDefault();
 
     var id = $(this).data('id');

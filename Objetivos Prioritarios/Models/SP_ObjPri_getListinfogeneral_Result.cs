@@ -35,5 +35,6 @@ namespace Objetivos_Prioritarios.Models
         public string Estado { get; set; }
         public Nullable<System.DateTime> Fec_Captu { get; set; }
         public string Fec_Captu_concat { get; set; }
+        public string ObjetivoPrioritario { get; set; }
     }
 }

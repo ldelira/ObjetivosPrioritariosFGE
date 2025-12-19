@@ -56,18 +56,40 @@
         {
             title: "Acciones",
             data: "int_id_carpeta_objetivo", render: function (data, type, full, meta) {
-                var action;
-                if ('@ViewBag.Actives'.toUpperCase() == 'TRUE') {
-                    action = [
-                        { divId: 'div_DisableCarpetaObjetivo_' + data, data: data, functionToExec: 'DisableCarpetaObjetivo', toolTip: 'Desactivar', icon: 'fa fa-trash' },
-                    ];
-                }
-                else {
-                    action = [
-                        { divId: 'div_ActivateCarpetaObjetivo_' + data, data: data, functionToExec: 'ActivateCarpetaObjetivo', toolTip: 'Activar', icon: 'fa fa-power-off' }
-                    ];
-                }
-                return AddActionsToGrid(action);
+
+                 var btnDelete = `
+                <button class="btn btn-sm btn-danger" onclick="DisableCarpetaObjetivo(${data})"
+                    data-id="${data}"
+                    title="Desactivar">
+                    <i class="fa fa-trash"></i>
+                </button>`;
+
+                  var btnActivate = `
+                  <button class="btn btn-sm btn-success activar-objetivo" onclick="ActivateCarpetaObjetivo(${data})"
+                      data-id="${data}" title="Activar">
+                      <i class="fa fa-power-off"></i>
+                  </button>`;
+
+                if ('@ViewBag.Actives'.toUpperCase() === 'TRUE') {
+                    return `<div class="btn-group">${btnDelete}</div>`;
+                  } else {
+                      return `<div class="btn-group">${btnActivate}</div>`;
+                  }
+
+
+
+                //var action;
+                //if ('ViewBag.Actives'.toUpperCase() == 'TRUE') {
+                //    action = [
+                //        { divId: 'div_DisableCarpetaObjetivo_' + data, data: data, functionToExec: 'DisableCarpetaObjetivo', toolTip: 'Desactivar', icon: 'fa fa-trash' },
+                //    ];
+                //}
+                //else {
+                //    action = [
+                //        { divId: 'div_ActivateCarpetaObjetivo_' + data, data: data, functionToExec: 'ActivateCarpetaObjetivo', toolTip: 'Activar', icon: 'fa fa-power-off' }
+                //    ];
+                //}
+                //return AddActionsToGrid(action);
             }
         }
     ];

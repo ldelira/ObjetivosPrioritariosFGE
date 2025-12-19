@@ -94,17 +94,41 @@
             title: "Acciones",
             data: "int_id_asunto_relacionado",
             render: function (data, type, full, meta) {
-                var action;
-                if ('@ViewBag.Actives'.toUpperCase() == 'TRUE') {
-                    action = [
-                        { divId: 'div_EditAsunto_' + data, data: data, functionToExec: 'AddEditAsunto', toolTip: 'Editar Asunto', icon: 'fa fa-eye' },
-                        { divId: 'div_InactivateAsunto_' + data, data: data, functionToExec: 'DisableAsunto', toolTip: 'Desactivar Asunto', icon: 'fa fa-trash' }
-                    ];
-                } else {
-                    action = [
-                        { divId: 'div_InactivateAsunto_' + data, data: data, functionToExec: 'ActivateAsunto', toolTip: 'Activar Asunto', icon: 'fa fa-power-off' },
-                    ];
-                }
+
+                var btnEdit = `
+                            <button class="btn btn-sm btn-primary"
+                                onclick="AddEditAsunto(${data})"
+                                data-id="${data}"
+                                title="Editar Asunto">
+                                <i class="fa fa-eye"></i>
+                            </button>`;
+
+                var btnDelete = `
+                            <button class="btn btn-sm btn-danger" onclick="DisableAsunto(${data})"
+                                data-id="${data}"
+                                title="Desactivar Asunto">
+                                <i class="fa fa-trash"></i>
+                            </button>`;
+
+
+                if ('@ViewBag.Actives'.toUpperCase() === 'TRUE') {
+                    return `<div class="btn-group">${btnEdit}${btnDelete}</div>`;
+                  } else {
+                    var btnActivate = `<button class="btn btn-sm btn-success activar-objetivo" onclick="ActivateAsunto(${data})" data-id="${data}" title="Activar Asunto"><i class="fa fa-power-off"></i></button>`;
+                      return `<div class="btn-group">${btnActivate}</div>`;
+                  }
+
+                //var action;
+                //if ('ViewBag.Actives'.toUpperCase() == 'TRUE') {
+                //    action = [
+                //        { divId: 'div_EditAsunto_' + data, data: data, functionToExec: 'AddEditAsunto', toolTip: 'Editar Asunto', icon: 'fa fa-eye' },
+                //        { divId: 'div_InactivateAsunto_' + data, data: data, functionToExec: 'DisableAsunto', toolTip: 'Desactivar Asunto', icon: 'fa fa-trash' }
+                //    ];
+                //} else {
+                //    action = [
+                //        { divId: 'div_InactivateAsunto_' + data, data: data, functionToExec: 'ActivateAsunto', toolTip: 'Activar Asunto', icon: 'fa fa-power-off' },
+                //    ];
+                //}
 
                 return AddActionsToGrid(action);
             }
@@ -179,7 +203,7 @@
     }
 
     function DisableAsunto(id) {
-         
+
         $.ajax({
             type: 'POST',
             url: '@Url.Action("DisableAsunto", "Asuntos")',

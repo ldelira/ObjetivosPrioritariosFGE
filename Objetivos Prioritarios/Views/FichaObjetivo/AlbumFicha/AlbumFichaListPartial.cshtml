@@ -95,24 +95,61 @@
         {
             title: "Acciones",
             data: "int_id_album_ficha_objetivo", render: function (data, type, full, meta) {
-                var action;
-                if ('@ViewBag.Actives'.toUpperCase() == 'TRUE') {
-                    action = [
-                        { divId: 'div_EditUser_' + data, data: data, functionToExec: 'addEditAlbumFicha', toolTip: 'Editar Album', icon: 'fa fa-edit' },
-                        { divId: 'div_EditUser_' + data, data: data, functionToExec: 'addGruoupFicha', toolTip: 'Agregar Objetivos Album', icon: 'fa fa-users' },
 
-                        { divId: 'div_InactivateUser_' + data, data: data, functionToExec: 'DisableAlbum', toolTip: 'Desactivar Objetivo', icon: 'fa fa-trash' },
+                  var btnEdit = `
+              <button class="btn btn-sm btn-primary"
+                  onclick="addEditAlbumFicha(${data})"
+                  data-id="${data}"
+                  title="Editar Album">
+                  <i class="fa fa-eye"></i>
+              </button>`;
+                var btnGroup = `
+                <button class="btn btn-sm btn-info"
+                    onclick="addGruoupFicha(${data})"
+                    data-id="${data}"
+                    title="Agregar Objetivos Album">
+                    <i class="fa fa-users"></i>
+                </button>`;
+               var btnDelete = `
+              <button class="btn btn-sm btn-danger" onclick="DisableAlbum(${data})"
+                  data-id="${data}"
+                  title="Desactivar Objetivo">
+                  <i class="fa fa-trash"></i>
+              </button>`;
 
+                var btnActivate = `
+                <button class="btn btn-sm btn-success activar-objetivo" onclick="ActivateAlbum(${data})"
+                    data-id="${data}" title="Activar Objetivo">
+                    <i class="fa fa-power-off"></i>
+                </button>`;
 
-
-                    ];
+              if ('@ViewBag.Actives'.toUpperCase() === 'TRUE') {
+                  return `<div class="btn-group">${btnEdit}${btnGroup}${btnDelete}</div>`;
                 } else {
-                    action = [
-                        { divId: 'div_InactivateUser_' + data, data: data, functionToExec: 'ActivateAlbum', toolTip: 'Activar Objetivo', icon: 'fa fa-power-off' },
-                    ];
+                    return `<div class="btn-group">${btnActivate}</div>`;
                 }
 
-                return AddActionsToGrid(action);
+
+
+
+                //var action;
+                //if ('ViewBag.Actives'.toUpperCase() == 'TRUE') {
+                //    action = [
+                //        { divId: 'div_EditUser_' + data, data: data, functionToExec: 'addEditAlbumFicha', toolTip: 'Editar Album', icon: 'fa fa-edit' },
+                //        { divId: 'div_EditUser_' + data, data: data, functionToExec: 'addGruoupFicha', toolTip: 'Agregar Objetivos Album', icon: 'fa fa-users' },
+
+                //        { divId: 'div_InactivateUser_' + data, data: data, functionToExec: 'DisableAlbum', toolTip: 'Desactivar Objetivo', icon: 'fa fa-trash' },
+
+
+
+                //    ];
+                //} else {
+                //    action = [
+                //        { divId: 'div_InactivateUser_' + data, data: data, functionToExec: 'ActivateAlbum', toolTip: 'Activar Objetivo', icon: 'fa fa-power-off' },
+                //    ];
+                //}
+
+                //return AddActionsToGrid(action);
             }
         }
     ];

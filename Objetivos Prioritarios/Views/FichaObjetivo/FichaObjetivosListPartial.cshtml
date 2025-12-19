@@ -97,27 +97,59 @@
         //    IsFiltered: false
         //},
 
-       
+
 
         {
             title: "Acciones",
             data: "int_id_objetivo", render: function (data, type, full, meta) {
-                var action;
-                if ('@ViewBag.Actives'.toUpperCase() == 'TRUE') {
-                    action = [
-                        { divId: 'div_EditUser_' + data, data: data, functionToExec: 'EditFichaObjetivo', toolTip: 'Editar Objetivo', icon: 'fa fa-eye' },
-                        { divId: 'div_InactivateUser_' + data, data: data, functionToExec: 'DisableObjetivo', toolTip: 'Desactivar Objetivo', icon: 'fa fa-trash' },
+
+
+                var btnEdit = `
+                <button class="btn btn-sm btn-primary"
+                    onclick="EditFichaObjetivo(${data})"
+                    data-id="${data}"
+                    title="Editar Objetivo">
+                    <i class="fa fa-eye"></i>
+                </button>`;
+
+                 var btnDelete = `
+                <button class="btn btn-sm btn-danger" onclick="DisableObjetivo(${data})"
+                    data-id="${data}"
+                    title="Desactivar Objetivo">
+                    <i class="fa fa-trash"></i>
+                </button>`;
+
+                  var btnActivate = `
+                  <button class="btn btn-sm btn-success activar-objetivo" onclick="ActivateObjetivo(${data})"
+                      data-id="${data}" title="Activar Objetivo">
+                      <i class="fa fa-power-off"></i>
+                  </button>`;
+
+                if ('@ViewBag.Actives'.toUpperCase() === 'TRUE') {
+                    return `<div class="btn-group">${btnEdit}${btnDelete}</div>`;
+                  } else {
+                      return `<div class="btn-group">${btnActivate}</div>`;
+                  }
 
 
 
-                    ];
-                } else {
-                    action = [
-                        { divId: 'div_InactivateUser_' + data, data: data, functionToExec: 'ActivateObjetivo', toolTip: 'Activar Objetivo', icon: 'fa fa-power-off' },
-                    ];
-                }
 
-                return AddActionsToGrid(action);
+                //var action;
+                //if ('ViewBag.Actives'.toUpperCase() == 'TRUE') {
+                //    action = [
+                //        { divId: 'div_EditUser_' + data, data: data, functionToExec: 'EditFichaObjetivo', toolTip: 'Editar Objetivo', icon: 'fa fa-eye' },
+                //        { divId: 'div_InactivateUser_' + data, data: data, functionToExec: 'DisableObjetivo', toolTip: 'Desactivar Objetivo', icon: 'fa fa-trash' },
+
+
+
+                //    ];
+                //} else {
+                //    action = [
+                //        { divId: 'div_InactivateUser_' + data, data: data, functionToExec: 'ActivateObjetivo', toolTip: 'Activar Objetivo', icon: 'fa fa-power-off' },
+                //    ];
+                //}
+
+                //return AddActionsToGrid(action);
             }
         }
     ];
@@ -249,7 +281,7 @@
         });
     }
 
-  
+
 
     function EditFichaObjetivo(int_id_objetivo) {
         location.href = '@Url.Action("EditFichaObjetivos","FichaObjetivo")?int_id_objetivo=' + int_id_objetivo;

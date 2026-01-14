@@ -146,7 +146,7 @@
                     // Si sí tiene ObjetivoPrioritario
                     return `
                         <button class="btn btn-primary btnIrObjetivo" data-idobjetivo="${row.ObjetivoPrioritario}">
-                            <i class="fa fa-fw fa-arrow-right"></i> Ir a objetivo
+                            <i class="fa fa-fw fa-arrow-right"></i> Ir a objetivo ${row.ObjetivoPrioritario}
                         </button>
 
                         <button class="btn btn-info btnVerImagen" data-id="${row.id}">
@@ -294,7 +294,7 @@
         swal("Error", "No se encontró el ID del objetivo.", "error");
         return;
     }
-        debugger;
+        
         console.log("Fila seleccionada:", idObjetivo);
     location.href = '@Url.Action("AddEditObjetivos","Objetivo")?int_id_objetivo=' + idObjetivo;
 }

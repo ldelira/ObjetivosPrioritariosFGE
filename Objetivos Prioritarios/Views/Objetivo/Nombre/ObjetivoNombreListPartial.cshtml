@@ -95,20 +95,60 @@
             title: "Acciones",
             data: "id_nombre",
             render: function (data, type, full, meta) {
-                var action;
-                if ('@ViewBag.Actives'.toUpperCase() === 'TRUE') {
-                    action = [
-                        { divId: 'div_EditObjetivoNombre_' + data, data: data, functionToExec: 'EditObjetivoNombre', toolTip: 'Editar', icon: 'fa fa-edit' },
-                        { divId: 'div_DisableObjetivoNombre_' + data, data: data, functionToExec: 'DisableObjetivoNombre', toolTip: 'Desactivar', icon: 'fa fa-trash' },
-                        { divId: 'div_SelectObjetivoPrincipal_' + data, data: data, functionToExec: 'SelectObjetivoPrincipal', toolTip: 'Principal', type: 'switch', switchState: full.bit_principal }
-                    ];
-                } else {
-                    action = [
-                        { divId: 'div_ActivateObjetivoNombre_' + data, data: data, functionToExec: 'ActivateObjetivoNombre', toolTip: 'Activar', icon: 'fa fa-power-off' }
-                    ];
-                }
-                return AddActionsToGrid(action);
+
+    if ('@ViewBag.Actives'.toUpperCase() === 'TRUE') {
+
+        // Generamos el switch con AddActionsToGrid SOLO para el switch
+        var switchHtml = AddActionsToGrid([
+            {
+                divId: 'div_SelectObjetivoPrincipal_' + data,
+                data: data,
+                functionToExec: 'SelectObjetivoPrincipal',
+                toolTip: 'Principal',
+                type: 'switch',
+                switchState: full.bit_principal
             }
+        ]);
+
+        return `
+            <div class="btn-group">
+
+                <!-- BOTÓN EDITAR -->
+                <button class="btn btn-sm btn-primary"
+                        onclick="EditObjetivoNombre(${data})"
+                        title="Editar">
+                    <i class="fa fa-edit"></i>
+                </button>
+
+                <!-- BOTÓN DESACTIVAR -->
+                <button class="btn btn-sm btn-danger"
+                        onclick="DisableObjetivoNombre(${data})"
+                        title="Desactivar">
+                    <i class="fa fa-trash"></i>
+                </button>
+
+                ${switchHtml}
+
+            </div>
+        `;
+
+    } else {
+
+        return `
+            <div class="btn-group">
+
+                <!-- BOTÓN ACTIVAR -->
+                <button class="btn btn-sm btn-success"
+                        onclick="ActivateObjetivoNombre(${data})"
+                        title="Activar">
+                    <i class="fa fa-power-off"></i>
+                </button>
+
+            </div>
+        `;
+    }
+}
+
         }
     ];
 
@@ -214,7 +254,7 @@
             $.post('@Url.Action("MarcarComoPrincipal", "Objetivo")', { int_id_nombre: id }, function (data) {
                 if (data.IsSuccess) {
                     refreshNombresList();
-                    debugger;
+                    
                     $("#nombrePrincipal").text("Nombre Objetivo: " + data.ExtraData)
 
                 } else {

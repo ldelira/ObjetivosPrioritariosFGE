@@ -312,7 +312,7 @@
                 refreshVictimas();
             });
             $("#btnBuscarObjetivoAsunto").click(function () {
-                debugger;
+                 
                 let nombre = $("#txtNombreObjAsunto").val().trim();
                 let paterno = $("#txtPaternoObjAsunto").val().trim();
                 let materno = $("#txtMaternoObjAsunto").val().trim();
@@ -342,8 +342,6 @@
         }
 
         function refreshObjetivoRelacionadoAsunto() {
-
-            debugger;
             var datos = {
                 nombre: $("#txtNombreObjAsunto").val().trim(),
                 paterno: $("#txtPaternoObjAsunto").val().trim(),

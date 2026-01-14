@@ -310,7 +310,7 @@
    }
 
     function AddObjetivoAliasModal2() {
-        debugger;
+        
         $("#divModalAlias").empty();
         $("#divModalAlias").load("@Url.Action("AddObjetivoAliasPartial", "Objetivo")");
 
@@ -390,7 +390,7 @@
 
     // Cuando selecciona archivo
     fotoInput.addEventListener('change', function () {
-        debugger;
+        
         const file = this.files[0];
         if (file) {
             const reader = new FileReader();
@@ -406,7 +406,7 @@
 
     // Botón para quitar imagen
     removeImage.addEventListener('click', function () {
-        debugger;
+        
         fotoInput.value = "";
         previewImage.setAttribute("src", "");
         previewContainer.style.display = "none";

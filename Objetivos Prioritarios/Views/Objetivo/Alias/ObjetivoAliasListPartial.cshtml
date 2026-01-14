@@ -49,27 +49,54 @@
             IsFiltered: false
         },
         {
-            title: "Acciones",
-            data: "id_alias", render: function (data, type, full, meta) {
-                var action;
-                if ('@ViewBag.Actives'.toUpperCase() == 'TRUE') {
-                    action = [
-                        { divId: 'div_EditObjetivoAlias_' + data, data: data, functionToExec: 'EditObjetivoAlias', toolTip: 'Editar', icon: 'fa fa-edit' },
-                        { divId: 'div_DisableObjetivoAlias_' + data, data: data, functionToExec: 'DisableObjetivoAlias', toolTip: 'Desactivar', icon: 'fa fa-trash' },
-                    ];
-                }
-                else {
-                    action = [
-                        { divId: 'div_ActivateObjetivoAlias_' + data, data: data, functionToExec: 'ActivateObjetivoAlias', toolTip: 'Activar', icon: 'fa fa-power-off' }
-                    ];
-                }
-                return AddActionsToGrid(action);
-            }
+           title: "Acciones",
+data: "id_alias",
+render: function (data, type, full, meta) {
+
+    if ('@ViewBag.Actives'.toUpperCase() === 'TRUE') {
+
+        return `
+            <div class="btn-group">
+
+                <!-- BOTÓN EDITAR -->
+                <button class="btn btn-sm btn-primary"
+                        onclick="EditObjetivoAlias(${data})"
+                        title="Editar">
+                    <i class="fa fa-edit"></i>
+                </button>
+
+                <!-- BOTÓN DESACTIVAR -->
+                <button class="btn btn-sm btn-danger"
+                        onclick="DisableObjetivoAlias(${data})"
+                        title="Desactivar">
+                    <i class="fa fa-trash"></i>
+                </button>
+
+            </div>
+        `;
+
+    } else {
+
+        return `
+            <div class="btn-group">
+
+                <!-- BOTÓN ACTIVAR -->
+                <button class="btn btn-sm btn-success"
+                        onclick="ActivateObjetivoAlias(${data})"
+                        title="Activar">
+                    <i class="fa fa-power-off"></i>
+                </button>
+
+            </div>
+        `;
+    }
+}
+
         }
     ];
 
     function FillGridObjetivoAlias() {
-       
+
         $.ajax({
             type: 'POST',
             url: '@Url.Action("FillObjetivoAliasList", "Objetivo")',

@@ -132,47 +132,45 @@
 
         {
             title: "Acciones",
-            data: null,
-            orderable: false,
-            render: function (data, type, full, meta) {
-                var idAlbum = full.int_id_album_detalle;
-                var idFicha = full.int_id_ficha_objetivo;
+data: null,
+orderable: false,
+render: function (data, type, full, meta) {
 
-        //        var btnView = `
-        //<button class="btn btn-sm btn-primary ver-foto-album"
-        //    data-id-album="${idAlbum}"
-        //    data-id-ficha="${idFicha}"
-        //    title="Ver Fotografía">
-        //    <i class="fa fa-eye"></i>
-        //</button>`;
-                var btnView = `
-                <button class="btn btn-sm btn-primary ver-foto-album"
-                    data-id="${idFicha}"
-                    title="Ver Fotografía">
-                    <i class="fa fa-eye"></i>
-                </button>`;
+    var idAlbum = full.int_id_album_detalle;
+    var idFicha = full.int_id_ficha_objetivo;
 
+    // 👁️ ICONO VER
+    var btnView = `
+        <i class="fa fa-eye text-primary ver-foto-album"
+           data-id-album="${idAlbum}"
+           data-id-ficha="${idFicha}"
+           title="Ver Fotografía"
+           style="cursor:pointer; font-size:18px; margin-right:8px;">
+        </i>`;
 
-                var btnDelete = `
-        <button class="btn btn-sm btn-danger eliminar-objetivo"
-            onclick="DisableObjetivoAsunto(${idAlbum})"
-            title="Desactivar Objetivo">
-            <i class="fa fa-trash"></i>
-        </button>`;
+    // 🗑 ICONO DESACTIVAR
+    var btnDelete = `
+        <i class="fa fa-trash text-danger"
+           onclick="DisableObjetivoAsunto(${idAlbum})"
+           title="Desactivar Objetivo"
+           style="cursor:pointer; font-size:18px;">
+        </i>`;
 
-                var btnActivate = `
-        <button class="btn btn-sm btn-success activar-objetivo"
-            onclick="ActivateObjetivoAsunto(${idAlbum})"
-            title="Activar Objetivo">
-            <i class="fa fa-power-off"></i>
-        </button>`;
+    // 🔌 ICONO ACTIVAR
+    var btnActivate = `
+        <i class="fa fa-power-off text-success"
+           onclick="ActivateObjetivoAsunto(${idAlbum})"
+           title="Activar Objetivo"
+           style="cursor:pointer; font-size:18px;">
+        </i>`;
 
-                if ('@ViewBag.Actives'.toUpperCase() === 'TRUE') {
-                    return `<div class="btn-group">${btnView}${btnDelete}</div>`;
-                } else {
-                    return `<div class="btn-group">${btnActivate}</div>`;
-                }
-            }
+    if ('@ViewBag.Actives'.toUpperCase() === 'TRUE') {
+        return `<div>${btnView}${btnDelete}</div>`;
+    } else {
+        return `<div>${btnActivate}</div>`;
+    }
+}
+
         }
 
 

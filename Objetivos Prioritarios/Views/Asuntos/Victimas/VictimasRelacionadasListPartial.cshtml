@@ -124,39 +124,42 @@
         //},
         {
             title: "Acciones",
-            data: null,
-            orderable: false,
-            render: function (data, type, full, meta) {
-                var id = full.int_id_asunto_victima;
-                var int_id_victima = full.int_id_victima;
+data: null,
+orderable: false,
+render: function (data, type, full, meta) {
 
-                var btnView = `
-        <button class="btn btn-sm btn-primary ver-foto-victima"
-            data-id="${int_id_victima}"
-            title="Ver Fotografía">
-            <i class="fa fa-eye"></i>
-        </button>`;
+    var id = full.int_id_asunto_victima;
+    var int_id_victima = full.int_id_victima;
 
-                var btnDelete = `
-        <button class="btn btn-sm btn-danger eliminar-victima" onclick="DisableVictimaRelacionada(${id})"
-            data-id="${id}"
-            title="Eliminar Víctima">
-            <i class="fa fa-trash"></i>
-        </button>`;
+    var iconView = `
+<i class="fa fa-eye text-primary ver-foto-victima"
+   data-id="${int_id_victima}"
+   title="Ver Fotografía"
+   style="cursor:pointer; font-size:18px; margin-right:8px;">
+</i>`;
 
-                var btnActivate = `
-        <button class="btn btn-sm btn-success activar-victima" onclick="ActivateVictimaRelacionada(${id})"
-            data-id="${id}"
-            title="Activar Víctima">
-            <i class="fa fa-power-off"></i>
-        </button>`;
+    var iconDelete = `
+<i class="fa fa-trash text-danger eliminar-victima"
+   onclick="DisableVictimaRelacionada(${id})"
+   data-id="${id}"
+   title="Eliminar Víctima"
+   style="cursor:pointer; font-size:18px;">
+</i>`;
 
-                if ('@ViewBag.Actives'.toUpperCase() === 'TRUE') {
-                    return `<div class="btn-group">${btnView}${btnDelete}</div>`;
-                } else {
-                    return `<div class="btn-group">${btnView}${btnActivate}</div>`;
-                }
-            }
+    var iconActivate = `
+<i class="fa fa-power-off text-success activar-victima"
+   onclick="ActivateVictimaRelacionada(${id})"
+   data-id="${id}"
+   title="Activar Víctima"
+   style="cursor:pointer; font-size:18px;">
+</i>`;
+
+    if ('@ViewBag.Actives'.toUpperCase() === 'TRUE') {
+        return `<div>${iconView}${iconDelete}</div>`;
+    } else {
+        return `<div>${iconView}${iconActivate}</div>`;
+    }
+}
         }
 
 

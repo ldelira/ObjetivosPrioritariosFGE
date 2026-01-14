@@ -305,6 +305,7 @@
           <Property Type="String" Name="Estado" Nullable="true" MaxLength="4000" />
           <Property Type="DateTime" Name="Fec_Captu" Nullable="true" Precision="16" />
           <Property Type="String" Name="Fec_Captu_concat" Nullable="true" MaxLength="8000" />
+          <Property Type="String" Name="ObjetivoPrioritario" Nullable="true" MaxLength="20" />
         </ComplexType>
       </Schema>
     </edmx:ConceptualModels>
@@ -475,6 +476,7 @@
                 <ScalarProperty Name="Estado" ColumnName="Estado" />
                 <ScalarProperty Name="Fec_Captu" ColumnName="Fec_Captu" />
                 <ScalarProperty Name="Fec_Captu_concat" ColumnName="Fec_Captu_concat" />
+                <ScalarProperty Name="ObjetivoPrioritario" ColumnName="ObjetivoPrioritario" />
               </ComplexTypeMapping>
             </ResultMapping>
           </FunctionImportMapping>

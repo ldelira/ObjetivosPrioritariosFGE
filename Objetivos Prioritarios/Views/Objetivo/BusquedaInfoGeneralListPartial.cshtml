@@ -124,18 +124,38 @@
                 }
             },
             { title: "CLAVE_PERSO", data: "CLAVE_PERSO", orderable: true, visible: false },
+            { title: "IDOBJETIVO", data: "ObjetivoPrioritario", orderable: true, visible: false },
             {
                 title: "Acciones",
                 data: null,
                 orderable: false,
                 render: function (data, type, row) {
+
+                    // Si el SP devolvió NULL
+                    if (row.ObjetivoPrioritario === null || row.ObjetivoPrioritario === "" || row.ObjetivoPrioritario === undefined) {
+                        return `
+                        <button class="btn btn-success btnAddInfo" data-id="${row.id}">
+                            <i class="fa fa-fw fa-check"></i> Agregar
+                        </button>
+                        <button class="btn btn-info btnVerImagen" data-id="${row.id}">
+                            <i class="fa fa-fw fa-check"></i> Ver Foto
+                        </button>
+                    `;
+                    }
+
+                    // Si sí tiene ObjetivoPrioritario
                     return `
-                <button class="btn btn-success btnAddInfo" data-id="${row.id}">
-                    <i class="fa fa-fw fa-check"></i> Agregar
-                </button>
-            `;
+                        <button class="btn btn-primary btnIrObjetivo" data-idobjetivo="${row.ObjetivoPrioritario}">
+                            <i class="fa fa-fw fa-arrow-right"></i> Ir a objetivo
+                        </button>
+
+                        <button class="btn btn-info btnVerImagen" data-id="${row.id}">
+                            <i class="fa fa-fw fa-check"></i> Ver Foto
+                        </button>
+                    `;
                 }
             }
+
         ];
 
         var datos = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model));
@@ -155,6 +175,19 @@
             console.log("Fila seleccionada:", rowData);
             AddObjetivoInfoGeneral(rowData);
         });
+
+        $('#objetivoDataTable').on('click', '.btnIrObjetivo', function () {
+            const idObjetivo = $(this).data('idobjetivo');
+            ObjetivoPrioritario(idObjetivo);
+        });
+
+        $('#objetivoDataTable').on('click', '.btnVerImagen', function () {
+            const rowData = tabla.row($(this).closest('tr')).data();
+            console.log("Fila seleccionada:", rowData);
+            cargarFotoPrincipal(rowData);
+        });
+
+
     });
 
     // 🔹 Función AJAX que envía los datos al controlador
@@ -255,6 +288,60 @@
         });
     }
 
+
+    function ObjetivoPrioritario(idObjetivo) {
+    if (!idObjetivo) {
+        swal("Error", "No se encontró el ID del objetivo.", "error");
+        return;
+    }
+        debugger;
+        console.log("Fila seleccionada:", idObjetivo);
+    location.href = '@Url.Action("AddEditObjetivos","Objetivo")?int_id_objetivo=' + idObjetivo;
+}
+
+
+    function cargarFotoPrincipal(Datos) {
+
+        // Activar la pestaña de fotos
+        var tabTrigger = new bootstrap.Tab(document.querySelector('#fotos-tab'));
+        tabTrigger.show();
+
+        $.ajax({
+            url: '/Objetivo/FotoPrincipal',
+            type: 'POST',
+            data: JSON.stringify(Datos),
+            contentType: 'application/json; charset=utf-8',
+
+            beforeSend: function () {
+                $('#busquedafotos #galeriaFotos')
+                    .empty()
+                    .html('<div class="text-center text-muted">Cargando foto...</div>');
+            },
+
+            success: function (partialHtml) {
+
+                // Si el servidor regresa JSON indicando que no hay foto
+                if (typeof partialHtml === 'object' && partialHtml.IsSuccess === false) {
+                    swal({
+                        title: "No Existe Una Fotografía del Objetivo",
+                        text: partialHtml.Message || "",
+                        type: 'info',
+                        confirmButtonText: "Continuar",
+                        closeOnConfirm: true
+                    });
+                    return;
+                }
+
+                // Cargar la vista parcial
+                $('#busquedafotos #galeriaFotos').html(partialHtml);
+            },
+
+            error: function () {
+                swal("Error", "No se pudo cargar la foto del detenido.", "error");
+                $('#modalFotosDetenido').modal('hide');
+            }
+        });
+    }
 
 
 

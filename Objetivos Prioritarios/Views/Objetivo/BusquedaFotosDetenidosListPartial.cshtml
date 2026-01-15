@@ -9,7 +9,7 @@
         </div>
         <div class="card-body text-center">
             <div class="mb-4">
-                <p><strong>ID Objetivo:</strong> @($"{rowData.ObjetivoPrioritario}")</p>
+                <p><strong>ID Objetivo:</strong> @ViewBag.IdObjetivo</p>
                 <p><strong>Nombre completo:</strong> @($"{rowData.nombre} {rowData.paterno} {rowData.materno}")</p>
                 <p><strong>Clave PERSO:</strong> @rowData.CLAVE_PERSO</p>
             </div>
@@ -47,7 +47,7 @@
 $(document).ready(function () {
 
     const $input = $("#int_id_objetivo");
-    const idObjetivo = parseInt('@ViewBag.RowData.ObjetivoPrioritario', 10);
+    const idObjetivo = parseInt('@ViewBag.IdObjetivo', 10);
     const $btnGuardar = $("#btnGuardarFoto");
 
     if ($input.length > 0 && $input.val()) {

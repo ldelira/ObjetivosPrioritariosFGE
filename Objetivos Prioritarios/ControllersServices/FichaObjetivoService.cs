@@ -3,8 +3,10 @@ using Objetivos_Prioritarios.Utils;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
+using System.Data.Entity.Validation;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Web;
 using System.Web.Mvc;
 
@@ -775,14 +777,24 @@ namespace Objetivos_Prioritarios.ControllersServices
                     message = "Datos actualizados correctamente."
                 };
             }
-            catch (Exception ex)
+            catch (DbEntityValidationException ex)
             {
-                return new
+                var errores = new StringBuilder();
+
+                foreach (var entityErrors in ex.EntityValidationErrors)
                 {
-                    success = false,
-                    message = "Error al actualizar: " + ex.Message
-                };
+                    foreach (var validationError in entityErrors.ValidationErrors)
+                    {
+                        errores.AppendLine(
+                            $"Entidad: {entityErrors.Entry.Entity.GetType().Name}, " +
+                            $"Propiedad: {validationError.PropertyName}, " +
+                            $"Error: {validationError.ErrorMessage}");
+                    }
+                }
+
+                throw new Exception(errores.ToString(), ex);
             }
+
         }
 
 

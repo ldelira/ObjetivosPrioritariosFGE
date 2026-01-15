@@ -59,26 +59,48 @@
                                 }
                             </div>
                             <!-- Estatus Actual -->
-                            <div>
-                                <div style="margin-top: 25px">
-                                    <h5 class="form-label fw-bold">Estatus actual:</h5>
-                                    <div class="border rounded p-2 bg-light">
-                                        @(string.IsNullOrWhiteSpace(ViewBag.EstatusActual)
-                                                            ? "No se ha capturado ningún estatus"
-                                                            : ViewBag.EstatusActual)
-                                    </div>
-                                </div>
-                                <div style="margin-top: 25px">
-                                    <!-- Nuevo Actual -->
-                                    <h5 for="selectEstatus" class="form-label fw-bold">Estatus del proceso:</h5>
-                                    <select id="selectEstatus" class="form-control form-control-lg">
-                                        <option value="">-- Seleccione --</option>
-                                        @foreach (var est in ViewBag.CatalogoEstatus)
+                            @{
+                                int? idEstatusActual = null;
+
+                                if (!string.IsNullOrWhiteSpace(ViewBag.EstatusActual))
+                                {
+                                    foreach (var est in ViewBag.CatalogoEstatus)
+                                    {
+                                        if (est.nvarchar_estatus == ViewBag.EstatusActual)
                                         {
-                                            <option value="@est.int_id_estatus_proceso">@est.nvarchar_estatus</option>
+                                            idEstatusActual = est.int_id_estatus_proceso;
+                                            break;
                                         }
-                                    </select>
-                                </div>
+                                    }
+                                }
+                            }
+                            <div style="margin-top: 25px">
+                                <h5 class="form-label fw-bold">Estatus actual:</h5>
+                                <select id="selectEstatus" class="form-control form-control-lg">
+
+                                    @if (idEstatusActual.HasValue)
+                                    {
+                                        <option value="@idEstatusActual" selected>
+                                            @ViewBag.EstatusActual
+                                        </option>
+                                    }
+                                    else
+                                    {
+                                        <option value="">
+                                            -- No se ha capturado ningún estatus --
+                                        </option>
+                                    }
+
+                                    @foreach (var est in ViewBag.CatalogoEstatus)
+                                    {
+                                        if (!idEstatusActual.HasValue || est.int_id_estatus_proceso != idEstatusActual)
+                                        {
+                                            <option value="@est.int_id_estatus_proceso">
+                                                @est.nvarchar_estatus
+                                            </option>
+                                        }
+                                    }
+                                </select>
                             </div>
                         </div>
                         <!-- Alias -->
@@ -105,7 +127,7 @@
                             <!-- Botón guardar alineado a la derecha -->
                             <div class="d-flex justify-content-end" style="margin-top: 15px;">
                                 <button type="button" class="btn btn-primary btn-lg px-4" onclick="guardarEstatusProceso()">
-                                    Guardar
+                                    Guardar1
                                 </button>
                             </div>
                         </div>

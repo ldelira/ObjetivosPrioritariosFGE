@@ -9,7 +9,7 @@
         </div>
         <div class="card-body text-center">
             <div class="mb-4">
-                <p><strong>ID Objetivo:</strong> @($"{rowData.id_objetivo}")</p>
+                <p><strong>ID Objetivo:</strong> @ViewBag.IdObjetivo</p>
                 <p><strong>Nombre completo:</strong> @($"{rowData.nombre} {rowData.paterno} {rowData.materno}")</p>
                 <p><strong>Clave PERSO:</strong> @rowData.CLAVE_PERSO</p>
             </div>
@@ -38,58 +38,86 @@
             </div>
 
         </div>
-            <input type="hidden" id="fotoBase64Hidden" value="@ViewBag.FotoBase64" />
-            <button id="btnGuardarFoto" class="btn btn-success px-4">✅ Aceptar / Guardar foto</button>
-        </div>
+        <input type="hidden" id="fotoBase64Hidden" value="@ViewBag.FotoBase64" />
+        <button id="btnGuardarFoto" class="btn btn-success px-4">✅ Aceptar / Guardar foto</button>
     </div>
 </div>
 
 <script>
-   document.getElementById('btnGuardarFoto').addEventListener('click', function () {
-    const fotoBase64 = document.getElementById('fotoBase64Hidden').value;
-    const clavePerso = '@ViewBag.RowData.CLAVE_PERSO'; // o extrae desde otro campo si lo prefieres
-    const idObjetivo = '@ViewBag.RowData.id_objetivo';
+$(document).ready(function () {
 
-    if (!fotoBase64) {
-        swal("Atención", "No hay foto disponible para guardar.", "warning");
-        return;
-       }
+    const $input = $("#int_id_objetivo");
+    const idObjetivo = parseInt('@ViewBag.IdObjetivo', 10);
+    const $btnGuardar = $("#btnGuardarFoto");
 
-       console.log("Foto Base64:", fotoBase64);
-       console.log("Clave Perso:", clavePerso);
-       console.log("ID Objetivo:", idObjetivo);
+    if ($input.length > 0 && $input.val()) {
 
-    const datos = {
-        IdObjetivo: idObjetivo,
-        FotoBase64: fotoBase64
-    };
+        const idGlobal = parseInt($input.val(), 10);
 
-    $.ajax({
-        url: '/Objetivo/GuardarFotoDetenido',
-        type: 'POST',
-        data: JSON.stringify(datos),
-        contentType: 'application/json; charset=utf-8',
-        success: function (response) {
-            if (response && response.IsSuccess) {
-                swal({
-                    title: "Éxito",
-                    text: response.Message,
-                    type: 'success',
-                    confirmButtonText: "Continuar",
-                    closeOnConfirm: true,
-                }, function (isConfirm) {
-                    if (isConfirm) {
-                        swal.close();
-                        location.reload();
-                    }
-                });
-            } else {
-                swal("Error", response ? response.Message : "Respuesta inesperada", "error");
-            }
-        },
-        error: function () {
-            swal("Error", "No se pudo guardar la foto.", "error");
+        console.log("Existe int_id_objetivo:", idGlobal);
+        console.log("ID Objetivo actual:", idObjetivo);
+
+        // 🔴 Si es de OTRO objetivo
+        if (idGlobal !== idObjetivo) {
+
+            $btnGuardar
+                .prop("disabled", true)                 // ✅ DESHABILITADO REAL
+                .removeClass("btn-success")
+                .addClass("btn-warning")
+                .html("⚠️ Foto de otro objetivo")
+                .css({
+                    "cursor": "not-allowed",
+                    "opacity": "0.7"
+                })
+                .attr("title", "Esta foto pertenece a otro objetivo");
         }
+    }
+
+    // 🔹 Click (por seguridad extra)
+    $btnGuardar.on("click", function (e) {
+        if ($(this).prop("disabled")) {
+            e.preventDefault();
+            return;
+        }
+
+        const fotoBase64 = document.getElementById('fotoBase64Hidden').value;
+
+        if (!fotoBase64) {
+            swal("Atención", "No hay foto disponible para guardar.", "warning");
+            return;
+        }
+
+        const datos = {
+            IdObjetivo: idObjetivo,
+            FotoBase64: fotoBase64
+        };
+
+        $.ajax({
+            url: '/Objetivo/GuardarFotoDetenido',
+            type: 'POST',
+            data: JSON.stringify(datos),
+            contentType: 'application/json; charset=utf-8',
+            success: function (response) {
+                if (response && response.IsSuccess) {
+                    swal({
+                        title: "Éxito",
+                        text: response.Message,
+                        type: 'success',
+                        confirmButtonText: "Continuar"
+                    }, function () {
+                        location.reload();
+                    });
+                } else {
+                    swal("Error", response ? response.Message : "Respuesta inesperada", "error");
+                }
+            },
+            error: function () {
+                swal("Error", "No se pudo guardar la foto.", "error");
+            }
+        });
     });
+
 });
 </script>
+
+

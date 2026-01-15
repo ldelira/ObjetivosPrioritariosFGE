@@ -579,12 +579,23 @@ namespace Objetivos_Prioritarios.Controllers
                 var rowData = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(json);
 
                 // Opcional: extraer campos que quieras usar en la vista parcial
-                string id_objetivo = rowData.id_objetivo;
+                string id_objetivo = null;
+
+                if (rowData.ObjetivoPrioritario != null &&
+                    !string.IsNullOrWhiteSpace(rowData.ObjetivoPrioritario.ToString()))
+                {
+                    id_objetivo = rowData.ObjetivoPrioritario.ToString();
+                }
+                else if (rowData.id_objetivo != null &&
+                         !string.IsNullOrWhiteSpace(rowData.id_objetivo.ToString()))
+                {
+                    id_objetivo = rowData.id_objetivo.ToString();
+                }
                 string nombre = rowData.nombre;
                 string paterno = rowData.paterno;
                 string materno = rowData.materno;
                 int clavePerso = rowData.CLAVE_PERSO;
-
+                ViewBag.IdObjetivo = id_objetivo;
                 string foto = AsuntoService.getFotosDetenidosBase(clavePerso);
 
                 if (string.IsNullOrEmpty(foto))

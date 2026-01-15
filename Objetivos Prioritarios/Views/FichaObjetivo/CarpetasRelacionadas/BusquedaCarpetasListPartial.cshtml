@@ -44,12 +44,12 @@
             data: "CarpetaInvestigacion", render: function (data, type, full, meta) {
 
             var btnEdit = `
-            <button class="btn btn-sm btn-primary"
-                onclick="AgregarCarpeta(${data})"
-                data-id="${data}"
-                title="Activar">
-                <i class="fa fa-check"></i>
-            </button>`;
+                <button class="btn btn-sm btn-primary"
+                    onclick="AgregarCarpeta('${data}')"
+                    data-id="${data}"
+                    title="Activar">
+                    <i class="fa fa-check"></i>
+                </button>`;
 
 
                 return `<div class="btn-group">${btnEdit}</div>`;

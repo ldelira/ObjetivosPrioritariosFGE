@@ -232,7 +232,7 @@
 
         // Enviar la información general al backend
         $.ajax({
-            url: '/Objetivo/AddInfoGeneral',
+            url:  "@Url.Action("AddInfoGeneral", "Objetivo")",
             type: 'POST',
             data: JSON.stringify(Datos),
             contentType: 'application/json; charset=utf-8',
@@ -245,7 +245,7 @@
                     // Cargar la vista parcial de la foto principal
 
                     $.ajax({
-                        url: '/Objetivo/FotoPrincipal',
+                        url: "@Url.Action("FotoPrincipal", "Objetivo")",
                         type: 'POST',
                         data: JSON.stringify(Datos),
                         contentType: 'application/json; charset=utf-8',
@@ -294,7 +294,7 @@
         swal("Error", "No se encontró el ID del objetivo.", "error");
         return;
     }
-        
+
         console.log("Fila seleccionada:", idObjetivo);
     location.href = '@Url.Action("AddEditObjetivos","Objetivo")?int_id_objetivo=' + idObjetivo;
 }
@@ -302,12 +302,13 @@
 
     function cargarFotoPrincipal(Datos) {
 
+        debugger;
         // Activar la pestaña de fotos
         var tabTrigger = new bootstrap.Tab(document.querySelector('#fotos-tab'));
         tabTrigger.show();
 
         $.ajax({
-            url: '/Objetivo/FotoPrincipal',
+            url: "@Url.Action("FotoPrincipal", "Objetivo")",
             type: 'POST',
             data: JSON.stringify(Datos),
             contentType: 'application/json; charset=utf-8',

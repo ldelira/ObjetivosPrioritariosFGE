@@ -93,7 +93,7 @@ $(document).ready(function () {
         };
 
         $.ajax({
-            url: '/Objetivo/GuardarFotoDetenido',
+            url: "@Url.Action("GuardarFotoDetenido", "Objetivo")",
             type: 'POST',
             data: JSON.stringify(datos),
             contentType: 'application/json; charset=utf-8',

@@ -24,6 +24,7 @@ namespace Objetivos_Prioritarios.Controllers
         public ActionResult Index()
         {
             ViewBag.title = "";
+            //ViewBag.usuario = Session["User"];
             return View();
         }
         public PartialViewResult ObjetivosListPartial(bool? actives)

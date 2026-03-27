@@ -1,11 +1,14 @@
-﻿using Objetivos_Prioritarios.Models;
+﻿using Antlr.Runtime.Misc;
+using Microsoft.Win32.SafeHandles;
+using Objetivos_Prioritarios.Models;
 using Objetivos_Prioritarios.Utils;
-using Antlr.Runtime.Misc;
+using SimpleImpersonation;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using System.Security.Principal;
 using System.Web;
 using System.Web.Mvc;
 
@@ -485,31 +488,99 @@ namespace Objetivos_Prioritarios.Controllers
         {
             var detenidos = ReporteService.ObtenerDatosDeTuBaseDeDatos(int_id_album_ficha_objetivo); // tu lógica propia
 
-            string plantilla = Server.MapPath("~/Plantillas/plantilla_base.pptx");
-            string salida = Server.MapPath("~/Salidas/informe_detenidos.pptx");
-            string defaultImg = Server.MapPath("~/Content/imagenes/Nodisponible.jpg");
-            string fondo = Server.MapPath("~/Content/imagenes/FONDO.jpg");
+            //string plantilla = Server.MapPath("~/Plantillas/plantilla_base.pptx");
+            //string salida = Server.MapPath("~/Salidas/informe_detenidos.pptx");
+            //string defaultImg = Server.MapPath("~/Content/imagenes/Nodisponible.jpg");
+            //string fondo = Server.MapPath("~/Content/imagenes/FONDO.jpg");
 
+            string plantilla = @"\\258fgea.pgj.gob\ObjetivosPrioritarios$\Plantillas\plantilla_base.pptx";
+            string salida = @"\\258fgea.pgj.gob\ObjetivosPrioritarios$\Salidas\informe_detenidos.pptx";
+            string defaultImg = @"\\258fgea.pgj.gob\ObjetivosPrioritarios$\imagenes\Nodisponible.jpg";
+            string fondo = @"\\258fgea.pgj.gob\ObjetivosPrioritarios$\imagenes\FONDO2.png";
 
-            
-            PowerPointGeneratorNoImagePartType.GenerarPresentacion(detenidos, plantilla, salida, defaultImg, fondo);
+            byte[] archivoFinal = null;
 
-            return File(salida, "application/vnd.openxmlformats-officedocument.presentationml.presentation", "informe_detenidos.pptx");
+            var credentials = new UserCredentials(
+                "pgj.gob",
+                "SisObjPrioritarios",
+                "WY[R1)Il9YJR"
+            );
+
+            SafeAccessTokenHandle userHandle =
+                credentials.LogonUser(LogonType.NewCredentials);
+
+            WindowsIdentity.RunImpersonated(userHandle, () =>
+            {
+                // 1️⃣ Genera el PPT (sigue igual)
+                PowerPointGeneratorNoImagePartType.GenerarPresentacion(
+                    detenidos,
+                    plantilla,
+                    salida,
+                    defaultImg,
+                    fondo
+                );
+
+                // 2️⃣ LEE EL ARCHIVO A MEMORIA (CLAVE)
+                archivoFinal = System.IO.File.ReadAllBytes(salida);
+            });
+
+            // 3️⃣ IIS SOLO ENVÍA BYTES (YA NO TOCA LA RUTA UNC)
+            return File(
+                archivoFinal,
+                "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+                "informe_detenidos.pptx"
+            );
         }
         public ActionResult GenerarPpt2(int int_id_album_ficha_objetivo)
         {
             var detenidos = ReporteService.ObtenerDatosDeTuBaseDeDatos(int_id_album_ficha_objetivo); // tu lógica propia
 
-            string plantilla = Server.MapPath("~/Plantillas/plantilla_base_vicefiscalia.pptx");
-            string salida = Server.MapPath("~/Salidas/informe_detenidos_vicefiscalia.pptx");
-            string defaultImg = Server.MapPath("~/Content/imagenes/Nodisponible.jpg");
-            string fondo = Server.MapPath("~/Content/imagenes/FONDO2.png");
+            //string plantilla = Server.MapPath("~/Plantillas/plantilla_base_vicefiscalia.pptx");
+            //string salida = Server.MapPath("~/Salidas/informe_detenidos_vicefiscalia.pptx");
+            //string defaultImg = Server.MapPath("~/Content/imagenes/Nodisponible.jpg");
+            //string fondo = Server.MapPath("~/Content/imagenes/FONDO2.png");
+
+            string plantilla = @"\\258fgea.pgj.gob\ObjetivosPrioritarios$\Plantillas\plantilla_base_vicefiscalia.pptx";
+
+            string salida = @"\\258fgea.pgj.gob\ObjetivosPrioritarios$\Salidas\informe_detenidos_vicefiscalia.pptx";
+
+            string defaultImg = @"\\258fgea.pgj.gob\ObjetivosPrioritarios$\imagenes\Nodisponible.jpg";
+
+            string fondo = @"\\258fgea.pgj.gob\ObjetivosPrioritarios$\imagenes\FONDO2.png";
 
 
+            byte[] archivoFinal = null;
 
-            PowerPointGeneratorNoImagePartType.GenerarPresentacion2(detenidos, plantilla, salida, defaultImg, fondo);
+            var credentials = new UserCredentials(
+                "pgj.gob",
+                "SisObjPrioritarios",
+                "WY[R1)Il9YJR"
+            );
 
-            return File(salida, "application/vnd.openxmlformats-officedocument.presentationml.presentation", "informe_detenidos.pptx");
+            SafeAccessTokenHandle userHandle =
+                credentials.LogonUser(LogonType.NewCredentials);
+
+            WindowsIdentity.RunImpersonated(userHandle, () =>
+            {
+                // 1️⃣ Genera el PPT (sigue igual)
+                PowerPointGeneratorNoImagePartType.GenerarPresentacion(
+                    detenidos,
+                    plantilla,
+                    salida,
+                    defaultImg,
+                    fondo
+                );
+
+                // 2️⃣ LEE EL ARCHIVO A MEMORIA (CLAVE)
+                archivoFinal = System.IO.File.ReadAllBytes(salida);
+            });
+
+            // 3️⃣ IIS SOLO ENVÍA BYTES (YA NO TOCA LA RUTA UNC)
+            return File(
+                archivoFinal,
+                "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+                "informe_detenidos_vicefiscalia.pptx"
+            );
         }
 
 

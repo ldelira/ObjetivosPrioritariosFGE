@@ -1,14 +1,17 @@
-﻿using System;
+﻿using DocumentFormat.OpenXml;
+using DocumentFormat.OpenXml.Presentation;
+using Microsoft.Win32.SafeHandles;
+using SimpleImpersonation;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Security.Principal;
 using System.Text;
-using DocumentFormat.OpenXml;
-using DocumentFormat.OpenXml.Presentation;
 using A = DocumentFormat.OpenXml.Drawing;
-using P = DocumentFormat.OpenXml.Presentation;
 using OpenXmlPackaging = DocumentFormat.OpenXml.Packaging;
+using P = DocumentFormat.OpenXml.Presentation;
 
 namespace Objetivos_Prioritarios.Utils
 {
@@ -20,183 +23,393 @@ namespace Objetivos_Prioritarios.Utils
         /// <summary>
         /// Genera la presentación a partir de plantilla. No usa ImagePartType en tiempo de compilación.
         /// </summary>
-        public static void GenerarPresentacion(List<Detenido> detenidos, string plantillaPath, string salidaPath, string defaultImg, string fondo, bool eliminarPlantillaOriginal = true)
+        //public static void GenerarPresentacion(List<Detenido> detenidos, string plantillaPath, string salidaPath, string defaultImg, string fondo, bool eliminarPlantillaOriginal = true)
+        //{
+        //    if (!File.Exists(plantillaPath))
+        //        throw new FileNotFoundException("No se encontró la plantilla", plantillaPath);
+
+        //    File.Copy(plantillaPath, salidaPath, true);
+
+        //    using (var ppt = OpenXmlPackaging.PresentationDocument.Open(salidaPath, true))
+        //    {
+        //        var presentationPart = ppt.PresentationPart ?? throw new Exception("No PresentationPart");
+
+        //        var slideTemplate = presentationPart.SlideParts.FirstOrDefault()
+        //            ?? throw new Exception("La plantilla no contiene diapositivas.");
+
+        //        // Obtener SlideId de la plantilla para eliminar luego (opcional)
+        //        string plantillaRelId = presentationPart.GetIdOfPart(slideTemplate);
+        //        P.SlideId plantillaSlideId = presentationPart.Presentation.SlideIdList?
+        //            .ChildElements
+        //            .OfType<P.SlideId>()
+        //            .FirstOrDefault(s => s.RelationshipId == plantillaRelId);
+
+        //        foreach (var detenido in detenidos)
+        //        {
+        //            var newSlide = CloneSlidePart(presentationPart, slideTemplate);
+
+        //            // Reemplazo de textos
+        //            ReplaceText(newSlide, "[C1]", detenido.Nombre);
+        //            ReplaceText(newSlide, "[C2]", detenido.Cartel);
+        //            ReplaceText(newSlide, "[C3]", detenido.Ocupacion);
+
+
+        //            ReplaceText(newSlide, "[C4]", ListToBulletedText(detenido.Delitos));
+        //            ReplaceText(newSlide, "[C5]", ListToBulletedText(detenido.Carpetas));
+        //            ReplaceText(newSlide, "[C6]", ListToBulletedText(detenido.Ordenes));
+
+        //            ReplaceText(newSlide, "[C7]", detenido.Estatus);
+        //            ReplaceText(newSlide, "[C8]", detenido.DescripcionEstatus);
+
+        //            // Listas como viñetas de texto
+        //            //ReplaceText(newSlide, "[C9]", detenido.Asunto);
+        //            ReplaceText(newSlide, "[C9]", ListToBulletedText(detenido.Asunto));
+
+        //            // Reemplazar foto principal (placeholder en alt text: {{foto}})
+
+        //            ReplaceImageSafeNoDelete2(newSlide, "[FONDO]", fondo);
+
+        //            if (!string.IsNullOrEmpty(detenido.Foto) )
+        //            {
+        //                //ReplaceImageSafeNoDelete(newSlide, "[FP]", detenido.Foto);
+
+        //                ReplaceImageSafeNoDelete2(newSlide, "[FP]", detenido.Foto, null,true);
+
+        //            }
+
+        //            // Victimas
+        //            for (int i = 0; i < detenido.Victimas.Count; i++)
+        //            {
+        //                int idx = i + 1;
+        //                string tagFoto = $"[FV{idx}]";
+        //                string tagNombre = $"[V{idx}]";
+
+        //                ReplaceText(newSlide, tagNombre, detenido.Victimas[i].Nombre ?? "");
+
+        //                if (!string.IsNullOrEmpty(detenido.Victimas[i].Foto) && File.Exists(detenido.Victimas[i].Foto))
+        //                {
+        //                    //ReplaceImageByPlaceholder_NoEnum(newSlide, tagFoto, detenido.Victimas[i].Foto);
+        //                    DebugSlidePartRelations(newSlide);
+        //                    //ReplaceImageSafe(newSlide, tagFoto, detenido.Victimas[i].Foto);
+        //                    ReplaceImageSafeNoDelete(newSlide, tagFoto, detenido.Victimas[i].Foto, defaultImg);
+
+        //                }
+        //            }
+
+        //            AddSlideToPresentation(presentationPart, newSlide);
+        //        }
+
+        //        if (eliminarPlantillaOriginal && plantillaSlideId != null)
+        //        {
+        //            plantillaSlideId.Remove();
+        //        }
+
+        //        presentationPart.Presentation.Save();
+        //    }
+        //}
+
+        public static void GenerarPresentacion(
+    List<Detenido> detenidos,
+    string plantillaPath,
+    string salidaPath,
+    string defaultImg,
+    string fondo,
+    bool eliminarPlantillaOriginal = true)
         {
-            if (!File.Exists(plantillaPath))
-                throw new FileNotFoundException("No se encontró la plantilla", plantillaPath);
+            var credentials = new UserCredentials(
+                "pgj.gob",
+                "SisObjPrioritarios",
+                "WY[R1)Il9YJR"
+            );
 
-            File.Copy(plantillaPath, salidaPath, true);
+            SafeAccessTokenHandle userHandle =
+                credentials.LogonUser(LogonType.NewCredentials);
 
-            using (var ppt = OpenXmlPackaging.PresentationDocument.Open(salidaPath, true))
+            WindowsIdentity.RunImpersonated(userHandle, () =>
             {
-                var presentationPart = ppt.PresentationPart ?? throw new Exception("No PresentationPart");
+                // 🔐 TODO lo que toca archivos de red va aquí
 
-                var slideTemplate = presentationPart.SlideParts.FirstOrDefault()
-                    ?? throw new Exception("La plantilla no contiene diapositivas.");
+                if (!File.Exists(plantillaPath))
+                    throw new FileNotFoundException("No se encontró la plantilla", plantillaPath);
 
-                // Obtener SlideId de la plantilla para eliminar luego (opcional)
-                string plantillaRelId = presentationPart.GetIdOfPart(slideTemplate);
-                P.SlideId plantillaSlideId = presentationPart.Presentation.SlideIdList?
-                    .ChildElements
-                    .OfType<P.SlideId>()
-                    .FirstOrDefault(s => s.RelationshipId == plantillaRelId);
+                File.Copy(plantillaPath, salidaPath, true);
 
-                foreach (var detenido in detenidos)
+                using (var ppt = OpenXmlPackaging.PresentationDocument.Open(salidaPath, true))
                 {
-                    var newSlide = CloneSlidePart(presentationPart, slideTemplate);
+                    var presentationPart = ppt.PresentationPart
+                        ?? throw new Exception("No PresentationPart");
 
-                    // Reemplazo de textos
-                    ReplaceText(newSlide, "[C1]", detenido.Nombre);
-                    ReplaceText(newSlide, "[C2]", detenido.Cartel);
-                    ReplaceText(newSlide, "[C3]", detenido.Ocupacion);
+                    var slideTemplate = presentationPart.SlideParts.FirstOrDefault()
+                        ?? throw new Exception("La plantilla no contiene diapositivas.");
 
+                    string plantillaRelId = presentationPart.GetIdOfPart(slideTemplate);
 
-                    ReplaceText(newSlide, "[C4]", ListToBulletedText(detenido.Delitos));
-                    ReplaceText(newSlide, "[C5]", ListToBulletedText(detenido.Carpetas));
-                    ReplaceText(newSlide, "[C6]", ListToBulletedText(detenido.Ordenes));
+                    P.SlideId plantillaSlideId = presentationPart.Presentation.SlideIdList?
+                        .ChildElements
+                        .OfType<P.SlideId>()
+                        .FirstOrDefault(s => s.RelationshipId == plantillaRelId);
 
-                    ReplaceText(newSlide, "[C7]", detenido.Estatus);
-                    ReplaceText(newSlide, "[C8]", detenido.DescripcionEstatus);
-
-                    // Listas como viñetas de texto
-                    //ReplaceText(newSlide, "[C9]", detenido.Asunto);
-                    ReplaceText(newSlide, "[C9]", ListToBulletedText(detenido.Asunto));
-
-                    // Reemplazar foto principal (placeholder en alt text: {{foto}})
-
-                    ReplaceImageSafeNoDelete2(newSlide, "[FONDO]", fondo);
-
-                    if (!string.IsNullOrEmpty(detenido.Foto) )
+                    foreach (var detenido in detenidos)
                     {
-                        //ReplaceImageSafeNoDelete(newSlide, "[FP]", detenido.Foto);
-                       
-                        ReplaceImageSafeNoDelete2(newSlide, "[FP]", detenido.Foto, null,true);
+                        var newSlide = CloneSlidePart(presentationPart, slideTemplate);
 
-                    }
+                        ReplaceText(newSlide, "[C1]", detenido.Nombre);
+                        ReplaceText(newSlide, "[C2]", detenido.Cartel);
+                        ReplaceText(newSlide, "[C3]", detenido.Ocupacion);
 
-                    // Victimas
-                    for (int i = 0; i < detenido.Victimas.Count; i++)
-                    {
-                        int idx = i + 1;
-                        string tagFoto = $"[FV{idx}]";
-                        string tagNombre = $"[V{idx}]";
+                        ReplaceText(newSlide, "[C4]", ListToBulletedText(detenido.Delitos));
+                        ReplaceText(newSlide, "[C5]", ListToBulletedText(detenido.Carpetas));
+                        ReplaceText(newSlide, "[C6]", ListToBulletedText(detenido.Ordenes));
 
-                        ReplaceText(newSlide, tagNombre, detenido.Victimas[i].Nombre ?? "");
+                        ReplaceText(newSlide, "[C7]", detenido.Estatus);
+                        ReplaceText(newSlide, "[C8]", detenido.DescripcionEstatus);
+                        ReplaceText(newSlide, "[C9]", ListToBulletedText(detenido.Asunto));
 
-                        if (!string.IsNullOrEmpty(detenido.Victimas[i].Foto) && File.Exists(detenido.Victimas[i].Foto))
+                        ReplaceImageSafeNoDelete2(newSlide, "[FONDO]", fondo);
+
+                        if (!string.IsNullOrEmpty(detenido.Foto))
                         {
-                            //ReplaceImageByPlaceholder_NoEnum(newSlide, tagFoto, detenido.Victimas[i].Foto);
-                            DebugSlidePartRelations(newSlide);
-                            //ReplaceImageSafe(newSlide, tagFoto, detenido.Victimas[i].Foto);
-                            ReplaceImageSafeNoDelete(newSlide, tagFoto, detenido.Victimas[i].Foto, defaultImg);
-
+                            ReplaceImageSafeNoDelete2(
+                                newSlide,
+                                "[FP]",
+                                detenido.Foto,
+                                null,
+                                true
+                            );
                         }
+
+                        for (int i = 0; i < detenido.Victimas.Count; i++)
+                        {
+                            int idx = i + 1;
+                            string tagFoto = $"[FV{idx}]";
+                            string tagNombre = $"[V{idx}]";
+
+                            ReplaceText(newSlide, tagNombre, detenido.Victimas[i].Nombre ?? "");
+
+                            if (!string.IsNullOrEmpty(detenido.Victimas[i].Foto)
+                                && File.Exists(detenido.Victimas[i].Foto))
+                            {
+                                ReplaceImageSafeNoDelete(
+                                    newSlide,
+                                    tagFoto,
+                                    detenido.Victimas[i].Foto,
+                                    defaultImg
+                                );
+                            }
+                        }
+
+                        AddSlideToPresentation(presentationPart, newSlide);
                     }
 
-                    AddSlideToPresentation(presentationPart, newSlide);
-                }
+                    if (eliminarPlantillaOriginal && plantillaSlideId != null)
+                    {
+                        plantillaSlideId.Remove();
+                    }
 
-                if (eliminarPlantillaOriginal && plantillaSlideId != null)
+                    presentationPart.Presentation.Save();
+                }
+            });
+        }
+
+
+        public static void GenerarPresentacion2(
+    List<Detenido> detenidos,
+    string plantillaPath,
+    string salidaPath,
+    string defaultImg,
+    string fondo,
+    bool eliminarPlantillaOriginal = true)
+        {
+            var credentials = new UserCredentials(
+                "pgj.gob",
+                "SisObjPrioritarios",
+                "WY[R1)Il9YJR"
+            );
+
+            SafeAccessTokenHandle userHandle =
+                credentials.LogonUser(LogonType.NewCredentials);
+
+            WindowsIdentity.RunImpersonated(userHandle, () =>
+            {
+                if (!File.Exists(plantillaPath))
+                    throw new FileNotFoundException("No se encontró la plantilla", plantillaPath);
+
+                File.Copy(plantillaPath, salidaPath, true);
+
+                using (var ppt = OpenXmlPackaging.PresentationDocument.Open(salidaPath, true))
                 {
-                    plantillaSlideId.Remove();
-                }
+                    var presentationPart = ppt.PresentationPart
+                        ?? throw new Exception("No PresentationPart");
 
-                presentationPart.Presentation.Save();
-            }
+                    var slideTemplate = presentationPart.SlideParts.FirstOrDefault()
+                        ?? throw new Exception("La plantilla no contiene diapositivas.");
+
+                    string plantillaRelId = presentationPart.GetIdOfPart(slideTemplate);
+
+                    P.SlideId plantillaSlideId = presentationPart.Presentation.SlideIdList?
+                        .ChildElements
+                        .OfType<P.SlideId>()
+                        .FirstOrDefault(s => s.RelationshipId == plantillaRelId);
+
+                    foreach (var detenido in detenidos)
+                    {
+                        var newSlide = CloneSlidePart(presentationPart, slideTemplate);
+
+                        ReplaceText(newSlide, "[C1]", detenido.Nombre);
+                        ReplaceText(newSlide, "[C2]", detenido.Cartel);
+                        ReplaceText(newSlide, "[C3]", detenido.Ocupacion);
+
+                        ReplaceText(newSlide, "[C4]", ListToBulletedText(detenido.Delitos));
+                        ReplaceText(newSlide, "[C5]", ListToBulletedText(detenido.Carpetas));
+                        ReplaceText(newSlide, "[C6]", ListToBulletedText(detenido.Ordenes));
+
+                        ReplaceText(newSlide, "[C7]", detenido.Estatus);
+                        ReplaceText(newSlide, "[C8]", detenido.DescripcionEstatus);
+                        ReplaceText(newSlide, "[C9]", ListToBulletedText(detenido.Asunto));
+
+                        ReplaceText(newSlide, "[C10]", detenido.Alias);
+                        ReplaceText(newSlide, "[C11]", detenido.FechaNacimiento);
+                        ReplaceText(newSlide, "[C12]", detenido.Edad);
+                        ReplaceText(newSlide, "[C13]", detenido.observacionObjetivo);
+
+                        ReplaceImageSafeNoDelete2(newSlide, "[FONDO]", fondo);
+
+                        if (!string.IsNullOrEmpty(detenido.Foto))
+                        {
+                            ReplaceImageSafeNoDelete2(
+                                newSlide,
+                                "[FP]",
+                                detenido.Foto,
+                                null,
+                                true
+                            );
+                        }
+
+                        for (int i = 0; i < detenido.Victimas.Count; i++)
+                        {
+                            int idx = i + 1;
+                            string tagFoto = $"[FV{idx}]";
+                            string tagNombre = $"[V{idx}]";
+
+                            ReplaceText(newSlide, tagNombre, detenido.Victimas[i].Nombre ?? "");
+
+                            if (!string.IsNullOrEmpty(detenido.Victimas[i].Foto)
+                                && File.Exists(detenido.Victimas[i].Foto))
+                            {
+                                ReplaceImageSafeNoDelete(
+                                    newSlide,
+                                    tagFoto,
+                                    detenido.Victimas[i].Foto,
+                                    defaultImg
+                                );
+                            }
+                        }
+
+                        AddSlideToPresentation(presentationPart, newSlide);
+                    }
+
+                    if (eliminarPlantillaOriginal && plantillaSlideId != null)
+                    {
+                        plantillaSlideId.Remove();
+                    }
+
+                    presentationPart.Presentation.Save();
+                }
+            });
         }
 
 
 
-        public static void GenerarPresentacion2(List<Detenido> detenidos, string plantillaPath, string salidaPath, string defaultImg, string fondo, bool eliminarPlantillaOriginal = true)
-        {
-            if (!File.Exists(plantillaPath))
-                throw new FileNotFoundException("No se encontró la plantilla", plantillaPath);
+        //public static void GenerarPresentacion2(List<Detenido> detenidos, string plantillaPath, string salidaPath, string defaultImg, string fondo, bool eliminarPlantillaOriginal = true)
+        //{
+        //    if (!File.Exists(plantillaPath))
+        //        throw new FileNotFoundException("No se encontró la plantilla", plantillaPath);
 
-            File.Copy(plantillaPath, salidaPath, true);
+        //    File.Copy(plantillaPath, salidaPath, true);
 
-            using (var ppt = OpenXmlPackaging.PresentationDocument.Open(salidaPath, true))
-            {
-                var presentationPart = ppt.PresentationPart ?? throw new Exception("No PresentationPart");
+        //    using (var ppt = OpenXmlPackaging.PresentationDocument.Open(salidaPath, true))
+        //    {
+        //        var presentationPart = ppt.PresentationPart ?? throw new Exception("No PresentationPart");
 
-                var slideTemplate = presentationPart.SlideParts.FirstOrDefault()
-                    ?? throw new Exception("La plantilla no contiene diapositivas.");
+        //        var slideTemplate = presentationPart.SlideParts.FirstOrDefault()
+        //            ?? throw new Exception("La plantilla no contiene diapositivas.");
 
-                // Obtener SlideId de la plantilla para eliminar luego (opcional)
-                string plantillaRelId = presentationPart.GetIdOfPart(slideTemplate);
-                P.SlideId plantillaSlideId = presentationPart.Presentation.SlideIdList?
-                    .ChildElements
-                    .OfType<P.SlideId>()
-                    .FirstOrDefault(s => s.RelationshipId == plantillaRelId);
+        //        // Obtener SlideId de la plantilla para eliminar luego (opcional)
+        //        string plantillaRelId = presentationPart.GetIdOfPart(slideTemplate);
+        //        P.SlideId plantillaSlideId = presentationPart.Presentation.SlideIdList?
+        //            .ChildElements
+        //            .OfType<P.SlideId>()
+        //            .FirstOrDefault(s => s.RelationshipId == plantillaRelId);
 
-                foreach (var detenido in detenidos)
-                {
-                    var newSlide = CloneSlidePart(presentationPart, slideTemplate);
+        //        foreach (var detenido in detenidos)
+        //        {
+        //            var newSlide = CloneSlidePart(presentationPart, slideTemplate);
 
-                    // Reemplazo de textos
-                    ReplaceText(newSlide, "[C1]", detenido.Nombre);
-                    ReplaceText(newSlide, "[C2]", detenido.Cartel);
-                    ReplaceText(newSlide, "[C3]", detenido.Ocupacion);
-
-
-                    ReplaceText(newSlide, "[C4]", ListToBulletedText(detenido.Delitos));
-                    ReplaceText(newSlide, "[C5]", ListToBulletedText(detenido.Carpetas));
-                    ReplaceText(newSlide, "[C6]", ListToBulletedText(detenido.Ordenes));
-
-                    ReplaceText(newSlide, "[C7]", detenido.Estatus);
-                    ReplaceText(newSlide, "[C8]", detenido.DescripcionEstatus);
-
-                    // Listas como viñetas de texto
-                    //ReplaceText(newSlide, "[C9]", detenido.Asunto);
-                    ReplaceText(newSlide, "[C9]", ListToBulletedText(detenido.Asunto));
-                    
-                    ReplaceText(newSlide, "[C10]", detenido.Alias);
-                    ReplaceText(newSlide, "[C11]", detenido.FechaNacimiento);
-                    ReplaceText(newSlide, "[C12]", detenido.Edad);
-                    ReplaceText(newSlide, "[C13]", detenido.observacionObjetivo);
+        //            // Reemplazo de textos
+        //            ReplaceText(newSlide, "[C1]", detenido.Nombre);
+        //            ReplaceText(newSlide, "[C2]", detenido.Cartel);
+        //            ReplaceText(newSlide, "[C3]", detenido.Ocupacion);
 
 
-                    // Reemplazar foto principal (placeholder en alt text: {{foto}})
+        //            ReplaceText(newSlide, "[C4]", ListToBulletedText(detenido.Delitos));
+        //            ReplaceText(newSlide, "[C5]", ListToBulletedText(detenido.Carpetas));
+        //            ReplaceText(newSlide, "[C6]", ListToBulletedText(detenido.Ordenes));
 
-                    ReplaceImageSafeNoDelete2(newSlide, "[FONDO]", fondo);
+        //            ReplaceText(newSlide, "[C7]", detenido.Estatus);
+        //            ReplaceText(newSlide, "[C8]", detenido.DescripcionEstatus);
 
-                    if (!string.IsNullOrEmpty(detenido.Foto))
-                    {
-                        //ReplaceImageSafeNoDelete(newSlide, "[FP]", detenido.Foto);
+        //            // Listas como viñetas de texto
+        //            //ReplaceText(newSlide, "[C9]", detenido.Asunto);
+        //            ReplaceText(newSlide, "[C9]", ListToBulletedText(detenido.Asunto));
 
-                        ReplaceImageSafeNoDelete2(newSlide, "[FP]", detenido.Foto, null, true);
+        //            ReplaceText(newSlide, "[C10]", detenido.Alias);
+        //            ReplaceText(newSlide, "[C11]", detenido.FechaNacimiento);
+        //            ReplaceText(newSlide, "[C12]", detenido.Edad);
+        //            ReplaceText(newSlide, "[C13]", detenido.observacionObjetivo);
 
-                    }
 
-                    // Victimas
-                    for (int i = 0; i < detenido.Victimas.Count; i++)
-                    {
-                        int idx = i + 1;
-                        string tagFoto = $"[FV{idx}]";
-                        string tagNombre = $"[V{idx}]";
+        //            // Reemplazar foto principal (placeholder en alt text: {{foto}})
 
-                        ReplaceText(newSlide, tagNombre, detenido.Victimas[i].Nombre ?? "");
+        //            ReplaceImageSafeNoDelete2(newSlide, "[FONDO]", fondo);
 
-                        if (!string.IsNullOrEmpty(detenido.Victimas[i].Foto) && File.Exists(detenido.Victimas[i].Foto))
-                        {
-                            //ReplaceImageByPlaceholder_NoEnum(newSlide, tagFoto, detenido.Victimas[i].Foto);
-                            DebugSlidePartRelations(newSlide);
-                            //ReplaceImageSafe(newSlide, tagFoto, detenido.Victimas[i].Foto);
-                            ReplaceImageSafeNoDelete(newSlide, tagFoto, detenido.Victimas[i].Foto, defaultImg);
+        //            if (!string.IsNullOrEmpty(detenido.Foto))
+        //            {
+        //                //ReplaceImageSafeNoDelete(newSlide, "[FP]", detenido.Foto);
 
-                        }
-                    }
+        //                ReplaceImageSafeNoDelete2(newSlide, "[FP]", detenido.Foto, null, true);
 
-                    AddSlideToPresentation(presentationPart, newSlide);
-                }
+        //            }
 
-                if (eliminarPlantillaOriginal && plantillaSlideId != null)
-                {
-                    plantillaSlideId.Remove();
-                }
+        //            // Victimas
+        //            for (int i = 0; i < detenido.Victimas.Count; i++)
+        //            {
+        //                int idx = i + 1;
+        //                string tagFoto = $"[FV{idx}]";
+        //                string tagNombre = $"[V{idx}]";
 
-                presentationPart.Presentation.Save();
-            }
-        }
+        //                ReplaceText(newSlide, tagNombre, detenido.Victimas[i].Nombre ?? "");
+
+        //                if (!string.IsNullOrEmpty(detenido.Victimas[i].Foto) && File.Exists(detenido.Victimas[i].Foto))
+        //                {
+        //                    //ReplaceImageByPlaceholder_NoEnum(newSlide, tagFoto, detenido.Victimas[i].Foto);
+        //                    DebugSlidePartRelations(newSlide);
+        //                    //ReplaceImageSafe(newSlide, tagFoto, detenido.Victimas[i].Foto);
+        //                    ReplaceImageSafeNoDelete(newSlide, tagFoto, detenido.Victimas[i].Foto, defaultImg);
+
+        //                }
+        //            }
+
+        //            AddSlideToPresentation(presentationPart, newSlide);
+        //        }
+
+        //        if (eliminarPlantillaOriginal && plantillaSlideId != null)
+        //        {
+        //            plantillaSlideId.Remove();
+        //        }
+
+        //        presentationPart.Presentation.Save();
+        //    }
+        //}
 
         #region Helpers
 

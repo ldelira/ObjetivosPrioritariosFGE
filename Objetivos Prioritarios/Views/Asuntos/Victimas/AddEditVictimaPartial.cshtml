@@ -174,7 +174,7 @@
     const idllamada = '@ViewBag.llamada';
     const idasunto = '@ViewBag.idasunto';
 
-   
+
 
     // si foto existe la anexamos
     if (fotoInput) {
@@ -186,10 +186,10 @@
     // siempre manda como string; en el server lo parseamos con TryParse
     formData.append("int_id_victima2", '@(Model.int_id_victima==null?0:Model.int_id_victima)');
 
-         
+
 
     $.ajax({
-        url: '/Asuntos/SaveVictima',
+        url: "@Url.Action("SaveVictima", "Asuntos")",
         type: 'POST',
         data: formData,
         processData: false,

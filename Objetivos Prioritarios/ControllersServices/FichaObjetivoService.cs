@@ -797,7 +797,17 @@ namespace Objetivos_Prioritarios.ControllersServices
 
         }
 
+        public DateTime? addFechaNac(int clave_Persona)
+        {
+            var fechnac = dbFili.Persona
+                .AsNoTracking()
+                .Where(x => x.CLAVE_PERSO == clave_Persona)
+                .Select(x => x.FEC_NAC)
+                .FirstOrDefault();
 
+            return fechnac;
+               
+        }
     }
 
 

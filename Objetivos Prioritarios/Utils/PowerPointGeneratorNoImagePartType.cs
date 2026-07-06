@@ -1,4 +1,5 @@
 ﻿using DocumentFormat.OpenXml;
+using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Presentation;
 using Microsoft.Win32.SafeHandles;
 using SimpleImpersonation;
@@ -177,24 +178,45 @@ namespace Objetivos_Prioritarios.Utils
                                 true
                             );
                         }
+                        // Definimos el máximo de espacios que tiene tu plantilla de PowerPoint
+                        int maxVictimasPlantilla = 2;
 
-                        for (int i = 0; i < detenido.Victimas.Count; i++)
+                        for (int i = 0; i < maxVictimasPlantilla; i++)
                         {
                             int idx = i + 1;
                             string tagFoto = $"[FV{idx}]";
                             string tagNombre = $"[V{idx}]";
 
-                            ReplaceText(newSlide, tagNombre, detenido.Victimas[i].Nombre ?? "");
-
-                            if (!string.IsNullOrEmpty(detenido.Victimas[i].Foto)
-                                && File.Exists(detenido.Victimas[i].Foto))
+                            // ¿Hay una víctima en esta posición dentro de la lista?
+                            if (i < detenido.Victimas.Count)
                             {
-                                ReplaceImageSafeNoDelete(
-                                    newSlide,
-                                    tagFoto,
-                                    detenido.Victimas[i].Foto,
-                                    defaultImg
-                                );
+                                // 1. SÍ EXISTE LA VÍCTIMA
+                                ReplaceText(newSlide, tagNombre, detenido.Victimas[i].Nombre ?? "");
+
+                                if (!string.IsNullOrEmpty(detenido.Victimas[i].Foto))
+                                {
+                                    // Tiene foto: La inyectamos y anclamos su posición a 1 cm desde abajo
+                                    ReplaceImageSafeNoDelete2(
+                                        newSlide,
+                                        tagFoto,
+                                        detenido.Victimas[i].Foto,
+                                        null,
+                                        true
+                                    );
+
+                                }
+                                else
+                                {
+                                    // No tiene foto: Borramos el cuadro gris para que no estorbe
+                                    EliminarImagen(newSlide, tagFoto);
+                                }
+                            }
+                            else
+                            {
+                                // 2. NO EXISTE LA VÍCTIMA (ej. el detenido solo tiene 1, y estamos en el espacio 2)
+                                // Limpiamos la diapositiva borrando el tag de texto y la imagen de "No disponible"
+                                ReplaceText(newSlide, tagNombre, "");
+                                EliminarImagen(newSlide, tagFoto);
                             }
                         }
 
@@ -209,6 +231,22 @@ namespace Objetivos_Prioritarios.Utils
                     presentationPart.Presentation.Save();
                 }
             });
+        }
+
+
+        public static void EliminarImagen(SlidePart slidePart, string tag)
+        {
+            var pic = slidePart.Slide.Descendants<DocumentFormat.OpenXml.Presentation.Picture>()
+                .FirstOrDefault(p =>
+                    (p.NonVisualPictureProperties?.NonVisualDrawingProperties?.Description?.Value != null &&
+                     p.NonVisualPictureProperties.NonVisualDrawingProperties.Description.Value.Contains(tag)) ||
+                    (p.NonVisualPictureProperties?.NonVisualDrawingProperties?.Name?.Value != null &&
+                     p.NonVisualPictureProperties.NonVisualDrawingProperties.Name.Value.Contains(tag)));
+
+            if (pic != null)
+            {
+                pic.Remove(); // Esto desaparece el cuadro gris de "Imagen no disponible"
+            }
         }
 
 

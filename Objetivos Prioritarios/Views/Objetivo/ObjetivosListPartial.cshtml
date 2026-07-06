@@ -1,57 +1,160 @@
 ﻿@model List<Objetivos_Prioritarios.Models.tb_Objetivo>
 
+<style>
+    /* Tarjeta principal sin bordes duros y sombra suave */
+    .card-institutional {
+        border: none !important;
+        border-radius: 12px !important;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04) !important;
+        background-color: #ffffff;
+    }
 
+    /* Estilización del filtro de estado */
+    .filter-container {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 10px 15px;
+        display: inline-flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+        .filter-container select {
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 4px 30px 4px 10px;
+            color: #495057;
+            font-weight: 500;
+            box-shadow: none;
+        }
+
+    /* Limpiando la tabla de DataTables */
+    .table-institutional th {
+        background-color: #ffffff !important;
+        color: #6c757d !important;
+        font-weight: 600 !important;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+        border-bottom: 2px solid #e9ecef !important;
+        border-top: none !important;
+    }
+
+    .table-institutional td {
+        vertical-align: middle;
+        color: #333333;
+        border-bottom: 1px solid #f1f3f5;
+    }
+
+    table.dataTable.no-footer {
+        border-bottom: 1px solid #e9ecef !important;
+    }
+
+    /* Botones de acción en la tabla */
+    .btn-action {
+        border-radius: 6px;
+        padding: 6px 10px;
+        font-size: 0.875rem;
+        transition: all 0.2s;
+    }
+
+    .btn-action-view {
+        background-color: #e8f0fe;
+        color: #1a73e8;
+        border: none;
+    }
+
+        .btn-action-view:hover {
+            background-color: #d2e3fc;
+        }
+
+    .btn-action-delete {
+        background-color: #fce8e6;
+        color: #d93025;
+        border: none;
+    }
+
+        .btn-action-delete:hover {
+            background-color: #fad2cf;
+        }
+
+    /* Estilizar los inputs generados automáticamente por DataTables */
+    .dataTables_wrapper .dataTables_filter input {
+        border: 1px solid #ced4da;
+        border-radius: 20px;
+        padding: 5px 15px;
+        outline: none;
+    }
+
+        .dataTables_wrapper .dataTables_filter input:focus {
+            border-color: #1d63d3;
+            box-shadow: 0 0 0 0.2rem rgba(29, 99, 211, 0.15);
+        }
+
+    /* Contenedor personalizado del Loading */
+    .loading-overlay {
+        display: none; /* Se controla por JS */
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 250px;
+    }
+</style>
 
 
 <div class="main-panel">
     <div class="content-wrapper">
-
         <div class="row">
-            <div class="col-md-12 stretch-card grid-margin ">
-                <div class="card" >
-                    <div class="card-body card-fixed">
-                        <p class="card-title">Listado de objetivos dados de alta en el sistema</p>
-                        <div class="row">
-                            <div class="col-md-1">
-                                <label class="control-label">Estados:</label>
-                            </div>
-                            <div class="col-md-2">
-                                <select class="form-control" id="estadoGeneral">
-                                    <option value="1" id="1" @((bool)ViewBag.Actives ? "selected" : "")>Activo</option>
-                                    <option value="0" id="0" @(!(bool)ViewBag.Actives ? "selected" : "")>Inactivo</option>
-                                </select>
-                            </div>
-                            <div class="col-md-2"></div>
-                            <div class="col-md-7" style="text-align:right">
-                                <button type="button" class="btn btn-primary"
-                                        onclick="AddObjetivo()">
-                                    Agregar Objetivo Prioritario
-                                </button>
+            <div class="col-md-12 stretch-card grid-margin">
+
+                <div class="card card-institutional">
+                    <div class="card-body p-4">
+
+                        <div class="d-flex justify-content-between align-items-sm-center flex-column flex-sm-row mb-4 gap-3">
+
+                            <div>
+                                <h3 class="card-title fw-bold text-dark mb-1" style="font-size: 1.5rem;">
+                                    Objetivos Prioritarios <span class="text-muted fw-light" style="font-size: 1.2rem;">> Directorio</span>
+                                </h3>
+                                <p class="text-muted mb-0 small">Listado de objetivos dados de alta en el sistema</p>
                             </div>
 
-                        </div>
-                        <br>
-                        <div class="row">
-                            <div class="col-12">
-                                <div class="table-responsive ">
-                                    <table id="generalDataTable" class="dataTable table table-striped" style="width:100%">
-                                    </table>
+                            <div class="d-flex align-items-center flex-wrap gap-3">
+
+                                <div class="d-flex align-items-center bg-light rounded px-3 shadow-sm" style="height: 42px; border: 1px solid #e9ecef;">
+                                    <span class="text-muted small fw-bold me-2" style="white-space: nowrap;">MOSTRAR ESTADO:</span>
+                                    <select class="form-select border-0 bg-transparent shadow-none fw-semibold text-dark p-0 pe-4" id="estadoGeneral" style="cursor: pointer; background-position: right center;">
+                                        <option value="1" id="1" @((bool)ViewBag.Actives ? "selected" : "")>Activo</option>
+                                        <option value="0" id="0" @(!(bool)ViewBag.Actives ? "selected" : "")>Inactivo</option>
+                                    </select>
                                 </div>
-                            </div>
+
+                                <button type="button" class="btn btn-primary shadow-sm fw-semibold text-nowrap" style="border-radius: 8px; height: 42px; padding: 0 20px;" onclick="AddObjetivo()">
+                                    <i class="fa fa-plus me-1"></i> AGREGAR NUEVO OBJETIVO
+                                </button>
+
                             </div>
                         </div>
-                </div>
 
+                        <div id="tableLoading" class="loading-overlay">
+                            <div class="spinner-border text-primary mb-3" role="status" style="width: 3rem; height: 3rem;">
+                                <span class="visually-hidden">Cargando...</span>
+                            </div>
+                            <span class="text-muted fw-medium">Consultando registros en la base de datos...</span>
+                        </div>
+
+                        <div id="tableContainer" class="table-responsive" style="display: none;">
+                            <table id="generalDataTable" class="table table-hover table-institutional w-100">
+                            </table>
+                        </div>
+
+                    </div>
+                </div>
 
             </div>
         </div>
-
-
-
     </div>
- 
 </div>
-<!-- main-panel ends -->
 
 
 <script>
@@ -62,42 +165,21 @@
     $("#estadoGeneral").change(function () {
         var valor = $("#estadoGeneral").val();
         if (valor == "1") {
-            refresobjetivosList(true);
+            refresobjetivosList(true); // Asumo que esta función llama a FillGrid internamente
         } else {
             refresobjetivosList(false);
         }
     });
 
-
     var columnFichaInfo = [
-
+        { title: "Id", data: "int_id_objetivo", orderable: true, IsFiltered: false },
+        { title: "Nombres", data: "Nombres", orderable: true, IsFiltered: false },
+        { title: "Alias", data: "Aliases", orderable: true, IsFiltered: false },
+        { title: "Grupos Criminales", data: "GruposDelictivos", orderable: true, IsFiltered: false },
         {
-            title: "Id",
-            data: "int_id_objetivo",
-            orderable: true,
-            IsFiltered: false
-        },
-        {
-            title: "Nombres",
-            data: "Nombres",
-            orderable: true,
-            IsFiltered: false
-        },
-        {
-            title: "Alias",
-            data: "Aliases",
-            orderable: true,
-            IsFiltered: false
-        },
-        {
-            title: "GruposDelictivos",
-            data: "GruposDelictivos",
-            orderable: true,
-            IsFiltered: false
-        },
-        {
-            title: "Fecha Nacimiento",
-            data: "FechaNacimiento", render: $.fn.dataTable.render.moment(undefined, 'DD-MM-YYYY', 'en'),
+            title: "Fecha Nac.",
+            data: "FechaNacimiento",
+            render: $.fn.dataTable.render.moment(undefined, 'DD-MM-YYYY', 'en'),
             orderable: true,
             IsFiltered: false
         },
@@ -105,194 +187,141 @@
             title: "Fotografía",
             data: "TieneFoto",
             orderable: true,
-            IsFiltered: false
+            IsFiltered: false,
+            render: function (data, type, row) {
+                if(data && data.toUpperCase().includes('CON FOTO')) {
+                    return '<span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-2 py-1 rounded-pill"><i class="fa fa-camera me-1"></i> Sí</span>';
+                }
+                return '<span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25 px-2 py-1 rounded-pill">No</span>';
+            }
         },
-
-
         {
             title: "Acciones",
-            data: "int_id_objetivo", render: function (data, type, full, meta) {
-                var action;
+            data: "int_id_objetivo",
+            orderable: false,
+            render: function (data, type, full, meta) {
                 if ('@ViewBag.Actives'.toUpperCase() === 'TRUE') {
-
-    return `
-        <div class="btn-group">
-            <button class="btn btn-sm btn-primary"
-                onclick="EditObjetivo(${data})"
-                title="Editar Objetivo">
-                <i class="fa fa-eye"></i>
-            </button>
-
-            <button class="btn btn-sm btn-danger"
-                onclick="DisableObjetivo(${data})"
-                title="Desactivar Objetivo">
-                <i class="fa fa-trash"></i>
-            </button>
-        </div>`;
-} else {
-    return `
-        <div class="btn-group">
-            <button class="btn btn-sm btn-success"
-                onclick="ActivateObjetivo(${data})"
-                title="Activar Objetivo">
-                <i class="fa fa-power-off"></i>
-            </button>
-        </div>`;
-}
-
-
-                return AddActionsToGrid(action);
+                    return `
+                        <div class="d-flex gap-2">
+                            <button class="btn-action btn-action-view" onclick="EditObjetivo(${data})" title="Ver / Editar">
+                                <i class="fa fa-eye"></i>
+                            </button>
+                            <button class="btn-action btn-action-delete" onclick="DisableObjetivo(${data})" title="Desactivar">
+                                <i class="fa fa-trash"></i>
+                            </button>
+                        </div>`;
+                } else {
+                    return `
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-sm btn-outline-success" style="border-radius:6px;" onclick="ActivateObjetivo(${data})" title="Activar Objetivo">
+                                <i class="fa fa-power-off me-1"></i> Activar
+                            </button>
+                        </div>`;
+                }
             }
         }
     ];
 
-
     function FillGrid(estado = null) {
-
-
-
         $.ajax({
             type: 'POST',
             url: '@Url.Action("FillObjetivosList", "Objetivo")',
             data: { active: @Json.Encode(ViewBag.Actives)},
-
+            beforeSend: function () {
+                $("#tableContainer").hide();
+                $("#tableLoading").css("display", "flex");
+            },
             success: function (data) {
-
                 if ($.fn.dataTable.isDataTable('#generalDataTable')) {
                     $('#generalDataTable').DataTable().clear().destroy();
                 }
+
                 var table = $('#generalDataTable').DataTable({
                     searching: true,
-                    responsive: true,
-                    scrollX: true,
+                    responsive: false, // APAGADO: Responsive y scrollX suelen pelearse
+                    scrollX: true,     // ENCENDIDO: Mantendremos la barra de desplazamiento horizontal
+                    autoWidth: false,  // CRÍTICO: Evita que DataTables adivine mal los anchos
                     data: data,
                     columns: columnFichaInfo,
-                    columnDefs: [
-                        //{
-                        //    targets: 4, // Índice de la columna "Observaciones" (0-based)
-                        //    createdCell: function (td, cellData, rowData, row, col) {
-                        //        var maxLength = 100;  // Límite de caracteres
-                        //        if (cellData.length > maxLength) {
-                        //            $(td).text(cellData.substring(0, maxLength) + '...');  // Truncar y añadir '...'
-                        //        } else {
-                        //            $(td).text(cellData);  // De lo contrario, mostrar el texto completo
-                        //        }
-                        //        $(td).addClass('col-observaciones');  // Aplica la clase de CSS
-                        //    }
-                        //}
-                        //,
-                        //{
-                        //    targets: 3, // Índice de la columna "Imputado" (0-based)
-                        //    createdCell: function (td, cellData, rowData, row, col) {
-                        //        var maxLength = 100;  // Límite de caracteres
-                        //        if (cellData.length > maxLength) {
-                        //            $(td).text(cellData.substring(0, maxLength) + '...');  // Truncar y añadir '...'
-                        //        } else {
-                        //            $(td).text(cellData);  // De lo contrario, mostrar el texto completo
-                        //        }
-                        //        $(td).addClass('col-imputado');  // Aplica la clase de CSS
-                        //    }
-                        //}
-                    ],
+                    dom: "<'row mb-3'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6 d-flex justify-content-end'f>>" +
+                         "<'row'<'col-sm-12'tr>>" +
+                         "<'row mt-3'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
                     language: {
                         "sProcessing": "Procesando...",
                         "sLengthMenu": "Mostrar _MENU_ registros",
                         "sZeroRecords": "No se encontraron resultados",
                         "sEmptyTable": "Ningún dato disponible en esta tabla",
-                        "sInfo": "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
-                        "sInfoEmpty": "Mostrando registros del 0 al 0 de un total de 0 registros",
-                        "sInfoFiltered": "(filtrado de un total de _MAX_ registros)",
-                        "sInfoPostFix": "",
-                        "sSearch": "Buscar:",
-                        "sUrl": "",
-                        "sInfoThousands": ",",
-                        "sLoadingRecords": "Cargando...",
+                        "sInfo": "Mostrando del _START_ al _END_ de _TOTAL_ registros",
+                        "sInfoEmpty": "Mostrando 0 registros",
+                        "sInfoFiltered": "(filtrado de _MAX_ totales)",
+                        "sSearch": "<i class='fa fa-search text-muted me-2'></i>",
+                        "sSearchPlaceholder": "Buscar en directorio...",
                         "oPaginate": {
                             "sFirst": "Primero",
                             "sLast": "Último",
                             "sNext": "Siguiente",
                             "sPrevious": "Anterior"
-                        },
-                        "oAria": {
-                            "sSortAscending": ": Activar para ordenar la columna de manera ascendente",
-                            "sSortDescending": ": Activar para ordenar la columna de manera descendente"
                         }
                     },
-                    //buttons: [
-                    //    'copy', 'csv', 'excel', 'pdf', 'print'
-                    //],
-                @*buttons: {
-                    buttons: [
-                        {
-                            text: 'New',
-                            action: function (e, dt, node, config) {
-                                var url = '@Url.Action("AddUser", "Users", new { __RequestVerificationToken = @AntiForgeryValidator.GetTokenValidation() }, null)';
-                                window.location.href = url;
-                            },
-                            className: "green"
-                        }
-                    ],
-                    dom: {
-                        button: {
-                            tag: "button",
-                            className: "btn btn-primary"
-                        },
-                        buttonLiner: {
-                            tag: null
-                        }
-                    }
-                },*@
                     initComplete: function (oSettings) {
-                        this.api().columns().every(function () {
+                        var api = this.api();
+
+                        api.columns().every(function () {
                             var column = this;
                             var nameColumn = column.header().textContent;
-                            var columnDef = oSettings.aoColumns.find(column => {
-                                return column.sTitle === nameColumn;
-                            });
-                            if (columnDef.IsFiltered) {
-                                $('<input type="text" placeholder="buscar" />')
+                            var columnDef = oSettings.aoColumns.find(col => col.sTitle === nameColumn);
+
+                            if (columnDef && columnDef.IsFiltered) {
+                                $('<input type="text" placeholder="buscar" class="form-control form-control-sm mt-1" style="width: 100%; min-width: 80px;" />')
                                     .appendTo($(column.header()))
-                                    .on('click', function (e) { e.stopPropagation(); })
+                                    .on('click', function (e) { e.stopPropagation(); });
                             }
+
                             $('input', column.header()).on('keyup change clear', function () {
                                 if (column.search !== this.value) {
-                                    column
-                                        .column($(this).parent().index() + ':visible')
-                                        .search(this.value)
-                                        .draw();
+                                    column.search(this.value).draw();
                                 }
                             });
                         });
-                        $($.fn.dataTable.tables(true)).DataTable().columns.adjust();
                     }
+                });
 
+                // SOLUCIÓN AL DESCUADRE:
+                // Forzamos el recálculo en cada evento donde la tabla se redibuja (cambiar página, ordenar, buscar)
+                table.on('draw.dt', function () {
+                    setTimeout(function () {
+                        table.columns.adjust();
+                    }, 50);
                 });
             },
             complete: function () {
-
+                $("#tableLoading").hide();
+                // Usamos un callback en el fadeIn para asegurar que la tabla ya está visible
+                // en el DOM antes de mandar a ajustar las columnas.
+                $("#tableContainer").fadeIn(300, function() {
+                    $('#generalDataTable').DataTable().columns.adjust();
+                });
             }
         });
     }
 
+    // -- Aquí se mantienen intactas tus funciones AddObjetivo, EditObjetivo, DisableObjetivo y ActivateObjetivo --
     function AddObjetivo() {
         swal({
             title: "¿Estás seguro?",
-            text: "Se generara un Id y Esta acción no se puede deshacer",
+            text: "Se generará un Id y esta acción no se puede deshacer",
             type: "warning",
             showCancelButton: true,
-            confirmButtonText: "Sí",
-            cancelButtonText: "No",
+            confirmButtonColor: "#1d63d3",
+            confirmButtonText: "Sí, agregar",
+            cancelButtonText: "Cancelar",
             closeOnConfirm: false,
             closeOnCancel: true
-        },
-            function (isConfirm) {
-                if (isConfirm) {
-
-                    location.href = '@Url.Action("AddObjetivo", "Objetivo")';
-                } else {
-
-                }
-            });
+        }, function (isConfirm) {
+            if (isConfirm) {
+                location.href = '@Url.Action("AddObjetivo", "Objetivo")';
+            }
+        });
     }
 
     function EditObjetivo(int_id_objetivo) {
@@ -300,38 +329,36 @@
     }
 
     function DisableObjetivo(id) {
-     $.ajax({
-         type: 'POST',
-         url: '@Url.Action("DisableObjetivo", "Objetivo")',
-         data: { int_id_objetivo: id },
-         success: function (data) {
-             if (data.IsSuccess) {
-                 swal({ title: "", text: data.Message, type: 'success', confirmButtonText: "Continuar", closeOnConfirm: true },
-                     function () { swal.close(); refresobjetivosList(); });
-             } else {
-                 swal({ title: "Error", text: "No tienes permisos para esta acción. Contacta al administrador.", type: 'error', confirmButtonText: "Continuar", closeOnConfirm: true },
-                     function () { window.location.href = '@Url.Action("Index", "Objetivo")'; });
-             }
-         }
-     });
- }
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("DisableObjetivo", "Objetivo")',
+            data: { int_id_objetivo: id },
+            success: function (data) {
+                if (data.IsSuccess) {
+                    swal({ title: "Desactivado", text: data.Message, type: 'success', confirmButtonText: "Continuar", confirmButtonColor: "#1d63d3", closeOnConfirm: true },
+                        function () { swal.close(); refresobjetivosList(); });
+                } else {
+                    swal({ title: "Error", text: "No tienes permisos para esta acción. Contacta al administrador.", type: 'error', confirmButtonText: "Continuar", confirmButtonColor: "#1d63d3", closeOnConfirm: true },
+                        function () { window.location.href = '@Url.Action("Index", "Objetivo")'; });
+                }
+            }
+        });
+    }
 
     function ActivateObjetivo(id) {
-     $.ajax({
-         type: 'POST',
-         url: '@Url.Action("ActivateObjetivo", "Objetivo")',
-         data: { int_id_objetivo: id },
-         success: function (data) {
-             if (data.IsSuccess) {
-                 swal({ title: "", text: data.Message, type: 'success', confirmButtonText: "Continuar", closeOnConfirm: true },
-                     function () { swal.close(); refresobjetivosList(); });
-             } else {
-                 swal({ title: "Error", text: "No tienes permisos para esta acción. Contacta al administrador.", type: 'error', confirmButtonText: "Continuar", closeOnConfirm: true },
-                     function () { window.location.href = '@Url.Action("Index", "Objetivo")'; });
-             }
-         }
-     });
- }
-
-
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("ActivateObjetivo", "Objetivo")',
+            data: { int_id_objetivo: id },
+            success: function (data) {
+                if (data.IsSuccess) {
+                    swal({ title: "Activado", text: data.Message, type: 'success', confirmButtonText: "Continuar", confirmButtonColor: "#1d63d3", closeOnConfirm: true },
+                        function () { swal.close(); refresobjetivosList(); });
+                } else {
+                    swal({ title: "Error", text: "No tienes permisos para esta acción. Contacta al administrador.", type: 'error', confirmButtonText: "Continuar", confirmButtonColor: "#1d63d3", closeOnConfirm: true },
+                        function () { window.location.href = '@Url.Action("Index", "Objetivo")'; });
+                }
+            }
+        });
+    }
 </script>

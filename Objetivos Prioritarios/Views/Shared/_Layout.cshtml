@@ -99,6 +99,79 @@
     <script src="~/assets/plugins/sweetalert/js/sweetalert.min.js"></script>
 </head>
 
+<style>
+    /* ==========================================================================
+       OVERRIDE INSTITUCIONAL (Basado en el nuevo diseño)
+       ========================================================================== */
+
+    /* 1. Fondo general del sistema */
+    body, .main {
+        background-color: #f4f6f9 !important; /* Gris súper claro para contrastar las tablas */
+    }
+
+    /* 2. Barra Lateral (Sidebar) Azul Marino */
+    .sidebar {
+        background-color: #113255 !important; /* Azul institucional */
+        border-right: none !important;
+        box-shadow: 2px 0 10px rgba(0,0,0,0.1) !important;
+    }
+
+    /* 3. Enlaces del menú lateral */
+    .sidebar-nav .nav-link {
+        background-color: transparent !important;
+        color: #b0c4d9 !important; /* Texto gris claro/azulado */
+        border-radius: 4px;
+        margin-bottom: 4px;
+    }
+    .sidebar-nav .nav-link i {
+        color: #b0c4d9 !important; /* Iconos en gris claro */
+    }
+
+    /* 4. Efecto Hover y Activo en el menú lateral */
+    .sidebar-nav .nav-link:hover,
+    .sidebar-nav .nav-link:focus,
+    .sidebar-nav .nav-item .nav-link:not(.collapsed) {
+        background-color: #1a497c !important; /* Azul un poco más claro al pasar el mouse */
+        color: #ffffff !important;
+    }
+    .sidebar-nav .nav-link:hover i,
+    .sidebar-nav .nav-link:focus i,
+    .sidebar-nav .nav-item .nav-link:not(.collapsed) i {
+        color: #ffffff !important;
+    }
+
+    /* 5. Barra Superior (Header) más limpia */
+    .header {
+        background-color: #ffffff !important;
+        box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05) !important; /* Sombra más suave */
+    }
+    .toggle-sidebar-btn {
+        color: #113255 !important; /* Botón de hamburguesa en azul oscuro */
+    }
+
+    /* 6. Botones principales (Como el de "Agregar Nuevo Objetivo") */
+    .btn-primary, 
+    .dt-button { /* Aplica también a los botones de DataTables */
+        background-color: #1d63d3 !important; /* Azul rey del mockup */
+        border-color: #1d63d3 !important;
+        border-radius: 6px !important;
+        font-weight: 500;
+        box-shadow: 0 2px 6px rgba(29, 99, 211, 0.3) !important;
+        transition: all 0.2s ease;
+    }
+    .btn-primary:hover {
+        background-color: #154bad !important;
+        transform: translateY(-1px);
+    }
+
+    /* 7. Contenedores de las tablas (Cards) */
+    .card {
+        border-radius: 8px !important;
+        border: none !important;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.04) !important;
+    }
+</style>
+
 <body>
     <header id="header" class="header fixed-top d-flex align-items-center">
 

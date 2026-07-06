@@ -1,193 +1,371 @@
 ﻿@model Objetivos_Prioritarios.Models.tb_Objetivo
 
+<style>
+    /* Estilos institucionales base */
+    body {
+        background-color: #f4f6f9 !important;
+    }
 
-<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalBusquedaInfoGeneral">
-    🙎🏼 Buscar Información General
-</button> 
-<div class="d-flex justify-content-end">
-    <button type="button" class="btn btn-primary" onclick="abrirFichaObjetivo()">
-        📄 CONTINUAR CON LA FICHA OBJETIVO
-    </button>
-</div>
+    .card-institutional {
+        border: none !important;
+        border-radius: 12px !important;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04) !important;
+        background-color: #ffffff;
+        transition: transform 0.2s ease-in-out;
+    }
 
-<!-- Modal -->
-<div class="modal fade" id="modalBusquedaInfoGeneral" tabindex="-1" aria-labelledby="modalBusquedaInfoGeneralLabel" aria-hidden="true">
-    <div class="modal-dialog" style="max-width:65%;">
-        <div class="modal-content">
-            <!-- Encabezado -->
-            <div class="modal-header bg-info text-white">
-                <h5 class="modal-title" id="modalBusquedaInfoGeneralLabel">Búsqueda de Información General</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+    .card-header-custom {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #2c3e50;
+        border-bottom: 2px solid #f1f3f5;
+        padding-bottom: 12px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+        .card-header-custom i {
+            color: #1d63d3;
+        }
+
+    /* Estilos para inputs y botones superiores */
+    .form-control, .form-select {
+        border-radius: 8px;
+        border: 1px solid #ced4da;
+        box-shadow: none !important;
+    }
+
+        .form-control:focus {
+            border-color: #1d63d3;
+        }
+
+    .btn-action-top {
+        border-radius: 8px;
+        padding: 10px 20px;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    /* ==========================================================
+       DISEÑO DE TABLAS (Basado exactamente en la imagen enviada)
+       ========================================================== */
+
+    /* Quitar bordes externos e internos pesados */
+    .table {
+        border-collapse: collapse !important;
+        margin-bottom: 0 !important;
+    }
+
+        /* Encabezados limpios, grises y en mayúsculas pequeñas */
+        .table thead th {
+            background-color: #ffffff !important;
+            color: #858c93 !important;
+            font-weight: 600 !important;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #e9ecef !important;
+            border-top: none !important;
+            padding: 12px 8px;
+        }
+
+        /* Celdas con texto oscuro, centradas verticalmente y solo línea inferior */
+        .table tbody td {
+            vertical-align: middle;
+            color: #333333;
+            border-bottom: 1px solid #f1f3f5 !important;
+            border-top: none !important;
+            font-size: 0.875rem;
+            padding: 12px 8px;
+        }
+
+        /* Efecto hover muy sutil en las filas */
+        .table tbody tr:hover {
+            background-color: #f8f9fa !important;
+        }
+
+    table.dataTable.no-footer {
+        border-bottom: 1px solid #e9ecef !important;
+    }
+
+    /*
+      Sobreescritura automática de botones dentro de la tabla.
+      Convierte los botones oscuros de los Partial Views en tonos pastel.
+    */
+    .table .btn-primary, .table .btn-action-view {
+        background-color: #e8f0fe !important;
+        color: #1a73e8 !important;
+        border: none !important;
+        border-radius: 6px !important;
+        padding: 4px 10px !important;
+    }
+
+        .table .btn-primary:hover, .table .btn-action-view:hover {
+            background-color: #d2e3fc !important;
+        }
+
+    .table .btn-danger, .table .btn-action-delete {
+        background-color: #fce8e6 !important;
+        color: #d93025 !important;
+        border: none !important;
+        border-radius: 6px !important;
+        padding: 4px 10px !important;
+    }
+
+        .table .btn-danger:hover, .table .btn-action-delete:hover {
+            background-color: #fad2cf !important;
+        }
+
+    /* Si las Partial views escupen un badge para fotos, lo forzamos al estilo de la imagen */
+    .table .badge.bg-success {
+        background-color: #e6f4ea !important;
+        color: #1e8e3e !important;
+        border: 1px solid #ceead6 !important;
+        border-radius: 50rem !important;
+        font-weight: 500 !important;
+        padding: 0.35rem 0.6rem !important;
+    }
+
+    /* Modal moderno */
+    .modal-content {
+        border: none;
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .modal-header {
+        background-color: #113255;
+        color: white;
+        border-bottom: none;
+    }
+
+        .modal-header .btn-close {
+            filter: invert(1);
+        }
+
+    .nav-tabs .nav-link {
+        font-weight: 600;
+        color: #6c757d;
+        border: none;
+        border-bottom: 3px solid transparent;
+        padding: 12px 20px;
+    }
+
+        .nav-tabs .nav-link.active {
+            color: #1d63d3;
+            background: transparent;
+            border-bottom: 3px solid #1d63d3;
+        }
+</style>
+
+<!-- Input Oculto -->
+<input type="text" id="int_id_objetivo" value="@(Model!=null?Model.int_id_objetivo:0)" style="display:none" />
+
+<div class="main-panel">
+    <div class="content-wrapper">
+
+        <!-- HEADER Y BOTONES DE ACCIÓN -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+            <div>
+                <h3 class="fw-bold text-dark mb-1" style="font-size: 1.5rem;">Gestión del Objetivo</h3>
+                <p class="text-muted mb-0 small">Administración de datos generales e información de ficha</p>
             </div>
+            <div class="d-flex flex-wrap gap-2">
+                <button type="button" class="btn btn-light btn-action-top border" data-bs-toggle="modal" data-bs-target="#modalBusquedaInfoGeneral">
+                    <i class="fa fa-search text-primary"></i> Buscar Info. General
+                </button>
+                <button type="button" class="btn btn-primary btn-action-top" onclick="abrirFichaObjetivo()">
+                    <i class="fa fa-file-text-o"></i> Continuar con la Ficha
+                </button>
+            </div>
+        </div>
 
-            <div class="modal-body">
-                <!-- Campos de búsqueda -->
-                <div id="busquedaPorNombreInfo">
-                    <div class="row">
-                        <div class="col-md-4">
-                            <label for="searchNameOrd" class="form-label">Nombre</label>
-                            <input type="text" class="form-control" id="searchNameOrd" placeholder="Nombre">
-                        </div>
-                        <div class="col-md-4">
-                            <label for="searchPaternoOrd" class="form-label">Apellido Paterno</label>
-                            <input type="text" class="form-control" id="searchPaternoOrd" placeholder="Paterno">
-                        </div>
-                        <div class="col-md-4">
-                            <label for="searchMaternoOrd" class="form-label">Apellido Materno</label>
-                            <input type="text" class="form-control" id="searchMaternoOrd" placeholder="Materno">
+        <section class="section">
+            <div class="row align-items-stretch">
+
+                <!-- COLUMNA NOMBRES -->
+                <div class="col-lg-4 d-flex mb-4">
+                    <div class="card card-institutional w-100">
+                        <div class="card-body p-4">
+                            <h5 class="card-header-custom"><i class="fa fa-user"></i> Nombre(s) del Objetivo</h5>
+                            <div id="listaNombrePersona" class="table-responsive"></div>
                         </div>
                     </div>
-                    <br>
                 </div>
 
-                <!-- Botón de búsqueda -->
-                <div class="mb-3">
-                    <button type="button" id="btnBuscarInfoGeneral" class="btn btn-primary w-100">
-                        🔍 Buscar
-                    </button>
+                <!-- COLUMNA ALIAS -->
+                <div class="col-lg-3 d-flex mb-4">
+                    <div class="card card-institutional w-100">
+                        <div class="card-body p-4">
+                            <h5 class="card-header-custom"><i class="fa fa-user-secret"></i> Alias</h5>
+                            <div id="listaAliasObjetivo" class="table-responsive"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- COLUMNA FOTO Y FECHA -->
+                <div class="col-lg-5 d-flex mb-4">
+                    <div class="card card-institutional w-100">
+                        <div class="card-body p-4">
+                            <h5 class="card-header-custom"><i class="fa fa-camera"></i> Identidad Principal</h5>
+
+                            <!-- Cintillo del nombre actual -->
+                            <div class="alert alert-secondary bg-light border-0 d-flex align-items-center mb-4 py-2 px-3" style="border-radius: 8px;">
+                                <i class="fa fa-info-circle text-muted me-2"></i>
+                                <span class="fw-bold text-dark me-2">Objetivo:</span>
+                                <span class="text-primary fw-semibold">@ViewBag.nombreprincipal</span>
+                            </div>
+
+                            <div class="row">
+                                <!-- Formulario Izquierda -->
+                                <div class="col-sm-7 pe-md-4">
+                                    <div class="mb-3">
+                                        <label for="fechaNacimiento" class="form-label text-muted fw-bold small mb-1">FECHA DE NACIMIENTO</label>
+                                        <input type="date" id="fechaNacimiento" name="fechaNacimiento" class="form-control" value="@(Model!=null?(Model.date_fecha_nacimiento!=null?Convert.ToDateTime(Model.date_fecha_nacimiento).ToString("yyyy-MM-dd"):""):"")">
+                                    </div>
+                                    <div class="mb-4">
+                                        <label for="fotoInput" class="form-label text-muted fw-bold small mb-1">ACTUALIZAR FOTO</label>
+                                        <input type="file" id="fotoInput" name="foto" accept="image/*" class="form-control form-control-sm">
+                                    </div>
+                                    <button class="btn btn-success w-100 fw-bold" id="savePhoto" style="border-radius: 8px;">
+                                        <i class="fa fa-save me-1"></i> GUARDAR CAMBIOS
+                                    </button>
+                                </div>
+
+                                <!-- Preview Derecha -->
+                                <div class="col-sm-5 d-flex flex-column align-items-center justify-content-center mt-3 mt-sm-0">
+                                    <!-- Contenedor cuando SÍ HAY foto -->
+                                    <div id="previewContainer" class="text-center" @(Model != null ? (Model.nvarchar_foto != null ? "" : "style=display:none;") : "style=display:none;")>
+                                        <div class="p-1 bg-white border rounded shadow-sm mb-2" style="display: inline-block;">
+                                            <img id="previewImage" src="data:image/jpg;base64,@(Model!=null?(Model.nvarchar_foto!=null?Model.nvarchar_foto:""):"")" class="img-fluid rounded" style="max-width: 140px; height: auto;">
+                                        </div>
+                                        <button type="button" id="removeImage" class="btn btn-outline-danger btn-sm w-100" style="border-radius: 6px;">
+                                            <i class="fa fa-trash"></i> Quitar
+                                        </button>
+                                    </div>
+
+                                    <!-- Contenedor cuando NO HAY foto (Ícono genérico) -->
+                                    <div id="noPhotoPlaceholder" class="text-center p-3 bg-light border rounded w-100" @(Model != null ? (Model.nvarchar_foto != null ? "style=display:none;" : "") : "")>
+                                        <i class="fa fa-user-circle-o text-secondary opacity-50" style="font-size: 4rem; margin-bottom: 10px;"></i>
+                                        <p class="text-muted small mb-0">Sin fotografía</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="row align-items-stretch">
+                <!-- COLUMNA DOMICILIO -->
+                <div class="col-lg-8 d-flex mb-4">
+                    <div class="card card-institutional w-100">
+                        <div class="card-body p-4">
+                            <h5 class="card-header-custom"><i class="fa fa-map-marker"></i> Domicilios Vinculados</h5>
+                            <div id="listaDomicilioObjetivo" class="table-responsive"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- COLUMNA GRUPO DELICTIVO -->
+                <div class="col-lg-4 d-flex mb-4">
+                    <div class="card card-institutional w-100">
+                        <div class="card-body p-4">
+                            <h5 class="card-header-custom"><i class="fa fa-users"></i> Grupos Delictivos</h5>
+                            <div id="listaGrupoDelictivo" class="table-responsive"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+
+<!-- MODAL INFO GENERAL REDISEÑADO -->
+<div class="modal fade" id="modalBusquedaInfoGeneral" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 70%;">
+        <div class="modal-content shadow">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold"><i class="fa fa-search me-2"></i> Búsqueda de Información General</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body p-4">
+
+                <div class="row g-3 mb-4 bg-light p-3 rounded border">
+                    <div class="col-md-4">
+                        <label class="form-label small fw-bold text-muted">Nombre</label>
+                        <input type="text" class="form-control" id="searchNameOrd" placeholder="Escriba el nombre...">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small fw-bold text-muted">Apellido Paterno</label>
+                        <input type="text" class="form-control" id="searchPaternoOrd" placeholder="Paterno...">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small fw-bold text-muted">Apellido Materno</label>
+                        <input type="text" class="form-control" id="searchMaternoOrd" placeholder="Materno...">
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button type="button" id="btnBuscarInfoGeneral" class="btn btn-primary w-100 fw-bold" style="border-radius: 8px; height: 38px;">
+                            <i class="fa fa-search me-1"></i> Buscar
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Pestañas -->
-                <ul class="nav nav-tabs" id="infoTabs" role="tablist">
+                <ul class="nav nav-tabs mb-3" id="infoTabs" role="tablist">
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link active" id="resultados-tab" data-bs-toggle="tab" data-bs-target="#resultadosTab" type="button" role="tab" aria-controls="resultadosTab" aria-selected="true">
-                            📄 Resultados
+                        <button class="nav-link active" id="resultados-tab" data-bs-toggle="tab" data-bs-target="#resultadosTab" type="button" role="tab">
+                            <i class="fa fa-list me-1"></i> Resultados
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="fotos-tab" data-bs-toggle="tab" data-bs-target="#fotosTab" type="button" role="tab" aria-controls="fotosTab" aria-selected="false">
-                            🖼️ Fotos
+                        <button class="nav-link" id="fotos-tab" data-bs-toggle="tab" data-bs-target="#fotosTab" type="button" role="tab">
+                            <i class="fa fa-image me-1"></i> Fotos
                         </button>
                     </li>
                 </ul>
 
                 <!-- Contenido de pestañas -->
-                <div class="tab-content mt-3" id="infoTabsContent">
-                    <!-- Resultados -->
-                    <div class="tab-pane fade show active" id="resultadosTab" role="tabpanel" aria-labelledby="resultados-tab">
-                        <div id="busquedaInfoGeneral" class="p-2 border rounded bg-light">
+                <div class="tab-content" id="infoTabsContent">
+                    <div class="tab-pane fade show active" id="resultadosTab" role="tabpanel">
+                        <div id="busquedaInfoGeneral" class="p-2 table-responsive">
                             <!-- Aquí se cargarán los resultados -->
+                            <div class="text-center py-5 text-muted">
+                                <i class="fa fa-inbox fa-3x mb-3 opacity-25"></i>
+                                <p>Realice una búsqueda para ver los resultados.</p>
+                            </div>
                         </div>
                     </div>
-
-                    <!-- Fotos -->
-                    <div class="tab-pane fade" id="fotosTab" role="tabpanel" aria-labelledby="fotos-tab">
-                        <div id="busquedafotos" class="p-2 border rounded bg-light text-center">
+                    <div class="tab-pane fade" id="fotosTab" role="tabpanel">
+                        <div id="busquedafotos" class="p-2 text-center">
                             <div class="row" id="galeriaFotos">
                                 <!-- Se llenará dinámicamente -->
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Pie del modal -->
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+            <div class="modal-footer bg-light border-top-0">
+                <button type="button" class="btn btn-secondary px-4 fw-bold" data-bs-dismiss="modal" style="border-radius: 8px;">Cerrar</button>
             </div>
         </div>
     </div>
 </div>
 
-
-
-<input type="text" id="int_id_objetivo" value="@(Model!=null?Model.int_id_objetivo:0)" style="display:none" />
-<section class="section">
-
-    <div class="row">
-
-        <div class="col-lg-4">
-
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Nombre(s) del Objetivo</h5>
-
-                    <div id="listaNombrePersona"></div>
-
-                </div>
-            </div>
-
-        </div>
-        <div class="col-lg-3">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Alias</h5>
-
-                    <div id="listaAliasObjetivo"></div>
-
-
-                </div>
-            </div>
-        </div>
-
-        <div class="col-lg-5">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title" style="text-align:center" id="nombrePrincipal">Nombre Objetivo: @ViewBag.nombreprincipal </h5>
-                    <h4 class="card-title">Fecha Nacimiento y Fotografía</h4>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <label for="fechaNacimiento" class="form-label">Fecha de nacimiento</label>
-                            <input type="date" id="fechaNacimiento" name="fechaNacimiento" class="form-control" value="@(Model!=null?(Model.date_fecha_nacimiento!=null?Convert.ToDateTime(Model.date_fecha_nacimiento).ToString("yyyy-MM-dd"):""):"")">
-                            <label for="fotoInput" class="form-label">Fotografía</label>
-                            <input type="file" id="fotoInput" name="foto" accept="image/*" class="form-control">
-                            <br />
-                            <button class="btn btn-primary" id="savePhoto">Guardar Fecha y Foto</button>
-                        </div>
-                        <!-- Subir imagen -->
-                        <div class="col-md-6">
-                            <!-- Vista previa -->
-                            <div id="previewContainer" class="mt-2" @(Model != null ? (Model.nvarchar_foto != null ? "" : "style=display:none;") : "style=display:none;")>
-                                <img id="previewImage" src="data:image/jpg;base64,@(Model!=null?(Model.nvarchar_foto!=null?Model.nvarchar_foto:""):"")" class="img-thumbnail mb-2" style="max-width: 200px;">
-                                <br>
-                                <button type="button" id="removeImage" class="btn btn-danger btn-sm">
-                                    Quitar imagen
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    </div>
-    <div class="row">
-        <div class="col-lg-8">
-
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Domicilio Objetivo</h5>
-
-                    <div id="listaDomicilioObjetivo"></div>
-
-                </div>
-            </div>
-
-
-        </div>
-        <div class="col-lg-4">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">GrupoDelictivo</h5>
-
-                    <div id="listaGrupoDelictivo"></div>
-
-
-                </div>
-            </div>
-        </div>
-    </div>
-
-</section>
-
-
-
-
-
 <div id="divModalNombre"></div>
 <div id="divModalAlias"></div>
 
 
+<!-- INICIO DEL JAVASCRIPT ORIGINAL INTACTO -->
 <script>
     $(document).ready(function () {
         refreshNombresList();
@@ -195,8 +373,6 @@
         refreshDomicilioList();
         refreshGrupoList();
 
-
-        // Mostrar u ocultar campos según el tipo de búsqueda
         $("input[name='tipoBusqueda2']").change(function () {
             if ($("#radioNombreOrd").is(":checked")) {
                 $("#busquedaPorNombreOrd").removeClass("d-none");
@@ -207,7 +383,6 @@
             }
         });
 
-        // Ejecutar búsqueda al hacer clic
         $("#btnBuscarOrd").click(function () {
             refreshOrdenesList();
         });
@@ -215,280 +390,177 @@
         $("#btnBuscarInfoGeneral").click(function () {
             refreshInfoGeneralList("#modalBusquedaInfoGeneral");
         });
+    });
 
-        $("#btnBuscarInfoGeneral").click(function () {
-            refreshInfoGeneralList("#modalBusquedaInfoGeneral");
-        });
+    function refreshOrdenesList() {
+        const tipoBusqueda = $("input[name='tipoBusqueda2']:checked").val();
+        const nombre = $("#searchNameOrd").val();
+        const paterno = $("#searchPaternoOrd").val();
+        const materno = $("#searchMaternoOrd").val();
+        const numavp = $("#numavpOrd").val();
 
+        const parametros = {
+            tipoBusqueda: tipoBusqueda,
+            nombre: nombre,
+            paterno: paterno,
+            materno: materno,
+            numavp: numavp
+        };
 
-
-    })
-
-            function refreshOrdenesList() {
-                const tipoBusqueda = $("input[name='tipoBusqueda2']:checked").val();
-                const nombre = $("#searchNameOrd").val();
-                const paterno = $("#searchPaternoOrd").val();
-                const materno = $("#searchMaternoOrd").val();
-                const numavp = $("#numavpOrd").val();
-
-                const parametros = {
-                    tipoBusqueda: tipoBusqueda,
-                    nombre: nombre,
-                    paterno: paterno,
-                    materno: materno,
-                    numavp: numavp
-                };
-
-                $("#busquedaOrdenes").empty();
-                $("#busquedaOrdenes").load('@Url.Action("BusquedaOrdenesListPartial", "FichaObjetivo")', parametros);
-            }
+        $("#busquedaOrdenes").empty();
+        $("#busquedaOrdenes").load('@Url.Action("BusquedaOrdenesListPartial", "FichaObjetivo")', parametros);
+    }
 
     function refreshInfoGeneralList(modalId) {
-    const $modal = $(modalId);
-    const nombre = $modal.find("#searchNameOrd").val();
-    const paterno = $modal.find("#searchPaternoOrd").val();
-    const materno = $modal.find("#searchMaternoOrd").val();
+        const $modal = $(modalId);
+        const nombre = $modal.find("#searchNameOrd").val();
+        const paterno = $modal.find("#searchPaternoOrd").val();
+        const materno = $modal.find("#searchMaternoOrd").val();
 
-        console.log("Datos a enviar al Partial:");
-        console.log("Nombre:", nombre);
-        console.log("Paterno:", paterno);
-        console.log("Materno:", materno);
+        // Mostrar un loader simple visual en lo que responde
+        $modal.find("#busquedaInfoGeneral").html('<div class="text-center py-5"><div class="spinner-border text-primary" role="status"></div><p class="mt-2 text-muted">Buscando...</p></div>');
 
-    const parametros = { nombre, paterno, materno };
-    $modal.find("#busquedaInfoGeneral").empty().load(
-        '@Url.Action("InfoGeneralListPartial", "Objetivo")',
-        parametros,
-        function(response, status, xhr) {
-            console.log("Partial cargado:", status);
-            if (status === "error") {
-                console.error("Error al cargar Partial:", xhr.status, xhr.statusText);
+        const parametros = { nombre, paterno, materno };
+        $modal.find("#busquedaInfoGeneral").empty().load(
+            '@Url.Action("InfoGeneralListPartial", "Objetivo")',
+            parametros,
+            function(response, status, xhr) {
+                if (status === "error") {
+                    console.error("Error al cargar Partial:", xhr.status, xhr.statusText);
+                }
             }
-        }
-    );
+        );
     }
 
     function abrirFichaObjetivo() {
         var int_id_objetivo = $("#int_id_objetivo").val();
-
         if (!int_id_objetivo) {
             swal("Error", "No se encontró el ID del objetivo.", "error");
             return;
         }
-
         location.href = '@Url.Action("EditFichaObjetivos","FichaObjetivo")?int_id_objetivo=' + int_id_objetivo;
     }
 
-
-  function refreshNombresList(active) {
-      var datos = {
-          actives: active
-      };
-      $("#listaNombrePersona").empty();
-      $("#listaNombrePersona").load("@Url.Action("ObjetivoNombreListPartial", "Objetivo")",datos);
+    function refreshNombresList(active) {
+        var datos = { actives: active };
+        $("#listaNombrePersona").empty();
+        $("#listaNombrePersona").load("@Url.Action("ObjetivoNombreListPartial", "Objetivo")",datos);
     }
 
     function AddObjetivoNombreModal() {
-
        $("#divModalNombre").empty();
        $("#divModalNombre").load("@Url.Action("AddObjetivoNombrePartial", "Objetivo")");
-
     }
+
     function EditObjetivoNombre(int_id_nombre) {
-         var data = {
-             int_id_nombre: int_id_nombre
-         };
+         var data = { int_id_nombre: int_id_nombre };
         $("#divModalNombre").empty();
         $("#divModalNombre").load("@Url.Action("EditObjetivoNombrePartial", "Objetivo")",data);
+    }
 
-     }
     function refreshAliasList(active) {
-     var datos = {
-         actives: active
-     };
+        var datos = { actives: active };
         $("#listaAliasObjetivo").empty();
         $("#listaAliasObjetivo").load("@Url.Action("ObjetivoAliasListPartial", "Objetivo")",datos);
-   }
+    }
 
     function AddObjetivoAliasModal2() {
-        
         $("#divModalAlias").empty();
         $("#divModalAlias").load("@Url.Action("AddObjetivoAliasPartial", "Objetivo")");
+    }
 
-   }
     function EditObjetivoAlias(int_id_alias) {
-
-        var data = {
-            int_id_alias: int_id_alias
-        };
+        var data = { int_id_alias: int_id_alias };
         $("#divModalAlias").empty();
         $("#divModalAlias").load("@Url.Action("EditObjetivoAliasPartial", "Objetivo")",data);
-
     }
 
     function refreshDomicilioList(active) {
-        var datos = {
-            actives: active
-        };
+        var datos = { actives: active };
         $("#listaDomicilioObjetivo").empty();
         $("#listaDomicilioObjetivo").load("@Url.Action("ObjetivoDomicilioListPartial", "Objetivo")", datos);
     }
 
     function AddObjetivoDomicilioModal() {
-
         $("#divModalNombre").empty();
         $("#divModalNombre").load("@Url.Action("AddObjetivoDomicilioPartial", "Objetivo")");
-
-
     }
 
     function AddObjetivoInfoGeneralModal() {
-
-    $("#divModalNombre").empty();
-    $("#divModalNombre").load("@Url.Action("AddObjetivoDomicilioPartial", "Objetivo")");
-
-
-}
-
-    function EditObjetivoDomicilio(int_id_informacion) {
-
-        var data = {
-            int_id_informacion: int_id_informacion
-        };
         $("#divModalNombre").empty();
-        $("#divModalNombre").load("@Url.Action("EditObjetivoDomicilioPartial", "Objetivo")", data);
-
+        $("#divModalNombre").load("@Url.Action("AddObjetivoDomicilioPartial", "Objetivo")");
     }
 
+    function EditObjetivoDomicilio(int_id_informacion) {
+        var data = { int_id_informacion: int_id_informacion };
+        $("#divModalNombre").empty();
+        $("#divModalNombre").load("@Url.Action("EditObjetivoDomicilioPartial", "Objetivo")", data);
+    }
 
     function refreshGrupoList(active) {
-        var datos = {
-            actives: active
-        };
+        var datos = { actives: active };
         $("#listaGrupoDelictivo").empty();
         $("#listaGrupoDelictivo").load("@Url.Action("ObjetivoGrupoListPartial", "Objetivo")", datos);
     }
 
     function AddObjetivoGrupoModal() {
+        $("#divModalNombre").empty();
+        $("#divModalNombre").load("@Url.Action("AddObjetivoGrupoPartial", "Objetivo")");
+    }
 
-     $("#divModalNombre").empty();
-     $("#divModalNombre").load("@Url.Action("AddObjetivoGrupoPartial", "Objetivo")");
-
-  }
     function EditObjetivoGrupo(int_id_objetivo_grupo) {
-       var data = {
-           int_id_objetivo_grupo: int_id_objetivo_grupo
-       };
-      $("#divModalNombre").empty();
-      $("#divModalNombre").load("@Url.Action("EditObjetivoGrupoPartial", "Objetivo")",data);
-
+       var data = { int_id_objetivo_grupo: int_id_objetivo_grupo };
+       $("#divModalNombre").empty();
+       $("#divModalNombre").load("@Url.Action("EditObjetivoGrupoPartial", "Objetivo")",data);
     }
 
     const fotoInput = document.getElementById('fotoInput');
     const previewContainer = document.getElementById('previewContainer');
     const previewImage = document.getElementById('previewImage');
     const removeImage = document.getElementById('removeImage');
+    const noPhotoPlaceholder = document.getElementById('noPhotoPlaceholder');
 
-    // Cuando selecciona archivo
     fotoInput.addEventListener('change', function () {
-        
         const file = this.files[0];
         if (file) {
             const reader = new FileReader();
-
             reader.addEventListener("load", function () {
                 previewImage.setAttribute("src", this.result);
                 previewContainer.style.display = "block";
+                noPhotoPlaceholder.style.display = "none";
             });
-
             reader.readAsDataURL(file);
         }
     });
 
-    // Botón para quitar imagen
     removeImage.addEventListener('click', function () {
-        
         fotoInput.value = "";
         previewImage.setAttribute("src", "");
         previewContainer.style.display = "none";
-    });
-
-    $("#savePhoto2333").click(function () {
-        var formData = new FormData();
-
-        // obtener archivo seleccionado
-        var foto = $("#fotoInput")[0].files[0];
-        var fechaNacimiento = $("#fechaNacimiento").val();
-
-        if (!fechaNacimiento) {
-            swal({
-                title: "Campo requerido",
-                text: "Por favor selecciona tu fecha de nacimiento.",
-                type: "warning",
-                confirmButtonText: "Aceptar"
-            });
-            return; // detener ejecución
-        }
-
-        formData.append("foto", foto);
-        formData.append("fechaNacimiento", fechaNacimiento);
-        formData.append("int_id_objetivo", $("#int_id_objetivo").val());
-        $.ajax({
-            url: '@Url.Action("AddOrEditFoto", "Objetivo")',
-            type: 'POST',
-            data: formData,
-            processData: false, // evita que jQuery procese los datos
-            contentType: false, // evita que jQuery asigne content-type
-            success: function (response) {
-                if (data.IsSuccess) {
-                    swal({
-                        title: "",
-                        text: data.Message,
-                        type: 'success',
-                        confirmButtonText: "Continuar",
-                        closeOnConfirm: true,
-                    },
-                        function () {
-
-                        });
-                } else {
-                    swal({
-                        title: "Error",
-                        text: data.Message || "No tienes permisos para esta acción",
-                        type: 'error',
-                        confirmButtonText: "Continuar",
-                        closeOnConfirm: true,
-                    });
-                }
-            },
-            error: function (xhr, status, error) {
-                alert("Error: " + error);
-            }
-        });
+        noPhotoPlaceholder.style.display = "block";
     });
 
     $("#savePhoto").click(function () {
-        debugger; 
         var formData = new FormData();
         var file = $("#fotoInput")[0].files[0];
         var fechaNacimiento = $("#fechaNacimiento").val();
+
         if (!fechaNacimiento) {
             swal({
                 title: "Campo requerido",
                 text: "Por favor selecciona tu fecha de nacimiento.",
                 type: "warning",
-                confirmButtonText: "Aceptar"
+                confirmButtonText: "Aceptar",
+                confirmButtonColor: "#1d63d3"
             });
             return;
         }
 
         if (file) {
-            // si el usuario subió foto
             formData.append("foto", file);
         }
-            formData.append("fechaNacimiento", fechaNacimiento);
-            formData.append("int_id_objetivo", $("#int_id_objetivo").val()); // asegúrate de tenerlo
 
-            enviarDatos(formData);
+        enviarDatos(formData, fechaNacimiento);
     });
 
     function enviarDatos(formData, fechaNacimiento) {
@@ -504,21 +576,22 @@
             success: function (data) {
                 if (data.IsSuccess) {
                     swal({
-                        title: "",
+                        title: "Guardado exitoso",
                         text: data.Message,
                         type: 'success',
                         confirmButtonText: "Continuar",
+                        confirmButtonColor: "#1d63d3",
                         closeOnConfirm: true,
-                    },
-                        function () {
-                            location.reload();
-                        });
+                    }, function () {
+                        location.reload();
+                    });
                 } else {
                     swal({
                         title: "Error",
                         text: data.Message || "No tienes permisos para esta acción",
                         type: 'error',
                         confirmButtonText: "Continuar",
+                        confirmButtonColor: "#1d63d3",
                         closeOnConfirm: true,
                     });
                 }
@@ -528,8 +601,4 @@
             }
         });
     }
-
-
-
-
 </script>

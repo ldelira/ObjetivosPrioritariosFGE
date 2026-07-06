@@ -95,6 +95,22 @@
             }
         },
         {
+            title: "Rol en asunto",
+            data: "rol_participacion",
+            orderable: true,
+            render: function (data, type, full) {
+                return data ? `<span class="op-badge op-badge-muted">${data}</span>` : `<span class="op-badge op-badge-muted">Por definir</span>`;
+            }
+        },
+        {
+            title: "Participación",
+            data: "nvarchar_descripcion_participacion",
+            orderable: true,
+            render: function (data, type, full) {
+                return data || "";
+            }
+        },
+        {
             title: "Estatus Proceso",
             data: "nvarchar_descripcion_estatus",
             orderable: true,
@@ -314,7 +330,7 @@
 
 
     $(document).on('click', '.ver-foto2', function (e) {
-       
+
     e.preventDefault();
 
     var id = $(this).data('id');

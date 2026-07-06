@@ -55,32 +55,95 @@ namespace Objetivos_Prioritarios.Controllers
         }
 
 
-        public ActionResult EditFichaObjetivos(int int_id_objetivo)
+        [HttpPost]
+        public JsonResult CrearObjetivoFicha()
         {
-            var busquedaFicha = FichaObjetivoService.addorgetFichObjetivo(int_id_objetivo);
+            try
+            {
+                var result = ObjetivoService.addObjetivoFicha();
 
-            // 1. Obtener catálogo de estatus
-            var catestatus = AsuntoService.GetEstatusProcesos(true).ToList();
+                if (result == null || result.int_id_objetivo <= 0)
+                {
+                    return Json(new
+                    {
+                        IsSuccess = false,
+                        Message = "No se pudo crear el objetivo."
+                    }, JsonRequestBehavior.AllowGet);
+                }
+
+                string url = Url.Action("EditFichaObjetivos", "FichaObjetivo", new
+                {
+                    int_id_objetivo = result.int_id_objetivo
+                });
+
+                return Json(new
+                {
+                    IsSuccess = true,
+                    Message = "Objetivo creado correctamente.",
+                    int_id_objetivo = result.int_id_objetivo,
+                    RedirectUrl = url
+                }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    IsSuccess = false,
+                    Message = "Ocurrió un error al crear el objetivo: " + ex.Message
+                }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+
+        public ActionResult EditFichaObjetivos(int? int_id_objetivo)
+        {
+            if (int_id_objetivo == null || int_id_objetivo <= 0)
+            {
+                TempData["Error"] = "No se encontró el objetivo seleccionado.";
+                return RedirectToAction("Index", "Objetivo");
+            }
+
+            int idObjetivo = int_id_objetivo.Value;
+
+            var busquedaFicha = FichaObjetivoService.addorgetFichObjetivo(idObjetivo);
 
             ViewBag.CatalogoEstatus = AsuntoService.GetEstatusProcesos(true).ToList();
-            var idficha = ObjetivoService.GetIdFichaObjetivo(int_id_objetivo);
+
+            var idficha = ObjetivoService.GetIdFichaObjetivo(idObjetivo);
 
             ViewBag.EstatusActual = ObjetivoService.GetEstatusObjetivo(idficha);
 
-            ViewBag.Nombre = ObjetivoService.ObtenerNombreCompletoPrincipal(int_id_objetivo);
+            ViewBag.Nombre = ObjetivoService.ObtenerNombreCompletoPrincipal(idObjetivo);
 
-            ViewBag.Nombress = ObjetivoService.ObtenerNombreCompletoSecundarios(int_id_objetivo);
+            ViewBag.Nombress = ObjetivoService.ObtenerNombreCompletoSecundarios(idObjetivo);
 
-            var alias = ObjetivoService.getAliasObjetivoList(true, int_id_objetivo);
+            var alias = ObjetivoService.getAliasObjetivoList(true, idObjetivo);
             ViewBag.Alias = alias.Select(x => x.nvarchar_alias).ToList();
 
-            var grupos = ObjetivoService.GetGruposDelictivosObjetivo(int_id_objetivo);
+            var grupos = ObjetivoService.GetGruposDelictivosObjetivo(idObjetivo);
             ViewBag.GruposDelictivos = grupos;
 
             ViewBag.Observacion = ObjetivoService.GetObservacionObjetivo(idficha);
             ViewBag.DescripcionEstatus = ObjetivoService.GetDescripcionEstatusObjetivo(idficha);
 
-            ViewBag.fotobase64 = ObjetivoService.GetFotoObjetivo(int_id_objetivo);
+            ViewBag.fotobase64 = ObjetivoService.GetFotoObjetivo(idObjetivo);
+
+            ViewBag.EstatusAsuntoList = AsuntoService.db.cat_EstatusAsunto.ToList();
+
+
+            ViewBag.CountNombres = ObjetivoService.getNombreObetivoList(true, idObjetivo).Count();
+            ViewBag.CountAlias = ObjetivoService.getAliasObjetivoList(true, idObjetivo).Count();
+            ViewBag.CountDomicilios = ObjetivoService.getDomicilioObjetivoList(true, idObjetivo).Count();
+            ViewBag.CountGrupos = ObjetivoService.GetGruposDelictivosObjetivo(idObjetivo).Count();
+
+            ViewBag.CountCarpetas = FichaObjetivoService.GetCarpetasList(true, idObjetivo).Count();
+            ViewBag.CountOrdenes = FichaObjetivoService.GetOrdenesList(true, idObjetivo).Count();
+            ViewBag.CountFiliacion = FichaObjetivoService.GetDelitosList(true, idObjetivo).Count();
+
+            ViewBag.RolesParticipacionAsunto = AsuntoService.GetRolesParticipacionAsunto(true).ToList();
+
+            ViewBag.CountAsuntos = AsuntoService.GetAsuntosByFichaObjetivo(idficha, true).Count();
+
 
             return View(busquedaFicha);
         }

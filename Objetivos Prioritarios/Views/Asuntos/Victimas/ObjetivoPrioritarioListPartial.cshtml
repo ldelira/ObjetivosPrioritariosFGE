@@ -1,5 +1,9 @@
 ﻿@model List<Objetivos_Prioritarios.Models.getNamePhotoList_Result>
 
+@{
+    var rolesParticipacion = ViewBag.RolesParticipacionAsunto as List<Objetivos_Prioritarios.Models.cat_RolParticipacionAsunto>;
+}
+
 @if (Model == null)
 {
     <div class="alert alert-secondary text-center">No hay objetivos prioritarios con la información</div>
@@ -18,25 +22,43 @@ else
                     </div>
                     <div class="modal-body">
                         <div class="row mt-3">
-                            <div class="mb-3">
-                                <label for="observaciones" class="form-label">Observaciones:</label>
-                                <textarea class="form-control" id="observaciones" rows="4"></textarea>
-                            </div>
-                            @*<div class="mb-3">
-                                <div class="mb-3">
-                                    <label for="estatusProceso" class="form-label">Estatus del proceso:</label>
 
-                                    <select id="selectEstatus" class="form-control">
-                                        <option value="">Cargando...</option>
-                                    </select>
-                                </div>
-                            </div>*@
+                            <div class="mb-3">
+                                <label for="selectRolParticipacionAsunto" class="form-label">Rol en el asunto:</label>
+                                <select id="selectRolParticipacionAsunto" class="form-control">
+                                    <option value="">Seleccione un rol...</option>
+                                    @if (rolesParticipacion != null)
+                                    {
+                                        foreach (var rol in rolesParticipacion)
+                                        {
+                                            <option value="@rol.int_id_rol_participacion">@rol.nvarchar_rol</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="descripcionParticipacion" class="form-label">Descripción de participación:</label>
+                                <textarea class="form-control"
+                                          id="descripcionParticipacion"
+                                          rows="3"
+                                          placeholder="Ejemplo: Participó como ejecutor, acompañante, chofer, apoyo logístico, etc."></textarea>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="observaciones" class="form-label">Observaciones de la relación:</label>
+                                <textarea class="form-control"
+                                          id="observaciones"
+                                          rows="3"
+                                          placeholder="Observaciones generales de la relación con el asunto."></textarea>
+                            </div>
+
                         </div>
                     </div>
 
                     <div class="modal-footer">
                         <button class="btn btn-secondary" data-bs-dismiss="modal">
-                        Cerrar
+                            Cerrar
                         </button>
                         <button class="btn btn-success" onclick="guardarObjetivoModal()">
                             Aceptar
@@ -73,8 +95,8 @@ else
                             else if (ViewBag.opcion == 1)
                             {
                                 @*<button class="btn btn-success btn-sm" onclick="addObjetivoAsunto(@item.int_id_objetivo)">
-                <i class="fa fa-check"></i>
-            </button>*@
+                                        <i class="fa fa-check"></i>
+                                    </button>*@
 
                                 <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#modalObjetivo" onclick="setObjetivo(@item.int_id_objetivo)">
                                     <i class="fa fa-check"></i>
@@ -241,9 +263,9 @@ else
         });
     }*@
 
-    
 
-    function addObjetivoAsunto(int_id_objetivo, observaciones) {
+
+    function addObjetivoAsunto(int_id_objetivo, observaciones, int_id_rol_participacion, descripcionParticipacion) {
 
     if (!int_id_objetivo) {
         swal("Error", "No se recibió el ID del objetivo.", "error");
@@ -256,7 +278,9 @@ else
         data: {
             int_id_objetivo: int_id_objetivo,
             int_id_asunto_relacionado: $("#int_id_asunto_relacionado").val(),
-            observaciones: observaciones
+            observaciones: observaciones,
+            int_id_rol_participacion: int_id_rol_participacion,
+            descripcionParticipacion: descripcionParticipacion
         },
         success: function (resp) {
             if (resp.IsSuccess) {
@@ -308,13 +332,23 @@ else
 
     function setObjetivo(id) {
         objetivoSeleccionado = id;
+
+        $("#selectRolParticipacionAsunto").val("");
+        $("#descripcionParticipacion").val("");
+        $("#observaciones").val("");
     }
 
     function guardarObjetivoModal() {
-        //const estatusId = document.getElementById("selectEstatus").value;
-        const observaciones = document.getElementById("observaciones").value;
+        const observaciones = $("#observaciones").val();
+        const int_id_rol_participacion = $("#selectRolParticipacionAsunto").val();
+        const descripcionParticipacion = $("#descripcionParticipacion").val();
 
-        addObjetivoAsunto(objetivoSeleccionado, observaciones);
+        addObjetivoAsunto(
+            objetivoSeleccionado,
+            observaciones,
+            int_id_rol_participacion,
+            descripcionParticipacion
+        );
     }
 
     function addObjetivoAlbum(int_id_objetivo) {

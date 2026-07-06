@@ -1,337 +1,427 @@
 ﻿@model List<Objetivos_Prioritarios.Models.tb_Objetivo>
 
-
-
-
 <div class="main-panel">
     <div class="content-wrapper">
 
-        <div class="row">
-            <div class="col-md-12 stretch-card grid-margin ">
-                <div class="card" >
-                    <div class="card-body card-fixed">
-                        <p class="card-title">Listado de objetivos dados de alta en el sistema</p>
-                        <div class="row">
-                            <div class="col-md-1">
-                                <label class="control-label">Estados:</label>
-                            </div>
-                            <div class="col-md-2">
-                                <select class="form-control" id="estadoGeneral">
-                                    <option value="1" id="1" @((bool)ViewBag.Actives ? "selected" : "")>Activo</option>
-                                    <option value="0" id="0" @(!(bool)ViewBag.Actives ? "selected" : "")>Inactivo</option>
-                                </select>
-                            </div>
-                            <div class="col-md-2"></div>
-                            <div class="col-md-7" style="text-align:right">
-                                <button type="button" class="btn btn-primary"
-                                        onclick="AddObjetivo()">
-                                    Agregar Objetivo Prioritario
-                                </button>
-                            </div>
-
-                        </div>
-                        <br>
-                        <div class="row">
-                            <div class="col-12">
-                                <div class="table-responsive ">
-                                    <table id="generalDataTable" class="dataTable table table-striped" style="width:100%">
-                                    </table>
-                                </div>
-                            </div>
-                            </div>
-                        </div>
-                </div>
-
-
+        <div class="op-page-header">
+            <div>
+                @*<h2>OBJETIVOS PRIORITARIOS</h2>*@
+                <p>Listado de objetivos dados de alta en el sistema</p>
             </div>
+
+            @*<button type="button" class="btn btn-primary" onclick="AddObjetivo2()">
+                <i class="fa fa-plus"></i> Agregar objetivo prioritario
+            </button>*@
         </div>
 
+        <div class="op-card op-card-flat">
 
+            <div class="row align-items-end">
+                <div class="col-md-3">
+                    <label class="control-label">Estado</label>
+                    <select class="form-control" id="estadoGeneral">
+                        <option value="1" @((bool)ViewBag.Actives ? "selected" : "")>Activo</option>
+                        <option value="0" @(!(bool)ViewBag.Actives ? "selected" : "")>Inactivo</option>
+                    </select>
+                </div>
+
+                <div class="col-md-9 d-flex justify-content-end">
+                    <button type="button" class="btn btn-primary" onclick="AddObjetivo2()">
+                        <i class="fa fa-plus"></i> Agregar objetivo prioritario
+                    </button>
+                </div>
+            </div>
+
+            <br />
+
+            <div class="op-table-container">
+                <table id="generalDataTable" class="table table-striped table-hover" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>Id</th>
+                            <th>Nombres</th>
+                            <th>Alias</th>
+                            <th>Grupo</th>
+                            <th>Fecha nacimiento</th>
+                            <th>Fotografía</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+        </div>
 
     </div>
- 
 </div>
-<!-- main-panel ends -->
-
 
 <script>
     $(document).ready(function () {
-        FillGrid();
+        FillGrid($("#estadoGeneral").val() === "1");
     });
 
-    $("#estadoGeneral").change(function () {
-        var valor = $("#estadoGeneral").val();
-        if (valor == "1") {
-            refresobjetivosList(true);
-        } else {
-            refresobjetivosList(false);
-        }
+    $("#estadoGeneral").off("change").on("change", function () {
+        var activo = $("#estadoGeneral").val() === "1";
+        FillGrid(activo);
     });
+
+    function escapeHtml(text) {
+        if (text === null || text === undefined) return "";
+
+        return text.toString()
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+    function limitarTexto(texto, max) {
+        if (!texto) return "";
+
+        texto = texto.toString();
+
+        if (texto.length <= max) {
+            return `<span>${escapeHtml(texto)}</span>`;
+        }
+
+        var corto = texto.substring(0, max) + "...";
+
+        return `
+            <span title="${escapeHtml(texto)}">
+                ${escapeHtml(corto)}
+            </span>
+        `;
+    }
+
+    function badgeFoto(valor) {
+        if (valor && valor.toString().toUpperCase() === "CON FOTO") {
+            return `<span class="op-badge op-badge-success">CON FOTO</span>`;
+        }
+
+        return `<span class="op-badge op-badge-muted">SIN FOTO</span>`;
+    }
+
+    function badgeGrupo(valor) {
+        if (!valor || valor.toString().toUpperCase() === "SIN GRUPO") {
+            return `<span class="op-badge op-badge-muted">SIN GRUPO</span>`;
+        }
+
+        return `<span class="op-badge op-badge-success">${escapeHtml(valor)}</span>`;
+    }
+
+    function formatearFechaMx(data, type) {
+        if (!data) return "";
+
+        var fecha = null;
+
+        // Formato MVC: /Date(1719792000000)/
+        if (typeof data === "string" && data.indexOf("/Date(") === 0) {
+            var timestamp = parseInt(data.replace("/Date(", "").replace(")/", ""));
+            fecha = new Date(timestamp);
+        }
+        // Si ya viene como fecha ISO o texto fecha
+        else {
+            fecha = new Date(data);
+        }
+
+        // Si no se pudo convertir, regresar el dato original
+        if (isNaN(fecha.getTime())) {
+            return data;
+        }
+
+        // Para que DataTables ordene correctamente
+        if (type === "sort" || type === "type") {
+            return fecha.getTime();
+        }
+
+        var dia = ("0" + fecha.getDate()).slice(-2);
+        var mes = ("0" + (fecha.getMonth() + 1)).slice(-2);
+        var anio = fecha.getFullYear();
+
+        return dia + "-" + mes + "-" + anio;
+    }
 
 
     var columnFichaInfo = [
-
         {
             title: "Id",
             data: "int_id_objetivo",
             orderable: true,
-            IsFiltered: false
+            className: "dt-nowrap"
         },
         {
             title: "Nombres",
             data: "Nombres",
             orderable: true,
-            IsFiltered: false
+            className: "dt-text-main",
+            render: function (data) {
+                return limitarTexto(data, 120);
+            }
         },
         {
             title: "Alias",
             data: "Aliases",
             orderable: true,
-            IsFiltered: false
+            className: "dt-text-small",
+            render: function (data) {
+                return limitarTexto(data, 45);
+            }
         },
         {
-            title: "GruposDelictivos",
+            title: "Grupo",
             data: "GruposDelictivos",
             orderable: true,
-            IsFiltered: false
+            className: "dt-nowrap",
+            render: function (data) {
+                return badgeGrupo(data);
+            }
         },
         {
-            title: "Fecha Nacimiento",
-            data: "FechaNacimiento", render: $.fn.dataTable.render.moment(undefined, 'DD-MM-YYYY', 'en'),
+            title: "Fecha nacimiento",
+            data: "FechaNacimiento",
             orderable: true,
-            IsFiltered: false
+            className: "dt-nowrap",
+            render: function (data, type, row) {
+                return formatearFechaMx(data, type);
+            }
         },
         {
             title: "Fotografía",
             data: "TieneFoto",
             orderable: true,
-            IsFiltered: false
+            className: "dt-nowrap",
+            render: function (data) {
+                return badgeFoto(data);
+            }
         },
-
-
         {
             title: "Acciones",
-            data: "int_id_objetivo", render: function (data, type, full, meta) {
-                var action;
-                if ('@ViewBag.Actives'.toUpperCase() === 'TRUE') {
+            data: "int_id_objetivo",
+            orderable: false,
+            searchable: false,
+            className: "dt-nowrap text-center",
+            render: function (data, type, full, meta) {
 
-    return `
-        <div class="btn-group">
-            <button class="btn btn-sm btn-primary"
-                onclick="EditObjetivo(${data})"
-                title="Editar Objetivo">
+                var activo = $("#estadoGeneral").val() === "1";
+
+                if (activo) {
+                    return `
+        <div class="dt-actions">
+
+            <button type="button"
+                    class="btn btn-sm btn-primary"
+                    onclick="EditObjetivo(${data})"
+                    title="Abrir ficha del objetivo"
+                    aria-label="Abrir ficha del objetivo">
                 <i class="fa fa-eye"></i>
             </button>
 
-            <button class="btn btn-sm btn-danger"
-                onclick="DisableObjetivo(${data})"
-                title="Desactivar Objetivo">
+            <button type="button"
+                    class="btn btn-sm btn-danger"
+                    onclick="DisableObjetivo(${data})"
+                    title="Desactivar objetivo"
+                    aria-label="Desactivar objetivo">
                 <i class="fa fa-trash"></i>
             </button>
-        </div>`;
-} else {
-    return `
-        <div class="btn-group">
-            <button class="btn btn-sm btn-success"
+
+        </div>
+    `;
+                }
+
+                return `
+    <div class="dt-actions">
+
+        <button type="button"
+                class="btn btn-sm btn-success"
                 onclick="ActivateObjetivo(${data})"
-                title="Activar Objetivo">
-                <i class="fa fa-power-off"></i>
-            </button>
-        </div>`;
-}
+                title="Reactivar objetivo"
+                aria-label="Reactivar objetivo">
+            <i class="fa fa-power-off"></i>
+        </button>
 
-
-                return AddActionsToGrid(action);
+    </div>
+`;
             }
         }
     ];
 
-
-    function FillGrid(estado = null) {
-
-
+    function FillGrid(active) {
 
         $.ajax({
-            type: 'POST',
+            type: "POST",
             url: '@Url.Action("FillObjetivosList", "Objetivo")',
-            data: { active: @Json.Encode(ViewBag.Actives)},
-
+            data: {
+                active: active
+            },
             success: function (data) {
 
-                if ($.fn.dataTable.isDataTable('#generalDataTable')) {
-                    $('#generalDataTable').DataTable().clear().destroy();
+                if ($.fn.dataTable.isDataTable("#generalDataTable")) {
+                    $("#generalDataTable").DataTable().clear().destroy();
+                    $("#generalDataTable tbody").empty();
                 }
-                var table = $('#generalDataTable').DataTable({
+
+                $("#generalDataTable").DataTable({
+                    destroy: true,
                     searching: true,
-                    responsive: true,
+                    responsive: false,
                     scrollX: true,
+                    scrollCollapse: true,
+                    autoWidth: false,
+                    processing: true,
+                    pageLength: 10,
+                    lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]],
                     data: data,
                     columns: columnFichaInfo,
-                    columnDefs: [
-                        //{
-                        //    targets: 4, // Índice de la columna "Observaciones" (0-based)
-                        //    createdCell: function (td, cellData, rowData, row, col) {
-                        //        var maxLength = 100;  // Límite de caracteres
-                        //        if (cellData.length > maxLength) {
-                        //            $(td).text(cellData.substring(0, maxLength) + '...');  // Truncar y añadir '...'
-                        //        } else {
-                        //            $(td).text(cellData);  // De lo contrario, mostrar el texto completo
-                        //        }
-                        //        $(td).addClass('col-observaciones');  // Aplica la clase de CSS
-                        //    }
-                        //}
-                        //,
-                        //{
-                        //    targets: 3, // Índice de la columna "Imputado" (0-based)
-                        //    createdCell: function (td, cellData, rowData, row, col) {
-                        //        var maxLength = 100;  // Límite de caracteres
-                        //        if (cellData.length > maxLength) {
-                        //            $(td).text(cellData.substring(0, maxLength) + '...');  // Truncar y añadir '...'
-                        //        } else {
-                        //            $(td).text(cellData);  // De lo contrario, mostrar el texto completo
-                        //        }
-                        //        $(td).addClass('col-imputado');  // Aplica la clase de CSS
-                        //    }
-                        //}
-                    ],
+                    order: [[0, "desc"]],
                     language: {
-                        "sProcessing": "Procesando...",
-                        "sLengthMenu": "Mostrar _MENU_ registros",
-                        "sZeroRecords": "No se encontraron resultados",
-                        "sEmptyTable": "Ningún dato disponible en esta tabla",
-                        "sInfo": "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
-                        "sInfoEmpty": "Mostrando registros del 0 al 0 de un total de 0 registros",
-                        "sInfoFiltered": "(filtrado de un total de _MAX_ registros)",
-                        "sInfoPostFix": "",
-                        "sSearch": "Buscar:",
-                        "sUrl": "",
-                        "sInfoThousands": ",",
-                        "sLoadingRecords": "Cargando...",
-                        "oPaginate": {
-                            "sFirst": "Primero",
-                            "sLast": "Último",
-                            "sNext": "Siguiente",
-                            "sPrevious": "Anterior"
+                        sProcessing: "Procesando...",
+                        sLengthMenu: "Mostrar _MENU_ registros",
+                        sZeroRecords: "No se encontraron resultados",
+                        sEmptyTable: "Ningún dato disponible en esta tabla",
+                        sInfo: "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                        sInfoEmpty: "Mostrando registros del 0 al 0 de un total de 0 registros",
+                        sInfoFiltered: "(filtrado de un total de _MAX_ registros)",
+                        sSearch: "Buscar:",
+                        sLoadingRecords: "Cargando...",
+                        oPaginate: {
+                            sFirst: "Primero",
+                            sLast: "Último",
+                            sNext: "Siguiente",
+                            sPrevious: "Anterior"
                         },
-                        "oAria": {
-                            "sSortAscending": ": Activar para ordenar la columna de manera ascendente",
-                            "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+                        oAria: {
+                            sSortAscending: ": Activar para ordenar la columna de manera ascendente",
+                            sSortDescending: ": Activar para ordenar la columna de manera descendente"
                         }
                     },
-                    //buttons: [
-                    //    'copy', 'csv', 'excel', 'pdf', 'print'
-                    //],
-                @*buttons: {
-                    buttons: [
-                        {
-                            text: 'New',
-                            action: function (e, dt, node, config) {
-                                var url = '@Url.Action("AddUser", "Users", new { __RequestVerificationToken = @AntiForgeryValidator.GetTokenValidation() }, null)';
-                                window.location.href = url;
-                            },
-                            className: "green"
-                        }
-                    ],
-                    dom: {
-                        button: {
-                            tag: "button",
-                            className: "btn btn-primary"
-                        },
-                        buttonLiner: {
-                            tag: null
-                        }
+                    initComplete: function () {
+                        setTimeout(function () {
+                            $("#generalDataTable").DataTable().columns.adjust();
+                        }, 150);
                     }
-                },*@
-                    initComplete: function (oSettings) {
-                        this.api().columns().every(function () {
-                            var column = this;
-                            var nameColumn = column.header().textContent;
-                            var columnDef = oSettings.aoColumns.find(column => {
-                                return column.sTitle === nameColumn;
-                            });
-                            if (columnDef.IsFiltered) {
-                                $('<input type="text" placeholder="buscar" />')
-                                    .appendTo($(column.header()))
-                                    .on('click', function (e) { e.stopPropagation(); })
-                            }
-                            $('input', column.header()).on('keyup change clear', function () {
-                                if (column.search !== this.value) {
-                                    column
-                                        .column($(this).parent().index() + ':visible')
-                                        .search(this.value)
-                                        .draw();
-                                }
-                            });
-                        });
-                        $($.fn.dataTable.tables(true)).DataTable().columns.adjust();
-                    }
-
                 });
             },
-            complete: function () {
-
+            error: function (xhr) {
+                console.log(xhr.responseText);
+                swal("Error", "Ocurrió un error al cargar los objetivos.", "error");
             }
         });
     }
 
-    function AddObjetivo() {
+    function AddObjetivo2() {
         swal({
             title: "¿Estás seguro?",
-            text: "Se generara un Id y Esta acción no se puede deshacer",
+            text: "Se generará un nuevo objetivo prioritario.",
             type: "warning",
             showCancelButton: true,
             confirmButtonText: "Sí",
             cancelButtonText: "No",
             closeOnConfirm: false,
             closeOnCancel: true
-        },
-            function (isConfirm) {
-                if (isConfirm) {
+        }, function (isConfirm) {
 
-                    location.href = '@Url.Action("AddObjetivo", "Objetivo")';
-                } else {
+            if (!isConfirm) {
+                return;
+            }
 
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("CrearObjetivoFicha", "FichaObjetivo")",
+                success: function (resp) {
+
+                    if (resp.IsSuccess) {
+                        window.location.href = resp.RedirectUrl;
+                    } else {
+                        swal("Error", resp.Message, "error");
+                    }
+                },
+                error: function (xhr) {
+                    console.log(xhr.responseText);
+                    swal("Error", "Ocurrió un error al crear el objetivo.", "error");
                 }
             });
+        });
     }
 
     function EditObjetivo(int_id_objetivo) {
-        location.href = '@Url.Action("AddEditObjetivos","Objetivo")?int_id_objetivo=' + int_id_objetivo;
+        location.href = '@Url.Action("EditFichaObjetivos", "FichaObjetivo")?int_id_objetivo=' + int_id_objetivo;
     }
 
     function DisableObjetivo(id) {
-     $.ajax({
-         type: 'POST',
-         url: '@Url.Action("DisableObjetivo", "Objetivo")',
-         data: { int_id_objetivo: id },
-         success: function (data) {
-             if (data.IsSuccess) {
-                 swal({ title: "", text: data.Message, type: 'success', confirmButtonText: "Continuar", closeOnConfirm: true },
-                     function () { swal.close(); refresobjetivosList(); });
-             } else {
-                 swal({ title: "Error", text: "No tienes permisos para esta acción. Contacta al administrador.", type: 'error', confirmButtonText: "Continuar", closeOnConfirm: true },
-                     function () { window.location.href = '@Url.Action("Index", "Objetivo")'; });
-             }
-         }
-     });
- }
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("DisableObjetivo", "Objetivo")',
+            data: {
+                int_id_objetivo: id
+            },
+            success: function (data) {
+                if (data.IsSuccess) {
+                    swal({
+                        title: "",
+                        text: data.Message,
+                        type: "success",
+                        confirmButtonText: "Continuar",
+                        closeOnConfirm: true
+                    }, function () {
+                        swal.close();
+                        FillGrid($("#estadoGeneral").val() === "1");
+                    });
+                } else {
+                    swal({
+                        title: "Error",
+                        text: "No tienes permisos para esta acción. Contacta al administrador.",
+                        type: "error",
+                        confirmButtonText: "Continuar",
+                        closeOnConfirm: true
+                    }, function () {
+                        window.location.href = '@Url.Action("Index", "Objetivo")';
+                    });
+                }
+            },
+            error: function (xhr) {
+                console.log(xhr.responseText);
+                swal("Error", "Ocurrió un error al desactivar el objetivo.", "error");
+            }
+        });
+    }
 
     function ActivateObjetivo(id) {
-     $.ajax({
-         type: 'POST',
-         url: '@Url.Action("ActivateObjetivo", "Objetivo")',
-         data: { int_id_objetivo: id },
-         success: function (data) {
-             if (data.IsSuccess) {
-                 swal({ title: "", text: data.Message, type: 'success', confirmButtonText: "Continuar", closeOnConfirm: true },
-                     function () { swal.close(); refresobjetivosList(); });
-             } else {
-                 swal({ title: "Error", text: "No tienes permisos para esta acción. Contacta al administrador.", type: 'error', confirmButtonText: "Continuar", closeOnConfirm: true },
-                     function () { window.location.href = '@Url.Action("Index", "Objetivo")'; });
-             }
-         }
-     });
- }
-
-
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("ActivateObjetivo", "Objetivo")',
+            data: {
+                int_id_objetivo: id
+            },
+            success: function (data) {
+                if (data.IsSuccess) {
+                    swal({
+                        title: "",
+                        text: data.Message,
+                        type: "success",
+                        confirmButtonText: "Continuar",
+                        closeOnConfirm: true
+                    }, function () {
+                        swal.close();
+                        FillGrid($("#estadoGeneral").val() === "1");
+                    });
+                } else {
+                    swal({
+                        title: "Error",
+                        text: "No tienes permisos para esta acción. Contacta al administrador.",
+                        type: "error",
+                        confirmButtonText: "Continuar",
+                        closeOnConfirm: true
+                    }, function () {
+                        window.location.href = '@Url.Action("Index", "Objetivo")';
+                    });
+                }
+            },
+            error: function (xhr) {
+                console.log(xhr.responseText);
+                swal("Error", "Ocurrió un error al activar el objetivo.", "error");
+            }
+        });
+    }
 </script>

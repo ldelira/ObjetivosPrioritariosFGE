@@ -1,0 +1,1461 @@
+﻿@{
+    ViewBag.Title = "Red de Inteligencia";
+}
+
+<script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+
+<div class="main-panel">
+    <div class="content-wrapper">
+
+        <div class="op-page-header">
+            <div>
+                <h2>Red de inteligencia criminal</h2>
+                <p>Mapa visual de objetivos, grupos, asuntos, álbumes y relaciones operativas.</p>
+            </div>
+        </div>
+
+        <!-- ================================
+             PANEL DE GENERACIÓN DEL MAPA
+        ================================= -->
+        <div class="op-map-toolbar">
+
+            <div class="op-map-help">
+                <div>
+                    <strong>Generador de mapas de relación</strong>
+                    <p>
+                        Selecciona el tipo de mapa que deseas consultar, elige un registro y presiona el botón
+                        para generar la red visual.
+                    </p>
+                </div>
+
+                <div class="op-map-help-badges">
+                    <span><i class="fa fa-sitemap"></i> Grupo</span>
+                    <span><i class="fa fa-share-alt"></i> Asunto</span>
+                    <span><i class="fa fa-user"></i> Objetivo</span>
+                    <span><i class="fa fa-folder-open"></i> Álbum</span>
+                </div>
+            </div>
+
+            <!-- TABS MANUALES -->
+            <div class="op-map-mode-tabs">
+                <button type="button" class="op-map-tab-btn active" data-target="#tabMapaGrupo">
+                    <i class="fa fa-sitemap"></i> Por grupo
+                </button>
+
+                <button type="button" class="op-map-tab-btn" data-target="#tabMapaAsunto">
+                    <i class="fa fa-share-alt"></i> Por asunto
+                </button>
+
+                <button type="button" class="op-map-tab-btn" data-target="#tabMapaObjetivo">
+                    <i class="fa fa-user"></i> Por objetivo
+                </button>
+
+                <button type="button" class="op-map-tab-btn" data-target="#tabMapaAlbum">
+                    <i class="fa fa-folder-open"></i> Por álbum
+                </button>
+            </div>
+
+            <div class="op-map-tab-content">
+
+                <!-- MAPA POR GRUPO -->
+                <div class="op-map-pane active" id="tabMapaGrupo">
+
+                    <div class="op-map-mode-description">
+                        <strong>Mapa por grupo delictivo</strong>
+                        <p>
+                            Muestra todos los objetivos relacionados a un grupo delictivo y el puesto o nivel que tiene cada uno.
+                        </p>
+                    </div>
+
+                    <div class="row align-items-end">
+                        <div class="col-md-8">
+                            <label>Grupo delictivo</label>
+                            <select id="ddlGrupoMapa" class="form-control">
+                                <option value="">Selecciona un grupo...</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-4 text-right">
+                            <button type="button" class="btn btn-primary op-btn-generate" id="btnGenerarMapaGrupo">
+                                <i class="fa fa-sitemap"></i> Generar mapa por grupo
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- MAPA POR ASUNTO -->
+                <div class="op-map-pane" id="tabMapaAsunto">
+
+                    <div class="op-map-mode-description">
+                        <strong>Mapa por asunto relacionado</strong>
+                        <p>
+                            Muestra el asunto al centro, los objetivos participantes, víctimas relacionadas y el rol de cada objetivo.
+                        </p>
+                    </div>
+
+                    <div class="row align-items-end">
+                        <div class="col-md-8">
+                            <label>Asunto relacionado</label>
+                            <select id="ddlAsuntoMapa" class="form-control">
+                                <option value="">Selecciona un asunto...</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-4 text-right">
+                            <button type="button" class="btn btn-danger op-btn-generate" id="btnGenerarMapaAsunto">
+                                <i class="fa fa-share-alt"></i> Generar mapa por asunto
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- MAPA POR OBJETIVO -->
+                <div class="op-map-pane" id="tabMapaObjetivo">
+
+                    <div class="op-map-mode-description">
+                        <strong>Mapa por objetivo prioritario</strong>
+                        <p>
+                            Muestra al objetivo seleccionado al centro y despliega sus grupos, asuntos, víctimas y objetivos relacionados.
+                        </p>
+                    </div>
+
+                    <div class="row align-items-end">
+                        <div class="col-md-8">
+                            <label>Objetivo prioritario</label>
+                            <select id="ddlObjetivoMapa" class="form-control">
+                                <option value="">Selecciona un objetivo...</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-4 text-right">
+                            <button type="button" class="btn btn-success op-btn-generate" id="btnGenerarMapaObjetivo">
+                                <i class="fa fa-user"></i> Generar mapa por objetivo
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- MAPA POR ÁLBUM -->
+                <div class="op-map-pane" id="tabMapaAlbum">
+
+                    <div class="op-map-mode-description">
+                        <strong>Mapa por álbum</strong>
+                        <p>
+                            Muestra todos los objetivos agrupados en un álbum. Útil para operativos, cargas masivas o grupos analizados en una misma fecha.
+                        </p>
+                    </div>
+
+                    <div class="row align-items-end">
+                        <div class="col-md-8">
+                            <label>Álbum</label>
+                            <select id="ddlAlbumMapa" class="form-control">
+                                <option value="">Selecciona un álbum...</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-4 text-right">
+                            <button type="button" class="btn btn-info op-btn-generate" id="btnGenerarMapaAlbum">
+                                <i class="fa fa-folder-open"></i> Generar mapa por álbum
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="op-map-tools">
+                <button type="button" class="btn btn-secondary" id="btnAjustarMapa">
+                    <i class="fa fa-compress"></i> Ajustar vista
+                </button>
+
+                <button type="button" class="btn btn-outline-primary" id="btnPantallaCompletaMapa">
+                    <i class="fa fa-expand"></i> Modo presentación
+                </button>
+            </div>
+
+        </div>
+
+        <!-- ================================
+             MAPA + PANEL DE DETALLE
+        ================================= -->
+        <div class="op-map-layout">
+
+            <div class="op-map-card">
+
+                <div class="op-map-title">
+                    <div>
+                        <strong id="lblTituloMapa">Mapa de relaciones</strong>
+                        <span id="lblTotalNodos">Selecciona un tipo de mapa para comenzar</span>
+                    </div>
+
+                    <div class="op-map-title-help">
+                        <i class="fa fa-info-circle"></i>
+                        Haz clic en un nodo para ver su información.
+                    </div>
+                </div>
+
+                <div id="mapaRelaciones"></div>
+
+            </div>
+
+            <div class="op-map-side-panel" id="panelDetalleNodo">
+                <div class="op-panel-empty">
+                    <i class="fa fa-mouse-pointer"></i>
+                    <p>Selecciona un nodo del mapa para ver su información.</p>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<style>
+    /* ================================
+       MAPA DE RELACIONES - TOOLBAR
+    ================================ */
+
+    .op-map-toolbar {
+        background: #fff;
+        border: 1px solid #e8eef8;
+        border-radius: 16px;
+        padding: 16px;
+        margin-bottom: 16px;
+        box-shadow: 0 8px 24px rgba(15, 35, 75, .06);
+    }
+
+    .op-map-help {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 14px;
+        border-radius: 14px;
+        background: linear-gradient(90deg, #f8fbff 0%, #eef4ff 100%);
+        border: 1px solid #dbe8ff;
+        margin-bottom: 14px;
+    }
+
+        .op-map-help strong {
+            display: block;
+            color: #0b2364;
+            font-size: 16px;
+            font-weight: 900;
+            margin-bottom: 4px;
+        }
+
+        .op-map-help p {
+            margin: 0;
+            color: #64748b;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+    .op-map-help-badges {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        justify-content: flex-end;
+    }
+
+        .op-map-help-badges span {
+            background: #fff;
+            color: #2f5bff;
+            border: 1px solid #cbd8ff;
+            border-radius: 999px;
+            padding: 5px 10px;
+            font-size: 12px;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .op-map-help-badges i {
+            margin-right: 4px;
+        }
+
+    /* ================================
+       TABS MANUALES
+    ================================ */
+
+    .op-map-mode-tabs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        border-bottom: 1px solid #dbe3ef;
+        margin-bottom: 0;
+    }
+
+    .op-map-tab-btn {
+        border: 1px solid transparent;
+        background: #f8fafc;
+        color: #475569;
+        font-weight: 800;
+        font-size: 13px;
+        border-radius: 10px 10px 0 0;
+        padding: 10px 14px;
+        cursor: pointer;
+        outline: none;
+    }
+
+        .op-map-tab-btn:hover {
+            background: #eef4ff;
+            color: #2f5bff;
+            border-color: #dbe3ef;
+        }
+
+        .op-map-tab-btn.active {
+            color: #2f5bff;
+            background: #fff;
+            border: 1px solid #dbe3ef;
+            border-bottom-color: #fff;
+            position: relative;
+            top: 1px;
+        }
+
+        .op-map-tab-btn i {
+            margin-right: 5px;
+        }
+
+    .op-map-tab-content {
+        border: 1px solid #dbe3ef;
+        border-top: none;
+        border-radius: 0 0 14px 14px;
+        padding: 16px;
+        background: #fff;
+        min-height: 155px;
+    }
+
+    .op-map-pane {
+        display: none;
+    }
+
+        .op-map-pane.active {
+            display: block;
+        }
+
+    .op-map-mode-description {
+        margin-bottom: 14px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid #edf2f7;
+    }
+
+        .op-map-mode-description strong {
+            display: block;
+            color: #0b2364;
+            font-size: 15px;
+            font-weight: 900;
+            margin-bottom: 3px;
+        }
+
+        .op-map-mode-description p {
+            margin: 0;
+            color: #64748b;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+    .op-btn-generate {
+        margin-top: 8px;
+        white-space: nowrap;
+    }
+
+    .op-map-tools {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+        margin-top: 14px;
+        padding-top: 14px;
+        border-top: 1px solid #edf2f7;
+    }
+
+    /* ================================
+       LAYOUT DEL MAPA
+    ================================ */
+
+    .op-map-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 340px;
+        gap: 16px;
+    }
+
+    .op-map-card {
+        background: #fff;
+        border: 1px solid #e8eef8;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 8px 24px rgba(15, 35, 75, .06);
+    }
+
+    .op-map-title {
+        padding: 14px 16px;
+        border-bottom: 1px solid #e8eef8;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+    }
+
+        .op-map-title strong {
+            display: block;
+            color: #0b2364;
+            font-size: 16px;
+            font-weight: 900;
+        }
+
+        .op-map-title span {
+            display: block;
+            color: #64748b;
+            font-size: 12px;
+            margin-top: 2px;
+        }
+
+    .op-map-title-help {
+        color: #64748b;
+        font-size: 12px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        white-space: nowrap;
+    }
+
+        .op-map-title-help i {
+            color: #2f5bff;
+        }
+
+    #mapaRelaciones {
+        width: 100%;
+        height: 680px;
+        background: radial-gradient(circle at top left, rgba(47, 91, 255, .08), transparent 30%), linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+    }
+
+    /* ================================
+       PANEL DERECHO
+    ================================ */
+
+    .op-map-side-panel {
+        background: #fff;
+        border: 1px solid #e8eef8;
+        border-radius: 16px;
+        padding: 16px;
+        box-shadow: 0 8px 24px rgba(15, 35, 75, .06);
+        min-height: 680px;
+    }
+
+    .op-panel-empty {
+        min-height: 220px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        color: #94a3b8;
+    }
+
+        .op-panel-empty i {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .op-panel-empty p {
+            margin: 4px 0;
+            color: #64748b;
+            font-size: 13px;
+        }
+
+    .op-node-photo {
+        width: 110px;
+        height: 110px;
+        border-radius: 18px;
+        object-fit: cover;
+        border: 3px solid #eff4ff;
+        display: block;
+        margin: 0 auto 12px auto;
+        background: #f8fafc;
+    }
+
+    .op-node-name {
+        text-align: center;
+        color: #0b2364;
+        font-weight: 900;
+        font-size: 17px;
+        line-height: 1.2;
+        margin-bottom: 4px;
+    }
+
+    .op-node-alias {
+        text-align: center;
+        color: #64748b;
+        font-size: 13px;
+        margin-bottom: 14px;
+    }
+
+    .op-node-info {
+        border-top: 1px solid #e8eef8;
+        padding-top: 12px;
+        margin-top: 12px;
+    }
+
+        .op-node-info label {
+            display: block;
+            color: #64748b;
+            font-size: 12px;
+            font-weight: 800;
+            margin-bottom: 2px;
+        }
+
+        .op-node-info div {
+            color: #0f172a;
+            font-size: 13px;
+            margin-bottom: 10px;
+            line-height: 1.35;
+            word-break: break-word;
+        }
+
+    /* ================================
+       MODO PRESENTACIÓN
+    ================================ */
+
+    .op-map-fullscreen {
+        position: fixed !important;
+        inset: 0 !important;
+        z-index: 9999 !important;
+        background: #f8fbff !important;
+        padding: 20px !important;
+        display: block !important;
+        overflow: auto !important;
+    }
+
+        .op-map-fullscreen .op-map-layout {
+            grid-template-columns: 1fr 340px;
+            height: calc(100vh - 40px);
+        }
+
+        .op-map-fullscreen #mapaRelaciones {
+            height: calc(100vh - 115px);
+        }
+
+        .op-map-fullscreen .op-map-side-panel {
+            min-height: calc(100vh - 40px);
+        }
+
+    /* ================================
+       RESPONSIVE
+    ================================ */
+
+    @@media (max-width: 992px) {
+        .op-map-layout {
+            grid-template-columns: 1fr;
+        }
+
+        .op-map-side-panel {
+            min-height: auto;
+        }
+
+        .op-map-title {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 6px;
+        }
+
+        .op-map-title-help {
+            white-space: normal;
+        }
+
+        .op-btn-generate {
+            width: 100%;
+            margin-top: 12px;
+        }
+
+        .op-map-toolbar .text-right {
+            text-align: left !important;
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .op-map-help {
+            flex-direction: column;
+        }
+
+        .op-map-help-badges {
+            justify-content: flex-start;
+        }
+
+        .op-map-mode-tabs {
+            flex-direction: column;
+            border-bottom: none;
+        }
+
+        .op-map-tab-btn {
+            width: 100%;
+            border-radius: 10px;
+            text-align: left;
+        }
+
+            .op-map-tab-btn.active {
+                top: 0;
+                border-bottom-color: #dbe3ef;
+            }
+
+        .op-map-tab-content {
+            border-top: 1px solid #dbe3ef;
+            border-radius: 14px;
+            margin-top: 8px;
+        }
+
+        .op-map-tools {
+            flex-direction: column;
+        }
+
+            .op-map-tools .btn {
+                width: 100%;
+            }
+
+        #mapaRelaciones {
+            height: 520px;
+        }
+    }
+
+    .op-participant-list {
+        margin-top: 12px;
+        border-top: 1px solid #e8eef8;
+        padding-top: 10px;
+    }
+
+    .op-participant-item {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 8px;
+        padding: 9px 8px;
+        border: 1px solid #edf2f7;
+        border-radius: 10px;
+        margin-bottom: 8px;
+        background: #f8fbff;
+    }
+
+        .op-participant-item strong {
+            display: block;
+            color: #0b2364;
+            font-size: 12px;
+            font-weight: 900;
+            line-height: 1.2;
+        }
+
+        .op-participant-item span {
+            display: block;
+            color: #64748b;
+            font-size: 11px;
+            margin-top: 2px;
+        }
+
+        .op-participant-item small {
+            background: #eef4ff;
+            color: #2f5bff;
+            border-radius: 999px;
+            padding: 3px 7px;
+            font-size: 10px;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+</style>
+
+<script>
+    var networkMapa = null;
+    var nodesMapa = null;
+    var edgesMapa = null;
+    var dataNodosMapa = [];
+
+    $(document).ready(function () {
+        inicializarTabsMapa();
+        enlazarEventosMapa();
+
+        cargarGruposMapa();
+        cargarAsuntosMapa();
+        cargarObjetivosMapa();
+        cargarAlbumesMapa();
+    });
+
+    function inicializarTabsMapa() {
+        $(".op-map-pane").hide().removeClass("active");
+        $("#tabMapaGrupo").show().addClass("active");
+
+        $(".op-map-tab-btn").removeClass("active");
+        $('.op-map-tab-btn[data-target="#tabMapaGrupo"]').addClass("active");
+
+        $(document).off("click", ".op-map-tab-btn").on("click", ".op-map-tab-btn", function () {
+            var target = $(this).data("target");
+
+            $(".op-map-tab-btn").removeClass("active");
+            $(this).addClass("active");
+
+            $(".op-map-pane").hide().removeClass("active");
+            $(target).show().addClass("active");
+        });
+    }
+
+    function enlazarEventosMapa() {
+
+        $("#btnGenerarMapaGrupo").off("click").on("click", function () {
+            var idGrupo = $("#ddlGrupoMapa").val();
+
+            if (!idGrupo) {
+                swal("Validación", "Selecciona un grupo delictivo.", "warning");
+                return;
+            }
+
+            generarMapaPorGrupo(idGrupo);
+        });
+
+        $("#btnGenerarMapaAsunto").off("click").on("click", function () {
+            var idAsunto = $("#ddlAsuntoMapa").val();
+
+            if (!idAsunto) {
+                swal("Validación", "Selecciona un asunto relacionado.", "warning");
+                return;
+            }
+
+            generarMapaPorAsunto(idAsunto);
+        });
+
+        $("#btnGenerarMapaObjetivo").off("click").on("click", function () {
+            var idObjetivo = $("#ddlObjetivoMapa").val();
+
+            if (!idObjetivo) {
+                swal("Validación", "Selecciona un objetivo prioritario.", "warning");
+                return;
+            }
+
+            generarMapaPorObjetivo(idObjetivo);
+        });
+
+        $("#btnGenerarMapaAlbum").off("click").on("click", function () {
+            var idAlbum = $("#ddlAlbumMapa").val();
+
+            if (!idAlbum) {
+                swal("Validación", "Selecciona un álbum.", "warning");
+                return;
+            }
+
+            generarMapaPorAlbum(idAlbum);
+        });
+
+        $("#btnAjustarMapa").off("click").on("click", function () {
+            if (networkMapa) {
+                networkMapa.fit({
+                    animation: {
+                        duration: 600,
+                        easingFunction: "easeInOutQuad"
+                    }
+                });
+            }
+        });
+
+        $("#btnPantallaCompletaMapa").off("click").on("click", function () {
+            $(".content-wrapper").toggleClass("op-map-fullscreen");
+
+            setTimeout(function () {
+                if (networkMapa) {
+                    networkMapa.redraw();
+                    networkMapa.fit();
+                }
+            }, 300);
+        });
+    }
+
+    function cargarGruposMapa() {
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("GetGruposActivos", "MapaRelaciones")",
+            success: function (data) {
+                var $ddl = $("#ddlGrupoMapa");
+                $ddl.empty();
+                $ddl.append('<option value="">Selecciona un grupo...</option>');
+
+                $.each(data, function (i, item) {
+                    var texto = item.grupo || ("Grupo #" + item.int_id_grupo);
+
+                    if (item.alias) {
+                        texto += " (" + item.alias + ")";
+                    }
+
+                    $ddl.append(
+                        '<option value="' + item.int_id_grupo + '">' +
+                        texto +
+                        '</option>'
+                    );
+                });
+            },
+            error: function (xhr) {
+                console.log(xhr.responseText);
+                swal("Error", "No se pudieron cargar los grupos.", "error");
+            }
+        });
+    }
+
+    function cargarAsuntosMapa() {
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("GetAsuntosActivos", "MapaRelaciones")",
+            success: function (data) {
+                var $ddl = $("#ddlAsuntoMapa");
+                $ddl.empty();
+                $ddl.append('<option value="">Selecciona un asunto...</option>');
+
+                $.each(data, function (i, item) {
+                    var texto = item.alias || item.numavp || ("Asunto #" + item.int_id_asunto_relacionado);
+
+                    if (item.numavp && item.alias) {
+                        texto += " - " + item.numavp;
+                    }
+
+                    $ddl.append(
+                        '<option value="' + item.int_id_asunto_relacionado + '">' +
+                        texto +
+                        '</option>'
+                    );
+                });
+            },
+            error: function (xhr) {
+                console.log(xhr.responseText);
+                swal("Error", "No se pudieron cargar los asuntos.", "error");
+            }
+        });
+    }
+
+    function cargarObjetivosMapa() {
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("GetObjetivosActivos", "MapaRelaciones")",
+            success: function (data) {
+                var $ddl = $("#ddlObjetivoMapa");
+                $ddl.empty();
+                $ddl.append('<option value="">Selecciona un objetivo...</option>');
+
+                $.each(data, function (i, item) {
+                    var texto = item.nombre || ("Objetivo #" + item.int_id_objetivo);
+
+                    if (item.alias && item.alias !== "SIN ALIAS") {
+                        texto += " - " + item.alias;
+                    }
+
+                    $ddl.append(
+                        '<option value="' + item.int_id_objetivo + '">' +
+                        texto +
+                        '</option>'
+                    );
+                });
+            },
+            error: function (xhr) {
+                console.log(xhr.responseText);
+                swal("Error", "No se pudieron cargar los objetivos.", "error");
+            }
+        });
+    }
+
+    function cargarAlbumesMapa() {
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("GetAlbumesActivos", "MapaRelaciones")",
+            success: function (data) {
+                var $ddl = $("#ddlAlbumMapa");
+                $ddl.empty();
+                $ddl.append('<option value="">Selecciona un álbum...</option>');
+
+                $.each(data, function (i, item) {
+                    var texto = item.nombre || ("Álbum #" + item.int_id_album_ficha_objetivo);
+                    texto += " (" + item.total + " objetivo(s))";
+
+                    $ddl.append(
+                        '<option value="' + item.int_id_album_ficha_objetivo + '">' +
+                        texto +
+                        '</option>'
+                    );
+                });
+            },
+            error: function (xhr) {
+                console.log(xhr.responseText);
+                swal("Error", "No se pudieron cargar los álbumes.", "error");
+            }
+        });
+    }
+
+    function generarMapaPorGrupo(idGrupo) {
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("GetRedPorGrupo", "MapaRelaciones")",
+            data: {
+                int_id_grupo: idGrupo
+            },
+            success: function (resp) {
+                console.log("RESPUESTA MAPA GRUPO:", resp);
+
+                if (!resp.success) {
+                    swal("Aviso", resp.message, "warning");
+                    return;
+                }
+
+                $("#lblTituloMapa").text("Red del grupo: " + resp.grupo);
+                $("#lblTotalNodos").text(resp.total + " objetivo(s) relacionado(s)");
+
+                pintarMapa(resp.nodes, resp.edges);
+            },
+            error: function (xhr, status, error) {
+                console.log("STATUS:", status);
+                console.log("ERROR:", error);
+                console.log("RESPONSE:", xhr.responseText);
+
+                swal("Error", "Ocurrió un error al generar el mapa por grupo.", "error");
+            }
+        });
+    }
+
+    function generarMapaPorAsunto(idAsunto) {
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("GetRedPorAsunto", "MapaRelaciones")",
+            data: {
+                int_id_asunto_relacionado: idAsunto
+            },
+            success: function (resp) {
+                console.log("RESPUESTA MAPA ASUNTO:", resp);
+
+                if (!resp.success) {
+                    swal("Aviso", resp.message, "warning");
+                    return;
+                }
+
+                $("#lblTituloMapa").text("Red del asunto: " + resp.asunto);
+                $("#lblTotalNodos").text(
+                    resp.totalGrupos + " grupo(s), " +
+                    resp.totalObjetivos + " objetivo(s), " +
+                    resp.totalVictimas + " víctima(s)"
+                );
+
+                pintarMapa(resp.nodes, resp.edges);
+            },
+            error: function (xhr, status, error) {
+                console.log("STATUS:", status);
+                console.log("ERROR:", error);
+                console.log("RESPONSE:", xhr.responseText);
+
+                swal("Error", "Ocurrió un error al generar el mapa por asunto.", "error");
+            }
+        });
+    }
+
+    function generarMapaPorObjetivo(idObjetivo) {
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("GetRedPorObjetivo", "MapaRelaciones")",
+            data: {
+                int_id_objetivo: idObjetivo
+            },
+            success: function (resp) {
+                console.log("RESPUESTA MAPA OBJETIVO:", resp);
+
+                if (!resp.success) {
+                    swal("Aviso", resp.message, "warning");
+                    return;
+                }
+
+                $("#lblTituloMapa").text("Red del objetivo: " + resp.objetivo);
+                $("#lblTotalNodos").text(
+                    resp.totalGrupos + " grupo(s), " +
+                    resp.totalAsuntos + " asunto(s), " +
+                    resp.totalObjetivosRelacionados + " objetivo(s) relacionado(s), " +
+                    resp.totalVictimas + " víctima(s)"
+                );
+
+                pintarMapa(resp.nodes, resp.edges, "objetivo");
+            },
+            error: function (xhr, status, error) {
+                console.log("STATUS:", status);
+                console.log("ERROR:", error);
+                console.log("RESPONSE:", xhr.responseText);
+
+                swal("Error", "Ocurrió un error al generar el mapa por objetivo.", "error");
+            }
+        });
+    }
+
+    function generarMapaPorAlbum(idAlbum) {
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("GetRedPorAlbum", "MapaRelaciones")",
+            data: {
+                int_id_album_ficha_objetivo: idAlbum
+            },
+            success: function (resp) {
+                console.log("RESPUESTA MAPA ÁLBUM:", resp);
+
+                if (!resp.success) {
+                    swal("Aviso", resp.message, "warning");
+                    return;
+                }
+
+                $("#lblTituloMapa").text("Red del álbum: " + resp.album);
+                $("#lblTotalNodos").text(resp.totalObjetivos + " objetivo(s) en el álbum");
+
+                pintarMapa(resp.nodes, resp.edges);
+            },
+            error: function (xhr, status, error) {
+                console.log("STATUS:", status);
+                console.log("ERROR:", error);
+                console.log("RESPONSE:", xhr.responseText);
+
+                swal("Error", "Ocurrió un error al generar el mapa por álbum.", "error");
+            }
+        });
+    }
+
+    function pintarMapa(nodes, edges, modo) {
+        dataNodosMapa = nodes || [];
+
+        if (networkMapa) {
+            networkMapa.destroy();
+            networkMapa = null;
+        }
+
+        nodesMapa = new vis.DataSet(nodes || []);
+        edgesMapa = new vis.DataSet(edges || []);
+
+        var container = document.getElementById("mapaRelaciones");
+
+        var data = {
+            nodes: nodesMapa,
+            edges: edgesMapa
+        };
+        var esModoObjetivo = modo === "objetivo";
+        var options = {
+            autoResize: true,
+            layout: {
+                hierarchical: {
+                    enabled: esModoObjetivo,
+                    direction: "LR",
+                    sortMethod: "directed",
+                    levelSeparation: 240,
+                    nodeSpacing: 190,
+                    treeSpacing: 240
+                }
+            },
+            interaction: {
+                hover: true,
+                tooltipDelay: 120,
+                navigationButtons: true,
+                keyboard: true
+            },
+            physics: {
+                enabled: !esModoObjetivo,
+                stabilization: {
+                    iterations: 150
+                },
+                barnesHut: {
+                    gravitationalConstant: -5500,
+                    springLength: 190,
+                    springConstant: 0.04,
+                    damping: 0.18
+                }
+            },
+            nodes: {
+                borderWidth: 2,
+                shadow: {
+                    enabled: true,
+                    color: "rgba(15, 35, 75, .18)",
+                    size: 10,
+                    x: 0,
+                    y: 4
+                }
+            },
+            edges: {
+                smooth: {
+                    enabled: true,
+                    type: esModoObjetivo ? "cubicBezier" : "dynamic",
+                    forceDirection: esModoObjetivo ? "horizontal" : "none",
+                    roundness: 0.4
+                },
+                width: 2,
+                shadow: false
+            }
+        };
+
+        networkMapa = new vis.Network(container, data, options);
+
+        networkMapa.once("stabilizationIterationsDone", function () {
+            networkMapa.fit({
+                animation: {
+                    duration: 600,
+                    easingFunction: "easeInOutQuad"
+                }
+            });
+        });
+
+        networkMapa.on("click", function (params) {
+            if (params.nodes.length === 0) {
+                limpiarPanelDetalle();
+                return;
+            }
+
+            var nodeId = params.nodes[0];
+
+            var nodo = dataNodosMapa.find(function (x) {
+                return x.id === nodeId;
+            });
+
+            if (!nodo) {
+                limpiarPanelDetalle();
+                return;
+            }
+
+            mostrarDetalleNodo(nodo);
+        });
+        networkMapa.on("oncontext", function (params) {
+            params.event.preventDefault();
+
+            var nodeId = networkMapa.getNodeAt(params.pointer.DOM);
+
+            if (!nodeId) {
+                return;
+            }
+
+            var nodo = dataNodosMapa.find(function (x) {
+                return x.id === nodeId;
+            });
+
+            if (!nodo) {
+                return;
+            }
+
+            if (nodo.tipo === "grupoCaso") {
+                mostrarParticipantesGrupoCaso(nodo);
+                return;
+            }
+
+            mostrarDetalleNodo(nodo);
+        });
+    }
+
+    function mostrarParticipantesGrupoCaso(nodo) {
+
+        var participantes = nodo.participantesCaso || [];
+
+        var htmlParticipantes = "";
+
+        if (participantes.length === 0) {
+            htmlParticipantes = `
+            <div class="op-table-empty">
+                No hay participantes registrados para este grupo en el asunto.
+            </div>
+        `;
+        } else {
+            htmlParticipantes = `
+            <div class="op-participant-list">
+                ${participantes.map(function (p) {
+
+                var botonFicha = "";
+
+                if (p.int_id_objetivo) {
+                    botonFicha = `
+                            <button type="button"
+                                    class="btn btn-primary btn-sm op-btn-ficha-participante"
+                                    title="Abrir ficha informativa"
+                                    onclick="abrirFichaObjetivo(${p.int_id_objetivo})">
+                                <i class="fa fa-eye"></i>
+                            </button>
+                        `;
+                }
+
+                return `
+                        <div class="op-participant-item">
+
+                            <div class="op-participant-info">
+                                <strong>${p.nombre || "SIN NOMBRE"}</strong>
+                                <span>${p.alias || "SIN ALIAS"}</span>
+
+                                <div class="op-participant-role">
+                                    ${p.rol || "Por definir"}
+                                </div>
+
+                                ${p.participacion ? `
+                                    <div class="op-participant-desc">
+                                        ${p.participacion}
+                                    </div>
+                                ` : ""}
+                            </div>
+
+                            ${botonFicha}
+
+                        </div>
+                    `;
+            }).join("")}
+            </div>
+        `;
+        }
+
+        $("#panelDetalleNodo").html(`
+        <div class="op-panel-empty">
+            <i class="fa fa-users"></i>
+            <p><strong>${nodo.alias || nodo.label || "Grupo"}</strong></p>
+            <p>Participantes del grupo en el asunto</p>
+        </div>
+
+        <div class="op-node-info">
+            <label>Asunto</label>
+            <div>${nodo.asunto || "Sin información"}</div>
+
+            <label>Grupo / cártel</label>
+            <div>${nodo.nombre || nodo.label || "Sin información"}</div>
+
+            ${nodo.perteneceObjetivoPrincipal ? `
+                <label>Relación con el objetivo seleccionado</label>
+                <div>Este es un grupo/cártel donde aparece registrado el objetivo seleccionado.</div>
+            ` : ""}
+
+            <label>Total participantes</label>
+            <div>${participantes.length}</div>
+        </div>
+
+        ${htmlParticipantes}
+    `);
+    }
+    function mostrarVictimasCaso(nodo) {
+
+        var victimas = nodo.victimasCaso || [];
+
+        var htmlVictimas = "";
+
+        if (victimas.length === 0) {
+            htmlVictimas = `
+            <div class="op-table-empty">
+                No hay víctimas registradas para este asunto.
+            </div>
+        `;
+        } else {
+            htmlVictimas = `
+            <div class="op-participant-list">
+                ${victimas.map(function (v) {
+                return `
+                        <div class="op-participant-item">
+                            <div>
+                                <strong>${v.nombre || "VÍCTIMA SIN NOMBRE"}</strong>
+                                <span>Víctima relacionada</span>
+                            </div>
+                            <small>Víctima</small>
+                        </div>
+                    `;
+            }).join("")}
+            </div>
+        `;
+        }
+
+        $("#panelDetalleNodo").html(`
+        <div class="op-panel-empty">
+            <i class="fa fa-users"></i>
+            <p><strong>Víctimas</strong></p>
+            <p>Víctimas relacionadas al asunto</p>
+        </div>
+
+        <div class="op-node-info">
+            <label>Asunto</label>
+            <div>${nodo.asunto || "Sin información"}</div>
+
+            <label>Total víctimas</label>
+            <div>${victimas.length}</div>
+        </div>
+
+        ${htmlVictimas}
+    `);
+    }
+
+    function mostrarDetalleNodo(nodo) {
+
+        if (!nodo) {
+            limpiarPanelDetalle();
+            return;
+        }
+
+        if (nodo.tipo === "album") {
+            $("#panelDetalleNodo").html(`
+                <div class="op-panel-empty">
+                    <i class="fa fa-folder-open"></i>
+                    <p><strong>${nodo.nombre || nodo.label || "Álbum"}</strong></p>
+                    <p>Álbum de objetivos prioritarios</p>
+                </div>
+
+                <div class="op-node-info">
+                    <label>Descripción</label>
+                    <div>${nodo.descripcion || "Sin información"}</div>
+
+                    <label>Total de objetivos</label>
+                    <div>${nodo.total || 0}</div>
+                </div>
+            `);
+            return;
+        }
+
+        if (nodo.tipo === "asunto") {
+            $("#panelDetalleNodo").html(`
+                <div class="op-panel-empty">
+                    <i class="fa fa-share-alt"></i>
+                    <p><strong>${nodo.label || "Asunto relacionado"}</strong></p>
+                    <p>Asunto relacionado</p>
+                </div>
+
+                <div class="op-node-info">
+                    <label>Descripción</label>
+                    <div>${nodo.descripcion || nodo.title || "Sin información"}</div>
+
+                    <label>Número de carpeta / AVP</label>
+                    <div>${nodo.numavp || "Sin información"}</div>
+
+                    <label>Fecha del asunto</label>
+                    <div>${nodo.fecha || "Sin información"}</div>
+                </div>
+            `);
+            return;
+        }
+
+        if (nodo.tipo === "victima") {
+            $("#panelDetalleNodo").html(`
+                <img class="op-node-photo" src="${nodo.image}" />
+
+                <div class="op-node-name">${nodo.nombre || "VÍCTIMA SIN NOMBRE"}</div>
+                <div class="op-node-alias">Víctima relacionada</div>
+
+                <div class="op-node-info">
+                    <label>Tipo de nodo</label>
+                    <div>Víctima</div>
+                </div>
+            `);
+            return;
+        }
+        if (nodo.tipo === "grupoCaso") {
+    mostrarParticipantesGrupoCaso(nodo);
+    return;
+}
+
+if (nodo.tipo === "victimasCaso") {
+    mostrarVictimasCaso(nodo);
+    return;
+}
+
+
+        if (nodo.tipo === "grupo") {
+            $("#panelDetalleNodo").html(`
+                <div class="op-panel-empty">
+                    <i class="fa fa-users"></i>
+                    <p><strong>${nodo.label || "Grupo delictivo"}</strong></p>
+                    <p>Grupo delictivo</p>
+                </div>
+
+                <div class="op-node-info">
+                    <label>Alias / clave</label>
+                    <div>${nodo.title || "Sin información"}</div>
+                </div>
+            `);
+            return;
+        }
+
+        if (nodo.tipo !== "objetivo") {
+            $("#panelDetalleNodo").html(`
+                <div class="op-panel-empty">
+                    <i class="fa fa-sitemap"></i>
+                    <p>${nodo.label || "Nodo seleccionado"}</p>
+                </div>
+            `);
+            return;
+        }
+
+        var bloqueExtra = "";
+
+        if (nodo.esPrincipal) {
+            bloqueExtra = `
+        <label>Tipo</label>
+        <div>Objetivo seleccionado</div>
+
+        <label>Grupo / cártel registrado</label>
+        <div>${nodo.grupos || "Sin grupo"}</div>
+
+        <label>Puesto / nivel</label>
+        <div>${nodo.puestos || "Por definir"}</div>
+    `;
+        }
+        else if (nodo.rol || nodo.participacion) {
+            bloqueExtra = `
+                <label>Rol en el asunto</label>
+                <div>${nodo.rol || "Por definir"}</div>
+
+                <label>Participación</label>
+                <div>${nodo.participacion || "Sin información"}</div>
+            `;
+        }
+        else if (nodo.grupos || nodo.puestos || nodo.estatus) {
+            bloqueExtra = `
+                <label>Grupos</label>
+                <div>${nodo.grupos || "Sin grupo"}</div>
+
+                <label>Puesto / nivel</label>
+                <div>${nodo.puestos || "Por definir"}</div>
+
+                <label>Estatus</label>
+                <div>${nodo.estatus || "Sin estatus"}</div>
+
+                <label>Descripción estatus</label>
+                <div>${nodo.descripcionEstatus || "Sin información"}</div>
+            `;
+        }
+        else {
+            bloqueExtra = `
+                <label>Puesto / nivel</label>
+                <div>${nodo.puesto || "Por definir"}</div>
+
+                <label>Función dentro del grupo</label>
+                <div>${nodo.funcion || "Sin información"}</div>
+
+                <label>Fecha ingreso</label>
+                <div>${nodo.fechaIngreso || "Sin información"}</div>
+
+                <label>Fecha salida</label>
+                <div>${nodo.fechaSalida || "Sin información"}</div>
+            `;
+        }
+
+        $("#panelDetalleNodo").html(`
+            <img class="op-node-photo" src="${nodo.image}" />
+
+            <div class="op-node-name">${nodo.nombre || "SIN NOMBRE"}</div>
+            <div class="op-node-alias">${nodo.alias || "SIN ALIAS"}</div>
+
+            <div class="op-node-info">
+                ${bloqueExtra}
+
+                <label>Observaciones</label>
+                <div>${nodo.observaciones || "Sin información"}</div>
+            </div>
+
+            <button type="button"
+                    class="btn btn-primary btn-block"
+                    onclick="abrirFichaObjetivo(${nodo.int_id_objetivo})">
+                <i class="fa fa-eye"></i> Abrir ficha informativa
+            </button>
+        `);
+    }
+
+    function limpiarPanelDetalle() {
+        $("#panelDetalleNodo").html(`
+            <div class="op-panel-empty">
+                <i class="fa fa-mouse-pointer"></i>
+                <p>Selecciona un nodo del mapa para ver su información.</p>
+            </div>
+        `);
+    }
+
+    function abrirFichaObjetivo(idObjetivo) {
+        window.open("@Url.Action("EditFichaObjetivos", "FichaObjetivo")?int_id_objetivo=" + idObjetivo, "_blank");
+    }
+</script>

@@ -12,19 +12,20 @@ namespace Objetivos_Prioritarios.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class tb_FichaAsunto
+    public partial class cat_RolParticipacionAsunto
     {
-        public int int_id_ficha_asunto { get; set; }
-        public int int_id_ficha_objetivo { get; set; }
-        public int int_id_asunto_relacionado { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
+        public cat_RolParticipacionAsunto()
+        {
+            this.tb_FichaAsunto = new HashSet<tb_FichaAsunto>();
+        }
+    
+        public int int_id_rol_participacion { get; set; }
+        public string nvarchar_rol { get; set; }
         public System.DateTime date_fecha_creacion { get; set; }
         public bool bit_estatus { get; set; }
-        public string nvarchar_observaciones { get; set; }
-        public Nullable<int> int_id_rol_participacion { get; set; }
-        public string nvarchar_descripcion_participacion { get; set; }
     
-        public virtual cat_RolParticipacionAsunto cat_RolParticipacionAsunto { get; set; }
-        public virtual tb_AsuntoRelacionado tb_AsuntoRelacionado { get; set; }
-        public virtual tb_FichaObjetivo tb_FichaObjetivo { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<tb_FichaAsunto> tb_FichaAsunto { get; set; }
     }
 }

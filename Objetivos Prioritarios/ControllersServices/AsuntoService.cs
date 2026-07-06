@@ -110,10 +110,10 @@ namespace Objetivos_Prioritarios.ControllersServices
             }
         }
 
-        public List<tb_AsuntoVictimas> getListAsuntoVictima(bool activo,int int_id_asunto_relacionado)
+        public List<tb_AsuntoVictimas> getListAsuntoVictima(bool activo, int int_id_asunto_relacionado)
         {
             return db.tb_AsuntoVictimas
-                .Where(v => v.int_id_asunto_relacionado == int_id_asunto_relacionado && v.bit_estatus== activo).ToList();
+                .Where(v => v.int_id_asunto_relacionado == int_id_asunto_relacionado && v.bit_estatus == activo).ToList();
         }
 
 
@@ -121,7 +121,7 @@ namespace Objetivos_Prioritarios.ControllersServices
         {
             try
             {
-                var existe = db.tb_AsuntoVictimas.Where(x=>x.int_id_asunto_victima==int_id_asunto_victima).FirstOrDefault();
+                var existe = db.tb_AsuntoVictimas.Where(x => x.int_id_asunto_victima == int_id_asunto_victima).FirstOrDefault();
                 existe.bit_estatus = false;
 
                 db.SaveChanges();
@@ -172,13 +172,13 @@ namespace Objetivos_Prioritarios.ControllersServices
 
         public List<getNamePhotoList_Result> GetVictimasNamePhotoList(string nombre, string paterno, string materno)
         {
-            return db.getNamePhotoList(nombre,paterno,materno).ToList();
+            return db.getNamePhotoList(nombre, paterno, materno).ToList();
         }
 
-        public List<getListVictimasByNombre_Result> getListVictimas(string nombre, string paterno, string materno,int option, bool active)
+        public List<getListVictimasByNombre_Result> getListVictimas(string nombre, string paterno, string materno, int option, bool active)
         {
 
-            return db.getListVictimasByNombre(nombre, paterno, materno,option,active).ToList();
+            return db.getListVictimasByNombre(nombre, paterno, materno, option, active).ToList();
         }
 
 
@@ -261,7 +261,7 @@ namespace Objetivos_Prioritarios.ControllersServices
                         }
 
                         var nuevaRelacion = new tb_AsuntoVictimas();
-                        nuevaRelacion = db.tb_AsuntoVictimas.Where(x => x.int_id_victima == nuevaVictima.int_id_victima && x.int_id_asunto_relacionado== id_asunto_relacionado).FirstOrDefault();
+                        nuevaRelacion = db.tb_AsuntoVictimas.Where(x => x.int_id_victima == nuevaVictima.int_id_victima && x.int_id_asunto_relacionado == id_asunto_relacionado).FirstOrDefault();
 
                         if (nuevaRelacion != null)
                         {
@@ -523,7 +523,7 @@ namespace Objetivos_Prioritarios.ControllersServices
             }
         }
 
-        public BasicOperationResponse ReactivarVictima(int id ,int id_victima, int id_asunto_relacionado)
+        public BasicOperationResponse ReactivarVictima(int id, int id_victima, int id_asunto_relacionado)
         {
             var response = new BasicOperationResponse();
             string msg = "";
@@ -618,7 +618,7 @@ namespace Objetivos_Prioritarios.ControllersServices
                         Message = "No se encontró la víctima con el ID proporcionado."
                     };
                 }
-              
+
                 string foto = null;
                 try
                 {
@@ -771,7 +771,7 @@ namespace Objetivos_Prioritarios.ControllersServices
                                 db.SaveChanges();
                             }
 
-                           
+
 
                             if (idllamada == 1)
                             {
@@ -821,54 +821,71 @@ namespace Objetivos_Prioritarios.ControllersServices
             }
         }
 
-        public BasicOperationResponse addObjetivoAsunto(int int_id_objetivo, int int_id_asunto_relacionado,/* int estatusId,*/ string observaciones)
+        public BasicOperationResponse addObjetivoAsunto(
+            int int_id_objetivo,
+            int int_id_asunto_relacionado,
+            string observaciones,
+            int? int_id_rol_participacion = null,
+            string descripcionParticipacion = null)
         {
             try
             {
                 string msg = "";
-                var busFicha = db.tb_FichaObjetivo.FirstOrDefault(x => x.int_id_objetivo == int_id_objetivo);
+
+                var busFicha = db.tb_FichaObjetivo
+                                 .FirstOrDefault(x => x.int_id_objetivo == int_id_objetivo);
+
+                if (busFicha == null)
+                {
+                    return new BasicOperationResponse
+                    {
+                        IsSuccess = false,
+                        Message = "No se encontró la ficha del objetivo."
+                    };
+                }
 
                 var id_ficha = busFicha.int_id_ficha_objetivo;
 
-                //busFicha.int_id_estatus_proceso = estatusId;
+                var busFichaAsunto = db.tb_FichaAsunto
+                                       .FirstOrDefault(x =>
+                                           x.int_id_asunto_relacionado == int_id_asunto_relacionado &&
+                                           x.int_id_ficha_objetivo == id_ficha);
 
-                var busFichaAsunto = db.tb_FichaAsunto.Where(x => x.int_id_asunto_relacionado == int_id_asunto_relacionado && x.int_id_ficha_objetivo == id_ficha).FirstOrDefault();
-                
-                
                 if (busFichaAsunto != null)
                 {
+                    busFichaAsunto.nvarchar_observaciones = observaciones;
+                    busFichaAsunto.int_id_rol_participacion = int_id_rol_participacion;
+                    busFichaAsunto.nvarchar_descripcion_participacion = descripcionParticipacion;
+
                     if (busFichaAsunto.bit_estatus == false)
                     {
-                        busFichaAsunto.nvarchar_observaciones = observaciones;
                         busFichaAsunto.bit_estatus = true;
-                        msg = "Se activo objetivo ya existente en la relación, se actualizo la observación..";
+                        msg = "Se activó el objetivo existente en la relación y se actualizó la participación.";
                     }
                     else
                     {
-                        busFichaAsunto.nvarchar_observaciones = observaciones;
-                        msg = "Objetivo ya existente en la relación, se actualizo la observación.";
+                        msg = "El objetivo ya existía en la relación; se actualizó la participación.";
                     }
-
                 }
                 else
                 {
-
-                    // Insertar relación con el asunto
                     busFichaAsunto = new tb_FichaAsunto
                     {
                         int_id_asunto_relacionado = int_id_asunto_relacionado,
                         int_id_ficha_objetivo = id_ficha,
+                        int_id_rol_participacion = int_id_rol_participacion,
+                        nvarchar_descripcion_participacion = descripcionParticipacion,
                         nvarchar_observaciones = observaciones,
                         date_fecha_creacion = DateTime.Now,
                         bit_estatus = true
                     };
-                    db.tb_FichaAsunto.Add(busFichaAsunto);
 
+                    db.tb_FichaAsunto.Add(busFichaAsunto);
 
                     msg = "Objetivo agregado correctamente al asunto.";
                 }
-                db.SaveChanges();
 
+                db.SaveChanges();
 
                 return new BasicOperationResponse
                 {
@@ -878,7 +895,11 @@ namespace Objetivos_Prioritarios.ControllersServices
             }
             catch (Exception e)
             {
-                return new BasicOperationResponse { IsSuccess = false, Message = "Ocurrió un error al activar el objetivo (" + e.Message + ")" };
+                return new BasicOperationResponse
+                {
+                    IsSuccess = false,
+                    Message = "Ocurrió un error al relacionar el objetivo con el asunto (" + e.Message + ")"
+                };
             }
         }
 
@@ -931,5 +952,247 @@ namespace Objetivos_Prioritarios.ControllersServices
                      .OrderByDescending(x => x.date_fecha_creacion)
                      .ToList();
         }
+
+        public List<cat_RolParticipacionAsunto> GetRolesParticipacionAsunto(bool? actives)
+        {
+            bool activo = actives ?? true;
+
+            return db.cat_RolParticipacionAsunto
+                     .AsNoTracking()
+                     .Where(x => x.bit_estatus == activo)
+                     .OrderBy(x => x.nvarchar_rol)
+                     .ToList();
+        }
+
+
+        //MODULO DE ASUNTOS QUE TIENE EL OBJETIVO
+
+
+        public List<tb_FichaAsunto> GetAsuntosByFichaObjetivo(int int_id_ficha_objetivo, bool? active)
+        {
+            return db.tb_FichaAsunto
+                     .Include(x => x.tb_AsuntoRelacionado)
+                     .Include(x => x.cat_RolParticipacionAsunto)
+                     .AsNoTracking()
+                     .Where(x => x.int_id_ficha_objetivo == int_id_ficha_objetivo
+                              && (active == null || x.bit_estatus == active))
+                     .OrderByDescending(x => x.date_fecha_creacion)
+                     .ToList();
+        }
+
+        public List<tb_AsuntoRelacionado> BuscarAsuntosParaRelacionar(string texto, bool? active)
+        {
+            bool activo = active ?? true;
+            texto = (texto ?? "").Trim();
+
+            var query = db.tb_AsuntoRelacionado
+                          .AsNoTracking()
+                          .Where(x => x.bit_estatus == activo);
+
+            if (!string.IsNullOrWhiteSpace(texto))
+            {
+                query = query.Where(x =>
+                    (x.nvarchar_alias != null && x.nvarchar_alias.Contains(texto)) ||
+                    (x.nvarchar_descripcion != null && x.nvarchar_descripcion.Contains(texto)) ||
+                    (x.numavp != null && x.numavp.Contains(texto))
+                );
+            }
+
+            return query
+                .OrderByDescending(x => x.date_fecha_creacion)
+                .Take(50)
+                .ToList();
+        }
+
+
+        public BasicOperationResponse CrearAsuntoYRelacionarObjetivo(
+            tb_AsuntoRelacionado asunto,
+            int int_id_objetivo,
+            string observacionesRelacion,
+            int? int_id_rol_participacion = null,
+            string descripcionParticipacion = null)
+        {
+            try
+            {
+                if (asunto == null)
+                {
+                    return new BasicOperationResponse
+                    {
+                        IsSuccess = false,
+                        Message = "Datos inválidos del asunto."
+                    };
+                }
+
+                if (string.IsNullOrWhiteSpace(asunto.nvarchar_alias))
+                {
+                    return new BasicOperationResponse
+                    {
+                        IsSuccess = false,
+                        Message = "El alias del asunto es obligatorio."
+                    };
+                }
+
+                using (var transaction = db.Database.BeginTransaction())
+                {
+                    try
+                    {
+                        asunto.date_fecha_creacion = DateTime.Now;
+                        asunto.bit_estatus = true;
+
+                        db.tb_AsuntoRelacionado.Add(asunto);
+                        db.SaveChanges();
+
+                        int idAsunto = asunto.int_id_asunto_relacionado;
+
+                        var ficha = db.tb_FichaObjetivo
+                                      .FirstOrDefault(x => x.int_id_objetivo == int_id_objetivo);
+
+                        if (ficha == null)
+                        {
+                            transaction.Rollback();
+
+                            return new BasicOperationResponse
+                            {
+                                IsSuccess = false,
+                                Message = "No se encontró la ficha del objetivo para relacionar el asunto."
+                            };
+                        }
+
+                        var relacion = db.tb_FichaAsunto
+                                         .FirstOrDefault(x =>
+                                             x.int_id_ficha_objetivo == ficha.int_id_ficha_objetivo &&
+                                             x.int_id_asunto_relacionado == idAsunto);
+
+                        if (relacion == null)
+                        {
+                            relacion = new tb_FichaAsunto
+                            {
+                                int_id_ficha_objetivo = ficha.int_id_ficha_objetivo,
+                                int_id_asunto_relacionado = idAsunto,
+                                int_id_rol_participacion = int_id_rol_participacion,
+                                nvarchar_descripcion_participacion = descripcionParticipacion,
+                                nvarchar_observaciones = observacionesRelacion,
+                                date_fecha_creacion = DateTime.Now,
+                                bit_estatus = true
+                            };
+
+                            db.tb_FichaAsunto.Add(relacion);
+                        }
+                        else
+                        {
+                            relacion.nvarchar_observaciones = observacionesRelacion;
+                            relacion.int_id_rol_participacion = int_id_rol_participacion;
+                            relacion.nvarchar_descripcion_participacion = descripcionParticipacion;
+                            relacion.bit_estatus = true;
+                        }
+
+                        db.SaveChanges();
+                        transaction.Commit();
+
+                        return new BasicOperationResponse
+                        {
+                            IsSuccess = true,
+                            Message = "Asunto creado y vinculado correctamente al objetivo.",
+                            Id = idAsunto
+                        };
+                    }
+                    catch (Exception exTrans)
+                    {
+                        transaction.Rollback();
+
+                        return new BasicOperationResponse
+                        {
+                            IsSuccess = false,
+                            Message = "Error durante la transacción: " + exTrans.Message
+                        };
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return new BasicOperationResponse
+                {
+                    IsSuccess = false,
+                    Message = "Ocurrió un error al crear y vincular el asunto: " + ex.Message
+                };
+            }
+        }
+
+
+        public BasicOperationResponse RelacionarAsuntoObjetivo(
+    int int_id_objetivo,
+    int int_id_asunto_relacionado,
+    int? int_id_rol_participacion,
+    string nvarchar_descripcion_participacion,
+    string observaciones)
+        {
+            var response = new BasicOperationResponse();
+
+            try
+            {
+                var fichaObjetivo = db.tb_FichaObjetivo
+                    .FirstOrDefault(x => x.int_id_objetivo == int_id_objetivo && x.bit_estatus == true);
+
+                if (fichaObjetivo == null)
+                {
+                    response.IsSuccess = false;
+                    response.Message = "No se encontró la ficha del objetivo.";
+                    return response;
+                }
+
+                var relacionExistente = db.tb_FichaAsunto
+                    .FirstOrDefault(x =>
+                        x.int_id_ficha_objetivo == fichaObjetivo.int_id_ficha_objetivo &&
+                        x.int_id_asunto_relacionado == int_id_asunto_relacionado);
+
+                if (relacionExistente != null)
+                {
+                    if (relacionExistente.bit_estatus == true)
+                    {
+                        response.IsSuccess = false;
+                        response.Message = "El asunto ya se encuentra relacionado con este objetivo.";
+                        return response;
+                    }
+
+                    relacionExistente.bit_estatus = true;
+                    relacionExistente.int_id_rol_participacion = int_id_rol_participacion;
+                    relacionExistente.nvarchar_descripcion_participacion = nvarchar_descripcion_participacion;
+                    relacionExistente.nvarchar_observaciones = observaciones;
+
+                    db.SaveChanges();
+
+                    response.IsSuccess = true;
+                    response.Message = "El asunto fue relacionado correctamente.";
+                    return response;
+                }
+
+                var nuevaRelacion = new tb_FichaAsunto
+                {
+                    int_id_ficha_objetivo = fichaObjetivo.int_id_ficha_objetivo,
+                    int_id_asunto_relacionado = int_id_asunto_relacionado,
+                    int_id_rol_participacion = int_id_rol_participacion,
+                    nvarchar_descripcion_participacion = nvarchar_descripcion_participacion,
+                    nvarchar_observaciones = observaciones,
+                    bit_estatus = true,
+                    date_fecha_creacion = DateTime.Now
+                };
+
+                db.tb_FichaAsunto.Add(nuevaRelacion);
+                db.SaveChanges();
+
+                response.IsSuccess = true;
+                response.Message = "El asunto fue relacionado correctamente.";
+                return response;
+            }
+            catch (Exception ex)
+            {
+                response.IsSuccess = false;
+                response.Message = "Ocurrió un error al relacionar el asunto: " + ex.Message;
+                return response;
+            }
+        }
+
+
+
     }
 }

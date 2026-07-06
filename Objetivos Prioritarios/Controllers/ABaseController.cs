@@ -72,5 +72,17 @@ namespace Objetivos_Prioritarios.Controllers
             }
         }
 
+        private MapaRelacionesService mapaRelacionesService = null;
+        public MapaRelacionesService MapaRelacionesService
+        {
+            get
+            {
+                if (mapaRelacionesService == null)
+                    mapaRelacionesService = new MapaRelacionesService();
+                return mapaRelacionesService;
+            }
+        }
+
+
     }
 }

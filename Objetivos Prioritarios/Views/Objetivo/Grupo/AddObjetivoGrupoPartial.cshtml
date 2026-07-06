@@ -1,35 +1,63 @@
 ﻿<div class="modal" id="modalAddObjetivoGrupo" tabindex="-1">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Agregar Grupo al Objetivo</h5>
+                <h5 class="modal-title">Agregar grupo al objetivo</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
 
                 <div class="row mb-2">
-                    <div class="col-sm-4 col-md-4"><label class="control-label">Grupo Delictivo:</label></div>
+                    <div class="col-sm-4 col-md-4">
+                        <label class="control-label">Grupo delictivo:</label>
+                    </div>
                     <div class="col-sm-8 col-md-8">
                         <select class="form-control" id="ddlGrupoDelictivo"></select>
                     </div>
                 </div>
 
                 <div class="row mb-2">
-                    <div class="col-sm-4 col-md-4"><label class="control-label">Fecha Ingreso:</label></div>
+                    <div class="col-sm-4 col-md-4">
+                        <label class="control-label">Puesto / nivel:</label>
+                    </div>
+                    <div class="col-sm-8 col-md-8">
+                        <select class="form-control" id="ddlNivelOrganizacion">
+                            <option value="">Por definir</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row mb-2">
+                    <div class="col-sm-4 col-md-4">
+                        <label class="control-label">Función dentro del grupo:</label>
+                    </div>
+                    <div class="col-sm-8 col-md-8">
+                        <textarea class="form-control" id="txtFuncionGrupo" rows="3" placeholder="Describe el papel o función que desempeña dentro del grupo..."></textarea>
+                    </div>
+                </div>
+
+                <div class="row mb-2">
+                    <div class="col-sm-4 col-md-4">
+                        <label class="control-label">Fecha ingreso:</label>
+                    </div>
                     <div class="col-sm-8 col-md-8">
                         <input type="date" class="form-control" id="txtFechaIngreso" />
                     </div>
                 </div>
 
                 <div class="row mb-2">
-                    <div class="col-sm-4 col-md-4"><label class="control-label">Fecha Salida:</label></div>
+                    <div class="col-sm-4 col-md-4">
+                        <label class="control-label">Fecha salida:</label>
+                    </div>
                     <div class="col-sm-8 col-md-8">
                         <input type="date" class="form-control" id="txtFechaSalida" />
                     </div>
                 </div>
 
                 <div class="row mb-2">
-                    <div class="col-sm-4 col-md-4"><label class="control-label">Observaciones:</label></div>
+                    <div class="col-sm-4 col-md-4">
+                        <label class="control-label">Observaciones:</label>
+                    </div>
                     <div class="col-sm-8 col-md-8">
                         <textarea class="form-control" id="txtObservaciones" rows="3"></textarea>
                     </div>
@@ -48,72 +76,98 @@
     $(document).ready(function () {
         $("#modalAddObjetivoGrupo").modal("show");
 
-        // 🔹 Cargar lista de grupos delictivos en el dropdown
+        cargarGruposDisponibles();
+        cargarNivelesOrganizacion();
+
+        $("#btnSaveGrupo").off("click").on("click", function () {
+
+            if (!$("#ddlGrupoDelictivo").val()) {
+                swal({
+                    title: "Validación",
+                    text: "Selecciona un grupo delictivo.",
+                    type: "warning",
+                    confirmButtonText: "Continuar",
+                    closeOnConfirm: true
+                });
+                return;
+            }
+
+            var datas = {
+                int_id_objetivo: $("#int_id_objetivo").val(),
+                int_id_grupo: $("#ddlGrupoDelictivo").val(),
+                ID_Nivel_Organizacion: $("#ddlNivelOrganizacion").val(),
+                nvarchar_funcion_grupo: $("#txtFuncionGrupo").val(),
+                date_fecha_ingreso: $("#txtFechaIngreso").val(),
+                date_fecha_salida: $("#txtFechaSalida").val(),
+                nvarchar_observaciones: $("#txtObservaciones").val()
+            };
+
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("AddObjetivoGrupo", "Objetivo")',
+                data: datas,
+                success: function (data) {
+                    if (data.IsSuccess) {
+                        swal({
+                            title: "",
+                            text: data.Message,
+                            type: "success",
+                            confirmButtonText: "Continuar",
+                            closeOnConfirm: true
+                        }, function () {
+                            $('#closeModal').trigger('click');
+                            refreshGrupoList(true);
+                        });
+                    } else {
+                        swal({
+                            title: "Error",
+                            text: data.Message || "No se pudo guardar el grupo del objetivo.",
+                            type: "error",
+                            confirmButtonText: "Continuar",
+                            closeOnConfirm: true
+                        });
+                    }
+                },
+                error: function (xhr) {
+                    console.log(xhr.responseText);
+                    swal("Error", "Ocurrió un error al guardar el grupo del objetivo.", "error");
+                }
+            });
+        });
+    });
+
+    function cargarGruposDisponibles() {
         $.ajax({
-            type: 'POST',
-            url: '@Url.Action("GetGrupoDelictivoNotinObjetivoList", "Objetivo")', // este método debe existir
-            data: { int_id_objetivo: $("#int_id_objetivo").val()},
+            type: "POST",
+            url: '@Url.Action("GetGrupoDelictivoNotinObjetivoList", "Objetivo")',
+            data: { int_id_objetivo: $("#int_id_objetivo").val() },
             success: function (data) {
                 $("#ddlGrupoDelictivo").empty();
+                $("#ddlGrupoDelictivo").append('<option value="">Selecciona un grupo...</option>');
+
                 data.forEach(function (item) {
                     $("#ddlGrupoDelictivo").append(
-                        `<option value="${item.int_id_grupo}">${item.nvarchar_alias}</option>`
+                        `<option value="${item.int_id_grupo}">${item.nvarchar_alias} - ${item.nvarchar_grupo}</option>`
                     );
                 });
             }
         });
+    }
 
-        // 🔹 Guardar nuevo registro
-        $("#btnSaveGrupo").click(function () {
+    function cargarNivelesOrganizacion() {
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("GetNivelOrganizacionList", "Objetivo")',
+            success: function (data) {
+                $("#ddlNivelOrganizacion").empty();
+                $("#ddlNivelOrganizacion").append('<option value="">Por definir</option>');
 
-            if ($("#ddlGrupoDelictivo").val() == null || $("#ddlGrupoDelictivo").val() == undefined) {
-                swal({
-                    title: "Error",
-                    text: "Selecciona un Grupo Delictivo",
-                    type: 'error',
-                    confirmButtonText: "Continuar",
-                    closeOnConfirm: true,
-                });
-            }
-            else {
-
-                var datas = {
-                    int_id_objetivo: $("#int_id_objetivo").val(),
-                    int_id_grupo: $("#ddlGrupoDelictivo").val(),
-                    date_fecha_ingreso: $("#txtFechaIngreso").val(),
-                    date_fecha_salida: $("#txtFechaSalida").val(),
-                    nvarchar_observaciones: $("#txtObservaciones").val()
-                };
-
-                $.ajax({
-                    type: 'POST',
-                    url: '@Url.Action("AddObjetivoGrupo", "Objetivo")',
-                    data: datas,
-                    success: function (data) {
-                        if (data.IsSuccess) {
-                            swal({
-                                title: "",
-                                text: data.Message,
-                                type: 'success',
-                                confirmButtonText: "Continuar",
-                                closeOnConfirm: true,
-                            },
-                                function () {
-                                    $('#closeModal').trigger('click');
-                                    refreshGrupoList(); // refresca la tabla
-                                });
-                        } else {
-                            swal({
-                                title: "Error",
-                                text: data.Message || "No tienes permisos para esta acción",
-                                type: 'error',
-                                confirmButtonText: "Continuar",
-                                closeOnConfirm: true,
-                            });
-                        }
-                    }
+                data.forEach(function (item) {
+                    $("#ddlNivelOrganizacion").append(
+                        `<option value="${item.id}">${item.puesto}</option>`
+                    );
                 });
             }
         });
-    });
+    }
 </script>

@@ -62,6 +62,13 @@
 </div>
 
 
+<div class="modal fade" id="ModalGenerico" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content" id="ModalGenericoContent"></div>
+    </div>
+</div>
+
+
 <script>
 
     $("#closeModal").click(function () {
@@ -263,8 +270,9 @@
     //}
 
     function AddVictimaRelacionada(id) {
+        debugger;
         var int_id_asunto_relacionado = $("#int_id_asunto_relacionado").val();
-
+        debugger;
     $.get('@Url.Action("AddEditVictimaPartial", "Asuntos")',
         {
             id: id,

@@ -29,8 +29,11 @@ namespace Objetivos_Prioritarios.Models
     
         public virtual DbSet<cat_EstatusAsunto> cat_EstatusAsunto { get; set; }
         public virtual DbSet<cat_EstatusProceso> cat_EstatusProceso { get; set; }
+        public virtual DbSet<cat_Nivel_Organizacion> cat_Nivel_Organizacion { get; set; }
+        public virtual DbSet<cat_RolParticipacionAsunto> cat_RolParticipacionAsunto { get; set; }
         public virtual DbSet<cat_TipoActividadDelictiva> cat_TipoActividadDelictiva { get; set; }
         public virtual DbSet<cat_TipoAgrupacion> cat_TipoAgrupacion { get; set; }
+        public virtual DbSet<sysdiagrams> sysdiagrams { get; set; }
         public virtual DbSet<tb_AlbumFichaObjetivo> tb_AlbumFichaObjetivo { get; set; }
         public virtual DbSet<tb_AlbumFichaObjetivoDetalle> tb_AlbumFichaObjetivoDetalle { get; set; }
         public virtual DbSet<tb_AliasObjetivo> tb_AliasObjetivo { get; set; }

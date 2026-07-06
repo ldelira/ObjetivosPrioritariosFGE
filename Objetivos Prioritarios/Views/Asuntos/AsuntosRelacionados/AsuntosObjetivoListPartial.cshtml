@@ -1,0 +1,211 @@
+﻿<div class="row">
+    <div class="col-md-2">
+        <label class="control-label">Estado:</label>
+    </div>
+
+    <div class="col-md-4">
+        <select class="form-control" id="estadoAsuntosObjetivo">
+            <option value="1" @((bool)ViewBag.Actives ? "selected" : "")>Activo</option>
+            <option value="0" @(!(bool)ViewBag.Actives ? "selected" : "")>Inactivo</option>
+        </select>
+    </div>
+</div>
+
+<br />
+
+<table id="asuntosObjetivoDataTable" class="table table-striped " style="width:100%">
+    <thead>
+        <tr>
+            <th>Alias</th>
+            <th>Descripción</th>
+            <th>CI</th>
+            <th>Fecha</th>
+            <th>Rol</th>
+            <th>Participación</th>
+            <th>Observaciones relación</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<script>
+    $(document).ready(function () {
+        FillGridAsuntosObjetivo();
+
+        $("#estadoAsuntosObjetivo").off("change").on("change", function () {
+            FillGridAsuntosObjetivo();
+        });
+    });
+
+    var asuntosObjetivoColumns = [
+        {
+            title: "Alias",
+            data: "alias",
+            defaultContent: ""
+        },
+        {
+            title: "Descripción",
+            data: "descripcion_corta",
+            defaultContent: ""
+        },
+        {
+            title: "CI",
+            data: "numavp",
+            defaultContent: ""
+        },
+        {
+            title: "Fecha",
+            data: "fecha_asunto",
+            defaultContent: ""
+        },
+        {
+            title: "Rol",
+            data: "rol_participacion",
+            defaultContent: "Por definir",
+            render: function (data) {
+                return data ? `<span class="op-badge op-badge-muted">${data}</span>` : `<span class="op-badge op-badge-muted">Por definir</span>`;
+            }
+        },
+        {
+            title: "Participación",
+            data: "descripcion_participacion",
+            defaultContent: ""
+        },
+        {
+            title: "Observaciones relación",
+            data: "observaciones_relacion",
+            defaultContent: ""
+        },
+        {
+            title: "Acciones",
+            data: "int_id_ficha_asunto",
+            orderable: false,
+            searchable: false,
+            render: function (data, type, row) {
+
+                var activo = $("#estadoAsuntosObjetivo").val() === "1";
+
+                if (activo) {
+                    return `
+    <div class="btn-group">
+        <button type="button"
+                class="btn btn-sm btn-primary"
+                onclick="verAsuntoRelacionado(${row.int_id_asunto_relacionado})"
+                title="Ver asunto">
+            <i class="fa fa-eye"></i>
+        </button>
+
+        <button type="button"
+                class="btn btn-sm btn-info"
+                onclick="abrirModalVictimasDesdeFicha(${row.int_id_asunto_relacionado}, '${(row.alias || "").replace(/'/g, "\\'")}')"
+                title="Víctimas">
+            <i class="fa fa-users"></i>
+        </button>
+
+        <button type="button"
+                class="btn btn-sm btn-danger"
+                onclick="DisableAsuntoObjetivo(${data})"
+                title="Desactivar relación">
+            <i class="fa fa-trash"></i>
+        </button>
+    </div>
+`;
+                }
+
+                return `
+                    <div class="btn-group">
+                        <button type="button"
+                                class="btn btn-sm btn-success"
+                                onclick="ActivateAsuntoObjetivo(${data})"
+                                title="Reactivar relación">
+                            <i class="fa fa-power-off"></i>
+                        </button>
+                    </div>
+                `;
+            }
+        }
+    ];
+
+    function FillGridAsuntosObjetivo() {
+
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("FillAsuntosObjetivoList", "Asuntos")",
+            data: {
+                active: $("#estadoAsuntosObjetivo").val() === "1",
+                int_id_ficha_objetivo: $("#int_id_ficha_objetivo").val()
+            },
+            success: function (data) {
+
+                if ($.fn.DataTable.isDataTable("#asuntosObjetivoDataTable")) {
+                    $("#asuntosObjetivoDataTable").DataTable().clear().destroy();
+                    $("#asuntosObjetivoDataTable tbody").empty();
+                }
+
+                $("#asuntosObjetivoDataTable").DataTable({
+                    destroy: true,
+                    searching: true,
+                    responsive: true,
+                    scrollX: true,
+                    autoWidth: false,
+                    data: data,
+                    columns: asuntosObjetivoColumns,
+                    language: {
+                        sProcessing: "Procesando...",
+                        sLengthMenu: "Mostrar _MENU_ registros",
+                        sZeroRecords: "No se encontraron resultados",
+                        sEmptyTable: "Ningún dato disponible en esta tabla",
+                        sInfo: "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                        sInfoEmpty: "Mostrando registros del 0 al 0 de un total de 0 registros",
+                        sInfoFiltered: "(filtrado de un total de _MAX_ registros)",
+                        sSearch: "Buscar:",
+                        sLoadingRecords: "Cargando...",
+                        oPaginate: {
+                            sFirst: "Primero",
+                            sLast: "Último",
+                            sNext: "Siguiente",
+                            sPrevious: "Anterior"
+                        }
+                    }
+                });
+            },
+            error: function (xhr) {
+                console.log(xhr.responseText);
+                alert("Ocurrió un error al cargar los asuntos relacionados.");
+            }
+        });
+    }
+
+    function DisableAsuntoObjetivo(id) {
+        $.post("@Url.Action("DisableAsuntoObjetivo", "Asuntos")",
+            { int_id_ficha_asunto: id },
+            function (resp) {
+                if (resp.IsSuccess) {
+                    swal("", resp.Message, "success");
+                    FillGridAsuntosObjetivo();
+                } else {
+                    swal("Error", resp.Message, "error");
+                }
+            }
+        );
+    }
+
+    function ActivateAsuntoObjetivo(id) {
+        $.post("@Url.Action("ActivateAsuntoObjetivo", "Asuntos")",
+            { int_id_ficha_asunto: id },
+            function (resp) {
+                if (resp.IsSuccess) {
+                    swal("", resp.Message, "success");
+                    FillGridAsuntosObjetivo();
+                } else {
+                    swal("Error", resp.Message, "error");
+                }
+            }
+        );
+    }
+
+    function verAsuntoRelacionado(id) {
+        window.location.href = "@Url.Action("AddEditAsuntos", "Asuntos")?int_id_asunto_relacionado=" + id;
+    }
+</script>

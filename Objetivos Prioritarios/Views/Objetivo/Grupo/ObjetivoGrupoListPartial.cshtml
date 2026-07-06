@@ -1,21 +1,25 @@
-﻿<div class="row">
-    <div class="col-md-2">
+﻿<div class="row align-items-end">
+    <div class="col-md-3">
         <label class="control-label">Estado:</label>
-    </div>
-    <div class="col-md-4">
         <select class="form-control" id="estadoObjetivoGrupo">
             <option value="1" id="1" @((bool)ViewBag.Actives ? "selected" : "")>Activo</option>
             <option value="0" id="0" @(!(bool)ViewBag.Actives ? "selected" : "")>Inactivo</option>
         </select>
     </div>
-    <div class="col-md-3"></div>
-    <div class="col-md-3" style="text-align:right">
-        <button class="btn btn-primary" onclick="AddObjetivoGrupoModal()">Agregar Grupo</button>
+
+    <div class="col-md-9" style="text-align:right;">
+        <button type="button" class="btn btn-primary" onclick="AddObjetivoGrupoModal()">
+            <i class="fa fa-plus"></i> Agregar grupo
+        </button>
     </div>
 </div>
+
 <br />
+
 <div class="row">
-    <table id="objetivoGrupoDataTable" class="dataTable table table-striped" style="width:100%"></table>
+    <div class="col-md-12">
+        <table id="objetivoGrupoDataTable" class="dataTable table table-striped table-hover" style="width:100%"></table>
+    </div>
 </div>
 
 <script type="text/javascript">
@@ -24,133 +28,241 @@
         FillGridObjetivoGrupo();
     });
 
-    $("#estadoObjetivoGrupo").change(function () {
+    $("#estadoObjetivoGrupo").off("change").on("change", function () {
         var valor = $("#estadoObjetivoGrupo").val();
-        if (valor == "1") {
-            refreshGrupoList(true);
-        } else {
-            refreshGrupoList(false);
-        }
+        refreshGrupoList(valor === "1");
     });
 
     var objetivoGrupoColumns = [
-        { title: "Id", data: "id_objetivo_grupo", orderable: true, IsFiltered: false },
-        { title: "Grupo", data: "nvarchar_alias", orderable: true, IsFiltered: false },
-        { title: "Fecha Ingreso", data: "fecha_ingreso", orderable: true, IsFiltered: false, visible:false },
-        { title: "Fecha Salida", data: "fecha_salida", orderable: true, IsFiltered: false, visible: false },
-        { title: "Observaciones", data: "observaciones", orderable: true, IsFiltered: false },
         {
-           title: "Acciones",
-data: "id_objetivo_grupo",
-render: function (data, type, full, meta) {
+            title: "Id",
+            data: "id_objetivo_grupo",
+            orderable: true,
+            className: "dt-nowrap"
+        },
+        {
+            title: "Grupo",
+            data: "nvarchar_alias",
+            orderable: true,
+            render: function (data, type, row) {
+                var alias = data || "";
+                var grupo = row.nvarchar_grupo || "";
 
-    if ('@ViewBag.Actives'.toUpperCase() === 'TRUE') {
+                if (grupo) {
+                    return `<strong>${alias}</strong><br><small>${grupo}</small>`;
+                }
 
-        return `
-            <div class="btn-group">
+                return alias;
+            }
+        },
+        {
+            title: "Puesto / nivel",
+            data: "nivel_organizacion",
+            orderable: true,
+            className: "dt-nowrap",
+            render: function (data) {
+                if (!data || data === "Por definir") {
+                    return `<span class="op-badge op-badge-muted">Por definir</span>`;
+                }
 
-                <!-- BOTÓN EDITAR -->
-                <button class="btn btn-sm btn-primary"
-                        onclick="EditObjetivoGrupo(${data})"
-                        title="Editar">
-                    <i class="fa fa-edit"></i>
-                </button>
+                return `<span class="op-badge op-badge-success">${data}</span>`;
+            }
+        },
+        {
+            title: "Función",
+            data: "funcion_grupo",
+            orderable: true,
+            render: function (data) {
+                return data || "Sin información";
+            }
+        },
+        {
+            title: "Fecha ingreso",
+            data: "fecha_ingreso",
+            orderable: true,
+            className: "dt-nowrap",
+            visible: false
+        },
+        {
+            title: "Fecha salida",
+            data: "fecha_salida",
+            orderable: true,
+            className: "dt-nowrap",
+            visible: false
+        },
+        {
+            title: "Observaciones",
+            data: "observaciones",
+            orderable: true,
+            render: function (data) {
+                return data || "Sin observaciones";
+            }
+        },
+        {
+            title: "Acciones",
+            data: "id_objetivo_grupo",
+            orderable: false,
+            searchable: false,
+            className: "dt-nowrap text-center",
+            render: function (data, type, full, meta) {
 
-                <!-- BOTÓN DESACTIVAR -->
-                <button class="btn btn-sm btn-danger"
-                        onclick="DisableObjetivoGrupo(${data})"
-                        title="Desactivar">
-                    <i class="fa fa-trash"></i>
-                </button>
+                if ('@ViewBag.Actives'.toUpperCase() === 'TRUE') {
+                    return `
+                        <div class="dt-actions">
+                            <button type="button"
+                                    class="btn btn-sm btn-primary"
+                                    onclick="EditObjetivoGrupo(${data})"
+                                    title="Editar grupo del objetivo"
+                                    aria-label="Editar grupo del objetivo">
+                                <i class="fa fa-edit"></i>
+                            </button>
 
-            </div>
-        `;
+                            <button type="button"
+                                    class="btn btn-sm btn-danger"
+                                    onclick="DisableObjetivoGrupo(${data})"
+                                    title="Desactivar grupo del objetivo"
+                                    aria-label="Desactivar grupo del objetivo">
+                                <i class="fa fa-trash"></i>
+                            </button>
+                        </div>
+                    `;
+                }
 
-    } else {
-
-        return `
-            <div class="btn-group">
-
-                <!-- BOTÓN ACTIVAR -->
-                <button class="btn btn-sm btn-success"
-                        onclick="ActivateObjetivoGrupo(${data})"
-                        title="Activar">
-                    <i class="fa fa-power-off"></i>
-                </button>
-
-            </div>
-        `;
-    }
-}
-
+                return `
+                    <div class="dt-actions">
+                        <button type="button"
+                                class="btn btn-sm btn-success"
+                                onclick="ActivateObjetivoGrupo(${data})"
+                                title="Reactivar grupo del objetivo"
+                                aria-label="Reactivar grupo del objetivo">
+                            <i class="fa fa-power-off"></i>
+                        </button>
+                    </div>
+                `;
+            }
         }
     ];
 
     function FillGridObjetivoGrupo() {
         $.ajax({
-            type: 'POST',
+            type: "POST",
             url: '@Url.Action("FillObjetivoGrupoList", "Objetivo")',
-            data: { active: @Json.Encode(ViewBag.Actives), int_id_objetivo: $("#int_id_objetivo").val() },
+            data: {
+                active: @Json.Encode(ViewBag.Actives),
+                int_id_objetivo: $("#int_id_objetivo").val()
+            },
             success: function (data) {
-                var table = $('#objetivoGrupoDataTable').DataTable({
+
+                if ($.fn.dataTable.isDataTable("#objetivoGrupoDataTable")) {
+                    $("#objetivoGrupoDataTable").DataTable().clear().destroy();
+                    $("#objetivoGrupoDataTable").empty();
+                }
+
+                $("#objetivoGrupoDataTable").DataTable({
+                    destroy: true,
                     searching: true,
-                    responsive: true,
+                    responsive: false,
                     scrollX: true,
+                    scrollCollapse: true,
+                    autoWidth: false,
                     data: data,
                     columns: objetivoGrupoColumns,
-                    destroy: true, // importante para que refresque al cambiar estado
+                    order: [[0, "desc"]],
                     language: {
-                        "sProcessing": "Procesando...",
-                        "sLengthMenu": "Mostrar _MENU_ registros",
-                        "sZeroRecords": "No se encontraron resultados",
-                        "sEmptyTable": "Ningún dato disponible en esta tabla",
-                        "sInfo": "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
-                        "sInfoEmpty": "Mostrando registros del 0 al 0 de un total de 0 registros",
-                        "sInfoFiltered": "(filtrado de un total de _MAX_ registros)",
-                        "sSearch": "Buscar:",
-                        "sLoadingRecords": "Cargando...",
-                        "oPaginate": {
-                            "sFirst": "Primero",
-                            "sLast": "Último",
-                            "sNext": "Siguiente",
-                            "sPrevious": "Anterior"
+                        sProcessing: "Procesando...",
+                        sLengthMenu: "Mostrar _MENU_ registros",
+                        sZeroRecords: "No se encontraron resultados",
+                        sEmptyTable: "Ningún dato disponible en esta tabla",
+                        sInfo: "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                        sInfoEmpty: "Mostrando registros del 0 al 0 de un total de 0 registros",
+                        sInfoFiltered: "(filtrado de un total de _MAX_ registros)",
+                        sSearch: "Buscar:",
+                        sLoadingRecords: "Cargando...",
+                        oPaginate: {
+                            sFirst: "Primero",
+                            sLast: "Último",
+                            sNext: "Siguiente",
+                            sPrevious: "Anterior"
                         }
+                    },
+                    initComplete: function () {
+                        setTimeout(function () {
+                            $("#objetivoGrupoDataTable").DataTable().columns.adjust();
+                        }, 150);
                     }
                 });
+            },
+            error: function (xhr) {
+                console.log(xhr.responseText);
+                swal("Error", "Ocurrió un error al cargar los grupos del objetivo.", "error");
             }
         });
     }
 
-   function DisableObjetivoGrupo(id) {
+    function DisableObjetivoGrupo(id) {
         $.ajax({
-            type: 'POST',
+            type: "POST",
             url: '@Url.Action("DesactivarObjetivoGrupo", "Objetivo")',
             data: { int_id_objetivo_grupo: id },
             success: function (data) {
                 if (data.IsSuccess) {
-                    swal({ title: "", text: data.Message, type: 'success', confirmButtonText: "Continuar", closeOnConfirm: true },
-                        function () { swal.close(); refreshGrupoList(); });
+                    swal({
+                        title: "",
+                        text: data.Message,
+                        type: "success",
+                        confirmButtonText: "Continuar",
+                        closeOnConfirm: true
+                    }, function () {
+                        swal.close();
+                        refreshGrupoList(true);
+                    });
                 } else {
-                    swal({ title: "Error", text: "No tienes permisos para esta acción. Contacta al administrador.", type: 'error', confirmButtonText: "Continuar", closeOnConfirm: true },
-                        function () { window.location.href = '@Url.Action("Index", "ObjetivoGrupo")'; });
+                    swal({
+                        title: "Error",
+                        text: data.Message || "No tienes permisos para esta acción. Contacta al administrador.",
+                        type: "error",
+                        confirmButtonText: "Continuar",
+                        closeOnConfirm: true
+                    });
                 }
+            },
+            error: function (xhr) {
+                console.log(xhr.responseText);
+                swal("Error", "Ocurrió un error al desactivar el grupo del objetivo.", "error");
             }
         });
     }
 
     function ActivateObjetivoGrupo(id) {
         $.ajax({
-            type: 'POST',
+            type: "POST",
             url: '@Url.Action("ReactivarObjetivoGrupo", "Objetivo")',
             data: { int_id_objetivo_grupo: id },
             success: function (data) {
                 if (data.IsSuccess) {
-                    swal({ title: "", text: data.Message, type: 'success', confirmButtonText: "Continuar", closeOnConfirm: true },
-                        function () { swal.close(); refreshGrupoList(); });
+                    swal({
+                        title: "",
+                        text: data.Message,
+                        type: "success",
+                        confirmButtonText: "Continuar",
+                        closeOnConfirm: true
+                    }, function () {
+                        swal.close();
+                        refreshGrupoList(false);
+                    });
                 } else {
-                    swal({ title: "Error", text: "No tienes permisos para esta acción. Contacta al administrador.", type: 'error', confirmButtonText: "Continuar", closeOnConfirm: true },
-                        function () { window.location.href = '@Url.Action("Index", "ObjetivoGrupo")'; });
+                    swal({
+                        title: "Error",
+                        text: data.Message || "No tienes permisos para esta acción. Contacta al administrador.",
+                        type: "error",
+                        confirmButtonText: "Continuar",
+                        closeOnConfirm: true
+                    });
                 }
+            },
+            error: function (xhr) {
+                console.log(xhr.responseText);
+                swal("Error", "Ocurrió un error al activar el grupo del objetivo.", "error");
             }
         });
     }

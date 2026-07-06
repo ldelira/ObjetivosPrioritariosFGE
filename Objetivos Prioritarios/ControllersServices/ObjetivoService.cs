@@ -107,7 +107,7 @@ namespace Objetivos_Prioritarios.ControllersServices
                 db.SaveChanges();
 
                 var contNombre = db.tb_NombreObjetivo.Where(x => x.int_id_objetivo == nombreObjetivo.int_id_objetivo).Count();
-                return new BasicOperationResponse() { IsSuccess = true, Message = "Se agrego la nombre satisfactoriamente", ExtraData=nombreObjetivo.NombreCompleto,Id= contNombre };
+                return new BasicOperationResponse() { IsSuccess = true, Message = "Se agrego la nombre satisfactoriamente", ExtraData = nombreObjetivo.NombreCompleto, Id = contNombre };
             }
             catch (Exception e)
             {
@@ -452,9 +452,19 @@ namespace Objetivos_Prioritarios.ControllersServices
         public List<tb_ObjetivoGrupo> GetObjetivoGrupoList(bool? active, int? int_id_objetivo)
         {
             return db.tb_ObjetivoGrupo
+                     .Include(x => x.tb_Grupo_Delictivo)
+                     .Include(x => x.cat_Nivel_Organizacion)
                      .AsNoTracking()
                      .Where(x => x.int_id_objetivo == int_id_objetivo
                                  && (active == null || x.bit_estatus == active))
+                     .ToList();
+        }
+
+        public List<cat_Nivel_Organizacion> GetNivelOrganizacionList()
+        {
+            return db.cat_Nivel_Organizacion
+                     .AsNoTracking()
+                     .OrderBy(x => x.Puesto)
                      .ToList();
         }
 
@@ -477,6 +487,8 @@ namespace Objetivos_Prioritarios.ControllersServices
                     busqueda.date_fecha_ingreso = objetivoGrupo.date_fecha_ingreso;
                     busqueda.date_fecha_salida = objetivoGrupo.date_fecha_salida;
                     busqueda.nvarchar_observaciones = objetivoGrupo.nvarchar_observaciones;
+                    busqueda.ID_Nivel_Organizacion = objetivoGrupo.ID_Nivel_Organizacion;
+                    busqueda.nvarchar_funcion_grupo = objetivoGrupo.nvarchar_funcion_grupo;
 
                 }
                 db.SaveChanges();
@@ -519,6 +531,8 @@ namespace Objetivos_Prioritarios.ControllersServices
                 registro.date_fecha_ingreso = objetivoGrupo.date_fecha_ingreso;
                 registro.date_fecha_salida = objetivoGrupo.date_fecha_salida;
                 registro.nvarchar_observaciones = objetivoGrupo.nvarchar_observaciones;
+                registro.ID_Nivel_Organizacion = objetivoGrupo.ID_Nivel_Organizacion;
+                registro.nvarchar_funcion_grupo = objetivoGrupo.nvarchar_funcion_grupo;
 
                 db.SaveChanges();
 
@@ -725,7 +739,7 @@ namespace Objetivos_Prioritarios.ControllersServices
                 {
                     IsSuccess = true,
                     Message = "Se marcó como principal correctamente.",
-                    ExtraData= PrincipalObjetivo.NombreCompleto
+                    ExtraData = PrincipalObjetivo.NombreCompleto
                 };
             }
             catch (Exception e)

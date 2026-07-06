@@ -155,6 +155,7 @@
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="ControllersServices\MapaRelacionesService.cs" />
     <Compile Include="ControllersServices\BaseService.cs" />
     <Compile Include="ControllersServices\AsuntoService.cs" />
     <Compile Include="ControllersServices\LoginService.cs" />
@@ -168,6 +169,7 @@
     <Compile Include="Controllers\DashboardController.cs" />
     <Compile Include="Controllers\FichaObjetivoController.cs" />
     <Compile Include="Controllers\LoginController.cs" />
+    <Compile Include="Controllers\MapaRelacionesController.cs" />
     <Compile Include="Controllers\ObjetivoController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -194,6 +196,12 @@
       <DependentUpon>ObjetivosPrioritarios.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\cat_EstatusProceso.cs">
+      <DependentUpon>ObjetivosPrioritarios.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\cat_Nivel_Organizacion.cs">
+      <DependentUpon>ObjetivosPrioritarios.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\cat_RolParticipacionAsunto.cs">
       <DependentUpon>ObjetivosPrioritarios.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\cat_TipoActividadDelictiva.cs">
@@ -321,6 +329,9 @@
     </Compile>
     <Compile Include="Models\sp_ObjPri_getObjetivoInfo_Result.cs">
       <DependentUpon>Mandamientos.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\sysdiagrams.cs">
+      <DependentUpon>ObjetivosPrioritarios.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\tb_AlbumFichaObjetivo.cs">
       <DependentUpon>ObjetivosPrioritarios.tt</DependentUpon>
@@ -2589,6 +2600,11 @@
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
+    <Content Include="images\icons8-detain-50.png" />
+    <Content Include="images\icons8-fingerprint-50.png" />
+    <Content Include="images\icons8-id-card-48.png" />
+    <Content Include="images\icons8-prison-50.png" />
+    <Content Include="images\icons8-prisoner-50.png" />
     <Content Include="images\logoIcono.png" />
     <Content Include="images\logoNe.png" />
     <Content Include="images\Nodisponible.png" />
@@ -3239,6 +3255,10 @@
     <Content Include="Views\FichaObjetivo\AlbumFicha\AddEditAlbumFichaPartial.cshtml" />
     <Content Include="Views\FichaObjetivo\AlbumFichaGrupo\IndexGrupo.cshtml" />
     <Content Include="Views\FichaObjetivo\AlbumFichaGrupo\GrupoFichasListPartial.cshtml" />
+    <Content Include="Views\FichaObjetivo\EditFichaObjetivos - BACKUP.cshtml" />
+    <Content Include="Views\Asuntos\AsuntosRelacionados\AsuntosObjetivoListPartial.cshtml" />
+    <Content Include="Views\Shared\_Layout - BACKUP.cshtml" />
+    <Content Include="Views\MapaRelaciones\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -1,175 +1,667 @@
 ﻿@model Objetivos_Prioritarios.Models.tb_FichaObjetivo
+@using System.Linq
+@using System.Collections.Generic
+
+@{
+    ViewBag.Title = "Ficha del Objetivo";
+
+    var nombre = ViewBag.Nombre as string;
+    if (string.IsNullOrWhiteSpace(nombre))
+    {
+        nombre = "SIN NOMBRE PRINCIPAL";
+    }
+
+    var estatusActual = "";
+    if (ViewBag.EstatusActual != null)
+    {
+        estatusActual = ViewBag.EstatusActual.ToString();
+    }
+
+    if (string.IsNullOrWhiteSpace(estatusActual))
+    {
+        estatusActual = "Sin estatus";
+    }
+
+    var observacion = "";
+    if (ViewBag.Observacion != null)
+    {
+        observacion = ViewBag.Observacion.ToString();
+    }
+
+    var descripcionEstatus = "";
+    if (ViewBag.DescripcionEstatus != null)
+    {
+        descripcionEstatus = ViewBag.DescripcionEstatus.ToString();
+    }
+
+    var fotoBase64 = "";
+    if (ViewBag.fotobase64 != null)
+    {
+        fotoBase64 = ViewBag.fotobase64.ToString();
+    }
+
+    var fotoSrc = "";
+    if (!string.IsNullOrWhiteSpace(fotoBase64))
+    {
+        if (fotoBase64.StartsWith("data:image", StringComparison.OrdinalIgnoreCase))
+        {
+            fotoSrc = fotoBase64;
+        }
+        else
+        {
+            fotoSrc = "data:image/jpeg;base64," + fotoBase64;
+        }
+    }
+
+    var aliasList = ViewBag.Alias as IEnumerable<string>;
+    var aliasTexto = aliasList != null && aliasList.Any()
+        ? string.Join(", ", aliasList)
+        : "Sin alias";
+
+    var gruposList = ViewBag.GruposDelictivos as IEnumerable<string>;
+    var gruposTexto = gruposList != null && gruposList.Any()
+        ? string.Join(", ", gruposList)
+        : "Sin grupo asignado";
+
+    var nombresSecundariosList = ViewBag.Nombress as IEnumerable<string>;
+    var nombresSecundariosTexto = nombresSecundariosList != null && nombresSecundariosList.Any()
+        ? string.Join(", ", nombresSecundariosList)
+        : "Sin nombres secundarios";
+
+    var catalogoEstatus = ViewBag.CatalogoEstatus;
 
 
-<input type="text" id="int_id_ficha_objetivo" value="@(Model!=null?Model.int_id_ficha_objetivo:0)" style="display:none" />
+    DateTime? fechaNacimientoObj = null;
 
-<input type="text" id="int_id_objetivo" value="@(Model!=null?Model.int_id_objetivo:0)" style="display:none" />
+    if (ViewBag.FechaNacimiento != null)
+    {
+        DateTime fechaParsed;
+        if (DateTime.TryParse(ViewBag.FechaNacimiento.ToString(), out fechaParsed))
+        {
+            fechaNacimientoObj = fechaParsed;
+        }
+    }
 
-<div class="card">
-    <div class="card-body">
-        <div class="row align-items-center mb-3">
-            <!-- Título -->
-            <div class="col-md-10">
-                <h2>Detalles Objetivo</h2>
-            </div>
+    if (!fechaNacimientoObj.HasValue && Model != null)
+    {
+        try
+        {
+            var propFechaDirecta = Model.GetType().GetProperty("date_fecha_nacimiento");
+            if (propFechaDirecta != null)
+            {
+                var valorFechaDirecta = propFechaDirecta.GetValue(Model, null);
+                if (valorFechaDirecta != null)
+                {
+                    fechaNacimientoObj = Convert.ToDateTime(valorFechaDirecta);
+                }
+            }
+
+            if (!fechaNacimientoObj.HasValue)
+            {
+                var propObjetivo = Model.GetType().GetProperty("tb_Objetivo");
+                if (propObjetivo != null)
+                {
+                    var objetivoNav = propObjetivo.GetValue(Model, null);
+                    if (objetivoNav != null)
+                    {
+                        var propFechaObjetivo = objetivoNav.GetType().GetProperty("date_fecha_nacimiento");
+                        if (propFechaObjetivo != null)
+                        {
+                            var valorFechaObjetivo = propFechaObjetivo.GetValue(objetivoNav, null);
+                            if (valorFechaObjetivo != null)
+                            {
+                                fechaNacimientoObj = Convert.ToDateTime(valorFechaObjetivo);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        catch
+        {
+            fechaNacimientoObj = null;
+        }
+    }
+
+    var fechaNacimientoInput = fechaNacimientoObj.HasValue
+        ? fechaNacimientoObj.Value.ToString("yyyy-MM-dd")
+        : "";
+
+    var fechaNacimientoTexto = fechaNacimientoObj.HasValue
+        ? fechaNacimientoObj.Value.ToString("dd/MM/yyyy")
+        : "Sin fecha registrada";
+
+    var edadTexto = "";
+    if (fechaNacimientoObj.HasValue)
+    {
+        var hoy = DateTime.Today;
+        var edad = hoy.Year - fechaNacimientoObj.Value.Year;
+        if (fechaNacimientoObj.Value.Date > hoy.AddYears(-edad))
+        {
+            edad--;
+        }
+
+        if (edad >= 0 && edad < 130)
+        {
+            edadTexto = " (" + edad + " años)";
+        }
+    }
+    var rolesParticipacion = ViewBag.RolesParticipacionAsunto as List<Objetivos_Prioritarios.Models.cat_RolParticipacionAsunto>;
+}
+
+<input type="hidden" id="int_id_objetivo" value="@Model.int_id_objetivo" />
+<input type="hidden" id="int_id_ficha_objetivo" value="@Model.int_id_ficha_objetivo" />
+
+<script>
+    var int_id_objetivo = parseInt($("#int_id_objetivo").val() || "0");
+    var int_id_ficha_objetivo = parseInt($("#int_id_ficha_objetivo").val() || "0");
+
+    window.int_id_objetivo = int_id_objetivo;
+    window.int_id_ficha_objetivo = int_id_ficha_objetivo;
+</script>
+
+<div class="op-page">
+
+    <div class="op-page-title">
+        @*<h2>Ficha del Objetivo</h2>*@
+        <div class="op-breadcrumb">
+            Objetivos Prioritarios / Ficha del Objetivo
         </div>
-        <input type="hidden" id="int_id_ficha_objetivo" value="@Model.int_id_ficha_objetivo" />
-        <div class="modal-body">
-            <!-- Fila que contiene ambas columnas (izquierda y derecha) -->
-            <div class="row">
-                <!-- Columna izquierda -->
-                <div class="col-md-8">
-                    <div class="row">
-                        <!-- Nombres -->
-                        <div class="col-md-4 mb-3 d-flex flex-column">
-                            <h5 class="form-label fw-bold">Nombres:</h5>
-                            <div class="border rounded p-2 bg-light" style="height: 135px; overflow-y: auto; ">
-                                @if (ViewBag.Nombress != null && ((IEnumerable<string>)ViewBag.Nombress).Any())
-                                {
-                                    foreach (string n in (IEnumerable<string>)ViewBag.Nombress)
-                                    {
-                                        <div>@n.</div>
-                                    }
-                                }
-                                else
-                                {
-                                    <div class="text-muted">No hay más nombres asignados.</div>
-                                }
+    </div>
+
+    <div class="op-header-card op-header-card-hero">
+
+        <div class="op-photo-panel">
+            <div class="op-photo-box op-photo-box-large">
+                @if (!string.IsNullOrWhiteSpace(fotoSrc))
+                {
+                    <img src="@fotoSrc" class="op-photo" />
+                }
+                else
+                {
+                    <div class="op-photo-empty">
+                        <i class="fa fa-user"></i>
+                        <span>Sin foto</span>
+                    </div>
+                }
+            </div>
+
+            <button type="button"
+                    class="op-photo-action"
+                    data-bs-toggle="modal"
+                    data-bs-target="#modalFotoFechaObjetivo">
+                <i class="fa fa-camera"></i> Actualizar foto
+            </button>
+        </div>
+
+        <div class="op-main-info op-main-info-hero">
+
+            <div class="op-title-row op-title-row-hero">
+                <div>
+                    <h1>@nombre</h1>
+                    <p>Ficha del objetivo prioritario</p>
+                </div>
+
+                <span class="op-status op-status-hero">
+                    <i class="fa fa-circle"></i> @estatusActual
+                </span>
+            </div>
+
+            <div class="op-info-grid op-info-grid-hero">
+                <div class="op-info-item op-info-item-hero">
+                    <div class="op-info-icon">
+                        <i class="fa fa-tag"></i>
+                    </div>
+                    <div>
+                        <label>Alias</label>
+                        <strong>@aliasTexto</strong>
+                    </div>
+                </div>
+
+                <div class="op-info-item op-info-item-hero">
+                    <div class="op-info-icon">
+                        <i class="fa fa-users"></i>
+                    </div>
+                    <div>
+                        <label>Grupo delictivo</label>
+                        <strong>@gruposTexto</strong>
+                    </div>
+                </div>
+
+                <div class="op-info-item op-info-item-hero">
+                    <div class="op-info-icon">
+                        <img src="@Url.Content("~/images/icons8-id-card-48.png")" alt="ID Objetivo" />
+                    </div>
+                    <div>
+                        <label>ID Objetivo</label>
+                        <strong>@Model.int_id_objetivo</strong>
+                    </div>
+                </div>
+
+                <div class="op-info-item op-info-item-hero">
+                    <div class="op-info-icon">
+                        <i class="fa fa-calendar"></i>
+                    </div>
+                    <div>
+                        <label>Fecha de nacimiento</label>
+                        <strong>@fechaNacimientoTexto@edadTexto</strong>
+                    </div>
+                </div>
+            </div>
+
+            <div class="op-actions op-actions-hero">
+                <a class="btn btn-primary"
+                   href="@Url.Action("AddEditObjetivos", "Objetivo", new { int_id_objetivo = Model.int_id_objetivo })">
+                    <i class="fa fa-edit"></i> Editar identidad
+                </a>
+
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalBusquedaInfoGeneralDetenidos">
+                    <i class="fa fa-database"></i> Importar desde detenidos
+                </button>
+
+                <button type="button" class="btn btn-outline-primary" id="btnIrRelaciones">
+                    <i class="fa fa-folder-open"></i> Relacionar carpeta
+                </button>
+            </div>
+
+        </div>
+
+        <div class="op-side-update">
+            <div class="op-side-update-icon">
+                <i class="fa fa-camera"></i>
+            </div>
+            <h4>Foto y fecha de nacimiento</h4>
+            <p>Actualiza la fotografía y la fecha de nacimiento del objetivo.</p>
+            <button type="button"
+                    class="btn btn-primary btn-block"
+                    data-bs-toggle="modal"
+                    data-bs-target="#modalFotoFechaObjetivo">
+                <i class="fa fa-edit"></i> Editar foto y fecha
+            </button>
+        </div>
+
+    </div>
+
+    <div class="op-tabs-wrapper">
+
+        <ul class="nav nav-tabs op-tabs" id="tabsFichaObjetivo">
+            <li class="nav-item">
+                <a class="nav-link active op-tab-link" href="#tabResumen">
+                    <i class="fa fa-list"></i> Resumen
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link op-tab-link" href="#tabIdentidad">
+                    <i class="fa fa-user"></i> Identidad
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link op-tab-link" href="#tabDomicilios">
+                    <i class="fa fa-map-marker"></i> Domicilios
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link op-tab-link" href="#tabGrupos">
+                    <i class="fa fa-users"></i> Grupos
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link op-tab-link" href="#tabRelaciones">
+                    <i class="fa fa-gavel"></i> Carpetas de Investigación
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link op-tab-link" href="#tabMandamientos">
+                    <i class="fa fa-gavel"></i> Mandamientos Judiciales
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link op-tab-link" href="#tabFiliacion">
+                    <i class="fa fa-link"></i> Detenidos/Filiación
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link op-tab-link" href="#tabAsuntos">
+                    <i class="fa fa-link"></i> Asuntos relacionados
+                </a>
+            </li>
+        </ul>
+
+        <div class="op-tab-content">
+
+
+            <!-- TAB RESUMEN -->
+            <div class="op-tab-pane active" id="tabResumen">
+                <div class="op-summary-grid">
+
+                    <div class="op-summary-card">
+                        <div class="op-summary-icon">
+                            <i class="fa fa-user"></i>
+                        </div>
+                        <div>
+                            <label>Nombres</label>
+                            <strong id="countNombres">@(ViewBag.CountNombres ?? 0)</strong>
+                        </div>
+                    </div>
+
+                    <div class="op-summary-card">
+                        <div class="op-summary-icon">
+                            <i class="fa fa-tag"></i>
+                        </div>
+                        <div>
+                            <label>Alias</label>
+                            <strong id="countAlias">@(ViewBag.CountAlias ?? 0)</strong>
+                        </div>
+                    </div>
+
+                    <div class="op-summary-card">
+                        <div class="op-summary-icon">
+                            <i class="fa fa-map-marker"></i>
+                        </div>
+                        <div>
+                            <label>Domicilios</label>
+                            <strong id="countDomicilios">@(ViewBag.CountDomicilios ?? 0)</strong>
+                        </div>
+                    </div>
+
+                    <div class="op-summary-card">
+                        <div class="op-summary-icon">
+                            <i class="fa fa-users"></i>
+                        </div>
+                        <div>
+                            <label>Grupos</label>
+                            <strong id="countGrupos">@(ViewBag.CountGrupos ?? 0)</strong>
+                        </div>
+                    </div>
+
+                    <div class="op-summary-card">
+                        <div class="op-summary-icon">
+                            <i class="fa fa-folder-open"></i>
+                        </div>
+                        <div>
+                            <label>Carpetas</label>
+                            <strong id="countCarpetas">@(ViewBag.CountCarpetas ?? 0)</strong>
+                        </div>
+                    </div>
+
+                    <div class="op-summary-card">
+                        <div class="op-summary-icon">
+                            <i class="fa fa-gavel"></i>
+                        </div>
+                        <div>
+                            <label>Órdenes</label>
+                            <strong id="countOrdenes">@(ViewBag.CountOrdenes ?? 0)</strong>
+                        </div>
+                    </div>
+
+                    <div class="op-summary-card">
+                        <div class="op-summary-icon">
+                            <img src="@Url.Content("~/images/icons8-fingerprint-50.png")" alt="Filiación" />
+                        </div>
+                        <div>
+                            <label>Filiación</label>
+                            <strong id="countFiliacion">@(ViewBag.CountFiliacion ?? 0)</strong>
+                        </div>
+                    </div>
+
+                    <div class="op-summary-card">
+                        <div class="op-summary-icon">
+                            <i class="fa fa-link"></i>
+                        </div>
+                        <div>
+                            <label>Asuntos</label>
+                            <strong id="countAsuntos">@(ViewBag.CountAsuntos ?? 0)</strong>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="row">
+
+                    <div class="col-md-4">
+                        <div class="op-card op-card-full">
+                            <div class="op-card-title">
+                                <h4>Datos generales</h4>
                             </div>
-                            <!-- Observaciones -->
-                            <div style="margin-top: 25px">
-                                <h5 class="form-label fw-bold">Observaciones objetivo:</h5>
-                                <textarea placeholder="No se ha capturado ninguna observación" id="observacionobjetivo" class="form-control form-control-lg" rows="4">@ViewBag.Observacion</textarea>
+
+                            <div class="op-data-row">
+                                <label>Nombre principal</label>
+                                <span>@nombre</span>
+                            </div>
+
+                            <div class="op-data-row">
+                                <label>Alias</label>
+                                <span>@aliasTexto</span>
+                            </div>
+
+                            <div class="op-data-row">
+                                <label>Grupo delictivo</label>
+                                <span>@gruposTexto</span>
+                            </div>
+
+                            <div class="op-data-row">
+                                <label>Estatus actual</label>
+                                <span class="op-mini-status">@estatusActual</span>
+                            </div>
+
+                            <div class="op-data-row">
+                                <label>Nombres secundarios</label>
+                                <span>@nombresSecundariosTexto</span>
                             </div>
                         </div>
-                        <!-- Grupo Delictivo -->
-                        <div class="col-md-4 mb-3 d-flex flex-column">
-                            <h5 class="form-label fw-bold">Grupo Delictivo:</h5>
-                            <div class="border rounded p-2 bg-light" style="height: 135px; overflow-y: auto; ">
-                                @if (ViewBag.GruposDelictivos != null && ((IEnumerable<string>)ViewBag.GruposDelictivos).Any())
-                                {
-                                    foreach (string g in (IEnumerable<string>)ViewBag.GruposDelictivos)
-                                    {
-                                        <div>@g.</div>
-                                    }
-                                }
-                                else
-                                {
-                                    <div class="text-muted">No hay grupos asignados.</div>
-                                }
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="op-card op-card-full">
+                            <div class="op-card-title">
+                                <h4>Observación importante</h4>
                             </div>
-                            <!-- Estatus Actual -->
-                            @{
-                                int? idEstatusActual = null;
 
-                                if (!string.IsNullOrWhiteSpace(ViewBag.EstatusActual))
-                                {
-                                    foreach (var est in ViewBag.CatalogoEstatus)
-                                    {
-                                        if (est.nvarchar_estatus == ViewBag.EstatusActual)
-                                        {
-                                            idEstatusActual = est.int_id_estatus_proceso;
-                                            break;
-                                        }
-                                    }
-                                }
+                            @if (string.IsNullOrWhiteSpace(observacion))
+                            {
+                                <div class="op-empty">
+                                    Sin observaciones registradas.
+                                </div>
                             }
-                            <div style="margin-top: 25px">
-                                <h5 class="form-label fw-bold">Estatus actual:</h5>
-                                <select id="selectEstatus" class="form-control form-control-lg">
+                            else
+                            {
+                                <div class="op-warning-box">
+                                    @observacion
+                                </div>
+                            }
+                        </div>
+                    </div>
 
-                                    @if (idEstatusActual.HasValue)
-                                    {
-                                        <option value="@idEstatusActual" selected>
-                                            @ViewBag.EstatusActual
-                                        </option>
-                                    }
-                                    else
-                                    {
-                                        <option value="">
-                                            -- No se ha capturado ningún estatus --
-                                        </option>
-                                    }
+                    <div class="col-md-4">
+                        <div class="op-card op-card-full">
+                            <div class="op-card-title">
+                                <h4>Descripción del estatus</h4>
+                            </div>
 
-                                    @foreach (var est in ViewBag.CatalogoEstatus)
+                            @if (string.IsNullOrWhiteSpace(descripcionEstatus))
+                            {
+                                <div class="op-empty">
+                                    Sin descripción registrada.
+                                </div>
+                            }
+                            else
+                            {
+                                <p class="op-description">@descripcionEstatus</p>
+                            }
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="op-card op-mt-3">
+                    <div class="op-card-title">
+                        <h4>Actualizar estatus y observaciones</h4>
+                        <span>Modifica la información principal de la ficha</span>
+                    </div>
+
+                    <div class="row">
+
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Estatus del proceso</label>
+                                <select id="ddlEstatusProceso" class="form-control">
+                                    <option value="">Seleccione...</option>
+
+                                    @if (catalogoEstatus != null)
                                     {
-                                        if (!idEstatusActual.HasValue || est.int_id_estatus_proceso != idEstatusActual)
+                                        foreach (var item in catalogoEstatus)
                                         {
-                                            <option value="@est.int_id_estatus_proceso">
-                                                @est.nvarchar_estatus
+                                            var selected = "";
+                                            try
+                                            {
+                                                if (Model.int_id_estatus_proceso == item.int_id_estatus_proceso)
+                                                {
+                                                    selected = "selected";
+                                                }
+                                            }
+                                            catch { }
+
+                                            <option value="@item.int_id_estatus_proceso" @selected>
+                                                @item.nvarchar_estatus
                                             </option>
                                         }
                                     }
                                 </select>
                             </div>
                         </div>
-                        <!-- Alias -->
-                        <div class="col-md-4 mb-3 d-flex flex-column">
-                            <h5 class="form-label fw-bold">Alias:</h5>
-                            <div class="border rounded p-2 bg-light" style="height: 135px; overflow-y: auto;">
-                                @if (ViewBag.Alias != null && ((IEnumerable<string>)ViewBag.Alias).Any())
-                                {
-                                    foreach (string a in (IEnumerable<string>)ViewBag.Alias)
-                                    {
-                                        <div>@a.</div>
-                                    }
-                                }
-                                else
-                                {
-                                    <div class="text-muted">No hay alias asignados.</div>
-                                }
-                            </div>
-                            <!-- Descripción Estatus (ocupa todo el espacio restante) -->
-                            <div style="margin-top: 25px">
-                                <h5 for="descripcionEstatus" class="form-label fw-bold">Descripción estatus:</h5>
-                                <textarea placeholder="No se ha capturado ninguna descripción" id="descripcionEstatus" class="form-control form-control-lg" rows="4">@ViewBag.DescripcionEstatus</textarea>
-                            </div>
-                            <!-- Botón guardar alineado a la derecha -->
-                            <div class="d-flex justify-content-end" style="margin-top: 15px;">
-                                <button type="button" class="btn btn-primary btn-lg px-4" onclick="guardarEstatusProceso()">
-                                    Guardar1
-                                </button>
+
+                        <div class="col-md-8">
+                            <div class="form-group">
+                                <label>Descripción del estatus</label>
+                                <textarea id="txtDescripcionEstatus"
+                                          class="form-control"
+                                          rows="3"
+                                          placeholder="Describe el estatus actual del objetivo...">@descripcionEstatus</textarea>
                             </div>
                         </div>
+
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Observación importante del objetivo</label>
+                                <textarea id="txtObservacionesObjetivo"
+                                          class="form-control"
+                                          rows="4"
+                                          placeholder="Agrega observaciones relevantes del objetivo...">@observacion</textarea>
+                            </div>
+                        </div>
+
+                        <div class="col-md-12 text-right">
+                            <button type="button" class="btn btn-primary" id="btnGuardarResumen">
+                                <i class="fa fa-save"></i> Guardar resumen
+                            </button>
+                        </div>
+
                     </div>
                 </div>
-                <!-- Columna derecha (¡alineada correctamente!) -->
-                <div class="col-md-2 d-flex flex-column align-items-center mx-auto pt-0 mt-0">
-                    <!-- Foto -->
-                    <div class="border rounded p-2 bg-light mb-3 text-center">
-                        <img src="data:image/*;base64,@ViewBag.fotobase64"
-                             alt="Foto"
-                             class="img-thumbnail"
-                             style="max-width:350px; max-height:350px; object-fit:contain;" />
-                    </div>
-                    <div class="text-center card-title" style="margin-top:0  !important; padding-top:0 !important">
-                        <label>@ViewBag.Nombre</label>
+
+            </div>
+
+            <!-- TAB IDENTIDAD -->
+            <div class="op-tab-pane" id="tabIdentidad">
+
+                <div class="op-section-header">
+                    <div>
+                        <h3>Identidad del objetivo</h3>
+                        <p>Administra nombres, alias, fotografía y datos básicos del objetivo.</p>
                     </div>
 
-                    <button type="button" class="btn btn-primary btn-lg px-4" onclick="ObjetivoPrioritario()">
-                        Redireccionar a objetivo
-                    </button>
+                    <a class="btn btn-primary"
+                       href="@Url.Action("AddEditObjetivos", "Objetivo", new { int_id_objetivo = Model.int_id_objetivo })">
+                        <i class="fa fa-edit"></i> Abrir edición completa
+                    </a>
                 </div>
+
+                <div class="row">
+
+                    <div class="col-md-6">
+                        <div class="op-card">
+                            <div class="op-card-title">
+                                <h4>Nombres registrados</h4>
+                                <span>Nombres principales y alternativos</span>
+                            </div>
+
+                            <div id="listaNombrePersona"></div>
+
+                            @*Html.Action("ObjetivoNombreListPartial", "Objetivo", new { actives = true })*@
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="op-card">
+                            <div class="op-card-title">
+                                <h4>Alias registrados</h4>
+                                <span>Sobrenombres conocidos</span>
+                            </div>
+
+                            <div id="listaAliasObjetivo"></div>
+                            @*Html.Action("ObjetivoAliasListPartial", "Objetivo", new { actives = true })*@
+                        </div>
+                    </div>
+
+                </div>
+
             </div>
-        </div>
-        <h5 class="card-title">Ficha Objetivo</h5>
-        <!-- Default Tabs -->
-        <ul class="nav nav-tabs" id="myTab" role="tablist">
-            <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">Carpetas de Investigación</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="false" tabindex="-1">Ordenes de Aprehensión</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact" type="button" role="tab" aria-controls="contact" aria-selected="false" tabindex="-1">Detenidos</button>
-            </li>
-        </ul>
-        <div class="tab-content pt-2" id="myTabContent">
-            <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
-                <section class="section">
-                    <div class="row">
-                        <div class="col-lg-6">
+
+            <!-- TAB DOMICILIOS -->
+            <div class="op-tab-pane" id="tabDomicilios">
+
+                <div class="op-section-header">
+                    <div>
+                        <h3>Domicilios del objetivo</h3>
+                        <p>Consulta, agrega o edita domicilios asociados al objetivo.</p>
+                    </div>
+                </div>
+
+                <div class="op-card">
+                    <div id="listaDomicilioObjetivo"></div>
+                    @*Html.Action("ObjetivoDomicilioListPartial", "Objetivo", new { actives = true })*@
+                </div>
+
+            </div>
+
+            <!-- TAB GRUPOS -->
+            <div class="op-tab-pane" id="tabGrupos">
+
+                <div class="op-section-header">
+                    <div>
+                        <h3>Grupos delictivos</h3>
+                        <p>Administra los grupos relacionados al objetivo.</p>
+                    </div>
+                </div>
+
+                <div class="op-card">
+                    <div id="listaGrupoDelictivo"></div>
+                    @*Html.Action("ObjetivoGrupoListPartial", "Objetivo", new { actives = true })*@
+                </div>
+
+            </div>
+
+            <!-- TAB CARPETAS INVESTIGACIÓN -->
+            <div class="op-tab-pane" id="tabRelaciones">
+
+                <div class="op-section-header">
+                    <div>
+                        <h3>Carpetas de Investigación</h3>
+                        <p>Relaciona carpetas de investigación relacionados al objetivo.</p>
+                    </div>
+                </div>
+
+                <div class="row">
+
+                    <div class="col-md-6">
+                        <div class="op-card">
+                            <div class="op-card-title">
+                                <h4>Búsqueda de carpetas</h4>
+                                <span>Busca por nombre o número de carpeta.</span>
+                            </div>
                             <div class="card">
                                 <div class="card-body">
                                     <h5 class="card-title">Búsqueda de Carpeta</h5>
@@ -209,28 +701,53 @@
                                     </div>
                                     <div class="mb-3">
                                         <button type="button" id="btnBuscar" class="btn btn-primary w-100">
-                                            🔍 Buscar
+                                            <i class="fa fa-search"></i> Buscar detenido
                                         </button>
                                     </div>
                                     <div id="busquedaCarpetas"></div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="col-lg-6">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h5 class="card-title">Carpetas Relacionadas</h5>
-                                    <div id="carpetasRelacionadas"></div>
-                                </div>
-                            </div>
+                            @*Html.Action("BusquedaCarpetasListPartial", "FichaObjetivo")*@
+                            @*<div id="busquedaCarpetas"></div>*@
                         </div>
                     </div>
-                </section>
+
+                    <div class="col-md-6">
+                        <div class="op-card">
+                            <div class="op-card-title">
+                                <h4>Carpetas relacionadas</h4>
+                                <span>Carpetas ya vinculadas al objetivo.</span>
+                            </div>
+
+                            @*Html.Action("CarpetasRelacionadasListPartial", "FichaObjetivo", new { actives = true })*@
+                            <div id="carpetasRelacionadas"></div>
+
+                        </div>
+                    </div>
+
+                </div>
+
+
+
             </div>
-            <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
-                <section class="section">
-                    <div class="row">
-                        <div class="col-lg-6">
+            <!-- TAB MANDAMIENTOS JUDICIALES -->
+            <div class="op-tab-pane" id="tabMandamientos">
+
+                <div class="op-section-header">
+                    <div>
+                        <h3>Mandamientos Judiciales</h3>
+                        <p>Relaciona mandamientos judiciales relacionados al objetivo.</p>
+                    </div>
+                </div>
+
+                <div class="row">
+
+                    <div class="col-md-6">
+                        <div class="op-card">
+                            <div class="op-card-title">
+                                <h4>Búsqueda de órdenes</h4>
+                                <span>Busca órdenes de aprehensión para relacionar.</span>
+                            </div>
                             <div class="card">
                                 <div class="card-body">
                                     <h5 class="card-title">Búsqueda de Ordenes de Aprehensión</h5>
@@ -270,30 +787,52 @@
                                     </div>
                                     <div class="mb-3">
                                         <button type="button" id="btnBuscarOrd" class="btn btn-primary w-100">
-                                            🔍 Buscar
+                                            <i class="fa fa-search"></i> Buscar detenido
                                         </button>
                                     </div>
                                     <div id="busquedaOrdenes"></div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="col-lg-6">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h5 class="card-title">Ordenes Aprehensión</h5>
 
-                                    <div id="ordenesRelacionadas"></div>
+                            @*<div id="busquedaOrdenes"></div>*@
 
-                                </div>
-                            </div>
+                            @*                                    Html.Action("BusquedaOrdenesListPartial", "FichaObjetivo")*@
                         </div>
                     </div>
-                </section>
+
+                    <div class="col-md-6">
+                        <div class="op-card">
+                            <div class="op-card-title">
+                                <h4>Órdenes relacionadas</h4>
+                                <span>Órdenes ya vinculadas al objetivo.</span>
+                            </div>
+                            <div id="ordenesRelacionadas"></div>
+
+                            @*Html.Action("OrdenesRelacionadasListPartial", "FichaObjetivo", new { actives = true })*@
+                        </div>
+                    </div>
+
+                </div>
+
             </div>
-            <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">
-                <section class="section">
-                    <div class="row">
-                        <div class="col-lg-6">
+            <!-- TAB FILIACIÓN -->
+            <div class="op-tab-pane" id="tabFiliacion">
+
+                <div class="op-section-header">
+                    <div>
+                        <h3>Detenidos/Filiación</h3>
+                        <p>Relaciona detenidos/filiación  relacionados al objetivo.</p>
+                    </div>
+                </div>
+
+                <div class="row">
+
+                    <div class="col-md-6">
+                        <div class="op-card">
+                            <div class="op-card-title">
+                                <h4>Búsqueda en filiación</h4>
+                                <span>Busca detenidos o registros de filiación.</span>
+                            </div>
                             <div class="card">
                                 <div class="card-body">
                                     <h5 class="card-title">Búsqueda de Detenidos</h5>
@@ -333,25 +872,264 @@
                                     </div>
                                     <div class="mb-3">
                                         <button type="button" id="btnBuscarFili" class="btn btn-primary w-100">
-                                            🔍 Buscar
+                                            <i class="fa fa-search"></i> Buscar detenido
                                         </button>
                                     </div>
                                     <div id="busquedafiliacion"></div>
                                 </div>
                             </div>
+
+                            @*<div id="busquedafiliacion"></div>*@
+                            @*Html.Action("BusquedaFiliacionListPartial", "FichaObjetivo")*@
                         </div>
-                        <div class="col-lg-6">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h5 class="card-title">Delitos Detenido</h5>
+                    </div>
 
-                                    <div id="filiacionRelacionadas"></div>
+                    <div class="col-md-6">
+                        <div class="op-card">
+                            <div class="op-card-title">
+                                <h4>Detenidos / delitos relacionados</h4>
+                                <span>Registros ya vinculados al objetivo.</span>
+                            </div>
+                            <div id="filiacionRelacionadas"></div>
+                            @*Html.Action("FiliacionRelacionadasListPartial", "FichaObjetivo", new { actives = true })*@
+                        </div>
+                    </div>
 
-                                </div>
+                </div>
+               
+
+            </div>
+            <!-- TAB ASUNTOS -->
+            <div class="op-tab-pane" id="tabAsuntos">
+
+                <div class="op-section-header">
+                    <div>
+                        <h3>Asuntos relacionados</h3>
+                        <p>Consulta los asuntos donde participa este objetivo o relaciona un asunto existente.</p>
+                    </div>
+
+                    <div>
+                        <button type="button" class="btn btn-primary" id="btnAbrirModalNuevoAsunto">
+                            <i class="fa fa-plus"></i> Crear asunto y vincular
+                        </button>
+
+                        <a class="btn btn-outline-primary" href="@Url.Action("Index", "Asuntos")">
+                            <i class="fa fa-link"></i> Ir a asuntos
+                        </a>
+                    </div>
+                </div>
+
+                <div class="row">
+
+                    <div class="col-md-5">
+                        <div class="op-card">
+                            <div class="op-card-title">
+                                <h4>Buscar asunto existente</h4>
+                                <span>Busca por alias, descripción o número de carpeta.</span>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Buscar asunto</label>
+                                <input type="text"
+                                       id="txtBuscarAsuntoExistente"
+                                       class="form-control"
+                                       placeholder="Alias, descripción o CI..." />
+                            </div>
+
+                            <div class="form-group">
+                                <label>Observación de la relación</label>
+                                <textarea id="txtObservacionRelacionAsunto"
+                                          class="form-control"
+                                          rows="3"
+                                          placeholder="Observación opcional sobre la participación del objetivo en este asunto..."></textarea>
+                            </div>
+
+                            <button type="button" class="btn btn-primary btn-block" id="btnBuscarAsuntosExistentes">
+                                <i class="fa fa-search"></i> Buscar asunto
+                            </button>
+
+                            <hr />
+
+                            <table id="asuntosBusquedaDataTable" class="table table-striped" style="width:100%">
+                                <thead>
+                                    <tr>
+                                        <th>Alias</th>
+                                        <th>CI</th>
+                                        <th>Acción</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+
+                        </div>
+                    </div>
+
+                    <div class="col-md-7">
+                        <div class="op-card">
+                            <div class="op-card-title">
+                                <h4>Asuntos vinculados al objetivo</h4>
+                                <span>Asuntos ya relacionados con esta ficha.</span>
+                            </div>
+
+                            <div id="asuntosRelacionadosObjetivo"></div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<div id="divModalNombre"></div>
+<div id="modalContainer"></div>
+<div id="modalBusquedaInfoGeneral"></div>
+<div id="divModalAlias"></div>
+
+
+
+<div class="modal fade" id="modalFotoFechaObjetivo" tabindex="-1" aria-labelledby="modalFotoFechaObjetivoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header" style="background:#2f5bff; color:white;">
+                <h5 class="modal-title" id="modalFotoFechaObjetivoLabel">
+                    <i class="fa fa-camera"></i> Editar foto y fecha de nacimiento
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-7">
+                        <div class="form-group">
+                            <label>Fecha de nacimiento <span style="color:red;">*</span></label>
+                            <input type="date"
+                                   id="fechaNacimientoFicha"
+                                   class="form-control"
+                                   value="@fechaNacimientoInput" />
+                        </div>
+
+                        <div class="form-group">
+                            <label>Fotografía</label>
+                            <input type="file"
+                                   id="fotoInputFicha"
+                                   accept="image/*"
+                                   class="form-control" />
+                            <small class="form-text text-muted">
+                                Si solo deseas cambiar la fecha, puedes guardar sin seleccionar una nueva fotografía.
+                            </small>
+                        </div>
+
+                        <div class="alert alert-info" style="margin-top:14px;">
+                            <i class="fa fa-info-circle"></i>
+                            Este cambio actualizará los datos principales del objetivo.
+                        </div>
+                    </div>
+
+                    <div class="col-md-5 text-center">
+                        <div id="previewContainerFicha" class="op-modal-photo-preview" style="@(string.IsNullOrWhiteSpace(fotoSrc) ? "display:none;" : "")">
+                            <img id="previewImageFicha" src="@fotoSrc" />
+                        </div>
+
+                        <div id="previewEmptyFicha" class="op-modal-photo-empty" style="@(string.IsNullOrWhiteSpace(fotoSrc) ? "" : "display:none;")">
+                            <i class="fa fa-user"></i>
+                            <span>Sin foto seleccionada</span>
+                        </div>
+
+                        <button type="button" id="removeImageFicha" class="btn btn-danger btn-sm" style="margin-top:10px;">
+                            <i class="fa fa-times"></i> Quitar selección
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" id="btnGuardarFotoFechaFicha" class="btn btn-primary">
+                    <i class="fa fa-save"></i> Guardar cambios
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="modalBusquedaInfoGeneralDetenidos" tabindex="-1" aria-labelledby="modalBusquedaInfoGeneralLabel" aria-hidden="true">
+    <div class="modal-dialog" style="max-width:65%;">
+        <div class="modal-content">
+            <!-- Encabezado -->
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title" id="modalBusquedaInfoGeneralLabel">Importar desde detenidos</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+
+            <div class="modal-body">
+                <!-- Campos de búsqueda -->
+                <div id="busquedaPorNombreInfo">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <label for="searchNameDetBus" class="form-label">Nombre</label>
+                            <input type="text" class="form-control" id="searchNameDetBus" placeholder="Nombre">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="searchPaternoDetBus" class="form-label">Apellido Paterno</label>
+                            <input type="text" class="form-control" id="searchPaternoDetBus" placeholder="Paterno">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="searchMaternoDetBus" class="form-label">Apellido Materno</label>
+                            <input type="text" class="form-control" id="searchMaternoDetBus" placeholder="Materno">
+                        </div>
+                    </div>
+                    <br>
+                </div>
+
+                <!-- Botón de búsqueda -->
+                <div class="mb-3">
+                    <button type="button" id="btnBuscarInfoGeneral" class="btn btn-primary w-100">
+                        <i class="fa fa-search"></i> Buscar detenido
+                    </button>
+                </div>
+
+                <!-- Pestañas -->
+                <ul class="nav nav-tabs" id="infoTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="resultados-tab" data-bs-toggle="tab" data-bs-target="#resultadosTab" type="button" role="tab" aria-controls="resultadosTab" aria-selected="true">
+                            <i class="fa fa-list"></i> Detenidos
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="fotos-tab" data-bs-toggle="tab" data-bs-target="#fotosTab" type="button" role="tab" aria-controls="fotosTab" aria-selected="false">
+                            <i class="fa fa-image"></i> Fotos
+                        </button>
+                    </li>
+                </ul>
+
+                <!-- Contenido de pestañas -->
+                <div class="tab-content mt-3" id="infoTabsContent">
+                    <!-- Resultados -->
+                    <div class="tab-pane fade show active" id="resultadosTab" role="tabpanel" aria-labelledby="resultados-tab">
+                        <div id="busquedaInfoGeneral" class="p-2 border rounded bg-light">
+                            <!-- Aquí se cargarán los resultados -->
+                        </div>
+                    </div>
+
+                    <!-- Fotos -->
+                    <div class="tab-pane fade" id="fotosTab" role="tabpanel" aria-labelledby="fotos-tab">
+                        <div id="busquedafotos" class="p-2 border rounded bg-light text-center">
+                            <div class="row" id="galeriaFotos">
+                                <!-- Se llenará dinámicamente -->
                             </div>
                         </div>
                     </div>
-                </section>
+                </div>
+            </div>
+
+            <!-- Pie del modal -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
             </div>
         </div>
     </div>
@@ -360,299 +1138,1935 @@
 
 
 
+<div class="modal fade" id="modalCrearAsuntoVincular" tabindex="-1" role="dialog" aria-labelledby="modalCrearAsuntoVincularLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
 
-<div id="divModalNombre"></div>
+            <div class="modal-header" style="background:#2f5bff; color:white;">
+                <h5 class="modal-title" id="modalCrearAsuntoVincularLabel">
+                    Crear asunto y vincular al objetivo
+                </h5>
+
+                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar" style="color:white;">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+
+                <div class="alert alert-info">
+                    Este asunto se guardará y se relacionará automáticamente con el objetivo actual.
+                </div>
+
+                <div class="row">
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Alias del asunto <span style="color:red">*</span></label>
+                            <input type="text"
+                                   class="form-control"
+                                   id="txtNuevoAsuntoAlias"
+                                   placeholder="Ej. Caso doña Juana" />
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>CI</label>
+                            <input type="text"
+                                   class="form-control"
+                                   id="txtNuevoAsuntoNumAvp"
+                                   placeholder="Ej. CI/AGS/10372/05-22" />
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Fecha del asunto</label>
+                            <input type="date"
+                                   class="form-control"
+                                   id="txtNuevoAsuntoFecha" />
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Estatus del asunto</label>
+                            <select class="form-control" id="ddlNuevoAsuntoEstatus">
+                                <option value="">Seleccione...</option>
+
+                                @if (ViewBag.EstatusAsuntoList != null)
+                                {
+                                    foreach (var item in ViewBag.EstatusAsuntoList)
+                                    {
+                                        <option value="@item.int_id_estatus_asunto">
+                                            @item.nvarchar_estatus
+                                        </option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label>Descripción del asunto</label>
+                            <textarea class="form-control"
+                                      id="txtNuevoAsuntoDescripcion"
+                                      rows="5"
+                                      placeholder="Describe los hechos o contexto del asunto..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label>Observación de la relación con este objetivo</label>
+                            <textarea class="form-control"
+                                      id="txtNuevoAsuntoObservacionRelacion"
+                                      rows="3"
+                                      placeholder="Ej. Participa como objetivo principal, probable generador, relacionado, etc."></textarea>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                    Cancelar
+                </button>
+
+                <button type="button" class="btn btn-primary" id="btnGuardarNuevoAsuntoVincular">
+                    <i class="fa fa-save"></i> Guardar y vincular
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="modalVictimasDesdeFicha" tabindex="-1" role="dialog" aria-labelledby="modalVictimasDesdeFichaLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+
+            <div class="modal-header" style="background:#2f5bff; color:white;">
+                <h5 class="modal-title" id="modalVictimasDesdeFichaLabel">
+                    Víctimas del asunto
+                </h5>
+
+                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar" style="color:white;">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+
+                <!-- IMPORTANTE: tus partials de Asuntos pueden leer este hidden -->
+                <input type="hidden" id="int_id_asunto_relacionado" value="0" />
+
+                <div class="alert alert-info">
+                    <strong>Asunto:</strong> <span id="lblAsuntoVictimasDesdeFicha">Sin asunto seleccionado</span>
+                </div>
+
+                <div class="row">
+
+                    <div class="col-md-5">
+                        <div class="op-card">
+                            <div class="op-card-title">
+                                <h4>Buscar víctima existente</h4>
+                                <span>Busca una víctima ya registrada y agrégala al asunto.</span>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <label>Nombre</label>
+                                    <input type="text" class="form-control" id="txtBuscarVictimaNombreFicha" placeholder="Nombre" />
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label>Paterno</label>
+                                    <input type="text" class="form-control" id="txtBuscarVictimaPaternoFicha" placeholder="Paterno" />
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label>Materno</label>
+                                    <input type="text" class="form-control" id="txtBuscarVictimaMaternoFicha" placeholder="Materno" />
+                                </div>
+                            </div>
+
+                            <br />
+
+                            <button type="button" class="btn btn-primary btn-block" id="btnBuscarVictimasDesdeFicha">
+                                <i class="fa fa-search"></i> Buscar víctima
+                            </button>
+
+                            <hr />
+
+                            <div id="contenedorVictimasBusquedaDesdeFicha"></div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-7">
+                        <div class="op-card">
+                            <div class="op-card-title">
+                                <h4>Víctimas agregadas al asunto</h4>
+                                <span>Víctimas ya vinculadas al asunto seleccionado.</span>
+                            </div>
+
+                            <div id="contenedorVictimasRelacionadasDesdeFicha"></div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                    Cerrar
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalObjetivo" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Información del objetivo en el asunto</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <div class="row mt-3">
+
+                    <div class="mb-3">
+                        <label class="form-label">Asunto seleccionado:</label>
+                        <div id="lblAsuntoSeleccionado" class="form-control bg-light">
+                            Sin asunto seleccionado
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="selectRolParticipacionAsunto" class="form-label">Rol en el asunto:</label>
+                        <select id="selectRolParticipacionAsunto" class="form-control">
+                            <option value="">Seleccione un rol...</option>
+                            @if (rolesParticipacion != null)
+                            {
+                                foreach (var rol in rolesParticipacion)
+                                {
+                                    <option value="@rol.int_id_rol_participacion">@rol.nvarchar_rol</option>
+                                }
+                            }
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="txtDescripcionParticipacionAsunto" class="form-label">Descripción de participación:</label>
+                        <textarea class="form-control"
+                                  id="txtDescripcionParticipacionAsunto"
+                                  rows="3"
+                                  placeholder="Ejemplo: Participó como ejecutor, acompañante, chofer, apoyo logístico, etc."></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="txtObservacionRelacionAsunto" class="form-label">Observaciones de la relación:</label>
+                        <textarea class="form-control"
+                                  id="txtObservacionRelacionAsunto"
+                                  rows="3"
+                                  placeholder="Observaciones generales de la relación con el asunto."></textarea>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">
+                    Cerrar
+                </button>
+
+                <button type="button" class="btn btn-success" onclick="guardarObjetivoModal()">
+                    Aceptar
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
 
 <script>
+    var int_id_objetivo = 0;
+    var int_id_ficha_objetivo = 0;
+
+    var asuntoSeleccionado = null;
+    var ciAsuntoSeleccionado = "";
+
     $(document).ready(function () {
-        refreshCarpetasAgregadasList();
-        refreshOrdenesAgregadasList();
-        refreshFiliacionAgregadasList();
-        //refreshEstatusObjetivo();
-    })
 
-        @*function refreshEstatusObjetivo() {
+        int_id_objetivo = parseInt($("#int_id_objetivo").val() || "0");
+        int_id_ficha_objetivo = parseInt($("#int_id_ficha_objetivo").val() || "0");
 
-    $.ajax({
-        url: '@Url.Action("GetEstatusProcesos", "FichaObjetivo")',
-        type: 'POST',
-        data: {
-            idficha: $("#int_id_ficha_objetivo").val()
-        },
-        success: function (data) {
+        window.int_id_objetivo = int_id_objetivo;
+        window.int_id_ficha_objetivo = int_id_ficha_objetivo;
 
-            // ============================
-            // 1. LLENAR EL SELECT
-            // ============================
-            const ddl = $("#selectEstatus");
-            ddl.empty();
-            ddl.append('<option value="">-- Seleccione --</option>');
+        inicializarTabsFicha();
+        inicializarSubtabsRelaciones();
+        inicializarBotonesFicha();
 
-            data.catalogo.forEach(est => {
-                ddl.append(
-                    `<option value="${est.int_id_estatus_proceso}">${est.nvarchar_estatus}</option>`
-                );
-            });
-
-            if (data.estatusActual) {
-                ddl.val(data.estatusActual);
-            }
-
-            // ============================
-            // 2. LLENAR TEXTAREA DE DESCRIPCIÓN
-            // ============================
-            if (data.descripcionestatus) {
-                $("#descripcionEstatus").val(data.descripcionestatus);
-            }
-
-            // ============================
-            // 3. LLENAR TEXTAREA DE OBSERVACIONES
-            // ============================
-            if (data.observacion) {
-                $("#observacionesObjetivo").val(data.observacion);
-            }
-
-            // ============================
-            // 4. NOMBRE DEL OBJETIVO (si lo usas)
-            // ============================
-            if (data.nombre) {
-                $("#lblNombreObjetivo").text(data.nombre);
-            }
-
-            // ============================
-            // 5. ALIAS (si quieres mostrarlos en lista)
-            // ============================
-            if (data.alias) {
-                let htmlAlias = "";
-                data.alias.forEach(a => {
-                    htmlAlias += `<span class="badge bg-secondary me-2">${a.nvarchar_alias}</span>`;
-                });
-                $("#divAlias").html(htmlAlias);
-            }
-
-            // ============================
-            // 6. GRUPO DELICTIVO
-            // ============================
-            if (data.grupodelictivo) {
-                let htmlGrupo = "";
-                data.grupodelictivo.forEach(g => {
-                    htmlGrupo += `<span class="badge bg-dark me-2">${g.nvarchar_grupodelictivo}</span>`;
-                });
-                $("#divGrupoDelictivo").html(htmlGrupo);
-            }
-
-        },
-        error: function (xhr) {
-            console.error("Error al cargar estatus:", xhr);
-        }
-    });
-}*@
-
-
-    $("#btnBuscar").click(function () {
-        refreshCarpetasBusquedaList();
-
+        // Carga todo al entrar a la ficha
+        precargarFichaCompleta();
     });
 
-     function refreshCarpetasBusquedaList() {
+    function inicializarTabsFicha() {
 
-         $("#busquedaCarpetas").empty();
-         $("#busquedaCarpetas").load("@Url.Action("BusquedaCarpetasListPartial", "FichaObjetivo")");
-   }
+        $(".op-tab-link").off("click").on("click", function (e) {
+            e.preventDefault();
 
+            var target = $(this).attr("href");
 
-    // Alternar entre búsqueda por nombre y por carpeta
-    $("input[name='tipoBusqueda']").change(function () {
-        const tipo = $(this).val();
-        if (tipo === "1") {
-            $("#busquedaPorNombre").removeClass("d-none");
-            $("#busquedaPorCarpeta").addClass("d-none");
-        } else {
-            $("#busquedaPorNombre").addClass("d-none");
-            $("#busquedaPorCarpeta").removeClass("d-none");
-        }
-    });
+            $(".op-tab-link").removeClass("active");
+            $(this).addClass("active");
 
-    document.addEventListener("DOMContentLoaded", function () {
-        const radioNombre = document.getElementById("radioNombre");
-        const radioCarpeta = document.getElementById("radioCarpeta");
-        const campoNombre = document.getElementById("busquedaPorNombre");
-        const campoCarpeta = document.getElementById("busquedaPorCarpeta");
+            $(".op-tab-pane").removeClass("active").hide();
+            $(target).addClass("active").fadeIn(120);
 
-        radioNombre.addEventListener("change", function () {
-            campoNombre.classList.remove("d-none");
-            campoCarpeta.classList.add("d-none");
+            ajustarDataTablesVisibles();
         });
-
-        radioCarpeta.addEventListener("change", function () {
-            campoCarpeta.classList.remove("d-none");
-            campoNombre.classList.add("d-none");
-        });
-    });
-
-     function refreshCarpetasAgregadasList(active) {
-     var datos = {
-         actives: active,
-         int_id_ficha_objetivo:$("#int_id_ficha_objetivo").val()
-     };
-     $("#carpetasRelacionadas").empty();
-     $("#carpetasRelacionadas").load("@Url.Action("CarpetasRelacionadasListPartial", "FichaObjetivo")", datos);
     }
 
+    function inicializarSubtabsRelaciones() {
 
+        $(".op-subtab-link").off("click").on("click", function () {
+            var target = $(this).data("target");
 
+            $(".op-subtab-link").removeClass("active");
+            $(this).addClass("active");
+
+            $(".op-subtab-pane").removeClass("active").hide();
+            $(target).addClass("active").fadeIn(120);
+
+            ajustarDataTablesVisibles();
+        });
+    }
+
+    function inicializarBotonesFicha() {
+
+        $("#btnIrRelaciones").off("click").on("click", function () {
+            $('.op-tab-link[href="#tabRelaciones"]').trigger("click");
+            $('.op-subtab-link[data-target="#subtabCarpetas"]').trigger("click");
+        });
+
+       $("#btnGuardarResumen").off("click").on("click", function () {
+
+    var idestatus = $("#ddlEstatusProceso").val();
+    var descripcion = $("#txtDescripcionEstatus").val();
+    var observaciones = $("#txtObservacionesObjetivo").val();
+
+    if (!idestatus) {
+        swal({
+            title: "Validación",
+            text: "Selecciona un estatus del objetivo.",
+            type: "warning",
+            showCancelButton: false,
+            confirmButtonText: "Continuar",
+            closeOnConfirm: true
+        });
+
+        return;
+    }
+
+    $.ajax({
+        type: "POST",
+        url: "@Url.Action("AddEstatusObservaciones", "FichaObjetivo")",
+        data: {
+            idestatus: idestatus,
+            descripcion: descripcion,
+            observaciones: observaciones,
+            idficha: int_id_ficha_objetivo
+        },
+        success: function (response) {
+
+            var ok = response.success === true || response.IsSuccess === true;
+            var msg = response.message || response.Message || "Operación realizada.";
+
+            if (ok) {
+                swal({
+                    title: "",
+                    text: msg,
+                    type: "success",
+                    showCancelButton: false,
+                    confirmButtonText: "Continuar",
+                    closeOnConfirm: true
+                },
+                function () {
+                    location.reload();
+                });
+            } else {
+                swal({
+                    title: "Aviso",
+                    text: msg,
+                    type: "warning",
+                    showCancelButton: false,
+                    confirmButtonText: "Continuar",
+                    closeOnConfirm: true
+                });
+            }
+        },
+        error: function (xhr) {
+            console.log(xhr.responseText);
+
+            swal({
+                title: "Error",
+                text: "Ocurrió un error al guardar el resumen del objetivo.",
+                type: "error",
+                showCancelButton: false,
+                confirmButtonText: "Continuar",
+                closeOnConfirm: true
+            });
+        }
+    });
+});
+        $(document).off("click", "#btnBuscar").on("click", "#btnBuscar", function () {
+            refreshCarpetasBusquedaList();
+        });
+
+        $(document).off("change", "input[name='tipoBusqueda']").on("change", "input[name='tipoBusqueda']", function () {
+
+            if ($("#radioNombre").is(":checked")) {
+                $("#busquedaPorNombre").removeClass("d-none").show();
+                $("#busquedaPorCarpeta").addClass("d-none").hide();
+            } else {
+                $("#busquedaPorNombre").addClass("d-none").hide();
+                $("#busquedaPorCarpeta").removeClass("d-none").show();
+            }
+        });
+    }
+
+    function precargarFichaCompleta() {
+
+        // Identidad
+        refreshNombresList(true);
+        refreshAliasList(true);
+
+        // Domicilios
+        refreshDomicilioList(true);
+
+        // Grupos
+        refreshGrupoList(true);
+
+        // Relaciones judiciales
+        refreshCarpetasAgregadasList(true);
+        //refreshOrdenesList();
+        refreshOrdenesAgregadasList(true);
+        //refreshFiliacionsList();
+        refreshFiliacionAgregadasList(true);
+
+        // No cargo búsqueda de carpetas aquí porque ya tienes el formulario
+        // y solo debe buscar cuando el usuario presione "Buscar".
+
+        refreshAsuntosObjetivoList(true);
+    }
+
+    function cargarPartial(contenedor, url, datos) {
+
+        var $contenedor = $(contenedor);
+
+        if ($contenedor.length === 0) {
+            return;
+        }
+
+        $contenedor.html(`
+            <div style="padding:15px; color:#7b8a9a;">
+                Cargando información...
+            </div>
+        `);
+
+        $contenedor.load(url, datos, function (response, status, xhr) {
+
+            if (status === "error") {
+                $contenedor.html(`
+                    <div class="alert alert-danger">
+                        Error al cargar la información.
+                    </div>
+                `);
+                console.log("Error al cargar partial:", url, xhr.responseText);
+                return;
+            }
+
+            ajustarDataTablesVisibles();
+        });
+    }
+
+    function ajustarDataTablesVisibles() {
+        setTimeout(function () {
+            try {
+                $.fn.dataTable
+                    .tables({ visible: true, api: true })
+                    .columns.adjust();
+            } catch (e) {
+                console.log("No se pudieron ajustar DataTables visibles:", e);
+            }
+        }, 200);
+    }
+
+    // =========================================================
+    // IDENTIDAD - NOMBRES
+    // =========================================================
+
+    function refreshNombresList(active) {
+        if (active === undefined) active = true;
+
+        var datos = {
+            actives: active,
+            int_id_objetivo: $("#int_id_objetivo").val()
+        };
+
+        cargarPartial(
+            "#listaNombrePersona",
+            "@Url.Action("ObjetivoNombreListPartial", "Objetivo")",
+            datos
+        );
+    }
+
+    function AddObjetivoNombreModal() {
+        $("#divModalNombre").empty();
+        $("#divModalNombre").load("@Url.Action("AddObjetivoNombrePartial", "Objetivo")");
+    }
+
+    function EditObjetivoNombre(int_id_nombre) {
+        var data = {
+            int_id_nombre: int_id_nombre
+        };
+
+        $("#divModalNombre").empty();
+        $("#divModalNombre").load("@Url.Action("EditObjetivoNombrePartial", "Objetivo")", data);
+    }
+
+    // =========================================================
+    // IDENTIDAD - ALIAS
+    // =========================================================
+
+    function refreshAliasList(active) {
+        if (active === undefined) active = true;
+
+        var datos = {
+            actives: active,
+            int_id_objetivo: $("#int_id_objetivo").val()
+        };
+
+        cargarPartial(
+            "#listaAliasObjetivo",
+            "@Url.Action("ObjetivoAliasListPartial", "Objetivo")",
+            datos
+        );
+    }
+
+    function AddObjetivoAliasModal2() {
+        $("#divModalAlias").empty();
+        $("#divModalAlias").load("@Url.Action("AddObjetivoAliasPartial", "Objetivo")");
+    }
+
+    function EditObjetivoAlias(int_id_alias) {
+        var data = {
+            int_id_alias: int_id_alias
+        };
+
+        $("#divModalAlias").empty();
+        $("#divModalAlias").load("@Url.Action("EditObjetivoAliasPartial", "Objetivo")", data);
+    }
+
+    // =========================================================
+    // DOMICILIOS
+    // =========================================================
+
+    function refreshDomicilioList(active) {
+        if (active === undefined) active = true;
+
+        var datos = {
+            actives: active,
+            int_id_objetivo: $("#int_id_objetivo").val()
+        };
+
+        cargarPartial(
+            "#listaDomicilioObjetivo",
+            "@Url.Action("ObjetivoDomicilioListPartial", "Objetivo")",
+            datos
+        );
+    }
+
+    function AddObjetivoDomicilioModal() {
+        $("#divModalNombre").empty();
+        $("#divModalNombre").load("@Url.Action("AddObjetivoDomicilioPartial", "Objetivo")");
+    }
+
+    function AddObjetivoInfoGeneralModal() {
+        $("#divModalNombre").empty();
+        $("#divModalNombre").load("@Url.Action("AddObjetivoDomicilioPartial", "Objetivo")");
+    }
+
+    function EditObjetivoDomicilio(int_id_informacion) {
+        var data = {
+            int_id_informacion: int_id_informacion
+        };
+
+        $("#divModalNombre").empty();
+        $("#divModalNombre").load("@Url.Action("EditObjetivoDomicilioPartial", "Objetivo")", data);
+    }
+
+    // =========================================================
+    // GRUPOS
+    // =========================================================
+
+    function refreshGrupoList(active) {
+        if (active === undefined) active = true;
+
+        var datos = {
+            actives: active,
+            int_id_objetivo: $("#int_id_objetivo").val()
+        };
+
+        cargarPartial(
+            "#listaGrupoDelictivo",
+            "@Url.Action("ObjetivoGrupoListPartial", "Objetivo")",
+            datos
+        );
+    }
+
+    function AddObjetivoGrupoModal() {
+        $("#divModalNombre").empty();
+        $("#divModalNombre").load("@Url.Action("AddObjetivoGrupoPartial", "Objetivo")");
+    }
+
+    function EditObjetivoGrupo(int_id_objetivo_grupo) {
+        var data = {
+            int_id_objetivo_grupo: int_id_objetivo_grupo
+        };
+
+        $("#divModalNombre").empty();
+        $("#divModalNombre").load("@Url.Action("EditObjetivoGrupoPartial", "Objetivo")", data);
+    }
+
+    // =========================================================
+    // RELACIONES JUDICIALES - CARPETAS
+    // =========================================================
+
+    function refreshCarpetasBusquedaList() {
+
+        cargarPartial(
+            "#busquedaCarpetas",
+            "@Url.Action("BusquedaCarpetasListPartial", "FichaObjetivo")",
+            {}
+        );
+    }
+
+    function refreshCarpetasAgregadasList(active) {
+        if (active === undefined) active = true;
+
+        var datos = {
+            actives: active,
+            int_id_ficha_objetivo: $("#int_id_ficha_objetivo").val()
+        };
+
+        cargarPartial(
+            "#carpetasRelacionadas",
+            "@Url.Action("CarpetasRelacionadasListPartial", "FichaObjetivo")",
+            datos
+        );
+    }
+
+    // =========================================================
+    // RELACIONES JUDICIALES - ÓRDENES
+    // =========================================================
     $("#btnBuscarOrd").click(function () {
         refreshOrdenesList();
 
     });
-
-
     function refreshOrdenesList() {
 
-        $("#busquedaOrdenes").empty();
-        $("#busquedaOrdenes").load("@Url.Action("BusquedaOrdenesListPartial", "FichaObjetivo")");
+        cargarPartial(
+            "#busquedaOrdenes",
+            "@Url.Action("BusquedaOrdenesListPartial", "FichaObjetivo")",
+            {}
+        );
     }
 
+    function refreshOrdenesAgregadasList(active) {
+        if (active === undefined) active = true;
 
-    // Alternar entre búsqueda por nombre y por carpeta
-    $("input[name='tipoBusqueda2']").change(function () {
-        const tipo = $(this).val();
-        if (tipo === "1") {
-            $("#busquedaPorNombreOrd").removeClass("d-none");
-            $("#busquedaPorCarpetaOrd").addClass("d-none");
-        } else {
-            $("#busquedaPorNombreOrd").addClass("d-none");
-            $("#busquedaPorCarpetaOrd").removeClass("d-none");
-        }
-    });
+        var datos = {
+            actives: active,
+            int_id_ficha_objetivo: $("#int_id_ficha_objetivo").val()
+        };
 
-    document.addEventListener("DOMContentLoaded2", function () {
-        const radioNombre = document.getElementById("radioNombreOrd");
-        const radioCarpeta = document.getElementById("radioCarpetaOrd");
-        const campoNombre = document.getElementById("busquedaPorNombreOrd");
-        const campoCarpeta = document.getElementById("busquedaPorCarpetaOrd");
-
-        radioNombre.addEventListener("change", function () {
-            campoNombre.classList.remove("d-none");
-            campoCarpeta.classList.add("d-none");
-        });
-
-        radioCarpeta.addEventListener("change", function () {
-            campoCarpeta.classList.remove("d-none");
-            campoNombre.classList.add("d-none");
-        });
-    });
-
-     function refreshOrdenesAgregadasList(active) {
-     var datos = {
-         actives: active,
-         int_id_ficha_objetivo:$("#int_id_ficha_objetivo").val()
-     };
-         $("#ordenesRelacionadas").empty();
-         $("#ordenesRelacionadas").load("@Url.Action("OrdenesRelacionadasListPartial", "FichaObjetivo")", datos);
+        cargarPartial(
+            "#ordenesRelacionadas",
+            "@Url.Action("OrdenesRelacionadasListPartial", "FichaObjetivo")",
+            datos
+        );
     }
 
+    // =========================================================
+    // RELACIONES JUDICIALES - FILIACIÓN
+    // =========================================================
+    $("#btnBuscarFili").click(function () {
+        refreshFiliacionsList();
 
-      $("#btnBuscarFili").click(function () {
-          refreshFiliacionsList();
+    });
+    function refreshFiliacionsList() {
 
-        });
+        cargarPartial(
+            "#busquedafiliacion",
+            "@Url.Action("BusquedaFiliacionListPartial", "FichaObjetivo")",
+            {}
+        );
+    }
 
+    function refreshFiliacionAgregadasList(active) {
+        if (active === undefined) active = true;
 
-  function refreshFiliacionsList() {
+        var datos = {
+            actives: active,
+            int_id_ficha_objetivo: $("#int_id_ficha_objetivo").val()
+        };
 
-      $("#busquedafiliacion").empty();
-      $("#busquedafiliacion").load("@Url.Action("BusquedaFiliacionListPartial", "FichaObjetivo")");
-  }
+        cargarPartial(
+            "#filiacionRelacionadas",
+            "@Url.Action("FiliacionRelacionadasListPartial", "FichaObjetivo")",
+            datos
+        );
+    }
 
+    function refreshAsuntosObjetivoList(active) {
+    if (active === undefined) active = true;
 
-  // Alternar entre búsqueda por nombre y por carpeta
-  $("input[name='tipoBusqueda3']").change(function () {
-      const tipo = $(this).val();
-      if (tipo === "1") {
-          $("#busquedaPorNombreFili").removeClass("d-none");
-          $("#busquedaPorCarpetaFili").addClass("d-none");
-      } else {
-          $("#busquedaPorNombreFili").addClass("d-none");
-          $("#busquedaPorCarpetaFili").removeClass("d-none");
-      }
-  });
+    var datos = {
+        actives: active,
+        int_id_ficha_objetivo: $("#int_id_ficha_objetivo").val()
+        };
+        debugger;
+    cargarPartial(
+        "#asuntosRelacionadosObjetivo",
+        "@Url.Action("AsuntosObjetivoListPartial", "Asuntos")",
+        datos
+    );
+}
 
-  document.addEventListener("DOMContentLoaded", function () {
-      const radioNombre = document.getElementById("radioNombreFili");
-      const radioCarpeta = document.getElementById("radioCarpetaFili");
-      const campoNombre = document.getElementById("busquedaPorNombreFili");
-      const campoCarpeta = document.getElementById("busquedaPorCarpetaFili");
+$(document).off("click", "#btnBuscarAsuntosExistentes").on("click", "#btnBuscarAsuntosExistentes", function () {
+    buscarAsuntosExistentes();
+});
 
-      radioNombre.addEventListener("change", function () {
-          campoNombre.classList.remove("d-none");
-          campoCarpeta.classList.add("d-none");
-      });
+function buscarAsuntosExistentes() {
 
-      radioCarpeta.addEventListener("change", function () {
-          campoCarpeta.classList.remove("d-none");
-          campoNombre.classList.add("d-none");
-      });
-  });
+    $.ajax({
+        type: "POST",
+        url: "@Url.Action("FillBusquedaAsuntosParaRelacionar", "Asuntos")",
+        data: {
+            texto: $("#txtBuscarAsuntoExistente").val(),
+            active: true
+        },
+        success: function (data) {
 
-   function refreshFiliacionAgregadasList(active) {
-   var datos = {
-       actives: active,
-       int_id_ficha_objetivo:$("#int_id_ficha_objetivo").val()
-   };
-       $("#filiacionRelacionadas").empty();
-       $("#filiacionRelacionadas").load("@Url.Action("FiliacionRelacionadasListPartial", "FichaObjetivo")", datos);
-  }
-    var idobjetivo = $("#int_id_objetivo").val();
-        function RefreshEditFichaObjetivos() {
-            location.href = '@Url.Action("EditFichaObjetivos","FichaObjetivo")?int_id_objetivo=' + idobjetivo;
-        }
-
-        function ObjetivoPrioritario() {
-            location.href = '@Url.Action("AddEditObjetivos","Objetivo")?int_id_objetivo=' + idobjetivo;
-        }
-
-        function guardarEstatusProceso() {
-
-            let estatus = $("#selectEstatus").val();
-            let descripcion = $("#descripcionEstatus").val();
-            let observaciones = $("#observacionobjetivo").val();
-            let idficha = $("#int_id_ficha_objetivo").val();
-
-            // Validaciones simples
-            if (estatus === "" || estatus == null) {
-                alert("Debes seleccionar un estatus del proceso.");
-                return;
+            if ($.fn.DataTable.isDataTable("#asuntosBusquedaDataTable")) {
+                $("#asuntosBusquedaDataTable").DataTable().clear().destroy();
+                $("#asuntosBusquedaDataTable tbody").empty();
             }
 
-            // Construcción del objeto que enviarás
-            let data = {
-                idestatus: estatus,
-                descripcion: descripcion,
-                observaciones: observaciones,
-                idficha: idficha
-            };
-
-            $.ajax({
-                url: "/FichaObjetivo/AddEstatusObservaciones",
-                type: "POST",
+            $("#asuntosBusquedaDataTable").DataTable({
+                destroy: true,
+                searching: true,
+                responsive: true,
+                scrollX: true,
+                autoWidth: false,
                 data: data,
-                success: function (response) {
-
-                    swal({
-                        title: "Éxito",
-                        text: response.message,
-                        type: "success"
-                    }, function () {
-                        RefreshEditFichaObjetivos();
-                    });
-                },
-                error: function (xhr, status, error) {
-                    console.log(xhr.responseText);
-                    alert("Error de comunicación con el servidor.");
+                columns: [
+                    {
+                        title: "Alias",
+                        data: "alias",
+                        defaultContent: ""
+                    },
+                    {
+                        title: "CI",
+                        data: "numavp",
+                        defaultContent: ""
+                    },
+                    {
+                        title: "Acción",
+                        data: "int_id_asunto_relacionado",
+                        orderable: false,
+                        searchable: false,
+                            render: function (data, type, row) {
+                                return `
+                                    <button type="button"
+                                            class="btn btn-success btn-sm"
+                                            onclick="setAsuntoParaRelacionar(${row.int_id_asunto_relacionado}, '${row.numavp || ""}')">
+                                        <i class="fa fa-check"></i>
+                                    </button>
+                                `;
+                        }
+                    }
+                ],
+                language: {
+                    sProcessing: "Procesando...",
+                    sLengthMenu: "Mostrar _MENU_ registros",
+                    sZeroRecords: "No se encontraron resultados",
+                    sEmptyTable: "Ningún dato disponible en esta tabla",
+                    sInfo: "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                    sInfoEmpty: "Mostrando registros del 0 al 0 de un total de 0 registros",
+                    sInfoFiltered: "(filtrado de un total de _MAX_ registros)",
+                    sSearch: "Buscar:",
+                    sLoadingRecords: "Cargando...",
+                    oPaginate: {
+                        sFirst: "Primero",
+                        sLast: "Último",
+                        sNext: "Siguiente",
+                        sPrevious: "Anterior"
+                    }
                 }
             });
+        },
+        error: function (xhr) {
+            console.log(xhr.responseText);
+            alert("Ocurrió un error al buscar asuntos.");
         }
+    });
+    }
+    function setAsuntoParaRelacionar(idAsunto, ci) {
+
+        asuntoSeleccionado = idAsunto;
+        ciAsuntoSeleccionado = ci || "";
+
+        $("#selectRolParticipacionAsunto").val("");
+        $("#txtDescripcionParticipacionAsunto").val("");
+        $("#txtObservacionRelacionAsunto").val("");
+
+        $("#lblAsuntoSeleccionado").text(ciAsuntoSeleccionado || "Asunto seleccionado");
+
+        $("#modalObjetivo").modal("show");
+    }
+
+    function guardarObjetivoModal() {
+
+        if (!asuntoSeleccionado) {
+            swal("Validación", "Selecciona un asunto para relacionar.", "warning");
+            return;
+        }
+
+        var idRolParticipacion = $("#selectRolParticipacionAsunto").val();
+        var descripcionParticipacion = $("#txtDescripcionParticipacionAsunto").val();
+        var observaciones = $("#txtObservacionRelacionAsunto").val();
+
+        RelacionarAsuntoExistente(
+            asuntoSeleccionado,
+            idRolParticipacion,
+            descripcionParticipacion,
+            observaciones
+        );
+    }
+
+
+function RelacionarAsuntoExistente(
+    int_id_asunto_relacionado,
+    int_id_rol_participacion,
+    nvarchar_descripcion_participacion,
+    observaciones
+) {
+
+    $.ajax({
+        type: "POST",
+        url: "@Url.Action("RelacionarAsuntoObjetivo", "Asuntos")",
+        data: {
+            int_id_objetivo: $("#int_id_objetivo").val(),
+            int_id_asunto_relacionado: int_id_asunto_relacionado,
+            int_id_rol_participacion: int_id_rol_participacion,
+            nvarchar_descripcion_participacion: nvarchar_descripcion_participacion,
+            observaciones: observaciones
+        },
+        success: function (resp) {
+
+            if (resp.IsSuccess) {
+
+                swal("", resp.Message, "success");
+
+                $("#modalObjetivo").modal("hide");
+
+                asuntoSeleccionado = null;
+                ciAsuntoSeleccionado = "";
+
+                $("#selectRolParticipacionAsunto").val("");
+                $("#txtDescripcionParticipacionAsunto").val("");
+                $("#txtObservacionRelacionAsunto").val("");
+
+                refreshAsuntosObjetivoList(true);
+
+            } else {
+                swal("Error", resp.Message, "error");
+            }
+        },
+        error: function (xhr) {
+            console.log(xhr.responseText);
+            swal("Error", "Ocurrió un error al relacionar el asunto.", "error");
+        }
+    });
+}
+
+
+$(document).off("click", "#btnAbrirModalNuevoAsunto").on("click", "#btnAbrirModalNuevoAsunto", function () {
+    limpiarModalNuevoAsunto();
+    $("#modalCrearAsuntoVincular").modal("show");
+});
+
+$(document).off("click", "#btnGuardarNuevoAsuntoVincular").on("click", "#btnGuardarNuevoAsuntoVincular", function () {
+    guardarNuevoAsuntoYVincular();
+});
+
+function limpiarModalNuevoAsunto() {
+    $("#txtNuevoAsuntoAlias").val("");
+    $("#txtNuevoAsuntoNumAvp").val("");
+    $("#txtNuevoAsuntoFecha").val("");
+    $("#ddlNuevoAsuntoEstatus").val("");
+    $("#txtNuevoAsuntoDescripcion").val("");
+    $("#txtNuevoAsuntoObservacionRelacion").val("");
+}
+
+function guardarNuevoAsuntoYVincular() {
+
+    var alias = $("#txtNuevoAsuntoAlias").val().trim();
+
+    if (alias === "") {
+        swal("Validación", "Captura el alias del asunto.", "warning");
+        return;
+    }
+
+    $("#btnGuardarNuevoAsuntoVincular")
+        .prop("disabled", true)
+        .html('<i class="fa fa-spinner fa-spin"></i> Guardando...');
+
+    $.ajax({
+        type: "POST",
+        url: "@Url.Action("CrearAsuntoYRelacionarObjetivo", "Asuntos")",
+        data: {
+            alias: alias,
+            descripcion: $("#txtNuevoAsuntoDescripcion").val(),
+            numavp: $("#txtNuevoAsuntoNumAvp").val(),
+            fechaAsunto: $("#txtNuevoAsuntoFecha").val(),
+            int_id_estatus_asunto: $("#ddlNuevoAsuntoEstatus").val(),
+            int_id_objetivo: $("#int_id_objetivo").val(),
+            observacionesRelacion: $("#txtNuevoAsuntoObservacionRelacion").val()
+        },
+        success: function (resp) {
+
+            $("#btnGuardarNuevoAsuntoVincular")
+                .prop("disabled", false)
+                .html('<i class="fa fa-save"></i> Guardar y vincular');
+
+            if (resp.IsSuccess) {
+
+                $("#modalCrearAsuntoVincular").modal("hide");
+
+                refreshAsuntosObjetivoList(true);
+
+                var idAsuntoCreado = resp.Id || resp.id || 0;
+                var aliasAsuntoCreado = $("#txtNuevoAsuntoAlias").val();
+
+                swal({
+                    title: "Asunto creado",
+                    text: resp.Message + "\n\n¿Deseas agregar víctimas a este asunto?",
+                    type: "success",
+                    showCancelButton: true,
+                    confirmButtonColor: "#2f5bff",
+                    cancelButtonColor: "#6c757d",
+                    confirmButtonText: "Agregar víctimas",
+                    cancelButtonText: "Después"
+                }, function (isConfirm) {
+                    if (isConfirm && idAsuntoCreado > 0) {
+                        abrirModalVictimasDesdeFicha(idAsuntoCreado, aliasAsuntoCreado);
+                    }
+                });
+
+                $("#txtBuscarAsuntoExistente").val("");
+                $("#txtObservacionRelacionAsunto").val("");
+
+                if ($.fn.DataTable.isDataTable("#asuntosBusquedaDataTable")) {
+                    $("#asuntosBusquedaDataTable").DataTable().clear().destroy();
+                    $("#asuntosBusquedaDataTable tbody").empty();
+                }
+            }
+             else {
+                swal("Error", resp.Message, "error");
+            }
+        },
+        error: function (xhr) {
+
+            $("#btnGuardarNuevoAsuntoVincular")
+                .prop("disabled", false)
+                .html('<i class="fa fa-save"></i> Guardar y vincular');
+
+            console.log(xhr.responseText);
+            swal("Error", "Ocurrió un error al crear y vincular el asunto.", "error");
+        }
+    });
+}
+
+
+function abrirModalVictimasDesdeFicha(int_id_asunto_relacionado, aliasAsunto) {
+
+    $("#int_id_asunto_relacionado").val(int_id_asunto_relacionado);
+    $("#lblAsuntoVictimasDesdeFicha").text(aliasAsunto || ("Asunto #" + int_id_asunto_relacionado));
+
+    $("#txtBuscarVictimaNombreFicha").val("");
+    $("#txtBuscarVictimaPaternoFicha").val("");
+    $("#txtBuscarVictimaMaternoFicha").val("");
+
+    $("#contenedorVictimasBusquedaDesdeFicha").empty();
+
+    cargarVictimasRelacionadasDesdeFicha(true);
+
+    $("#modalVictimasDesdeFicha").modal("show");
+}
+
+$(document).off("click", "#btnBuscarVictimasDesdeFicha").on("click", "#btnBuscarVictimasDesdeFicha", function () {
+    cargarBusquedaVictimasDesdeFicha();
+});
+
+function cargarBusquedaVictimasDesdeFicha() {
+
+    var datos = {
+        nombre: $("#txtBuscarVictimaNombreFicha").val(),
+        paterno: $("#txtBuscarVictimaPaternoFicha").val(),
+        materno: $("#txtBuscarVictimaMaternoFicha").val(),
+        opcion: 1,
+        active: true
+    };
+
+    $("#contenedorVictimasBusquedaDesdeFicha").empty();
+
+    $("#contenedorVictimasBusquedaDesdeFicha").load(
+        "@Url.Action("VictimasListPartial", "Asuntos")",
+        datos,
+        function () {
+            ajustarDataTablesVisibles();
+        }
+    );
+}
+
+function cargarVictimasRelacionadasDesdeFicha(active) {
+
+    if (active === undefined) active = true;
+
+    var datos = {
+        actives: active
+    };
+
+    $("#contenedorVictimasRelacionadasDesdeFicha").empty();
+
+    $("#contenedorVictimasRelacionadasDesdeFicha").load(
+        "@Url.Action("VictimasRelacionadasListPartial", "Asuntos")",
+        datos,
+        function () {
+            ajustarDataTablesVisibles();
+        }
+    );
+}
+
+/*
+    Estas funciones son "puente".
+    Sirven por si tus partials de Asuntos llamaban funciones
+    que antes vivían en AddEditAsuntos.cshtml.
+*/
+
+function refreshVictimasRelacionadasList(active) {
+    cargarVictimasRelacionadasDesdeFicha(active);
+}
+
+function refreshVictimasList(nombre, paterno, materno, opcion, active) {
+
+    var datos = {
+        nombre: nombre || $("#txtBuscarVictimaNombreFicha").val(),
+        paterno: paterno || $("#txtBuscarVictimaPaternoFicha").val(),
+        materno: materno || $("#txtBuscarVictimaMaternoFicha").val(),
+        opcion: opcion || 1,
+        active: active === undefined ? true : active
+    };
+
+    $("#contenedorVictimasBusquedaDesdeFicha").empty();
+
+    $("#contenedorVictimasBusquedaDesdeFicha").load(
+        "@Url.Action("VictimasListPartial", "Asuntos")",
+        datos,
+        function () {
+            ajustarDataTablesVisibles();
+        }
+    );
+}
+
+function addVictimaVictima(id_victima) {
+
+    var id_asunto = $("#int_id_asunto_relacionado").val();
+
+    if (!id_asunto || id_asunto === "0") {
+        swal("Validación", "No se encontró el asunto seleccionado.", "warning");
+        return;
+    }
+
+    $.ajax({
+        type: "POST",
+        url: "@Url.Action("addVictimaVictima", "Asuntos")",
+        data: {
+            id_victima: id_victima,
+            id_asunto_relacionado: id_asunto
+        },
+        success: function (resp) {
+            if (resp.IsSuccess) {
+                swal("", resp.Message, "success");
+                cargarVictimasRelacionadasDesdeFicha(true);
+            } else {
+                swal("Error", resp.Message, "error");
+            }
+        },
+        error: function (xhr) {
+            console.log(xhr.responseText);
+            swal("Error", "Ocurrió un error al agregar la víctima al asunto.", "error");
+        }
+    });
+}
+
+function DisableVictimaRelacionada(int_id_asunto_victima) {
+
+    $.ajax({
+        type: "POST",
+        url: "@Url.Action("DisableVictimaRelacionada", "Asuntos")",
+        data: {
+            int_id_asunto_victima: int_id_asunto_victima
+        },
+        success: function (resp) {
+            if (resp.IsSuccess) {
+                swal("", resp.Message, "success");
+                cargarVictimasRelacionadasDesdeFicha(true);
+            } else {
+                swal("Error", resp.Message, "error");
+            }
+        },
+        error: function (xhr) {
+            console.log(xhr.responseText);
+            swal("Error", "Ocurrió un error al desactivar la víctima.", "error");
+        }
+    });
+}
+
+function ActivateVictimaRelacionada(int_id_asunto_victima) {
+
+    $.ajax({
+        type: "POST",
+        url: "@Url.Action("ActivateVictimaRelacionada", "Asuntos")",
+        data: {
+            int_id_asunto_victima: int_id_asunto_victima
+        },
+        success: function (resp) {
+            if (resp.IsSuccess) {
+                swal("", resp.Message, "success");
+                cargarVictimasRelacionadasDesdeFicha(false);
+            } else {
+                swal("Error", resp.Message, "error");
+            }
+        },
+        error: function (xhr) {
+            console.log(xhr.responseText);
+            swal("Error", "Ocurrió un error al activar la víctima.", "error");
+        }
+    });
+}
+
+
+    $("#btnBuscarInfoGeneral").click(function () {
+        refreshInfoGeneralList("#modalBusquedaInfoGeneral");
+    });
+
+    function refreshInfoGeneralList(modalId) {
+        debugger;
+
+        const nombre = $("#searchNameDetBus").val();
+        const paterno = $("#searchPaternoDetBus").val();
+        const materno = $("#searchMaternoDetBus").val();
+        debugger;
+        console.log("Datos a enviar al Partial:");
+        console.log("Nombre:", nombre);
+        console.log("Paterno:", paterno);
+        console.log("Materno:", materno);
+
+        const parametros = { nombre, paterno, materno };
+        $("#busquedaInfoGeneral").empty().load(
+            '@Url.Action("InfoGeneralListPartial", "Objetivo")',
+            parametros,
+            function (response, status, xhr) {
+                console.log("Partial cargado:", status);
+                if (status === "error") {
+                    console.error("Error al cargar Partial:", xhr.status, xhr.statusText);
+                }
+            }
+        );
+    }
+
+
+
+
+
+
+    function opFichaDataUrlToBlob(dataUrl) {
+        var arr = dataUrl.split(',');
+        var mime = arr[0].match(/:(.*?);/)[1];
+        var bstr = atob(arr[1]);
+        var n = bstr.length;
+        var u8arr = new Uint8Array(n);
+
+        while (n--) {
+            u8arr[n] = bstr.charCodeAt(n);
+        }
+
+        return new Blob([u8arr], { type: mime });
+    }
+
+    $(document).off("change", "#fotoInputFicha").on("change", "#fotoInputFicha", function () {
+        var file = this.files[0];
+
+        if (!file) {
+            return;
+        }
+
+        var reader = new FileReader();
+        reader.onload = function (e) {
+            $("#previewImageFicha").attr("src", e.target.result);
+            $("#previewContainerFicha").show();
+            $("#previewEmptyFicha").hide();
+        };
+        reader.readAsDataURL(file);
+    });
+
+    $(document).off("click", "#removeImageFicha").on("click", "#removeImageFicha", function () {
+        $("#fotoInputFicha").val("");
+        $("#previewImageFicha").attr("src", "@fotoSrc");
+
+        if ("@fotoSrc" !== "") {
+            $("#previewContainerFicha").show();
+            $("#previewEmptyFicha").hide();
+        } else {
+            $("#previewContainerFicha").hide();
+            $("#previewEmptyFicha").show();
+        }
+    });
+
+    $(document).off("click", "#btnGuardarFotoFechaFicha").on("click", "#btnGuardarFotoFechaFicha", function () {
+        var fechaNacimiento = $("#fechaNacimientoFicha").val();
+        var file = $("#fotoInputFicha")[0].files[0];
+
+        if (!fechaNacimiento) {
+            swal("Campo requerido", "Selecciona la fecha de nacimiento.", "warning");
+            return;
+        }
+
+        var formData = new FormData();
+        formData.append("fechaNacimiento", fechaNacimiento);
+        formData.append("int_id_objetivo", $("#int_id_objetivo").val());
+
+        if (file) {
+            formData.append("foto", file);
+        } else {
+            var transparentPng = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII=";
+            formData.append("foto", opFichaDataUrlToBlob(transparentPng), "Nodisponible.png");
+        }
+
+        $("#btnGuardarFotoFechaFicha").prop("disabled", true).html('<i class="fa fa-spinner fa-spin"></i> Guardando...');
+
+        $.ajax({
+            url: '@Url.Action("AddOrEditFoto", "Objetivo")',
+            type: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (resp) {
+                if (resp.IsSuccess) {
+                    swal({
+                        title: "",
+                        text: resp.Message,
+                        type: "success",
+                        confirmButtonText: "Continuar",
+                        closeOnConfirm: true
+                    }, function () {
+                        location.reload();
+                    });
+                } else {
+                    swal("Error", resp.Message || "No se pudieron guardar los cambios.", "error");
+                    $("#btnGuardarFotoFechaFicha").prop("disabled", false).html('<i class="fa fa-save"></i> Guardar cambios');
+                }
+            },
+            error: function (xhr) {
+                console.log(xhr.responseText);
+                swal("Error", "Ocurrió un error al guardar la foto y fecha.", "error");
+                $("#btnGuardarFotoFechaFicha").prop("disabled", false).html('<i class="fa fa-save"></i> Guardar cambios');
+            }
+        });
+    });
+
 
 
 </script>
+
+<style>
+    .op-page {
+        padding: 20px 28px;
+        background: #f4f7fb;
+        min-height: calc(100vh - 80px);
+    }
+
+    .op-page-title {
+        margin-bottom: 18px;
+    }
+
+        .op-page-title h2 {
+            margin: 0;
+            color: #08246b;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+    .op-breadcrumb {
+        color: #7b8a9a;
+        font-size: 13px;
+        margin-top: 5px;
+    }
+
+    .op-header-card {
+        background: #fff;
+        border-radius: 14px;
+        padding: 20px;
+        display: flex;
+        gap: 22px;
+        box-shadow: 0 5px 18px rgba(15, 35, 75, .08);
+        margin-bottom: 18px;
+    }
+
+    .op-photo-box {
+        width: 150px;
+        min-width: 150px;
+        height: 180px;
+        border-radius: 12px;
+        background: #eef3f8;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid #e1e7ef;
+    }
+
+    .op-photo {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .op-photo-empty {
+        color: #7b8a9a;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+        .op-photo-empty i {
+            font-size: 44px;
+        }
+
+    .op-main-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .op-title-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 20px;
+    }
+
+        .op-title-row h1 {
+            margin: 0;
+            font-size: 29px;
+            font-weight: 800;
+            color: #10233d;
+            text-transform: uppercase;
+        }
+
+        .op-title-row p {
+            margin: 4px 0 0;
+            color: #6f7d93;
+            font-size: 14px;
+        }
+
+    .op-status {
+        background: #e8f7ee;
+        color: #18864b;
+        border-radius: 999px;
+        padding: 7px 14px;
+        font-weight: 700;
+        white-space: nowrap;
+        font-size: 13px;
+    }
+
+    .op-info-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 14px;
+        margin-top: 22px;
+    }
+
+    .op-info-item {
+        border-left: 1px solid #edf0f5;
+        padding-left: 12px;
+    }
+
+        .op-info-item:first-child {
+            border-left: none;
+            padding-left: 0;
+        }
+
+        .op-info-item label {
+            display: block;
+            color: #748199;
+            font-size: 12px;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        .op-info-item strong {
+            color: #1d2d44;
+            font-size: 14px;
+        }
+
+    .op-actions {
+        margin-top: 22px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .op-tabs-wrapper {
+        background: #fff;
+        border-radius: 14px;
+        box-shadow: 0 5px 18px rgba(15, 35, 75, .07);
+        overflow: hidden;
+    }
+
+    .op-tabs {
+        background: #fff;
+        padding: 10px 12px 0;
+        border-bottom: 1px solid #dfe5ee;
+    }
+
+        .op-tabs .nav-link {
+            cursor: pointer;
+            color: #0b45ff;
+            border-radius: 8px 8px 0 0;
+            padding: 12px 15px;
+            border: 1px solid transparent;
+            font-size: 14px;
+        }
+
+            .op-tabs .nav-link i {
+                margin-right: 5px;
+            }
+
+            .op-tabs .nav-link.active {
+                color: #111;
+                background-color: #fff;
+                border-color: #dfe5ee #dfe5ee #fff;
+                font-weight: 700;
+            }
+
+    .op-tab-content {
+        background: #fff;
+        padding: 20px;
+        min-height: 360px;
+    }
+
+    .op-tab-pane {
+        display: none;
+    }
+
+        .op-tab-pane.active {
+            display: block;
+        }
+
+    .op-card {
+        background: #fff;
+        border: 1px solid #edf0f5;
+        border-radius: 12px;
+        padding: 16px;
+        margin-bottom: 14px;
+        box-shadow: 0 2px 8px rgba(15, 35, 75, .03);
+    }
+
+    .op-card-full {
+        min-height: 235px;
+    }
+
+    .op-card-title {
+        margin-bottom: 14px;
+        border-bottom: 1px solid #eef2f7;
+        padding-bottom: 10px;
+    }
+
+        .op-card-title h4 {
+            margin: 0;
+            font-size: 17px;
+            font-weight: 700;
+            color: #0b2364;
+        }
+
+        .op-card-title span {
+            display: block;
+            margin-top: 4px;
+            color: #7b8a9a;
+            font-size: 12px;
+        }
+
+    .op-data-row {
+        margin-bottom: 13px;
+    }
+
+        .op-data-row label {
+            display: block;
+            color: #7b8a9a;
+            font-size: 12px;
+            margin-bottom: 4px;
+            font-weight: 600;
+        }
+
+        .op-data-row span {
+            color: #1d2d44;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+    .op-mini-status {
+        background: #e8f7ee;
+        color: #18864b !important;
+        border-radius: 999px;
+        padding: 5px 10px;
+        display: inline-block;
+        font-weight: 700 !important;
+    }
+
+    .op-warning-box {
+        background: #fff7df;
+        border: 1px solid #f3dd9b;
+        color: #4c3b13;
+        border-radius: 10px;
+        padding: 14px;
+        line-height: 1.45;
+        white-space: pre-line;
+    }
+
+    .op-description {
+        color: #1d2d44;
+        line-height: 1.55;
+        white-space: pre-line;
+        margin: 0;
+    }
+
+    .op-empty {
+        color: #7b8a9a;
+        background: #f8fafc;
+        border: 1px dashed #dbe3ee;
+        border-radius: 10px;
+        padding: 14px;
+    }
+
+    .op-empty-big {
+        text-align: center;
+        padding: 45px 20px;
+    }
+
+        .op-empty-big i {
+            font-size: 38px;
+            color: #2f5bff;
+            margin-bottom: 10px;
+        }
+
+        .op-empty-big h4 {
+            margin: 8px 0;
+            color: #0b2364;
+            font-weight: 700;
+        }
+
+        .op-empty-big p {
+            max-width: 650px;
+            margin: auto;
+        }
+
+    .op-section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 18px;
+        background: #f8fbff;
+        border: 1px solid #edf0f5;
+        border-radius: 12px;
+        padding: 14px 16px;
+    }
+
+        .op-section-header h3 {
+            margin: 0;
+            color: #0b2364;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .op-section-header p {
+            margin: 4px 0 0;
+            color: #7b8a9a;
+            font-size: 13px;
+        }
+
+    .op-subtabs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 16px;
+    }
+
+    .op-subtab-link {
+        border: 1px solid #dce4f0;
+        background: #fff;
+        color: #0b2364;
+        border-radius: 10px;
+        padding: 10px 14px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all .15s ease;
+    }
+
+        .op-subtab-link i {
+            margin-right: 5px;
+        }
+
+        .op-subtab-link.active,
+        .op-subtab-link:hover {
+            background: #2f5bff;
+            border-color: #2f5bff;
+            color: #fff;
+        }
+
+    .op-subtab-pane {
+        display: none;
+    }
+
+        .op-subtab-pane.active {
+            display: block;
+        }
+
+    .op-mt-3 {
+        margin-top: 18px;
+    }
+
+    .text-right {
+        text-align: right;
+    }
+
+    @@media (max-width: 992px) {
+        .op-header-card {
+            flex-direction: column;
+        }
+
+        .op-info-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .op-title-row {
+            flex-direction: column;
+        }
+    }
+
+    @@media (max-width: 576px) {
+        .op-page {
+            padding: 12px;
+        }
+
+        .op-info-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .op-section-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+    }
+
+
+    /* ================================
+       HEADER HERO FICHA OBJETIVO
+    ================================ */
+
+    .op-header-card-hero {
+        border: 1px solid #dce7ff;
+        border-radius: 18px;
+        padding: 26px 28px;
+        align-items: stretch;
+        gap: 28px;
+        min-height: 285px;
+        box-shadow: 0 10px 30px rgba(15, 35, 75, .07);
+    }
+
+    .op-photo-panel {
+        width: 255px;
+        min-width: 255px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0;
+    }
+
+    .op-photo-box-large {
+        width: 230px;
+        min-width: 230px;
+        height: 230px;
+        border-radius: 18px;
+        border: 1px solid #dbe3ef;
+        box-shadow: 0 6px 18px rgba(15, 35, 75, .08);
+    }
+
+    .op-photo-action {
+        margin-top: -48px;
+        position: relative;
+        z-index: 2;
+        background: #fff;
+        color: #2f5bff;
+        border: 1px solid #dbe3ef;
+        border-radius: 10px;
+        padding: 9px 16px;
+        font-weight: 800;
+        box-shadow: 0 8px 18px rgba(15, 35, 75, .14);
+        cursor: pointer;
+    }
+
+        .op-photo-action i {
+            margin-right: 6px;
+        }
+
+    .op-main-info-hero {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 4px 0;
+    }
+
+    .op-title-row-hero h1 {
+        color: #0b2364;
+        font-size: 38px;
+        line-height: 1.06;
+        letter-spacing: .2px;
+        max-width: 780px;
+    }
+
+    .op-title-row-hero p {
+        color: #64748b;
+        font-size: 15px;
+        font-weight: 600;
+    }
+
+    .op-status-hero {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 10px 18px;
+        font-size: 13px;
+        margin-left: auto;
+    }
+
+        .op-status-hero i {
+            font-size: 8px;
+        }
+
+    .op-info-grid-hero {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 22px 34px;
+        margin-top: 28px;
+        max-width: 860px;
+    }
+
+    .op-info-item-hero {
+        border-left: none;
+        padding-left: 0;
+        display: grid;
+        grid-template-columns: 42px minmax(0, 1fr);
+        align-items: center;
+        gap: 12px;
+    }
+
+    .op-info-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        background: #eef4ff;
+        color: #2f5bff;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+    }
+
+    .op-info-item-hero label {
+        margin-bottom: 4px;
+        font-size: 12px;
+        font-weight: 800;
+        color: #64748b;
+    }
+
+    .op-info-item-hero strong {
+        color: #0f172a;
+        font-size: 15px;
+        line-height: 1.35;
+        font-weight: 800;
+    }
+
+    .op-actions-hero {
+        margin-top: 30px;
+        gap: 12px;
+    }
+
+        .op-actions-hero .btn {
+            border-radius: 9px;
+            padding: 10px 16px;
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+    .op-side-update {
+        width: 280px;
+        min-width: 280px;
+        border-left: 1px dashed #cfd8ea;
+        padding-left: 28px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .op-side-update-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 14px;
+        background: #eef4ff;
+        color: #2f5bff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        margin-bottom: 14px;
+    }
+
+    .op-side-update h4 {
+        color: #0b2364;
+        font-size: 17px;
+        font-weight: 900;
+        margin: 0 0 8px;
+    }
+
+    .op-side-update p {
+        color: #64748b;
+        font-size: 13px;
+        line-height: 1.45;
+        margin-bottom: 18px;
+    }
+
+    .op-side-update .btn {
+        border-radius: 10px;
+        font-weight: 800;
+        padding: 10px 14px;
+    }
+
+    .op-modal-photo-preview {
+        width: 210px;
+        height: 210px;
+        border: 1px solid #dbe3ef;
+        border-radius: 16px;
+        overflow: hidden;
+        margin: 0 auto;
+        background: #f8fafc;
+    }
+
+        .op-modal-photo-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+    .op-modal-photo-empty {
+        width: 210px;
+        height: 210px;
+        border: 1px dashed #cbd5e1;
+        border-radius: 16px;
+        margin: 0 auto;
+        background: #f8fafc;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        color: #64748b;
+        gap: 8px;
+    }
+
+        .op-modal-photo-empty i {
+            font-size: 42px;
+        }
+
+    @@media (max-width: 1200px) {
+        .op-header-card-hero {
+            flex-wrap: wrap;
+        }
+
+        .op-side-update {
+            width: 100%;
+            min-width: 100%;
+            border-left: none;
+            border-top: 1px dashed #cfd8ea;
+            padding-left: 0;
+            padding-top: 18px;
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .op-photo-panel {
+            width: 100%;
+            min-width: 100%;
+        }
+
+        .op-title-row-hero h1 {
+            font-size: 28px;
+        }
+
+        .op-info-grid-hero {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .op-info-icon img {
+        width: 22px;
+        height: 22px;
+        object-fit: contain;
+        display: block;
+    }
+
+    .op-summary-icon img {
+        width: 24px;
+        height: 24px;
+        object-fit: contain;
+        display: block;
+    }
+
+</style>
+

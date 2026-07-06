@@ -23,6 +23,22 @@
           <Property Name="date_fecha_creacion" Type="datetime" Nullable="false" />
           <Property Name="bit_estatus" Type="bit" Nullable="false" />
         </EntityType>
+        <EntityType Name="cat_Nivel_Organizacion">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Puesto" Type="nvarchar" MaxLength="50" Nullable="false" />
+        </EntityType>
+        <EntityType Name="cat_RolParticipacionAsunto">
+          <Key>
+            <PropertyRef Name="int_id_rol_participacion" />
+          </Key>
+          <Property Name="int_id_rol_participacion" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="nvarchar_rol" Type="nvarchar" MaxLength="150" Nullable="false" />
+          <Property Name="date_fecha_creacion" Type="datetime" Nullable="false" />
+          <Property Name="bit_estatus" Type="bit" Nullable="false" />
+        </EntityType>
         <EntityType Name="cat_TipoActividadDelictiva">
           <Key>
             <PropertyRef Name="int_id_tipo_actividad_delictiva" />
@@ -40,6 +56,16 @@
           <Property Name="nvarchar_agrupacion" Type="nvarchar" MaxLength="150" Nullable="false" />
           <Property Name="date_fecha_creacion" Type="datetime" Nullable="false" />
           <Property Name="bit_estatus" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="sysdiagrams">
+          <Key>
+            <PropertyRef Name="diagram_id" />
+          </Key>
+          <Property Name="name" Type="nvarchar" MaxLength="128" Nullable="false" />
+          <Property Name="principal_id" Type="int" Nullable="false" />
+          <Property Name="diagram_id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="version" Type="int" />
+          <Property Name="definition" Type="varbinary(max)" />
         </EntityType>
         <EntityType Name="tb_AlbumFichaObjetivo">
           <Key>
@@ -146,6 +172,8 @@
           <Property Name="date_fecha_creacion" Type="datetime" Nullable="false" />
           <Property Name="bit_estatus" Type="bit" Nullable="false" />
           <Property Name="nvarchar_observaciones" Type="nvarchar(max)" />
+          <Property Name="int_id_rol_participacion" Type="int" />
+          <Property Name="nvarchar_descripcion_participacion" Type="nvarchar(max)" />
         </EntityType>
         <EntityType Name="tb_FichaObjetivo">
           <Key>
@@ -233,6 +261,8 @@
           <Property Name="nvarchar_observaciones" Type="nvarchar" MaxLength="400" />
           <Property Name="date_fecha_creacion" Type="datetime" Nullable="false" />
           <Property Name="bit_estatus" Type="bit" Nullable="false" />
+          <Property Name="ID_Nivel_Organizacion" Type="int" />
+          <Property Name="nvarchar_funcion_grupo" Type="nvarchar" MaxLength="500" />
         </EntityType>
         <EntityType Name="tb_OrdenAprehension">
           <Key>
@@ -382,6 +412,18 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_tb_FichaAsunto_cat_RolParticipacionAsunto">
+          <End Role="cat_RolParticipacionAsunto" Type="Self.cat_RolParticipacionAsunto" Multiplicity="0..1" />
+          <End Role="tb_FichaAsunto" Type="Self.tb_FichaAsunto" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="cat_RolParticipacionAsunto">
+              <PropertyRef Name="int_id_rol_participacion" />
+            </Principal>
+            <Dependent Role="tb_FichaAsunto">
+              <PropertyRef Name="int_id_rol_participacion" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_tb_FichaAsunto_tb_AsuntoRelacionado">
           <End Role="tb_AsuntoRelacionado" Type="Self.tb_AsuntoRelacionado" Multiplicity="1" />
           <End Role="tb_FichaAsunto" Type="Self.tb_FichaAsunto" Multiplicity="*" />
@@ -490,6 +532,18 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_tb_ObjetivoGrupo_cat_Nivel_Organizacion">
+          <End Role="cat_Nivel_Organizacion" Type="Self.cat_Nivel_Organizacion" Multiplicity="0..1" />
+          <End Role="tb_ObjetivoGrupo" Type="Self.tb_ObjetivoGrupo" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="cat_Nivel_Organizacion">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="tb_ObjetivoGrupo">
+              <PropertyRef Name="ID_Nivel_Organizacion" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_tb_ObjetivoGrupo_tb_Grupo_Delictivo">
           <End Role="tb_Grupo_Delictivo" Type="Self.tb_Grupo_Delictivo" Multiplicity="1" />
           <End Role="tb_ObjetivoGrupo" Type="Self.tb_ObjetivoGrupo" Multiplicity="*" />
@@ -566,8 +620,11 @@
         <EntityContainer Name="Objetivos_PrioritariosModelStoreContainer">
           <EntitySet Name="cat_EstatusAsunto" EntityType="Self.cat_EstatusAsunto" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="cat_EstatusProceso" EntityType="Self.cat_EstatusProceso" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="cat_Nivel_Organizacion" EntityType="Self.cat_Nivel_Organizacion" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="cat_RolParticipacionAsunto" EntityType="Self.cat_RolParticipacionAsunto" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="cat_TipoActividadDelictiva" EntityType="Self.cat_TipoActividadDelictiva" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="cat_TipoAgrupacion" EntityType="Self.cat_TipoAgrupacion" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagrams" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="tb_AlbumFichaObjetivo" EntityType="Self.tb_AlbumFichaObjetivo" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="tb_AlbumFichaObjetivoDetalle" EntityType="Self.tb_AlbumFichaObjetivoDetalle" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="tb_AliasObjetivo" EntityType="Self.tb_AliasObjetivo" Schema="dbo" store:Type="Tables" />
@@ -623,6 +680,10 @@
             <End Role="tb_Detenido" EntitySet="tb_Detenido" />
             <End Role="tb_Detenidos_DelitoIngreso" EntitySet="tb_Detenidos_DelitoIngreso" />
           </AssociationSet>
+          <AssociationSet Name="FK_tb_FichaAsunto_cat_RolParticipacionAsunto" Association="Self.FK_tb_FichaAsunto_cat_RolParticipacionAsunto">
+            <End Role="cat_RolParticipacionAsunto" EntitySet="cat_RolParticipacionAsunto" />
+            <End Role="tb_FichaAsunto" EntitySet="tb_FichaAsunto" />
+          </AssociationSet>
           <AssociationSet Name="FK_tb_FichaAsunto_tb_AsuntoRelacionado" Association="Self.FK_tb_FichaAsunto_tb_AsuntoRelacionado">
             <End Role="tb_AsuntoRelacionado" EntitySet="tb_AsuntoRelacionado" />
             <End Role="tb_FichaAsunto" EntitySet="tb_FichaAsunto" />
@@ -658,6 +719,10 @@
           <AssociationSet Name="FK_tb_NombreObjetivo_tb_Objetivo" Association="Self.FK_tb_NombreObjetivo_tb_Objetivo">
             <End Role="tb_Objetivo" EntitySet="tb_Objetivo" />
             <End Role="tb_NombreObjetivo" EntitySet="tb_NombreObjetivo" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tb_ObjetivoGrupo_cat_Nivel_Organizacion" Association="Self.FK_tb_ObjetivoGrupo_cat_Nivel_Organizacion">
+            <End Role="cat_Nivel_Organizacion" EntitySet="cat_Nivel_Organizacion" />
+            <End Role="tb_ObjetivoGrupo" EntitySet="tb_ObjetivoGrupo" />
           </AssociationSet>
           <AssociationSet Name="FK_tb_ObjetivoGrupo_tb_Grupo_Delictivo" Association="Self.FK_tb_ObjetivoGrupo_tb_Grupo_Delictivo">
             <End Role="tb_Grupo_Delictivo" EntitySet="tb_Grupo_Delictivo" />
@@ -704,10 +769,23 @@
             <Parameter Name="bit_estatus" Mode="In" Type="Boolean" />
             <Parameter Name="int_id_asunto_relacionado" Mode="In" Type="Int32" />
           </FunctionImport>
+          <FunctionImport Name="getListObjetivosPrioritarios" ReturnType="Collection(Objetivos_PrioritariosModel.getListObjetivosPrioritarios_Result)">
+          <Parameter Name="bit_estatus" Mode="In" Type="Boolean" />
+          </FunctionImport>
+          <FunctionImport Name="getListFichaObjetivos" ReturnType="Collection(Objetivos_PrioritariosModel.getListFichaObjetivos_Result)">
+          <Parameter Name="bit_estatus" Mode="In" Type="Boolean" />
+          </FunctionImport>
+          <FunctionImport Name="getListObjetivosRelacionadoGrupo" ReturnType="Collection(Objetivos_PrioritariosModel.getListObjetivosRelacionadoGrupo_Result)">
+            <Parameter Name="bit_estatus" Mode="In" Type="Boolean" />
+            <Parameter Name="int_id_album_ficha_objetivo" Mode="In" Type="Int32" />
+          </FunctionImport>
           <EntitySet Name="cat_EstatusAsunto" EntityType="Objetivos_PrioritariosModel.cat_EstatusAsunto" />
           <EntitySet Name="cat_EstatusProceso" EntityType="Objetivos_PrioritariosModel.cat_EstatusProceso" />
+          <EntitySet Name="cat_Nivel_Organizacion" EntityType="Objetivos_PrioritariosModel.cat_Nivel_Organizacion" />
+          <EntitySet Name="cat_RolParticipacionAsunto" EntityType="Objetivos_PrioritariosModel.cat_RolParticipacionAsunto" />
           <EntitySet Name="cat_TipoActividadDelictiva" EntityType="Objetivos_PrioritariosModel.cat_TipoActividadDelictiva" />
           <EntitySet Name="cat_TipoAgrupacion" EntityType="Objetivos_PrioritariosModel.cat_TipoAgrupacion" />
+          <EntitySet Name="sysdiagrams" EntityType="Objetivos_PrioritariosModel.sysdiagrams" />
           <EntitySet Name="tb_AlbumFichaObjetivo" EntityType="Objetivos_PrioritariosModel.tb_AlbumFichaObjetivo" />
           <EntitySet Name="tb_AlbumFichaObjetivoDetalle" EntityType="Objetivos_PrioritariosModel.tb_AlbumFichaObjetivoDetalle" />
           <EntitySet Name="tb_AliasObjetivo" EntityType="Objetivos_PrioritariosModel.tb_AliasObjetivo" />
@@ -734,6 +812,14 @@
           <AssociationSet Name="FK_tb_FichaObjetivo_cat_EstatusProceso" Association="Objetivos_PrioritariosModel.FK_tb_FichaObjetivo_cat_EstatusProceso">
             <End Role="cat_EstatusProceso" EntitySet="cat_EstatusProceso" />
             <End Role="tb_FichaObjetivo" EntitySet="tb_FichaObjetivo" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tb_ObjetivoGrupo_cat_Nivel_Organizacion" Association="Objetivos_PrioritariosModel.FK_tb_ObjetivoGrupo_cat_Nivel_Organizacion">
+            <End Role="cat_Nivel_Organizacion" EntitySet="cat_Nivel_Organizacion" />
+            <End Role="tb_ObjetivoGrupo" EntitySet="tb_ObjetivoGrupo" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tb_FichaAsunto_cat_RolParticipacionAsunto" Association="Objetivos_PrioritariosModel.FK_tb_FichaAsunto_cat_RolParticipacionAsunto">
+            <End Role="cat_RolParticipacionAsunto" EntitySet="cat_RolParticipacionAsunto" />
+            <End Role="tb_FichaAsunto" EntitySet="tb_FichaAsunto" />
           </AssociationSet>
           <AssociationSet Name="FK_tb_GrupoTipoActividadDelictiva_cat_TipoActividadDelictiva" Association="Objetivos_PrioritariosModel.FK_tb_GrupoTipoActividadDelictiva_cat_TipoActividadDelictiva">
             <End Role="cat_TipoActividadDelictiva" EntitySet="cat_TipoActividadDelictiva" />
@@ -811,16 +897,6 @@
             <End Role="tb_Objetivo" EntitySet="tb_Objetivo" />
             <End Role="tb_ObjetivoGrupo" EntitySet="tb_ObjetivoGrupo" />
           </AssociationSet>
-          <FunctionImport Name="getListObjetivosPrioritarios" ReturnType="Collection(Objetivos_PrioritariosModel.getListObjetivosPrioritarios_Result)">
-          <Parameter Name="bit_estatus" Mode="In" Type="Boolean" />
-          </FunctionImport>
-          <FunctionImport Name="getListFichaObjetivos" ReturnType="Collection(Objetivos_PrioritariosModel.getListFichaObjetivos_Result)">
-          <Parameter Name="bit_estatus" Mode="In" Type="Boolean" />
-          </FunctionImport>
-          <FunctionImport Name="getListObjetivosRelacionadoGrupo" ReturnType="Collection(Objetivos_PrioritariosModel.getListObjetivosRelacionadoGrupo_Result)">
-            <Parameter Name="bit_estatus" Mode="In" Type="Boolean" />
-            <Parameter Name="int_id_album_ficha_objetivo" Mode="In" Type="Int32" />
-          </FunctionImport>
           </EntityContainer>
         <ComplexType Name="getInfoObjetivoList_Result">
           <Property Type="Int32" Name="int_id_informacion" Nullable="false" />
@@ -901,6 +977,37 @@
           <Property Type="Boolean" Name="estatus_objetivo" Nullable="true" />
           <Property Type="String" Name="nvarchar_foto" Nullable="true" />
         </ComplexType>
+        <ComplexType Name="getListObjetivosPrioritarios_Result">
+          <Property Type="Int32" Name="int_id_objetivo" Nullable="false" />
+          <Property Type="String" Name="Nombres" Nullable="false" MaxLength="4000" />
+          <Property Type="String" Name="Aliases" Nullable="false" MaxLength="4000" />
+          <Property Type="String" Name="GruposDelictivos" Nullable="false" MaxLength="4000" />
+          <Property Type="DateTime" Name="FechaNacimiento" Nullable="false" Precision="23" />
+          <Property Type="Boolean" Name="bit_estatus" Nullable="false" />
+          <Property Type="String" Name="nvarchar_foto" Nullable="true" />
+        </ComplexType>
+        <ComplexType Name="getListFichaObjetivos_Result">
+          <Property Type="Int32" Name="int_id_objetivo" Nullable="false" />
+          <Property Type="String" Name="Nombres" Nullable="false" MaxLength="4000" />
+          <Property Type="String" Name="Carpetas" Nullable="false" MaxLength="4000" />
+          <Property Type="String" Name="Delitos" Nullable="false" MaxLength="4000" />
+        </ComplexType>
+        <ComplexType Name="getListObjetivosRelacionadoGrupo_Result">
+          <Property Type="Int32" Name="int_id_album_detalle" Nullable="false" />
+          <Property Type="Int32" Name="int_id_ficha_objetivo" Nullable="false" />
+          <Property Type="Int32" Name="int_id_album_ficha_objetivo" Nullable="false" />
+          <Property Type="Boolean" Name="estatus_ficha" Nullable="false" />
+          <Property Type="Int32" Name="int_id_estatus_proceso" Nullable="true" />
+          <Property Type="String" Name="nvarchar_descripcion_estatus" Nullable="true" MaxLength="400" />
+          <Property Type="String" Name="nvarchar_observaciones" Nullable="true" MaxLength="400" />
+          <Property Type="Int32" Name="int_id_objetivo" Nullable="true" />
+          <Property Type="String" Name="Nombres" Nullable="false" MaxLength="4000" />
+          <Property Type="String" Name="Aliases" Nullable="false" MaxLength="4000" />
+          <Property Type="String" Name="GruposDelictivos" Nullable="false" MaxLength="4000" />
+          <Property Type="DateTime" Name="FechaNacimiento" Nullable="false" Precision="23" />
+          <Property Type="Boolean" Name="estatus_objetivo" Nullable="true" />
+          <Property Type="String" Name="nvarchar_foto" Nullable="true" />
+        </ComplexType>
         <EntityType Name="cat_EstatusAsunto">
           <Key>
             <PropertyRef Name="int_id_estatus_asunto" />
@@ -921,6 +1028,24 @@
           <Property Name="bit_estatus" Type="Boolean" Nullable="false" />
           <NavigationProperty Name="tb_FichaObjetivo" Relationship="Objetivos_PrioritariosModel.FK_tb_FichaObjetivo_cat_EstatusProceso" FromRole="cat_EstatusProceso" ToRole="tb_FichaObjetivo" />
         </EntityType>
+        <EntityType Name="cat_Nivel_Organizacion">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Puesto" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="tb_ObjetivoGrupo" Relationship="Objetivos_PrioritariosModel.FK_tb_ObjetivoGrupo_cat_Nivel_Organizacion" FromRole="cat_Nivel_Organizacion" ToRole="tb_ObjetivoGrupo" />
+        </EntityType>
+        <EntityType Name="cat_RolParticipacionAsunto">
+          <Key>
+            <PropertyRef Name="int_id_rol_participacion" />
+          </Key>
+          <Property Name="int_id_rol_participacion" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="nvarchar_rol" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="true" />
+          <Property Name="date_fecha_creacion" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="bit_estatus" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="tb_FichaAsunto" Relationship="Objetivos_PrioritariosModel.FK_tb_FichaAsunto_cat_RolParticipacionAsunto" FromRole="cat_RolParticipacionAsunto" ToRole="tb_FichaAsunto" />
+        </EntityType>
         <EntityType Name="cat_TipoActividadDelictiva">
           <Key>
             <PropertyRef Name="int_id_tipo_actividad_delictiva" />
@@ -940,6 +1065,16 @@
           <Property Name="date_fecha_creacion" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="bit_estatus" Type="Boolean" Nullable="false" />
           <NavigationProperty Name="tb_Grupo_Delictivo" Relationship="Objetivos_PrioritariosModel.FK_tb_Grupo_Delictivo_cat_TipoAgrupacion" FromRole="cat_TipoAgrupacion" ToRole="tb_Grupo_Delictivo" />
+        </EntityType>
+        <EntityType Name="sysdiagrams">
+          <Key>
+            <PropertyRef Name="diagram_id" />
+          </Key>
+          <Property Name="name" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
+          <Property Name="principal_id" Type="Int32" Nullable="false" />
+          <Property Name="diagram_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="version" Type="Int32" />
+          <Property Name="definition" Type="Binary" MaxLength="Max" FixedLength="false" />
         </EntityType>
         <EntityType Name="tb_AlbumFichaObjetivo">
           <Key>
@@ -1059,6 +1194,9 @@
           <Property Name="date_fecha_creacion" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="bit_estatus" Type="Boolean" Nullable="false" />
           <Property Name="nvarchar_observaciones" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="int_id_rol_participacion" Type="Int32" />
+          <Property Name="nvarchar_descripcion_participacion" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="cat_RolParticipacionAsunto" Relationship="Objetivos_PrioritariosModel.FK_tb_FichaAsunto_cat_RolParticipacionAsunto" FromRole="tb_FichaAsunto" ToRole="cat_RolParticipacionAsunto" />
           <NavigationProperty Name="tb_AsuntoRelacionado" Relationship="Objetivos_PrioritariosModel.FK_tb_FichaAsunto_tb_AsuntoRelacionado" FromRole="tb_FichaAsunto" ToRole="tb_AsuntoRelacionado" />
           <NavigationProperty Name="tb_FichaObjetivo" Relationship="Objetivos_PrioritariosModel.FK_tb_FichaAsunto_tb_FichaObjetivo" FromRole="tb_FichaAsunto" ToRole="tb_FichaObjetivo" />
         </EntityType>
@@ -1167,6 +1305,9 @@
           <Property Name="nvarchar_observaciones" Type="String" MaxLength="400" FixedLength="false" Unicode="true" />
           <Property Name="date_fecha_creacion" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="bit_estatus" Type="Boolean" Nullable="false" />
+          <Property Name="ID_Nivel_Organizacion" Type="Int32" />
+          <Property Name="nvarchar_funcion_grupo" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="cat_Nivel_Organizacion" Relationship="Objetivos_PrioritariosModel.FK_tb_ObjetivoGrupo_cat_Nivel_Organizacion" FromRole="tb_ObjetivoGrupo" ToRole="cat_Nivel_Organizacion" />
           <NavigationProperty Name="tb_Grupo_Delictivo" Relationship="Objetivos_PrioritariosModel.FK_tb_ObjetivoGrupo_tb_Grupo_Delictivo" FromRole="tb_ObjetivoGrupo" ToRole="tb_Grupo_Delictivo" />
           <NavigationProperty Name="tb_Objetivo" Relationship="Objetivos_PrioritariosModel.FK_tb_ObjetivoGrupo_tb_Objetivo" FromRole="tb_ObjetivoGrupo" ToRole="tb_Objetivo" />
         </EntityType>
@@ -1233,6 +1374,30 @@
             </Principal>
             <Dependent Role="tb_FichaObjetivo">
               <PropertyRef Name="int_id_estatus_proceso" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tb_ObjetivoGrupo_cat_Nivel_Organizacion">
+          <End Type="Objetivos_PrioritariosModel.cat_Nivel_Organizacion" Role="cat_Nivel_Organizacion" Multiplicity="0..1" />
+          <End Type="Objetivos_PrioritariosModel.tb_ObjetivoGrupo" Role="tb_ObjetivoGrupo" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="cat_Nivel_Organizacion">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="tb_ObjetivoGrupo">
+              <PropertyRef Name="ID_Nivel_Organizacion" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tb_FichaAsunto_cat_RolParticipacionAsunto">
+          <End Type="Objetivos_PrioritariosModel.cat_RolParticipacionAsunto" Role="cat_RolParticipacionAsunto" Multiplicity="0..1" />
+          <End Type="Objetivos_PrioritariosModel.tb_FichaAsunto" Role="tb_FichaAsunto" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="cat_RolParticipacionAsunto">
+              <PropertyRef Name="int_id_rol_participacion" />
+            </Principal>
+            <Dependent Role="tb_FichaAsunto">
+              <PropertyRef Name="int_id_rol_participacion" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -1464,37 +1629,6 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <ComplexType Name="getListObjetivosPrioritarios_Result">
-          <Property Type="Int32" Name="int_id_objetivo" Nullable="false" />
-          <Property Type="String" Name="Nombres" Nullable="false" MaxLength="4000" />
-          <Property Type="String" Name="Aliases" Nullable="false" MaxLength="4000" />
-          <Property Type="String" Name="GruposDelictivos" Nullable="false" MaxLength="4000" />
-          <Property Type="DateTime" Name="FechaNacimiento" Nullable="false" Precision="23" />
-          <Property Type="Boolean" Name="bit_estatus" Nullable="false" />
-          <Property Type="String" Name="nvarchar_foto" Nullable="true" />
-        </ComplexType>
-        <ComplexType Name="getListFichaObjetivos_Result">
-          <Property Type="Int32" Name="int_id_objetivo" Nullable="false" />
-          <Property Type="String" Name="Nombres" Nullable="false" MaxLength="4000" />
-          <Property Type="String" Name="Carpetas" Nullable="false" MaxLength="4000" />
-          <Property Type="String" Name="Delitos" Nullable="false" MaxLength="4000" />
-        </ComplexType>
-        <ComplexType Name="getListObjetivosRelacionadoGrupo_Result">
-          <Property Type="Int32" Name="int_id_album_detalle" Nullable="false" />
-          <Property Type="Int32" Name="int_id_ficha_objetivo" Nullable="false" />
-          <Property Type="Int32" Name="int_id_album_ficha_objetivo" Nullable="false" />
-          <Property Type="Boolean" Name="estatus_ficha" Nullable="false" />
-          <Property Type="Int32" Name="int_id_estatus_proceso" Nullable="true" />
-          <Property Type="String" Name="nvarchar_descripcion_estatus" Nullable="true" MaxLength="400" />
-          <Property Type="String" Name="nvarchar_observaciones" Nullable="true" MaxLength="400" />
-          <Property Type="Int32" Name="int_id_objetivo" Nullable="true" />
-          <Property Type="String" Name="Nombres" Nullable="false" MaxLength="4000" />
-          <Property Type="String" Name="Aliases" Nullable="false" MaxLength="4000" />
-          <Property Type="String" Name="GruposDelictivos" Nullable="false" MaxLength="4000" />
-          <Property Type="DateTime" Name="FechaNacimiento" Nullable="false" Precision="23" />
-          <Property Type="Boolean" Name="estatus_objetivo" Nullable="true" />
-          <Property Type="String" Name="nvarchar_foto" Nullable="true" />
-        </ComplexType>
         </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -1604,6 +1738,49 @@
               </ComplexTypeMapping>
             </ResultMapping>
           </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="getListObjetivosPrioritarios" FunctionName="Objetivos_PrioritariosModel.Store.getListObjetivosPrioritarios">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="Objetivos_PrioritariosModel.getListObjetivosPrioritarios_Result">
+                <ScalarProperty Name="int_id_objetivo" ColumnName="int_id_objetivo" />
+                <ScalarProperty Name="Nombres" ColumnName="Nombres" />
+                <ScalarProperty Name="Aliases" ColumnName="Aliases" />
+                <ScalarProperty Name="GruposDelictivos" ColumnName="GruposDelictivos" />
+                <ScalarProperty Name="FechaNacimiento" ColumnName="FechaNacimiento" />
+                <ScalarProperty Name="bit_estatus" ColumnName="bit_estatus" />
+                <ScalarProperty Name="nvarchar_foto" ColumnName="nvarchar_foto" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="getListFichaObjetivos" FunctionName="Objetivos_PrioritariosModel.Store.getListFichaObjetivos">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="Objetivos_PrioritariosModel.getListFichaObjetivos_Result">
+                <ScalarProperty Name="int_id_objetivo" ColumnName="int_id_objetivo" />
+                <ScalarProperty Name="Nombres" ColumnName="Nombres" />
+                <ScalarProperty Name="Carpetas" ColumnName="Carpetas" />
+                <ScalarProperty Name="Delitos" ColumnName="Delitos" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="getListObjetivosRelacionadoGrupo" FunctionName="Objetivos_PrioritariosModel.Store.getListObjetivosRelacionadoGrupo">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="Objetivos_PrioritariosModel.getListObjetivosRelacionadoGrupo_Result">
+                <ScalarProperty Name="int_id_album_detalle" ColumnName="int_id_album_detalle" />
+                <ScalarProperty Name="int_id_ficha_objetivo" ColumnName="int_id_ficha_objetivo" />
+                <ScalarProperty Name="int_id_album_ficha_objetivo" ColumnName="int_id_album_ficha_objetivo" />
+                <ScalarProperty Name="estatus_ficha" ColumnName="estatus_ficha" />
+                <ScalarProperty Name="int_id_estatus_proceso" ColumnName="int_id_estatus_proceso" />
+                <ScalarProperty Name="nvarchar_descripcion_estatus" ColumnName="nvarchar_descripcion_estatus" />
+                <ScalarProperty Name="nvarchar_observaciones" ColumnName="nvarchar_observaciones" />
+                <ScalarProperty Name="int_id_objetivo" ColumnName="int_id_objetivo" />
+                <ScalarProperty Name="Nombres" ColumnName="Nombres" />
+                <ScalarProperty Name="Aliases" ColumnName="Aliases" />
+                <ScalarProperty Name="GruposDelictivos" ColumnName="GruposDelictivos" />
+                <ScalarProperty Name="FechaNacimiento" ColumnName="FechaNacimiento" />
+                <ScalarProperty Name="estatus_objetivo" ColumnName="estatus_objetivo" />
+                <ScalarProperty Name="nvarchar_foto" ColumnName="nvarchar_foto" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
           <EntitySetMapping Name="cat_EstatusAsunto">
             <EntityTypeMapping TypeName="Objetivos_PrioritariosModel.cat_EstatusAsunto">
               <MappingFragment StoreEntitySet="cat_EstatusAsunto">
@@ -1624,6 +1801,24 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <EntitySetMapping Name="cat_Nivel_Organizacion">
+            <EntityTypeMapping TypeName="Objetivos_PrioritariosModel.cat_Nivel_Organizacion">
+              <MappingFragment StoreEntitySet="cat_Nivel_Organizacion">
+                <ScalarProperty Name="Puesto" ColumnName="Puesto" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="cat_RolParticipacionAsunto">
+            <EntityTypeMapping TypeName="Objetivos_PrioritariosModel.cat_RolParticipacionAsunto">
+              <MappingFragment StoreEntitySet="cat_RolParticipacionAsunto">
+                <ScalarProperty Name="bit_estatus" ColumnName="bit_estatus" />
+                <ScalarProperty Name="date_fecha_creacion" ColumnName="date_fecha_creacion" />
+                <ScalarProperty Name="nvarchar_rol" ColumnName="nvarchar_rol" />
+                <ScalarProperty Name="int_id_rol_participacion" ColumnName="int_id_rol_participacion" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
           <EntitySetMapping Name="cat_TipoActividadDelictiva">
             <EntityTypeMapping TypeName="Objetivos_PrioritariosModel.cat_TipoActividadDelictiva">
               <MappingFragment StoreEntitySet="cat_TipoActividadDelictiva">
@@ -1641,6 +1836,17 @@
                 <ScalarProperty Name="date_fecha_creacion" ColumnName="date_fecha_creacion" />
                 <ScalarProperty Name="nvarchar_agrupacion" ColumnName="nvarchar_agrupacion" />
                 <ScalarProperty Name="int_id_tipo_agrupacion" ColumnName="int_id_tipo_agrupacion" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="sysdiagrams">
+            <EntityTypeMapping TypeName="Objetivos_PrioritariosModel.sysdiagrams">
+              <MappingFragment StoreEntitySet="sysdiagrams">
+                <ScalarProperty Name="definition" ColumnName="definition" />
+                <ScalarProperty Name="version" ColumnName="version" />
+                <ScalarProperty Name="diagram_id" ColumnName="diagram_id" />
+                <ScalarProperty Name="principal_id" ColumnName="principal_id" />
+                <ScalarProperty Name="name" ColumnName="name" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -1750,6 +1956,8 @@
           <EntitySetMapping Name="tb_FichaAsunto">
             <EntityTypeMapping TypeName="Objetivos_PrioritariosModel.tb_FichaAsunto">
               <MappingFragment StoreEntitySet="tb_FichaAsunto">
+                <ScalarProperty Name="nvarchar_descripcion_participacion" ColumnName="nvarchar_descripcion_participacion" />
+                <ScalarProperty Name="int_id_rol_participacion" ColumnName="int_id_rol_participacion" />
                 <ScalarProperty Name="nvarchar_observaciones" ColumnName="nvarchar_observaciones" />
                 <ScalarProperty Name="bit_estatus" ColumnName="bit_estatus" />
                 <ScalarProperty Name="date_fecha_creacion" ColumnName="date_fecha_creacion" />
@@ -1842,6 +2050,8 @@
           <EntitySetMapping Name="tb_ObjetivoGrupo">
             <EntityTypeMapping TypeName="Objetivos_PrioritariosModel.tb_ObjetivoGrupo">
               <MappingFragment StoreEntitySet="tb_ObjetivoGrupo">
+                <ScalarProperty Name="nvarchar_funcion_grupo" ColumnName="nvarchar_funcion_grupo" />
+                <ScalarProperty Name="ID_Nivel_Organizacion" ColumnName="ID_Nivel_Organizacion" />
                 <ScalarProperty Name="bit_estatus" ColumnName="bit_estatus" />
                 <ScalarProperty Name="date_fecha_creacion" ColumnName="date_fecha_creacion" />
                 <ScalarProperty Name="nvarchar_observaciones" ColumnName="nvarchar_observaciones" />
@@ -1896,49 +2106,6 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <FunctionImportMapping FunctionImportName="getListObjetivosPrioritarios" FunctionName="Objetivos_PrioritariosModel.Store.getListObjetivosPrioritarios">
-            <ResultMapping>
-              <ComplexTypeMapping TypeName="Objetivos_PrioritariosModel.getListObjetivosPrioritarios_Result">
-                <ScalarProperty Name="int_id_objetivo" ColumnName="int_id_objetivo" />
-                <ScalarProperty Name="Nombres" ColumnName="Nombres" />
-                <ScalarProperty Name="Aliases" ColumnName="Aliases" />
-                <ScalarProperty Name="GruposDelictivos" ColumnName="GruposDelictivos" />
-                <ScalarProperty Name="FechaNacimiento" ColumnName="FechaNacimiento" />
-                <ScalarProperty Name="bit_estatus" ColumnName="bit_estatus" />
-                <ScalarProperty Name="nvarchar_foto" ColumnName="nvarchar_foto" />
-              </ComplexTypeMapping>
-            </ResultMapping>
-          </FunctionImportMapping>
-          <FunctionImportMapping FunctionImportName="getListFichaObjetivos" FunctionName="Objetivos_PrioritariosModel.Store.getListFichaObjetivos">
-            <ResultMapping>
-              <ComplexTypeMapping TypeName="Objetivos_PrioritariosModel.getListFichaObjetivos_Result">
-                <ScalarProperty Name="int_id_objetivo" ColumnName="int_id_objetivo" />
-                <ScalarProperty Name="Nombres" ColumnName="Nombres" />
-                <ScalarProperty Name="Carpetas" ColumnName="Carpetas" />
-                <ScalarProperty Name="Delitos" ColumnName="Delitos" />
-              </ComplexTypeMapping>
-            </ResultMapping>
-          </FunctionImportMapping>
-          <FunctionImportMapping FunctionImportName="getListObjetivosRelacionadoGrupo" FunctionName="Objetivos_PrioritariosModel.Store.getListObjetivosRelacionadoGrupo">
-            <ResultMapping>
-              <ComplexTypeMapping TypeName="Objetivos_PrioritariosModel.getListObjetivosRelacionadoGrupo_Result">
-                <ScalarProperty Name="int_id_album_detalle" ColumnName="int_id_album_detalle" />
-                <ScalarProperty Name="int_id_ficha_objetivo" ColumnName="int_id_ficha_objetivo" />
-                <ScalarProperty Name="int_id_album_ficha_objetivo" ColumnName="int_id_album_ficha_objetivo" />
-                <ScalarProperty Name="estatus_ficha" ColumnName="estatus_ficha" />
-                <ScalarProperty Name="int_id_estatus_proceso" ColumnName="int_id_estatus_proceso" />
-                <ScalarProperty Name="nvarchar_descripcion_estatus" ColumnName="nvarchar_descripcion_estatus" />
-                <ScalarProperty Name="nvarchar_observaciones" ColumnName="nvarchar_observaciones" />
-                <ScalarProperty Name="int_id_objetivo" ColumnName="int_id_objetivo" />
-                <ScalarProperty Name="Nombres" ColumnName="Nombres" />
-                <ScalarProperty Name="Aliases" ColumnName="Aliases" />
-                <ScalarProperty Name="GruposDelictivos" ColumnName="GruposDelictivos" />
-                <ScalarProperty Name="FechaNacimiento" ColumnName="FechaNacimiento" />
-                <ScalarProperty Name="estatus_objetivo" ColumnName="estatus_objetivo" />
-                <ScalarProperty Name="nvarchar_foto" ColumnName="nvarchar_foto" />
-              </ComplexTypeMapping>
-            </ResultMapping>
-          </FunctionImportMapping>
           </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>

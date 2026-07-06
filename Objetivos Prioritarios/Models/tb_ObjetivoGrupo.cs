@@ -22,7 +22,10 @@ namespace Objetivos_Prioritarios.Models
         public string nvarchar_observaciones { get; set; }
         public System.DateTime date_fecha_creacion { get; set; }
         public bool bit_estatus { get; set; }
+        public Nullable<int> ID_Nivel_Organizacion { get; set; }
+        public string nvarchar_funcion_grupo { get; set; }
     
+        public virtual cat_Nivel_Organizacion cat_Nivel_Organizacion { get; set; }
         public virtual tb_Grupo_Delictivo tb_Grupo_Delictivo { get; set; }
         public virtual tb_Objetivo tb_Objetivo { get; set; }
     }

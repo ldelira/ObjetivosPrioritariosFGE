@@ -72,7 +72,7 @@ namespace Objetivos_Prioritarios.Controllers
             ViewBag.nombreprincipal = ObjetivoService.ObtenerNombreCompletoPrincipal(int_id_objetivo);
             var busqueda = ObjetivoService.getObjetivoById((int)int_id_objetivo);
             return View(busqueda);
-            
+
         }
 
 
@@ -323,7 +323,10 @@ namespace Objetivos_Prioritarios.Controllers
             var objetivosGrupoList = objetivosGrupo.Select(u => new
             {
                 id_objetivo_grupo = u.int_id_objetivo_grupo,
-                nvarchar_alias = u.tb_Grupo_Delictivo.nvarchar_alias,
+                nvarchar_alias = u.tb_Grupo_Delictivo == null ? "" : u.tb_Grupo_Delictivo.nvarchar_alias,
+                nvarchar_grupo = u.tb_Grupo_Delictivo == null ? "" : u.tb_Grupo_Delictivo.nvarchar_grupo,
+                nivel_organizacion = u.cat_Nivel_Organizacion == null ? "Por definir" : u.cat_Nivel_Organizacion.Puesto,
+                funcion_grupo = u.nvarchar_funcion_grupo,
                 fecha_ingreso = u.date_fecha_ingreso?.ToString("yyyy-MM-dd"),
                 fecha_salida = u.date_fecha_salida?.ToString("yyyy-MM-dd"),
                 observaciones = u.nvarchar_observaciones,
@@ -412,6 +415,20 @@ namespace Objetivos_Prioritarios.Controllers
 
 
             return Json(gruposDisponibles, JsonRequestBehavior.AllowGet);
+        }
+
+
+        public JsonResult GetNivelOrganizacionList()
+        {
+            var niveles = ObjetivoService.GetNivelOrganizacionList()
+                .Select(x => new
+                {
+                    id = x.ID,
+                    puesto = x.Puesto
+                })
+                .ToList();
+
+            return Json(niveles, JsonRequestBehavior.AllowGet);
         }
 
 

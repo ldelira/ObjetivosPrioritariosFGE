@@ -293,7 +293,7 @@
           <Property Type="Int32" Name="Cla_Calle" Nullable="true" />
           <Property Type="String" Name="Cla_Calle_concat" Nullable="true" MaxLength="8000" />
           <Property Type="String" Name="Calle" Nullable="true" MaxLength="4000" />
-          <Property Type="String" Name="Num_Casa" Nullable="true" MaxLength="4000" />
+          <Property Type="String" Name="Num_Casa" Nullable="true" MaxLength="8000" />
           <Property Type="Int32" Name="Cve_mun" Nullable="true" />
           <Property Type="String" Name="Cve_mun_concat" Nullable="true" MaxLength="8000" />
           <Property Type="String" Name="Municipio" Nullable="true" MaxLength="4000" />

@@ -1,7 +1,7 @@
 ﻿@model List<Objetivos_Prioritarios.Models.SP_ObjPri_getListinfogeneral_Result>
 
-<div class="row">
-    <table id="objetivoDataTable" class="dataTable table table-striped" style="width:100%"></table>
+<div class="table-responsive w-100 border-0 p-1">
+    <table id="objetivoDataTable" class="table table-hover table-institutional w-100"></table>
 </div>
 
 <script type="text/javascript">
@@ -14,7 +14,7 @@
                 data: "id_concat",
                 orderable: true,
                 render: function (data) {
-                    return data ? data.replace(/(\r\n|\n|\r)/g, "<br>") : "";
+                    return data ? `<span class="text-muted small">${data.replace(/(\r\n|\n|\r)/g, "<br>")}</span>` : "";
                 }
             },
             {
@@ -31,9 +31,11 @@
                         let n = nombreLines[i] || "";
                         let p = paternoLines[i] || "";
                         let m = maternoLines[i] || "";
-                        resultado.push(`${n} ${p} ${m},`);
+                        // Se agrega un pequeño estilo de negrita al nombre para que resalte
+                        if(n || p || m) {
+                            resultado.push(`<span class="fw-semibold text-dark">${n} ${p} ${m}</span>`);
+                        }
                     }
-
                     return resultado.join("<br>");
                 }
             },
@@ -42,11 +44,9 @@
                 data: "alias",
                 orderable: true,
                 render: function (data) {
-                    if (!data) return "";
-                    let result = data.split(/\r\n|\r|\n/).map(a => a.trim()).join(",<br>");
-                    return result;
+                    if (!data) return '<span class="text-muted fst-italic small">Sin alias</span>';
+                    return data.split(/\r\n|\r|\n/).map(a => a.trim()).filter(a => a !== "").join("<br>");
                 }
-
             },
             { title: "Cla_Calle", data: "Cla_Calle", orderable: true, visible: false },
             { title: "Cla_Calle_concat", data: "Cla_Calle_concat", orderable: true, visible: false },
@@ -56,20 +56,17 @@
                 orderable: true,
                 render: function (data) {
                     if (!data) return "";
-                    let result = data.split(/\r\n|\r|\n/).map(a => a.trim()).join(", ");
-                    return result;
+                    return data.split(/\r\n|\r|\n/).map(a => a.trim()).join(", ");
                 }
             },
             {
-                title: "Número de Casa",
+                title: "Número",
                 data: "Num_Casa",
                 orderable: true,
                 render: function (data) {
                     if (!data) return "";
-                    let result = data.split(/\r\n|\r|\n/).map(a => a.trim()).join(",<br>");
-                    return result;
+                    return data.split(/\r\n|\r|\n/).map(a => a.trim()).join("<br>");
                 }
-
             },
             { title: "Cve_col_concat", data: "Cve_col_concat", orderable: true, visible: false },
             { title: "Cve_col", data: "Cve_col", orderable: true, visible: false },
@@ -78,9 +75,8 @@
                 data: "Colonia",
                 orderable: true,
                 render: function (data) {
-                        if (!data) return "";
-                        let result = data.split(/\r\n|\r|\n/).map(a => a.trim()).join(",<br>");
-                        return result;
+                    if (!data) return "";
+                    return data.split(/\r\n|\r|\n/).map(a => a.trim()).join("<br>");
                 }
             },
             { title: "Cve_mun_concat", data: "Cve_mun_concat", orderable: true, visible: false },
@@ -90,9 +86,8 @@
                 data: "Municipio",
                 orderable: true,
                 render: function (data) {
-                        if (!data) return "";
-                        let result = data.split(/\r\n|\r|\n/).map(a => a.trim()).join(",<br>");
-                        return result;
+                    if (!data) return "";
+                    return data.split(/\r\n|\r|\n/).map(a => a.trim()).join("<br>");
                 }
             },
             { title: "Cve_Edo_concat", data: "Cve_Edo_concat", orderable: true, visible: false },
@@ -103,12 +98,9 @@
                 orderable: true,
                 render: function (data) {
                     if (!data) return "";
-                    let result = data.split(/\r\n|\r|\n/).map(a => a.trim()).join(",<br>");
-                    return result;
+                    return data.split(/\r\n|\r|\n/).map(a => a.trim()).join("<br>");
                 }
             },
-
-            // 📅 Otros datos
             {
                 title: "Fecha Captura",
                 data: "Fec_Captu_concat",
@@ -120,7 +112,7 @@
                         const fecha = new Date(f);
                         return isNaN(fecha) ? f : fecha.toLocaleDateString();
                     });
-                    return fechas.join("<br>");
+                    return `<span class="text-muted small">${fechas.join("<br>")}</span>`;
                 }
             },
             { title: "CLAVE_PERSO", data: "CLAVE_PERSO", orderable: true, visible: false },
@@ -130,49 +122,85 @@
                 data: null,
                 orderable: false,
                 render: function (data, type, row) {
+                    // Diseño de botones compactos y modernos
+                    let btnVerFoto = `
+                        <button class="btn-action btn-action-view btnVerImagen me-1" data-id="${row.id}" title="Ver Fotografía">
+                            <i class="fa fa-camera"></i>
+                        </button>`;
 
-                    // Si el SP devolvió NULL
+                    // Si NO tiene ObjetivoPrioritario
                     if (row.ObjetivoPrioritario === null || row.ObjetivoPrioritario === "" || row.ObjetivoPrioritario === undefined) {
                         return `
-                        <button class="btn btn-success btnAddInfo" data-id="${row.id}">
-                            <i class="fa fa-fw fa-check"></i> Agregar
-                        </button>
-                        <button class="btn btn-info btnVerImagen" data-id="${row.id}">
-                            <i class="fa fa-fw fa-check"></i> Ver Foto
-                        </button>
-                    `;
+                            <div class="d-flex align-items-center justify-content-center">
+                                ${btnVerFoto}
+                                <button class="btn btn-sm btn-outline-success fw-bold btnAddInfo" data-id="${row.id}" style="border-radius: 6px; font-size: 0.75rem;">
+                                    <i class="fa fa-plus me-1"></i> Agregar
+                                </button>
+                            </div>`;
                     }
 
-                    // Si sí tiene ObjetivoPrioritario
+                    // Si SÍ tiene ObjetivoPrioritario
                     return `
-                        <button class="btn btn-primary btnIrObjetivo" data-idobjetivo="${row.ObjetivoPrioritario}">
-                            <i class="fa fa-fw fa-arrow-right"></i> Ir a objetivo ${row.ObjetivoPrioritario}
-                        </button>
-
-                        <button class="btn btn-info btnVerImagen" data-id="${row.id}">
-                            <i class="fa fa-fw fa-check"></i> Ver Foto
-                        </button>
-                    `;
+                        <div class="d-flex align-items-center justify-content-center">
+                            ${btnVerFoto}
+                            <button class="btn btn-sm btn-outline-primary fw-bold btnIrObjetivo" data-idobjetivo="${row.ObjetivoPrioritario}" style="border-radius: 6px; font-size: 0.75rem;">
+                                <i class="fa fa-arrow-right me-1"></i> Ir a Obj. ${row.ObjetivoPrioritario}
+                            </button>
+                        </div>`;
                 }
             }
-
         ];
 
         var datos = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model));
-        console.log("Datos recibidos en la partial:", datos);
 
         var tabla = $('#objetivoDataTable').DataTable({
             destroy: true,
             searching: true,
-            responsive: true,
+            responsive: false, // Apagado para evitar conflictos con scrollX
             scrollX: true,
+            autoWidth: false,  // Clave para evitar el descuadre de encabezados
             data: datos,
-            columns: infoGeneralColumns
+            columns: infoGeneralColumns,
+            dom: "<'row mb-3'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6 d-flex justify-content-end'f>>" +
+                 "<'row'<'col-sm-12'tr>>" +
+                 "<'row mt-3'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+            language: {
+                "sProcessing": "Procesando...",
+                "sLengthMenu": "Mostrar _MENU_ registros",
+                "sZeroRecords": "No se encontraron resultados",
+                "sEmptyTable": "Ningún dato disponible en esta tabla",
+                "sInfo": "Mostrando del _START_ al _END_ de _TOTAL_ registros",
+                "sInfoEmpty": "Mostrando 0 registros",
+                "sInfoFiltered": "(filtrado de _MAX_ totales)",
+                "sSearch": "<i class='fa fa-search text-muted me-2'></i>",
+                "sSearchPlaceholder": "Buscar en resultados...",
+                "oPaginate": {
+                    "sFirst": "Primero",
+                    "sLast": "Último",
+                    "sNext": "Siguiente",
+                    "sPrevious": "Anterior"
+                }
+            }
         });
 
+        // SOLUCIÓN AL DESCUADRE DE ENCABEZADOS EN EL MODAL
+        tabla.on('draw.dt', function () {
+            setTimeout(function () {
+                tabla.columns.adjust();
+            }, 50);
+        });
+
+        // Al abrir la pestaña de Resultados en el Modal, forzar ajuste de tabla
+        $('button[data-bs-target="#resultadosTab"]').on('shown.bs.tab', function (e) {
+            tabla.columns.adjust();
+        });
+
+
+        // ==========================================
+        // EVENTOS DE BOTONES
+        // ==========================================
         $('#objetivoDataTable').on('click', '.btnAddInfo', function () {
             const rowData = tabla.row($(this).closest('tr')).data();
-            console.log("Fila seleccionada:", rowData);
             AddObjetivoInfoGeneral(rowData);
         });
 
@@ -183,66 +211,27 @@
 
         $('#objetivoDataTable').on('click', '.btnVerImagen', function () {
             const rowData = tabla.row($(this).closest('tr')).data();
-            console.log("Fila seleccionada:", rowData);
             cargarFotoPrincipal(rowData);
         });
 
-
     });
 
-    // 🔹 Función AJAX que envía los datos al controlador
-    @*function AddObjetivoInfoGeneral(rowData) {
-        var Datos = {
-            id_objetivo: +$("#int_id_objetivo").val(),
-            id_municipio: rowData.id_municipio,
-            colonia: rowData.colonia,
-            calle_numero: rowData.calle_numero,
-            alias: rowData.alias,
-            nombre_completo: rowData.nombre_completo
-        };
-
-        console.log("Datos a enviar:", Datos);
-
-        $.ajax({
-            url: '@Url.Action("AddInfoGeneral", "Objetivo")',
-            type: 'POST',
-            contentType: 'application/json; charset=utf-8',
-            data: JSON.stringify(Datos),
-            success: function (response) {
-                if (response.IsSuccess) {
-                    swal("Éxito", response.Message, "success");
-                } else {
-                    swal("Error", response.Message, "error");
-                }
-            },
-            error: function (xhr, status, error) {
-                swal("Error", "No se pudo guardar la información.", "error");
-                console.error(error);
-            }
-        });
-    }*@
-
-
+    // ==========================================
+    // FUNCIONES AJAX
+    // ==========================================
     function AddObjetivoInfoGeneral(rowData) {
-        // Obtener el ID del objetivo desde el input oculto o visible
         var idObjetivo = parseInt($("#int_id_objetivo").val(), 10) || null;
-
-        // Combinar los datos recibidos con el ID del objetivo
         var Datos = Object.assign({}, rowData, { id_objetivo: idObjetivo });
 
-        // Enviar la información general al backend
         $.ajax({
-            url:  "@Url.Action("AddInfoGeneral", "Objetivo")",
+            url: "@Url.Action("AddInfoGeneral", "Objetivo")",
             type: 'POST',
             data: JSON.stringify(Datos),
             contentType: 'application/json; charset=utf-8',
             success: function (response) {
                 if (response && response.IsSuccess) {
-                    // Activar la pestaña de fotos
                     var tabTrigger = new bootstrap.Tab(document.querySelector('#fotos-tab'));
                     tabTrigger.show();
-
-                    // Cargar la vista parcial de la foto principal
 
                     $.ajax({
                         url: "@Url.Action("FotoPrincipal", "Objetivo")",
@@ -250,32 +239,26 @@
                         data: JSON.stringify(Datos),
                         contentType: 'application/json; charset=utf-8',
                         beforeSend: function () {
-                            // Limpia el contenedor y muestra mensaje de carga
                             $('#busquedafotos #galeriaFotos')
                                 .empty()
-                                .html('<div class="text-center text-muted">Cargando foto...</div>');
+                                .html('<div class="text-center py-4"><div class="spinner-border spinner-border-sm text-primary"></div><span class="ms-2 text-muted small">Cargando foto...</span></div>');
                         },
                         success: function (partialHtml) {
-                            // Si el servidor devuelve JSON (por ejemplo, sin foto), manejarlo
                             if (typeof partialHtml === 'object' && partialHtml.IsSuccess === false) {
                                 swal({
                                     title: "No Existe Una Fotografía del Objetivo",
                                     text: response.Message,
                                     type: 'info',
                                     confirmButtonText: "Continuar",
+                                    confirmButtonColor: "#1d63d3",
                                     closeOnConfirm: true,
-                                }, function (isConfirm) {
                                 });
                                 return;
                             }
-
-                            // Insertar la vista parcial en el contenedor
                             $('#busquedafotos #galeriaFotos').html(partialHtml);
-
                         },
                         error: function () {
                             swal("Error", "No se pudo cargar la foto del detenido.", "error");
-                            $('#modalFotosDetenido').modal('hide');
                         }
                     });
                 } else {
@@ -288,22 +271,15 @@
         });
     }
 
-
     function ObjetivoPrioritario(idObjetivo) {
-    if (!idObjetivo) {
-        swal("Error", "No se encontró el ID del objetivo.", "error");
-        return;
+        if (!idObjetivo) {
+            swal("Error", "No se encontró el ID del objetivo.", "error");
+            return;
+        }
+        location.href = '@Url.Action("AddEditObjetivos","Objetivo")?int_id_objetivo=' + idObjetivo;
     }
 
-        console.log("Fila seleccionada:", idObjetivo);
-    location.href = '@Url.Action("AddEditObjetivos","Objetivo")?int_id_objetivo=' + idObjetivo;
-}
-
-
     function cargarFotoPrincipal(Datos) {
-
-        debugger;
-        // Activar la pestaña de fotos
         var tabTrigger = new bootstrap.Tab(document.querySelector('#fotos-tab'));
         tabTrigger.show();
 
@@ -312,38 +288,28 @@
             type: 'POST',
             data: JSON.stringify(Datos),
             contentType: 'application/json; charset=utf-8',
-
             beforeSend: function () {
                 $('#busquedafotos #galeriaFotos')
                     .empty()
-                    .html('<div class="text-center text-muted">Cargando foto...</div>');
+                    .html('<div class="text-center py-4"><div class="spinner-border spinner-border-sm text-primary"></div><span class="ms-2 text-muted small">Cargando foto...</span></div>');
             },
-
             success: function (partialHtml) {
-
-                // Si el servidor regresa JSON indicando que no hay foto
                 if (typeof partialHtml === 'object' && partialHtml.IsSuccess === false) {
                     swal({
                         title: "No Existe Una Fotografía del Objetivo",
                         text: partialHtml.Message || "",
                         type: 'info',
                         confirmButtonText: "Continuar",
+                        confirmButtonColor: "#1d63d3",
                         closeOnConfirm: true
                     });
                     return;
                 }
-
-                // Cargar la vista parcial
                 $('#busquedafotos #galeriaFotos').html(partialHtml);
             },
-
             error: function () {
                 swal("Error", "No se pudo cargar la foto del detenido.", "error");
-                $('#modalFotosDetenido').modal('hide');
             }
         });
     }
-
-
-
 </script>

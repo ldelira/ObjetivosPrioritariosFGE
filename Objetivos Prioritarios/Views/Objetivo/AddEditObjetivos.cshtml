@@ -467,6 +467,7 @@
     });
 
     $("#savePhoto").click(function () {
+        debugger; 
         var formData = new FormData();
         var file = $("#fotoInput")[0].files[0];
         var fechaNacimiento = $("#fechaNacimiento").val();
@@ -483,19 +484,11 @@
         if (file) {
             // si el usuario subió foto
             formData.append("foto", file);
-            enviarDatos(formData, fechaNacimiento);
-        } else {
-            // si NO subió, usamos la de Nodisponible.png
-            fetch('/images/Nodisponible.png')
-                .then(res => res.blob())
-                .then(blob => {
-                    formData.append("foto", blob, "Nodisponible.png");
-                    enviarDatos(formData, fechaNacimiento);
-                })
-                .catch(err => {
-                    alert("No se pudo cargar la imagen por defecto.");
-                });
         }
+            formData.append("fechaNacimiento", fechaNacimiento);
+            formData.append("int_id_objetivo", $("#int_id_objetivo").val()); // asegúrate de tenerlo
+
+            enviarDatos(formData);
     });
 
     function enviarDatos(formData, fechaNacimiento) {

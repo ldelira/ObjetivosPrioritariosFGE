@@ -1,0 +1,405 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="PortalDetenidosModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="Cat_Faltas">
+          <Key>
+            <PropertyRef Name="IdFueroComun" />
+          </Key>
+          <Property Name="IdFueroComun" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="FueroComun" Type="varchar(max)" />
+          <Property Name="IdTipoFuero" Type="int" />
+          <Property Name="Municipio" Type="nvarchar" MaxLength="10" />
+        </EntityType>
+        <!--Errores durante la generación:
+advertencia 6002: La tabla o vista 'PortalDetenidos.dbo.CAT_Municipio' no tiene definida ninguna clave principal. Se ha inferido la clave y la definición se creado como una vista o tabla de solo lectura.-->
+        <EntityType Name="CAT_Municipio">
+          <Key>
+            <PropertyRef Name="Muni" />
+          </Key>
+          <Property Name="Muni" Type="bigint" Nullable="false" />
+          <Property Name="Nombre" Type="nvarchar(max)" />
+        </EntityType>
+        <!--Errores durante la generación:
+advertencia 6013: La tabla o vista 'PortalDetenidos.dbo.CAT_SEXO' no tiene definida una clave principal y no es posible inferir ninguna clave principal válida. Esta tabla o vista se ha excluido. Para usar la entidad, necesitará revisar el esquema, agregar las claves correctas y quitar sus comentarios.
+        <EntityType Name="CAT_SEXO">
+          <Property Name="IDSEXO" Type="int" />
+          <Property Name="SEXO" Type="varchar" MaxLength="20" />
+        </EntityType>-->
+        <EntityType Name="DETENCION">
+          <Key>
+            <PropertyRef Name="IDDETENCION" />
+          </Key>
+          <Property Name="IDDETENCION" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="SERIE_MUNICIPIO" Type="varchar" MaxLength="5" />
+          <Property Name="CONSECUTIVO" Type="varchar" MaxLength="30" />
+          <Property Name="ANO" Type="varchar" MaxLength="4" />
+          <Property Name="FECHA_DETENCION" Type="date" />
+          <Property Name="HORA_DETENCION" Type="varchar" MaxLength="5" />
+          <Property Name="FUERO" Type="varchar" MaxLength="30" />
+          <Property Name="NoDETENIDOS" Type="int" />
+          <Property Name="CALLE" Type="varchar" MaxLength="200" />
+          <Property Name="COLONIA" Type="varchar" MaxLength="200" />
+          <Property Name="CP" Type="varchar" MaxLength="200" />
+          <Property Name="MUNICIPIO" Type="varchar" MaxLength="200" />
+          <Property Name="HECHO" Type="varchar" MaxLength="5000" />
+          <Property Name="CAUSA" Type="varchar" MaxLength="200" />
+          <Property Name="OBSERVACIONES" Type="varchar" MaxLength="5000" />
+          <Property Name="VECHICULO" Type="bit" />
+          <Property Name="NUMEXT" Type="int" />
+          <Property Name="NUMINT" Type="varchar" MaxLength="5" />
+          <Property Name="Gramos" Type="numeric" Precision="8" Scale="4" />
+          <Property Name="Mes" Type="varchar" MaxLength="20" />
+          <Property Name="Dia" Type="varchar" MaxLength="20" />
+          <Property Name="Feria" Type="bit" />
+          <Property Name="Latitud" Type="varchar" MaxLength="20" />
+          <Property Name="Longitud" Type="varchar" MaxLength="20" />
+          <Property Name="Aseguramientos" Type="varchar" MaxLength="3000" />
+          <Property Name="Envoltorios" Type="varchar" MaxLength="500" />
+          <Property Name="Armas" Type="varchar" MaxLength="500" />
+          <Property Name="Cartuchos" Type="varchar" MaxLength="500" />
+          <Property Name="FueroDescripcion" Type="varchar(max)" />
+          <Property Name="Cargadores" Type="varchar" MaxLength="500" />
+        </EntityType>
+        <EntityType Name="DETENIDO">
+          <Key>
+            <PropertyRef Name="IDDETENIDO" />
+          </Key>
+          <Property Name="IDDETENIDO" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="IDDETENCION" Type="int" />
+          <Property Name="NOMBRE" Type="varchar" MaxLength="100" />
+          <Property Name="ALIAS" Type="varchar" MaxLength="100" />
+          <Property Name="EDAD" Type="varchar" MaxLength="3" />
+          <Property Name="ORIGINARIO" Type="varchar" MaxLength="200" />
+          <Property Name="SEXO" Type="varchar" MaxLength="200" />
+          <Property Name="FECHA_NACIMIENTO" Type="varchar" MaxLength="30" />
+          <Property Name="CALLE" Type="varchar" MaxLength="200" />
+          <Property Name="COLONIA" Type="varchar" MaxLength="200" />
+          <Property Name="CP" Type="varchar" MaxLength="200" />
+          <Property Name="MUNICIPIO" Type="varchar" MaxLength="200" />
+          <Property Name="NUMEXT" Type="int" />
+          <Property Name="NUMINT" Type="varchar" MaxLength="5" />
+          <Property Name="Ap_Paterno" Type="varchar" MaxLength="30" />
+          <Property Name="Ap_Materno" Type="varchar" MaxLength="30" />
+          <Property Name="Ocupacion" Type="varchar" MaxLength="100" />
+          <Property Name="CaracteristicasDetenido" Type="varchar" MaxLength="3000" />
+          <Property Name="Estado" Type="varchar" MaxLength="50" />
+          <Property Name="Folio" Type="varchar" MaxLength="50" />
+          <Property Name="Situacion" Type="varchar" MaxLength="1" />
+          <Property Name="Telefono" Type="varchar" MaxLength="20" />
+        </EntityType>
+        <EntityType Name="FOTO">
+          <Key>
+            <PropertyRef Name="IDFOTO" />
+          </Key>
+          <Property Name="IDFOTO" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="IDDETENIDO" Type="int" />
+          <Property Name="FOTO" Type="varchar(max)" />
+          <Property Name="FEHCA" Type="date" />
+          <Property Name="TIPO" Type="varchar" MaxLength="150" />
+          <Property Name="VECTOR_EMBEDDING" Type="nvarchar(max)" />
+        </EntityType>
+        <EntityType Name="Huella">
+          <Key>
+            <PropertyRef Name="IdHuella" />
+          </Key>
+          <Property Name="IdHuella" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="IdDetenido" Type="int" />
+          <Property Name="Huellas" Type="text" />
+          <Property Name="VECTOR_EMBEDDING" Type="nvarchar(max)" />
+        </EntityType>
+        <Association Name="FK_IDDETENIDO">
+          <End Role="DETENIDO" Type="Self.DETENIDO" Multiplicity="0..1" />
+          <End Role="FOTO" Type="Self.FOTO" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="DETENIDO">
+              <PropertyRef Name="IDDETENIDO" />
+            </Principal>
+            <Dependent Role="FOTO">
+              <PropertyRef Name="IDDETENIDO" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="PortalDetenidosModelStoreContainer">
+          <EntitySet Name="Cat_Faltas" EntityType="Self.Cat_Faltas" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="DETENCION" EntityType="Self.DETENCION" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="DETENIDO" EntityType="Self.DETENIDO" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="FOTO" EntityType="Self.FOTO" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Huella" EntityType="Self.Huella" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="CAT_Municipio" EntityType="Self.CAT_Municipio" store:Type="Tables" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [CAT_Municipio].[Muni] AS [Muni], 
+    [CAT_Municipio].[Nombre] AS [Nombre]
+    FROM [dbo].[CAT_Municipio] AS [CAT_Municipio]</DefiningQuery>
+          </EntitySet>
+          <AssociationSet Name="FK_IDDETENIDO" Association="Self.FK_IDDETENIDO">
+            <End Role="DETENIDO" EntitySet="DETENIDO" />
+            <End Role="FOTO" EntitySet="FOTO" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="PortalDetenidosModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="Cat_Faltas">
+          <Key>
+            <PropertyRef Name="IdFueroComun" />
+          </Key>
+          <Property Name="IdFueroComun" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="FueroComun" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="IdTipoFuero" Type="Int32" />
+          <Property Name="Municipio" Type="String" MaxLength="10" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="DETENCION">
+          <Key>
+            <PropertyRef Name="IDDETENCION" />
+          </Key>
+          <Property Name="IDDETENCION" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="SERIE_MUNICIPIO" Type="String" MaxLength="5" FixedLength="false" Unicode="false" />
+          <Property Name="CONSECUTIVO" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="ANO" Type="String" MaxLength="4" FixedLength="false" Unicode="false" />
+          <Property Name="FECHA_DETENCION" Type="DateTime" Precision="0" />
+          <Property Name="HORA_DETENCION" Type="String" MaxLength="5" FixedLength="false" Unicode="false" />
+          <Property Name="FUERO" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="NoDETENIDOS" Type="Int32" />
+          <Property Name="CALLE" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="COLONIA" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="CP" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="MUNICIPIO" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="HECHO" Type="String" MaxLength="5000" FixedLength="false" Unicode="false" />
+          <Property Name="CAUSA" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="OBSERVACIONES" Type="String" MaxLength="5000" FixedLength="false" Unicode="false" />
+          <Property Name="VECHICULO" Type="Boolean" />
+          <Property Name="NUMEXT" Type="Int32" />
+          <Property Name="NUMINT" Type="String" MaxLength="5" FixedLength="false" Unicode="false" />
+          <Property Name="Gramos" Type="Decimal" Precision="8" Scale="4" />
+          <Property Name="Mes" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="Dia" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="Feria" Type="Boolean" />
+          <Property Name="Latitud" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="Longitud" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="Aseguramientos" Type="String" MaxLength="3000" FixedLength="false" Unicode="false" />
+          <Property Name="Envoltorios" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="Armas" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="Cartuchos" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="FueroDescripcion" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="Cargadores" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="DETENIDO">
+          <Key>
+            <PropertyRef Name="IDDETENIDO" />
+          </Key>
+          <Property Name="IDDETENIDO" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="IDDETENCION" Type="Int32" />
+          <Property Name="NOMBRE" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="ALIAS" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="EDAD" Type="String" MaxLength="3" FixedLength="false" Unicode="false" />
+          <Property Name="ORIGINARIO" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="SEXO" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="FECHA_NACIMIENTO" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="CALLE" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="COLONIA" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="CP" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="MUNICIPIO" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="NUMEXT" Type="Int32" />
+          <Property Name="NUMINT" Type="String" MaxLength="5" FixedLength="false" Unicode="false" />
+          <Property Name="Ap_Paterno" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="Ap_Materno" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="Ocupacion" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="CaracteristicasDetenido" Type="String" MaxLength="3000" FixedLength="false" Unicode="false" />
+          <Property Name="Estado" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Folio" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Situacion" Type="String" MaxLength="1" FixedLength="false" Unicode="false" />
+          <Property Name="Telefono" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="FOTO" Relationship="Self.FK_IDDETENIDO" FromRole="DETENIDO" ToRole="FOTO" />
+        </EntityType>
+        <EntityType Name="FOTO">
+          <Key>
+            <PropertyRef Name="IDFOTO" />
+          </Key>
+          <Property Name="IDFOTO" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="IDDETENIDO" Type="Int32" />
+          <Property Name="FOTO1" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="FEHCA" Type="DateTime" Precision="0" />
+          <Property Name="TIPO" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="VECTOR_EMBEDDING" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="DETENIDO" Relationship="Self.FK_IDDETENIDO" FromRole="FOTO" ToRole="DETENIDO" />
+        </EntityType>
+        <EntityType Name="Huella">
+          <Key>
+            <PropertyRef Name="IdHuella" />
+          </Key>
+          <Property Name="IdHuella" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="IdDetenido" Type="Int32" />
+          <Property Name="Huellas" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="VECTOR_EMBEDDING" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="CAT_Municipio">
+          <Key>
+            <PropertyRef Name="Muni" />
+          </Key>
+          <Property Name="Muni" Type="Int64" Nullable="false" />
+          <Property Name="Nombre" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <Association Name="FK_IDDETENIDO">
+          <End Role="DETENIDO" Type="Self.DETENIDO" Multiplicity="0..1" />
+          <End Role="FOTO" Type="Self.FOTO" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="DETENIDO">
+              <PropertyRef Name="IDDETENIDO" />
+            </Principal>
+            <Dependent Role="FOTO">
+              <PropertyRef Name="IDDETENIDO" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="PortalDetenidosEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Cat_Faltas" EntityType="Self.Cat_Faltas" />
+          <EntitySet Name="DETENCION" EntityType="Self.DETENCION" />
+          <EntitySet Name="DETENIDO" EntityType="Self.DETENIDO" />
+          <EntitySet Name="FOTO" EntityType="Self.FOTO" />
+          <EntitySet Name="Huella" EntityType="Self.Huella" />
+          <EntitySet Name="CAT_Municipio" EntityType="Self.CAT_Municipio" />
+          <AssociationSet Name="FK_IDDETENIDO" Association="Self.FK_IDDETENIDO">
+            <End Role="DETENIDO" EntitySet="DETENIDO" />
+            <End Role="FOTO" EntitySet="FOTO" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="PortalDetenidosModelStoreContainer" CdmEntityContainer="PortalDetenidosEntities">
+          <EntitySetMapping Name="Cat_Faltas">
+            <EntityTypeMapping TypeName="PortalDetenidosModel.Cat_Faltas">
+              <MappingFragment StoreEntitySet="Cat_Faltas">
+                <ScalarProperty Name="IdFueroComun" ColumnName="IdFueroComun" />
+                <ScalarProperty Name="FueroComun" ColumnName="FueroComun" />
+                <ScalarProperty Name="IdTipoFuero" ColumnName="IdTipoFuero" />
+                <ScalarProperty Name="Municipio" ColumnName="Municipio" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="DETENCION">
+            <EntityTypeMapping TypeName="PortalDetenidosModel.DETENCION">
+              <MappingFragment StoreEntitySet="DETENCION">
+                <ScalarProperty Name="IDDETENCION" ColumnName="IDDETENCION" />
+                <ScalarProperty Name="SERIE_MUNICIPIO" ColumnName="SERIE_MUNICIPIO" />
+                <ScalarProperty Name="CONSECUTIVO" ColumnName="CONSECUTIVO" />
+                <ScalarProperty Name="ANO" ColumnName="ANO" />
+                <ScalarProperty Name="FECHA_DETENCION" ColumnName="FECHA_DETENCION" />
+                <ScalarProperty Name="HORA_DETENCION" ColumnName="HORA_DETENCION" />
+                <ScalarProperty Name="FUERO" ColumnName="FUERO" />
+                <ScalarProperty Name="NoDETENIDOS" ColumnName="NoDETENIDOS" />
+                <ScalarProperty Name="CALLE" ColumnName="CALLE" />
+                <ScalarProperty Name="COLONIA" ColumnName="COLONIA" />
+                <ScalarProperty Name="CP" ColumnName="CP" />
+                <ScalarProperty Name="MUNICIPIO" ColumnName="MUNICIPIO" />
+                <ScalarProperty Name="HECHO" ColumnName="HECHO" />
+                <ScalarProperty Name="CAUSA" ColumnName="CAUSA" />
+                <ScalarProperty Name="OBSERVACIONES" ColumnName="OBSERVACIONES" />
+                <ScalarProperty Name="VECHICULO" ColumnName="VECHICULO" />
+                <ScalarProperty Name="NUMEXT" ColumnName="NUMEXT" />
+                <ScalarProperty Name="NUMINT" ColumnName="NUMINT" />
+                <ScalarProperty Name="Gramos" ColumnName="Gramos" />
+                <ScalarProperty Name="Mes" ColumnName="Mes" />
+                <ScalarProperty Name="Dia" ColumnName="Dia" />
+                <ScalarProperty Name="Feria" ColumnName="Feria" />
+                <ScalarProperty Name="Latitud" ColumnName="Latitud" />
+                <ScalarProperty Name="Longitud" ColumnName="Longitud" />
+                <ScalarProperty Name="Aseguramientos" ColumnName="Aseguramientos" />
+                <ScalarProperty Name="Envoltorios" ColumnName="Envoltorios" />
+                <ScalarProperty Name="Armas" ColumnName="Armas" />
+                <ScalarProperty Name="Cartuchos" ColumnName="Cartuchos" />
+                <ScalarProperty Name="FueroDescripcion" ColumnName="FueroDescripcion" />
+                <ScalarProperty Name="Cargadores" ColumnName="Cargadores" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="DETENIDO">
+            <EntityTypeMapping TypeName="PortalDetenidosModel.DETENIDO">
+              <MappingFragment StoreEntitySet="DETENIDO">
+                <ScalarProperty Name="IDDETENIDO" ColumnName="IDDETENIDO" />
+                <ScalarProperty Name="IDDETENCION" ColumnName="IDDETENCION" />
+                <ScalarProperty Name="NOMBRE" ColumnName="NOMBRE" />
+                <ScalarProperty Name="ALIAS" ColumnName="ALIAS" />
+                <ScalarProperty Name="EDAD" ColumnName="EDAD" />
+                <ScalarProperty Name="ORIGINARIO" ColumnName="ORIGINARIO" />
+                <ScalarProperty Name="SEXO" ColumnName="SEXO" />
+                <ScalarProperty Name="FECHA_NACIMIENTO" ColumnName="FECHA_NACIMIENTO" />
+                <ScalarProperty Name="CALLE" ColumnName="CALLE" />
+                <ScalarProperty Name="COLONIA" ColumnName="COLONIA" />
+                <ScalarProperty Name="CP" ColumnName="CP" />
+                <ScalarProperty Name="MUNICIPIO" ColumnName="MUNICIPIO" />
+                <ScalarProperty Name="NUMEXT" ColumnName="NUMEXT" />
+                <ScalarProperty Name="NUMINT" ColumnName="NUMINT" />
+                <ScalarProperty Name="Ap_Paterno" ColumnName="Ap_Paterno" />
+                <ScalarProperty Name="Ap_Materno" ColumnName="Ap_Materno" />
+                <ScalarProperty Name="Ocupacion" ColumnName="Ocupacion" />
+                <ScalarProperty Name="CaracteristicasDetenido" ColumnName="CaracteristicasDetenido" />
+                <ScalarProperty Name="Estado" ColumnName="Estado" />
+                <ScalarProperty Name="Folio" ColumnName="Folio" />
+                <ScalarProperty Name="Situacion" ColumnName="Situacion" />
+                <ScalarProperty Name="Telefono" ColumnName="Telefono" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="FOTO">
+            <EntityTypeMapping TypeName="PortalDetenidosModel.FOTO">
+              <MappingFragment StoreEntitySet="FOTO">
+                <ScalarProperty Name="IDFOTO" ColumnName="IDFOTO" />
+                <ScalarProperty Name="IDDETENIDO" ColumnName="IDDETENIDO" />
+                <ScalarProperty Name="FOTO1" ColumnName="FOTO" />
+                <ScalarProperty Name="FEHCA" ColumnName="FEHCA" />
+                <ScalarProperty Name="TIPO" ColumnName="TIPO" />
+                <ScalarProperty Name="VECTOR_EMBEDDING" ColumnName="VECTOR_EMBEDDING" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Huella">
+            <EntityTypeMapping TypeName="PortalDetenidosModel.Huella">
+              <MappingFragment StoreEntitySet="Huella">
+                <ScalarProperty Name="IdHuella" ColumnName="IdHuella" />
+                <ScalarProperty Name="IdDetenido" ColumnName="IdDetenido" />
+                <ScalarProperty Name="Huellas" ColumnName="Huellas" />
+                <ScalarProperty Name="VECTOR_EMBEDDING" ColumnName="VECTOR_EMBEDDING" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="CAT_Municipio">
+            <EntityTypeMapping TypeName="PortalDetenidosModel.CAT_Municipio">
+              <MappingFragment StoreEntitySet="CAT_Municipio">
+                <ScalarProperty Name="Muni" ColumnName="Muni" />
+                <ScalarProperty Name="Nombre" ColumnName="Nombre" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="false" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="Ninguno" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

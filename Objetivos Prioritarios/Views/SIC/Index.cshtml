@@ -1,0 +1,67 @@
+﻿@{
+    ViewBag.Title = "SIC";
+}
+
+<div class="card">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="card-title mb-0">Sistema de Identificación Criminal</h5>
+        </div>
+
+        <div class="table-responsive">
+            <table id="tablaSIC" class="table table-striped table-bordered w-100">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Fuente</th>
+                        <th>Estatus</th>
+                        <th>Detenciones</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        $(document).ready(function () {
+            $('#tablaSIC').DataTable({
+                ajax: {
+                    url: '@Url.Action("ObtenerSIC", "SIC")',
+                    type: 'GET',
+                    dataSrc: 'data'
+                },
+                columns: [
+                    { data: 'Nombre' },
+                    { data: 'Fuente' },
+                    { data: 'Estatus' },
+                    { data: 'Detenciones' },
+                    {
+                        data: 'Id',
+                        orderable: false,
+                        searchable: false,
+                        render: function (data) {
+                            return `
+                                <div class="dt-actions">
+                                    <button type="button" class="btn btn-primary btn-sm" onclick="verSIC(${data})">
+                                        <i class="fa fa-eye"></i>
+                                    </button>
+                                </div>`;
+                        }
+                    }
+                ],
+                scrollX: true,
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.10.22/i18n/Spanish.json'
+                }
+            });
+        });
+
+        function verSIC(id) {
+            console.log("Ver SIC:", id);
+        }
+    </script>
+}

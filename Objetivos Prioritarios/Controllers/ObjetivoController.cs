@@ -77,7 +77,7 @@ namespace Objetivos_Prioritarios.Controllers
 
 
         [HttpPost]
-        public JsonResult AddOrEditFoto(HttpPostedFileBase foto, DateTime fechaNacimiento, int int_id_objetivo)
+        public JsonResult AddOrEditFoto(HttpPostedFileBase foto, DateTime? fechaNacimiento, int int_id_objetivo)
         {
             var res = ObjetivoService.addEditPhoto(foto, fechaNacimiento, int_id_objetivo);
             return Json(res, JsonRequestBehavior.AllowGet);
@@ -546,7 +546,13 @@ namespace Objetivos_Prioritarios.Controllers
                         responseAlias.Add(resultado);
                     }
 
+                    var FechNac = FichaObjetivoService.addFechaNac(Clave_Persona);
 
+                    ObjetivoService.addEditPhoto(null , FechNac, id_objetivo);
+
+                    var res = FichaObjetivoService.AddDelitoFiliacion(id_objetivo, Clave_Persona);
+
+                    
                     return Json(new
                     {
                         IsSuccess = true,

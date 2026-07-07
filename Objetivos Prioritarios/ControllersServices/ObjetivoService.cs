@@ -115,7 +115,7 @@ namespace Objetivos_Prioritarios.ControllersServices
             }
         }
 
-        public BasicOperationResponse addEditPhoto(HttpPostedFileBase foto, DateTime fechaNacimiento, int int_id_objetivo)
+        public BasicOperationResponse addEditPhoto(HttpPostedFileBase foto, DateTime? fechaNacimiento, int int_id_objetivo)
         {
             try
             {
@@ -131,23 +131,21 @@ namespace Objetivos_Prioritarios.ControllersServices
                         // Convertir a Base64
                         base64String = Convert.ToBase64String(fileBytes);
                     }
-
-                    var busqueda = db.tb_Objetivo.FirstOrDefault(x => x.int_id_objetivo == int_id_objetivo);
+                }
+                var busqueda = db.tb_Objetivo.FirstOrDefault(x => x.int_id_objetivo == int_id_objetivo);
 
                     bool cambioFecha = false;
                     bool cambioFoto = false;
 
                     if (busqueda != null)
                     {
-                        // Solo actualiza la fecha si es diferente
-                        if (busqueda.date_fecha_nacimiento != fechaNacimiento)
+                        if (fechaNacimiento.HasValue && busqueda.date_fecha_nacimiento != fechaNacimiento.Value)
                         {
-                            busqueda.date_fecha_nacimiento = fechaNacimiento;
+                            busqueda.date_fecha_nacimiento = fechaNacimiento.Value;
                             cambioFecha = true;
                         }
 
-                        // Solo actualiza la foto si es diferente y no es "Nodisponible.png"
-                        if (busqueda.nvarchar_foto != base64String && foto.FileName != "Nodisponible.png")
+                        if (base64String != null && busqueda.nvarchar_foto != base64String && foto.FileName != "Nodisponible.png")
                         {
                             busqueda.nvarchar_foto = base64String;
                             cambioFoto = true;
@@ -174,12 +172,6 @@ namespace Objetivos_Prioritarios.ControllersServices
                         Message = mensaje
                     };
                 }
-                return new BasicOperationResponse()
-                {
-                    IsSuccess = false,
-                    Message = "No se recibió ninguna foto válida."
-                };
-            }
             catch (Exception e)
             {
                 return new BasicOperationResponse()
@@ -912,5 +904,6 @@ namespace Objetivos_Prioritarios.ControllersServices
             return foto;
         }
 
+        
     }
 }

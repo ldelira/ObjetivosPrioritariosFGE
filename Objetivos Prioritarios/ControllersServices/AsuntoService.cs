@@ -74,39 +74,106 @@ namespace Objetivos_Prioritarios.ControllersServices
         }
 
         // Guardar (insert/update)
+        //public BasicOperationResponse SaveAsunto(tb_AsuntoRelacionado asunto, string usuario = "delira")
+        //{
+        //    try
+        //    {
+        //        if (asunto == null) return new BasicOperationResponse { IsSuccess = false, Message = "Datos inválidos." };
+
+        //        if (asunto.int_id_asunto_relacionado == 0)
+        //        {
+        //            asunto.date_fecha_creacion = DateTime.Now;
+        //            asunto.bit_estatus = true;
+        //            // si quieres guardar usuario: agregar propiedad en el modelo o manejar de otra forma
+        //            db.tb_AsuntoRelacionado.Add(asunto);
+        //        }
+        //        else
+        //        {
+        //            var found = db.tb_AsuntoRelacionado.FirstOrDefault(x => x.int_id_asunto_relacionado == asunto.int_id_asunto_relacionado);
+        //            if (found == null) return new BasicOperationResponse { IsSuccess = false, Message = "Asunto no encontrado para actualizar." };
+
+        //            // Actualiza campos que permitan editar
+        //            found.nvarchar_alias = asunto.nvarchar_alias;
+        //            found.nvarchar_descripcion = asunto.nvarchar_descripcion;
+        //            found.date_fecha_asunto = asunto.date_fecha_asunto;
+        //            found.numavp = asunto.numavp;
+        //            found.int_id_estatus_asunto = asunto.int_id_estatus_asunto;
+        //            // no tocamos date_fecha_creacion ni bit_estatus aquí salvo que sea necesario
+        //        }
+
+        //        db.SaveChanges();
+        //        return new BasicOperationResponse { IsSuccess = true, Message = "Asunto guardado correctamente." };
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        return new BasicOperationResponse { IsSuccess = false, Message = "Ocurrió un error al guardar el asunto (" + e.Message + ")" };
+        //    }
+        //}
+
         public BasicOperationResponse SaveAsunto(tb_AsuntoRelacionado asunto, string usuario = "delira")
         {
             try
             {
-                if (asunto == null) return new BasicOperationResponse { IsSuccess = false, Message = "Datos inválidos." };
+                if (asunto == null)
+                {
+                    return new BasicOperationResponse
+                    {
+                        IsSuccess = false,
+                        Message = "Datos inválidos."
+                    };
+                }
+
+                int idGuardado = 0;
 
                 if (asunto.int_id_asunto_relacionado == 0)
                 {
                     asunto.date_fecha_creacion = DateTime.Now;
                     asunto.bit_estatus = true;
-                    // si quieres guardar usuario: agregar propiedad en el modelo o manejar de otra forma
+
                     db.tb_AsuntoRelacionado.Add(asunto);
+                    db.SaveChanges();
+
+                    idGuardado = asunto.int_id_asunto_relacionado;
                 }
                 else
                 {
-                    var found = db.tb_AsuntoRelacionado.FirstOrDefault(x => x.int_id_asunto_relacionado == asunto.int_id_asunto_relacionado);
-                    if (found == null) return new BasicOperationResponse { IsSuccess = false, Message = "Asunto no encontrado para actualizar." };
+                    var found = db.tb_AsuntoRelacionado
+                                  .FirstOrDefault(x => x.int_id_asunto_relacionado == asunto.int_id_asunto_relacionado);
 
-                    // Actualiza campos que permitan editar
+                    if (found == null)
+                    {
+                        return new BasicOperationResponse
+                        {
+                            IsSuccess = false,
+                            Message = "Asunto no encontrado para actualizar."
+                        };
+                    }
+
                     found.nvarchar_alias = asunto.nvarchar_alias;
                     found.nvarchar_descripcion = asunto.nvarchar_descripcion;
                     found.date_fecha_asunto = asunto.date_fecha_asunto;
                     found.numavp = asunto.numavp;
                     found.int_id_estatus_asunto = asunto.int_id_estatus_asunto;
-                    // no tocamos date_fecha_creacion ni bit_estatus aquí salvo que sea necesario
+
+                    db.SaveChanges();
+
+                    idGuardado = found.int_id_asunto_relacionado;
                 }
 
-                db.SaveChanges();
-                return new BasicOperationResponse { IsSuccess = true, Message = "Asunto guardado correctamente." };
+                return new BasicOperationResponse
+                {
+                    IsSuccess = true,
+                    Message = "Asunto guardado correctamente.",
+                    Id = idGuardado
+                };
             }
             catch (Exception e)
             {
-                return new BasicOperationResponse { IsSuccess = false, Message = "Ocurrió un error al guardar el asunto (" + e.Message + ")" };
+                return new BasicOperationResponse
+                {
+                    IsSuccess = false,
+                    Message = "Ocurrió un error al guardar el asunto (" + e.Message + ")"
+                };
             }
         }
 

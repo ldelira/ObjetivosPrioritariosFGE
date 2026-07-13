@@ -27,6 +27,10 @@ namespace Objetivos_Prioritarios.Models
             throw new UnintentionalCodeFirstException();
         }
     
+        public virtual DbSet<catalogo_estado_proceso> catalogo_estado_proceso { get; set; }
+        public virtual DbSet<delitos_mandamiento> delitos_mandamiento { get; set; }
+        public virtual DbSet<mandamiento_judicial> mandamiento_judicial { get; set; }
+        public virtual DbSet<nombres_mandamiento> nombres_mandamiento { get; set; }
     
         public virtual ObjectResult<sp_ObjPri_getObjetivoInfo_Result> sp_ObjPri_getObjetivoInfo(Nullable<int> movimiento, string nombre, string paterno, string materno, string numavp, Nullable<int> id_mandamiento)
         {

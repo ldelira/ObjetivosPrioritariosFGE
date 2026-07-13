@@ -4,7 +4,60 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-    <Schema Namespace="Mandamientos_JudicialesModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+    <Schema Namespace="Mandamientos_JudicialesModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="catalogo_estado_proceso">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="id_estado_proceso" Type="int" Nullable="false" />
+          <Property Name="tipo" Type="nvarchar" MaxLength="50" Nullable="false" />
+        </EntityType>
+        <EntityType Name="delitos_mandamiento">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="id_mandamiento_judicial" Type="int" Nullable="false" />
+          <Property Name="id_delito" Type="int" Nullable="false" />
+          <Property Name="fecha_alta" Type="datetime" Nullable="false" />
+          <Property Name="principal" Type="int" />
+        </EntityType>
+        <EntityType Name="mandamiento_judicial">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="numero_control" Type="nvarchar" MaxLength="12" Nullable="false" />
+          <Property Name="numero_expediente_juzgado" Type="nvarchar" MaxLength="12" Nullable="false" />
+          <Property Name="numero_expediente" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="id_tipo_mandato" Type="int" Nullable="false" />
+          <Property Name="id_juzgado" Type="int" Nullable="false" />
+          <Property Name="id_sexo" Type="int" Nullable="false" />
+          <Property Name="numero_oficio_juzgado" Type="nvarchar" MaxLength="25" Nullable="false" />
+          <Property Name="requerido_por" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="fecha_expedicion" Type="datetime" Nullable="false" />
+          <Property Name="fecha_recepcion" Type="datetime" Nullable="false" />
+          <Property Name="fecha_alta" Type="datetime" Nullable="false" />
+          <Property Name="id_estado_proceso" Type="int" />
+          <Property Name="domicilio" Type="int" />
+          <Property Name="id_estado_origen_mandamiento" Type="int" Nullable="false" />
+          <Property Name="id_grupo_cumple_orden" Type="int" />
+          <Property Name="id_grupo_cumplio_turno" Type="int" />
+          <Property Name="clave_usuario" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="nombres_mandamiento">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="id_mandamiento_judicial" Type="int" Nullable="false" />
+          <Property Name="nombre" Type="nvarchar" MaxLength="60" Nullable="false" />
+          <Property Name="paterno" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="materno" Type="nvarchar" MaxLength="50" />
+          <Property Name="fecha_alta" Type="datetime" Nullable="false" />
+          <Property Name="principal" Type="int" Nullable="false" />
+        </EntityType>
         <Function Name="sp_ObjPri_getObjetivoInfo" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
           <Parameter Name="movimiento" Type="int" Mode="In" />
           <Parameter Name="nombre" Type="nvarchar" Mode="In" />
@@ -13,7 +66,12 @@
           <Parameter Name="numavp" Type="nvarchar" Mode="In" />
           <Parameter Name="id_mandamiento" Type="int" Mode="In" />
         </Function>
-        <EntityContainer Name="Mandamientos_JudicialesModelStoreContainer" />
+        <EntityContainer Name="Mandamientos_JudicialesModelStoreContainer">
+          <EntitySet Name="catalogo_estado_proceso" EntityType="Self.catalogo_estado_proceso" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="delitos_mandamiento" EntityType="Self.delitos_mandamiento" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="mandamiento_judicial" EntityType="Self.mandamiento_judicial" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="nombres_mandamiento" EntityType="Self.nombres_mandamiento" Schema="dbo" store:Type="Tables" />
+        </EntityContainer>
       </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
@@ -27,7 +85,11 @@
             <Parameter Name="numavp" Mode="In" Type="String" />
             <Parameter Name="id_mandamiento" Mode="In" Type="Int32" />
           </FunctionImport>
-        </EntityContainer>
+          <EntitySet Name="catalogo_estado_proceso" EntityType="Mandamientos_JudicialesModel.catalogo_estado_proceso" />
+          <EntitySet Name="delitos_mandamiento" EntityType="Mandamientos_JudicialesModel.delitos_mandamiento" />
+          <EntitySet Name="mandamiento_judicial" EntityType="Mandamientos_JudicialesModel.mandamiento_judicial" />
+          <EntitySet Name="nombres_mandamiento" EntityType="Mandamientos_JudicialesModel.nombres_mandamiento" />
+          </EntityContainer>
         <ComplexType Name="sp_ObjPri_getObjetivoInfo_Result">
           <Property Type="Int32" Name="id" Nullable="false" />
           <Property Type="String" Name="numero_control" Nullable="false" MaxLength="12" />
@@ -44,7 +106,60 @@
           <Property Type="String" Name="delito" Nullable="true" MaxLength="200" />
           <Property Type="Int32" Name="delito_principal" Nullable="true" />
         </ComplexType>
-      </Schema>
+        <EntityType Name="catalogo_estado_proceso">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="id_estado_proceso" Type="Int32" Nullable="false" />
+          <Property Name="tipo" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="delitos_mandamiento">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="id_mandamiento_judicial" Type="Int32" Nullable="false" />
+          <Property Name="id_delito" Type="Int32" Nullable="false" />
+          <Property Name="fecha_alta" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="principal" Type="Int32" />
+        </EntityType>
+        <EntityType Name="mandamiento_judicial">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="numero_control" Type="String" Nullable="false" MaxLength="12" FixedLength="false" Unicode="true" />
+          <Property Name="numero_expediente_juzgado" Type="String" Nullable="false" MaxLength="12" FixedLength="false" Unicode="true" />
+          <Property Name="numero_expediente" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="id_tipo_mandato" Type="Int32" Nullable="false" />
+          <Property Name="id_juzgado" Type="Int32" Nullable="false" />
+          <Property Name="id_sexo" Type="Int32" Nullable="false" />
+          <Property Name="numero_oficio_juzgado" Type="String" Nullable="false" MaxLength="25" FixedLength="false" Unicode="true" />
+          <Property Name="requerido_por" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="fecha_expedicion" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="fecha_recepcion" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="fecha_alta" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="id_estado_proceso" Type="Int32" />
+          <Property Name="domicilio" Type="Int32" />
+          <Property Name="id_estado_origen_mandamiento" Type="Int32" Nullable="false" />
+          <Property Name="id_grupo_cumple_orden" Type="Int32" />
+          <Property Name="id_grupo_cumplio_turno" Type="Int32" />
+          <Property Name="clave_usuario" Type="Int32" Nullable="false" />
+        </EntityType>
+        <EntityType Name="nombres_mandamiento">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="id_mandamiento_judicial" Type="Int32" Nullable="false" />
+          <Property Name="nombre" Type="String" Nullable="false" MaxLength="60" FixedLength="false" Unicode="true" />
+          <Property Name="paterno" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="materno" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="fecha_alta" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="principal" Type="Int32" Nullable="false" />
+        </EntityType>
+        </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
     <edmx:Mappings>
@@ -70,7 +185,64 @@
               </ComplexTypeMapping>
             </ResultMapping>
           </FunctionImportMapping>
-        </EntityContainerMapping>
+          <EntitySetMapping Name="catalogo_estado_proceso">
+            <EntityTypeMapping TypeName="Mandamientos_JudicialesModel.catalogo_estado_proceso">
+              <MappingFragment StoreEntitySet="catalogo_estado_proceso">
+                <ScalarProperty Name="tipo" ColumnName="tipo" />
+                <ScalarProperty Name="id_estado_proceso" ColumnName="id_estado_proceso" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="delitos_mandamiento">
+            <EntityTypeMapping TypeName="Mandamientos_JudicialesModel.delitos_mandamiento">
+              <MappingFragment StoreEntitySet="delitos_mandamiento">
+                <ScalarProperty Name="principal" ColumnName="principal" />
+                <ScalarProperty Name="fecha_alta" ColumnName="fecha_alta" />
+                <ScalarProperty Name="id_delito" ColumnName="id_delito" />
+                <ScalarProperty Name="id_mandamiento_judicial" ColumnName="id_mandamiento_judicial" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="mandamiento_judicial">
+            <EntityTypeMapping TypeName="Mandamientos_JudicialesModel.mandamiento_judicial">
+              <MappingFragment StoreEntitySet="mandamiento_judicial">
+                <ScalarProperty Name="clave_usuario" ColumnName="clave_usuario" />
+                <ScalarProperty Name="id_grupo_cumplio_turno" ColumnName="id_grupo_cumplio_turno" />
+                <ScalarProperty Name="id_grupo_cumple_orden" ColumnName="id_grupo_cumple_orden" />
+                <ScalarProperty Name="id_estado_origen_mandamiento" ColumnName="id_estado_origen_mandamiento" />
+                <ScalarProperty Name="domicilio" ColumnName="domicilio" />
+                <ScalarProperty Name="id_estado_proceso" ColumnName="id_estado_proceso" />
+                <ScalarProperty Name="fecha_alta" ColumnName="fecha_alta" />
+                <ScalarProperty Name="fecha_recepcion" ColumnName="fecha_recepcion" />
+                <ScalarProperty Name="fecha_expedicion" ColumnName="fecha_expedicion" />
+                <ScalarProperty Name="requerido_por" ColumnName="requerido_por" />
+                <ScalarProperty Name="numero_oficio_juzgado" ColumnName="numero_oficio_juzgado" />
+                <ScalarProperty Name="id_sexo" ColumnName="id_sexo" />
+                <ScalarProperty Name="id_juzgado" ColumnName="id_juzgado" />
+                <ScalarProperty Name="id_tipo_mandato" ColumnName="id_tipo_mandato" />
+                <ScalarProperty Name="numero_expediente" ColumnName="numero_expediente" />
+                <ScalarProperty Name="numero_expediente_juzgado" ColumnName="numero_expediente_juzgado" />
+                <ScalarProperty Name="numero_control" ColumnName="numero_control" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="nombres_mandamiento">
+            <EntityTypeMapping TypeName="Mandamientos_JudicialesModel.nombres_mandamiento">
+              <MappingFragment StoreEntitySet="nombres_mandamiento">
+                <ScalarProperty Name="principal" ColumnName="principal" />
+                <ScalarProperty Name="fecha_alta" ColumnName="fecha_alta" />
+                <ScalarProperty Name="materno" ColumnName="materno" />
+                <ScalarProperty Name="paterno" ColumnName="paterno" />
+                <ScalarProperty Name="nombre" ColumnName="nombre" />
+                <ScalarProperty Name="id_mandamiento_judicial" ColumnName="id_mandamiento_judicial" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>
   </edmx:Runtime>

@@ -2,66 +2,297 @@
     ViewBag.Title = "SIC";
 }
 
+<style>
+    #tablaSIC {
+        width: 100% !important;
+        margin-bottom: 0 !important;
+        border-collapse: collapse !important;
+        border: none !important;
+    }
+
+        #tablaSIC th,
+        #tablaSIC td {
+            border-left: none !important;
+            border-right: none !important;
+            border-top: none !important;
+        }
+
+        #tablaSIC thead th {
+            background-color: #f8fafc !important;
+            color: #001f5b !important;
+            font-weight: 700 !important;
+            vertical-align: middle !important;
+            padding: 13px 12px !important;
+            border-bottom: 2px solid #111827 !important;
+        }
+
+        #tablaSIC tbody tr td {
+            background-color: #ffffff !important;
+            color: #111827 !important;
+            font-weight: 500;
+            vertical-align: middle !important;
+            padding: 14px 12px !important;
+            border-bottom: 1px solid #e5e7eb !important;
+        }
+
+        #tablaSIC tbody tr:hover td {
+            background-color: #f8fafc !important;
+            color: #111827 !important;
+        }
+
+        #tablaSIC tbody tr.sic-alerta-activa td {
+            background-color: #fff5f5 !important;
+            color: #111827 !important;
+            font-weight: 700;
+        }
+
+            #tablaSIC tbody tr.sic-alerta-activa td:first-child {
+                box-shadow: inset 6px 0 0 #dc2626;
+                padding-left: 20px !important;
+            }
+
+        #tablaSIC tbody tr.sic-alerta-activa:hover td {
+            background-color: #ffe4e6 !important;
+            color: #111827 !important;
+        }
+
+            #tablaSIC tbody tr.sic-alerta-activa:hover td:first-child {
+                box-shadow: inset 6px 0 0 #b91c1c;
+            }
+
+    .sic-actions {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+
+        .sic-actions .btn {
+            width: 34px;
+            height: 34px;
+            padding: 0 !important;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 9px !important;
+            box-shadow: 0 4px 10px rgba(47, 91, 255, .20);
+        }
+
+    .sic-card-title {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        color: #001f5b;
+        font-weight: 800;
+        margin-bottom: 22px;
+    }
+
+        .sic-card-title::before {
+            content: "";
+            width: 5px;
+            height: 36px;
+            background: #dc2626;
+            border-radius: 999px;
+            display: inline-block;
+        }
+
+    .sic-badge-alertas {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 34px;
+        height: 28px;
+        padding: 0 10px;
+        border-radius: 999px;
+        background: #dc2626;
+        color: #ffffff;
+        font-size: 13px;
+        font-weight: 800;
+    }
+
+    .sic-id-detenido {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 44px;
+        height: 28px;
+        padding: 0 10px;
+        border-radius: 999px;
+        background: #eef4ff;
+        color: #1d4ed8;
+        border: 1px solid #dbeafe;
+        font-size: 13px;
+        font-weight: 800;
+    }
+</style>
+
 <div class="card">
     <div class="card-body">
-        <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="sic-card-title">
             <h5 class="card-title mb-0">Sistema de Identificación Criminal</h5>
         </div>
 
-        <div class="table-responsive">
-            <table id="tablaSIC" class="table table-striped table-bordered w-100">
-                <thead>
-                    <tr>
-                        <th>Nombre</th>
-                        <th>Fuente</th>
-                        <th>Estatus</th>
-                        <th>Detenciones</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
-        </div>
+        <table id="tablaSIC" class="table w-100">
+            <thead>
+                <tr>
+                    <th>ID Detenido C5</th>
+                    <th>Nombre</th>
+                    <th>Fecha detención</th>
+                    <th>Municipio detención</th>
+                    <th>Total alertas</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
     </div>
 </div>
 
 @section scripts {
     <script>
+        let tablaSIC = null;
+
         $(document).ready(function () {
-            $('#tablaSIC').DataTable({
+            tablaSIC = $('#tablaSIC').DataTable({
+                autoWidth: false,
+                stripeClasses: [],
+                processing: true,
+                deferRender: true,
+                scrollX: false,
                 ajax: {
                     url: '@Url.Action("ObtenerSIC", "SIC")',
                     type: 'GET',
-                    dataSrc: 'data'
+                    dataSrc: function (json) {
+                        if (!json || json.success === false) {
+                            console.log(json ? json.message : 'No se recibió respuesta.');
+                            return [];
+                        }
+
+                        return json.data || [];
+                    }
                 },
                 columns: [
-                    { data: 'Nombre' },
-                    { data: 'Fuente' },
-                    { data: 'Estatus' },
-                    { data: 'Detenciones' },
                     {
-                        data: 'Id',
+                        data: 'IdDetenidoC5',
+                        render: function (data) {
+                            return '<span class="sic-id-detenido">' + textoSeguro(data) + '</span>';
+                        }
+                    },
+                    {
+                        data: 'NombrePersona',
+                        render: function (data) {
+                            return textoSeguro(data);
+                        }
+                    },
+                    {
+                        data: 'FechaDetencion',
+                        render: function (data) {
+                            return formatearFecha(data);
+                        }
+                    },
+                    {
+                        data: 'MunicipioDetencion',
+                        render: function (data) {
+                            return textoSeguro(data);
+                        }
+                    },
+                    {
+                        data: 'TotalAlertas',
+                        className: 'text-center',
+                        render: function (data) {
+                            return '<span class="sic-badge-alertas">' + textoSeguro(data) + '</span>';
+                        }
+                    },
+                    {
+                        data: 'IdDetenidoC5',
                         orderable: false,
                         searchable: false,
                         render: function (data) {
+                            if (!data) {
+                                return `
+                                    <div class="sic-actions">
+                                        <button type="button" class="btn btn-secondary btn-sm" disabled title="Sin detenido C5">
+                                            <i class="fa fa-eye-slash"></i>
+                                        </button>
+                                    </div>`;
+                            }
+
                             return `
-                                <div class="dt-actions">
-                                    <button type="button" class="btn btn-primary btn-sm" onclick="verSIC(${data})">
+                                <div class="sic-actions">
+                                    <button type="button" class="btn btn-primary btn-sm" onclick="verDetenidoC5(${data})" title="Ver detenido C5">
                                         <i class="fa fa-eye"></i>
                                     </button>
                                 </div>`;
                         }
                     }
                 ],
-                scrollX: true,
+                createdRow: function (row, data) {
+                    if (Number(data.TotalAlertas) > 0) {
+                        $(row).addClass('sic-alerta-activa');
+                    }
+                },
+                order: [[2, 'asc']],
                 language: {
-                    url: '//cdn.datatables.net/plug-ins/1.10.22/i18n/Spanish.json'
+                    emptyTable: "No hay información disponible",
+                    info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+                    infoEmpty: "Mostrando 0 a 0 de 0 registros",
+                    infoFiltered: "(filtrado de _MAX_ registros totales)",
+                    lengthMenu: "Mostrar _MENU_ registros",
+                    loadingRecords: "Cargando...",
+                    processing: "Procesando...",
+                    search: "Buscar:",
+                    zeroRecords: "No se encontraron registros",
+                    paginate: {
+                        first: "Primero",
+                        last: "Último",
+                        next: "Siguiente",
+                        previous: "Anterior"
+                    }
+                }
+            });
+
+            $(window).on('resize', function () {
+                if (tablaSIC) {
+                    tablaSIC.columns.adjust();
                 }
             });
         });
 
-        function verSIC(id) {
-            console.log("Ver SIC:", id);
+        function textoSeguro(valor) {
+            if (valor === null || valor === undefined || valor.toString().trim() === '') {
+                return 'SIN INFORMACIÓN';
+            }
+
+            return valor.toString().trim();
+        }
+
+        function formatearFecha(valor) {
+            if (valor === null || valor === undefined || valor.toString().trim() === '') {
+                return 'SIN FECHA';
+            }
+
+            let fecha = null;
+
+            if (typeof valor === 'string' && valor.indexOf('/Date(') === 0) {
+                let milisegundos = parseInt(valor.replace('/Date(', '').replace(')/', ''));
+                fecha = new Date(milisegundos);
+            } else {
+                fecha = new Date(valor);
+            }
+
+            if (isNaN(fecha.getTime())) {
+                return textoSeguro(valor);
+            }
+
+            let dia = fecha.getDate().toString().padStart(2, '0');
+            let mes = (fecha.getMonth() + 1).toString().padStart(2, '0');
+            let anio = fecha.getFullYear();
+
+            return dia + '/' + mes + '/' + anio;
+        }
+
+        function verDetenidoC5(idDetenido) {
+            window.location.href = '@Url.Action("DetalleDetenidoC5", "SIC")' + '?idDetenido=' + idDetenido;
         }
     </script>
 }

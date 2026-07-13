@@ -14,6 +14,7 @@ namespace Objetivos_Prioritarios.ControllersServices
         public SIPJEntities dbSIPJ = new SIPJEntities();
         public Mandamientos_JudicialesEntities dbMand = new Mandamientos_JudicialesEntities();
         public FiliacionEntities dbFili = new FiliacionEntities();
+        public Filiacion_MunicipiosEntities dbFiliMuni = new Filiacion_MunicipiosEntities();
 
     }
 }

@@ -9,8 +9,12 @@
 
     var isAsuntos = controllerName.Equals("Asuntos", StringComparison.OrdinalIgnoreCase);
 
+    var isSic = controllerName.Equals("SIC", StringComparison.OrdinalIgnoreCase)
+            || controllerName.Equals("Sic", StringComparison.OrdinalIgnoreCase)
+            || controllerName.Equals("SicNotificador", StringComparison.OrdinalIgnoreCase);
+
     var isAlbum = controllerName.Equals("FichaObjetivo", StringComparison.OrdinalIgnoreCase)
-                  && actionName.Equals("IndexAlbum", StringComparison.OrdinalIgnoreCase);
+          && actionName.Equals("IndexAlbum", StringComparison.OrdinalIgnoreCase);
 
     var isObjetivos = controllerName.Equals("Objetivo", StringComparison.OrdinalIgnoreCase)
                       || (controllerName.Equals("FichaObjetivo", StringComparison.OrdinalIgnoreCase) && !isAlbum);
@@ -1025,6 +1029,15 @@
                 <a class="nav-link @(isAlbum ? "active" : "collapsed")" href="@Url.Action("IndexAlbum", "FichaObjetivo")">
                     <i class="fa fa-folder-open"></i>
                     <span>Álbum de fichas</span>
+                </a>
+            </li>
+
+            <li class="nav-heading">Sistema de Identificación Criminal</li>
+
+            <li class="nav-item">
+                <a class="nav-link @(isSic ? "active" : "collapsed")" href="@Url.Action("Index", "SIC")">
+                    <i class="fa fa-bell"></i>
+                    <span>SIC</span>
                 </a>
             </li>
         </ul>

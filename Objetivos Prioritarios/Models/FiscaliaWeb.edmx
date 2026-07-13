@@ -1,0 +1,148 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="fiscalia_webModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="Capea_boletin_busqueda">
+          <Key>
+            <PropertyRef Name="id_boletin_busqueda" />
+          </Key>
+          <Property Name="id_boletin_busqueda" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="id_estatus_boletin" Type="int" Nullable="false" />
+          <Property Name="nombre" Type="nvarchar" MaxLength="200" Nullable="false" />
+          <Property Name="a_paterno" Type="nvarchar" MaxLength="200" Nullable="false" />
+          <Property Name="a_materno" Type="nvarchar" MaxLength="200" Nullable="false" />
+          <Property Name="edad" Type="int" Nullable="false" />
+          <Property Name="sexo" Type="int" Nullable="false" />
+          <Property Name="fecha_nacimiento" Type="date" Nullable="false" />
+          <Property Name="fecha_ausencia" Type="date" Nullable="false" />
+          <Property Name="lugar_ausencia" Type="nvarchar" MaxLength="300" Nullable="false" />
+          <Property Name="estatura" Type="float" Nullable="false" />
+          <Property Name="peso" Type="int" Nullable="false" />
+          <Property Name="complexion" Type="nvarchar" MaxLength="200" Nullable="false" />
+          <Property Name="tez" Type="nvarchar" MaxLength="200" Nullable="false" />
+          <Property Name="cara" Type="nvarchar" MaxLength="200" Nullable="false" />
+          <Property Name="frente" Type="nvarchar" MaxLength="200" Nullable="false" />
+          <Property Name="tipo_color_cabello" Type="nvarchar" MaxLength="200" Nullable="false" />
+          <Property Name="cejas" Type="nvarchar" MaxLength="200" Nullable="false" />
+          <Property Name="tipo_color_ojos" Type="nvarchar" MaxLength="200" Nullable="false" />
+          <Property Name="nariz" Type="nvarchar" MaxLength="200" Nullable="false" />
+          <Property Name="boca" Type="nvarchar" MaxLength="200" Nullable="false" />
+          <Property Name="menton" Type="nvarchar" MaxLength="200" Nullable="false" />
+          <Property Name="senas_particulares" Type="nvarchar" MaxLength="500" Nullable="false" />
+          <Property Name="vestimenta" Type="nvarchar" MaxLength="500" Nullable="false" />
+          <Property Name="observaciones" Type="nvarchar" MaxLength="500" Nullable="false" />
+          <Property Name="url_imagen" Type="nvarchar" MaxLength="200" Nullable="false" />
+          <Property Name="fecha_alta" Type="datetime" Nullable="false" />
+          <Property Name="prioridad" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityContainer Name="fiscalia_webModelStoreContainer">
+          <EntitySet Name="Capea_boletin_busqueda" EntityType="Self.Capea_boletin_busqueda" Schema="dbo" store:Type="Tables" />
+        </EntityContainer>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="fiscalia_webModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="Capea_boletin_busqueda">
+          <Key>
+            <PropertyRef Name="id_boletin_busqueda" />
+          </Key>
+          <Property Name="id_boletin_busqueda" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="id_estatus_boletin" Type="Int32" Nullable="false" />
+          <Property Name="nombre" Type="String" MaxLength="200" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="a_paterno" Type="String" MaxLength="200" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="a_materno" Type="String" MaxLength="200" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="edad" Type="Int32" Nullable="false" />
+          <Property Name="sexo" Type="Int32" Nullable="false" />
+          <Property Name="fecha_nacimiento" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="fecha_ausencia" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="lugar_ausencia" Type="String" MaxLength="300" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="estatura" Type="Double" Nullable="false" />
+          <Property Name="peso" Type="Int32" Nullable="false" />
+          <Property Name="complexion" Type="String" MaxLength="200" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="tez" Type="String" MaxLength="200" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="cara" Type="String" MaxLength="200" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="frente" Type="String" MaxLength="200" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="tipo_color_cabello" Type="String" MaxLength="200" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="cejas" Type="String" MaxLength="200" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="tipo_color_ojos" Type="String" MaxLength="200" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="nariz" Type="String" MaxLength="200" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="boca" Type="String" MaxLength="200" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="menton" Type="String" MaxLength="200" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="senas_particulares" Type="String" MaxLength="500" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="vestimenta" Type="String" MaxLength="500" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="observaciones" Type="String" MaxLength="500" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="url_imagen" Type="String" MaxLength="200" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="fecha_alta" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="prioridad" Type="Int32" Nullable="false" />
+        </EntityType>
+        <EntityContainer Name="fiscalia_webEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Capea_boletin_busqueda" EntityType="Self.Capea_boletin_busqueda" />
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="fiscalia_webModelStoreContainer" CdmEntityContainer="fiscalia_webEntities">
+          <EntitySetMapping Name="Capea_boletin_busqueda">
+            <EntityTypeMapping TypeName="fiscalia_webModel.Capea_boletin_busqueda">
+              <MappingFragment StoreEntitySet="Capea_boletin_busqueda">
+                <ScalarProperty Name="id_boletin_busqueda" ColumnName="id_boletin_busqueda" />
+                <ScalarProperty Name="id_estatus_boletin" ColumnName="id_estatus_boletin" />
+                <ScalarProperty Name="nombre" ColumnName="nombre" />
+                <ScalarProperty Name="a_paterno" ColumnName="a_paterno" />
+                <ScalarProperty Name="a_materno" ColumnName="a_materno" />
+                <ScalarProperty Name="edad" ColumnName="edad" />
+                <ScalarProperty Name="sexo" ColumnName="sexo" />
+                <ScalarProperty Name="fecha_nacimiento" ColumnName="fecha_nacimiento" />
+                <ScalarProperty Name="fecha_ausencia" ColumnName="fecha_ausencia" />
+                <ScalarProperty Name="lugar_ausencia" ColumnName="lugar_ausencia" />
+                <ScalarProperty Name="estatura" ColumnName="estatura" />
+                <ScalarProperty Name="peso" ColumnName="peso" />
+                <ScalarProperty Name="complexion" ColumnName="complexion" />
+                <ScalarProperty Name="tez" ColumnName="tez" />
+                <ScalarProperty Name="cara" ColumnName="cara" />
+                <ScalarProperty Name="frente" ColumnName="frente" />
+                <ScalarProperty Name="tipo_color_cabello" ColumnName="tipo_color_cabello" />
+                <ScalarProperty Name="cejas" ColumnName="cejas" />
+                <ScalarProperty Name="tipo_color_ojos" ColumnName="tipo_color_ojos" />
+                <ScalarProperty Name="nariz" ColumnName="nariz" />
+                <ScalarProperty Name="boca" ColumnName="boca" />
+                <ScalarProperty Name="menton" ColumnName="menton" />
+                <ScalarProperty Name="senas_particulares" ColumnName="senas_particulares" />
+                <ScalarProperty Name="vestimenta" ColumnName="vestimenta" />
+                <ScalarProperty Name="observaciones" ColumnName="observaciones" />
+                <ScalarProperty Name="url_imagen" ColumnName="url_imagen" />
+                <ScalarProperty Name="fecha_alta" ColumnName="fecha_alta" />
+                <ScalarProperty Name="prioridad" ColumnName="prioridad" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="false" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="Ninguno" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

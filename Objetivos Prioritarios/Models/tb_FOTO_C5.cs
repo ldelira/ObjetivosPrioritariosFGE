@@ -12,17 +12,13 @@ namespace Objetivos_Prioritarios.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class tb_Alerta
+    public partial class tb_FOTO_C5
     {
-        public int idAlerta { get; set; }
-        public Nullable<int> idPersonaFGEA { get; set; }
-        public Nullable<int> idTipoAlerta { get; set; }
-        public int IdTbFuente { get; set; }
-        public Nullable<System.DateTime> FechaAlerta { get; set; }
-        public Nullable<int> Estatus { get; set; }
-        public Nullable<int> idDetenidoC5 { get; set; }
-    
-        public virtual cat_TbFuente cat_TbFuente { get; set; }
-        public virtual cat_TipoAlerta cat_TipoAlerta { get; set; }
+        public int IDFOTO { get; set; }
+        public Nullable<int> IDDETENIDO { get; set; }
+        public string FOTO { get; set; }
+        public Nullable<System.DateTime> FEHCA { get; set; }
+        public string TIPO { get; set; }
+        public string VECTOR_EMBEDDING { get; set; }
     }
 }

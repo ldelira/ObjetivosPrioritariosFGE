@@ -1,0 +1,2713 @@
+﻿@model Objetivos_Prioritarios.Models.sp_BuscarDetenido_Result
+
+@{
+    ViewBag.Title = "Ficha del detenido en Municipio / Sistema de Identificación Criminal";
+
+    string nombreCompleto = string.IsNullOrWhiteSpace(Model.Nombre) ? "SIN INFORMACIÓN" : Model.Nombre;
+    string alias = string.IsNullOrWhiteSpace(Model.ALIAS) ? "SIN INFORMACIÓN" : Model.ALIAS;
+    string folio = string.IsNullOrWhiteSpace(Model.Folio) ? "SIN INFORMACIÓN" : Model.Folio;
+    string sexo = string.IsNullOrWhiteSpace(Model.SEXO) ? "SIN INFORMACIÓN" : Model.SEXO;
+    string municipioDetencion = string.IsNullOrWhiteSpace(Model.MunicipioDetencion) ? "SIN INFORMACIÓN" : Model.MunicipioDetencion;
+    string siglasMunicipio = string.IsNullOrWhiteSpace(Model.SiglasMunicipio) ? "SIN INFORMACIÓN" : Model.SiglasMunicipio;
+
+    string idDetenido = Convert.ToString(Model.IDDETENIDO);
+    string idDetencion = Convert.ToString(Model.IDDETENCION);
+    string edad = Convert.ToString(Model.EDAD);
+
+    string totalFotos = Convert.ToString(Model.TotalFotos);
+    string totalHuellas = Convert.ToString(Model.TotalHuellas);
+    string totalAlertas = Convert.ToString(Model.TotalRegistroAlertas);
+    string totalRegistrosDetenido = Convert.ToString(Model.TotalRegistrosDetenido);
+
+    idDetenido = string.IsNullOrWhiteSpace(idDetenido) ? "SIN INFORMACIÓN" : idDetenido;
+    idDetencion = string.IsNullOrWhiteSpace(idDetencion) ? "SIN INFORMACIÓN" : idDetencion;
+    edad = string.IsNullOrWhiteSpace(edad) ? "SIN INFORMACIÓN" : edad;
+
+    totalFotos = string.IsNullOrWhiteSpace(totalFotos) ? "0" : totalFotos;
+    totalHuellas = string.IsNullOrWhiteSpace(totalHuellas) ? "0" : totalHuellas;
+    totalAlertas = string.IsNullOrWhiteSpace(totalAlertas) ? "0" : totalAlertas;
+    totalRegistrosDetenido = string.IsNullOrWhiteSpace(totalRegistrosDetenido) ? "0" : totalRegistrosDetenido;
+
+    string fotoPrincipalUrl = Url.Action("FotoDetenidoC5", "SIC", new { idDetenido = Model.IDDETENIDO });
+
+    string fuente = "SIC / C5";
+    string tipoAlerta = "Coincidencia activa";
+    string estatus = "Coincidencia pendiente";
+
+    string lugarDetencion = municipioDetencion;
+    string fechaDetencion = "SIN INFORMACIÓN";
+    string horaDetencion = "SIN INFORMACIÓN";
+    string anio = "SIN INFORMACIÓN";
+
+    string hecho = "SIN INFORMACIÓN";
+    string causa = "SIN INFORMACIÓN";
+    string aseguramiento = "SIN INFORMACIÓN";
+
+    string latitud = "";
+    string longitud = "";
+
+    var capeas = ViewBag.Capeas as System.Collections.Generic.List<Objetivos_Prioritarios.Models.Capea_boletin_busqueda>
+             ?? new System.Collections.Generic.List<Objetivos_Prioritarios.Models.Capea_boletin_busqueda>();
+    var mandamientos = ViewBag.Mandamientos as System.Data.DataTable;
+    int fuenteCapea = ViewBag.FuenteCapea == null ? 0 : Convert.ToInt32(ViewBag.FuenteCapea);
+    var detencionC5 = ViewBag.DetencionC5 as Objetivos_Prioritarios.Models.tb_DETENCION_C5;
+    var datosDetenidoC5 = ViewBag.DatosDetenidoC5 as Objetivos_Prioritarios.Models.tb_DETENIDO_C5;
+
+    var fotosC5 = ViewBag.FotosC5 as System.Collections.Generic.List<Objetivos_Prioritarios.Models.tb_FOTO_C5>
+              ?? new System.Collections.Generic.List<Objetivos_Prioritarios.Models.tb_FOTO_C5>();
+
+    var huellasC5 = ViewBag.HuellasC5 as System.Collections.Generic.List<Objetivos_Prioritarios.Models.tb_HUELLA_C5>
+                ?? new System.Collections.Generic.List<Objetivos_Prioritarios.Models.tb_HUELLA_C5>();
+
+    var rasgosC5 = ViewBag.RasgosC5 as System.Collections.Generic.List<Objetivos_Prioritarios.Models.tb_FOTO_C5>
+               ?? new System.Collections.Generic.List<Objetivos_Prioritarios.Models.tb_FOTO_C5>();
+
+    var alertasTipo = ViewBag.AlertasTipo as System.Collections.Generic.List<System.Tuple<int, int, int>>
+                  ?? new System.Collections.Generic.List<System.Tuple<int, int, int>>();
+
+    int totalAlertasActivas = ViewBag.TotalAlertasActivas == null
+    ? 0
+    : Convert.ToInt32(ViewBag.TotalAlertasActivas);
+
+    int totalAlertasRevisadas = ViewBag.TotalAlertasRevisadas == null
+        ? 0
+        : Convert.ToInt32(ViewBag.TotalAlertasRevisadas);
+
+    var tiposAlertas = ViewBag.TiposAlertas as System.Collections.Generic.List<System.Tuple<int, int>>
+                   ?? new System.Collections.Generic.List<System.Tuple<int, int>>();
+
+
+    Func<object, string> Texto = valor =>
+    {
+        if (valor == null)
+            return "SIN INFORMACIÓN";
+
+        string texto = Convert.ToString(valor);
+
+        return string.IsNullOrWhiteSpace(texto)
+            ? "SIN INFORMACIÓN"
+            : texto;
+    };
+
+    Func<object, string> ParteNombre = valor =>
+    {
+        if (valor == null)
+            return "";
+
+        string texto = Convert.ToString(valor);
+
+        return string.IsNullOrWhiteSpace(texto)
+            ? ""
+            : texto.Trim();
+    };
+
+    Func<object, string> Fecha = valor =>
+    {
+        if (valor == null)
+            return "SIN INFORMACIÓN";
+
+        DateTime fecha;
+
+        if (DateTime.TryParse(Convert.ToString(valor), out fecha))
+            return fecha.ToString("dd/MM/yyyy");
+
+        return "SIN INFORMACIÓN";
+    };
+
+    Func<object, string> TextoDetencion = valor =>
+    {
+        if (valor == null)
+            return "SIN INFORMACIÓN";
+
+        string texto = Convert.ToString(valor);
+
+        return string.IsNullOrWhiteSpace(texto)
+            ? "SIN INFORMACIÓN"
+            : texto.Trim();
+    };
+
+    Func<object, string> FechaHoraDetencion = valor =>
+    {
+        if (valor == null)
+            return "SIN INFORMACIÓN";
+
+        DateTime fecha;
+
+        if (DateTime.TryParse(Convert.ToString(valor), out fecha))
+            return fecha.ToString("dd/MM/yyyy HH:mm");
+
+        return "SIN INFORMACIÓN";
+    };
+
+    Func<int, int, int> ObtenerEstatusAlerta = (idOrigen, idFuente) =>
+    {
+        var alerta = alertasTipo
+            .Where(x => x.Item1 == idOrigen && x.Item2 == idFuente)
+            .OrderByDescending(x => x.Item3)
+            .FirstOrDefault();
+
+        if (alerta == null)
+        {
+            return 0;
+        }
+
+        return alerta.Item3;
+    };
+
+    string mapaLatitud = detencionC5 != null ? TextoDetencion(detencionC5.Latitud) : "SIN INFORMACIÓN";
+    string mapaLongitud = detencionC5 != null ? TextoDetencion(detencionC5.Longitud) : "SIN INFORMACIÓN";
+
+    bool tieneCoordenadasMapa =
+        mapaLatitud != "SIN INFORMACIÓN" &&
+        mapaLongitud != "SIN INFORMACIÓN";
+
+    Func<int, int> TotalPorTipoAlerta = idTipoAlerta =>
+    {
+        var tipo = tiposAlertas
+            .FirstOrDefault(x => x.Item1 == idTipoAlerta);
+
+        if (tipo == null)
+            return 0;
+
+        return tipo.Item2;
+    };
+
+    int totalCoincidenciaNombre = TotalPorTipoAlerta(1);
+    int totalCoincidenciaFoto = TotalPorTipoAlerta(2);
+    int totalCoincidenciaHuella = TotalPorTipoAlerta(3);
+
+}
+
+<style>
+    .sic-ficha-page {
+        color: #111827;
+    }
+
+    .sic-page-title-actions {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 8px;
+    }
+
+    .sic-btn-light,
+    .sic-btn-warning-soft {
+        border-radius: 10px;
+        padding: 9px 13px;
+        font-weight: 800;
+        font-size: 13px;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+    }
+
+    .sic-btn-light {
+        background: #ffffff;
+        color: #102f55;
+        border: 1px solid #dbe3ef;
+    }
+
+    .sic-btn-warning-soft {
+        background: #fff7ed;
+        color: #9a3412;
+        border: 1px solid #fed7aa;
+    }
+
+        .sic-btn-light:hover,
+        .sic-btn-warning-soft:hover {
+            text-decoration: none;
+            filter: brightness(.98);
+        }
+
+    .sic-hero {
+        background: linear-gradient(135deg, #102f55 0%, #1d63d3 100%);
+        border-radius: 18px;
+        padding: 22px;
+        color: #ffffff;
+        box-shadow: 0 12px 28px rgba(15, 35, 75, .16);
+        margin-bottom: 18px;
+        overflow: hidden;
+    }
+
+    .sic-hero-content {
+        display: grid;
+        grid-template-columns: 210px minmax(0, 1fr) 470px;
+        align-items: start;
+        gap: 20px;
+    }
+
+    .sic-photo-main {
+        width: 200px;
+        height: 240px;
+        border-radius: 16px;
+        background: rgba(255,255,255,.18);
+        border: 2px solid rgba(255,255,255,.35);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+
+        .sic-photo-main i {
+            font-size: 64px;
+            color: rgba(255,255,255,.85);
+        }
+
+        .sic-photo-main img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: inherit;
+        }
+
+    .sic-photo-caption {
+        margin-top: 8px;
+        text-align: center;
+        font-size: 12px;
+        font-weight: 800;
+        color: rgba(255,255,255,.88);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+
+    .sic-hero-info {
+        min-width: 0;
+    }
+
+        .sic-hero-info h2 {
+            font-size: 50px;
+            font-weight: 700;
+            margin: 0 0 6px;
+            color: #ffffff;
+            letter-spacing: .4px;
+            text-transform: uppercase;
+            line-height: 1.1;
+        }
+
+    .sic-hero-subtitle {
+        font-size: 13px;
+        font-weight: 700;
+        color: rgba(255,255,255,.82);
+        margin-bottom: 14px;
+    }
+
+    .sic-hero-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 14px;
+    }
+
+    .sic-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 11px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 800;
+        background: rgba(255,255,255,.14);
+        border: 1px solid rgba(255,255,255,.20);
+        color: #ffffff;
+    }
+
+    .sic-pill-alerta {
+        background: #fff1f2;
+        color: #be123c;
+        border-color: #fecdd3;
+    }
+
+    .sic-main-info-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(130px, 1fr));
+        gap: 6px 12px;
+        max-width: 520px;
+    }
+
+    .sic-main-info-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        min-width: 0;
+    }
+
+    .sic-main-info-icon {
+        width: 28px;
+        height: 28px;
+        border-radius: 9px;
+        background: rgba(255,255,255,.16);
+        border: 1px solid rgba(255,255,255,.18);
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        font-size: 13px;
+    }
+
+    .sic-main-info-item label {
+        display: block;
+        margin: 0;
+        font-size: 10px;
+        font-weight: 800;
+        color: rgba(255,255,255,.75);
+        text-transform: uppercase;
+        letter-spacing: .2px;
+    }
+
+    .sic-main-info-item strong {
+        display: block;
+        color: #ffffff;
+        font-size: 13px;
+        font-weight: 900;
+        line-height: 1.15;
+        word-break: break-word;
+    }
+
+    .sic-hero-counters {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 30px;
+        width: 100%;
+        margin-left: auto;
+        align-self: start;
+    }
+
+    .sic-hero-counter {
+        min-height: 62px;
+        border-radius: 14px;
+        padding: 10px;
+        background: rgba(255,255,255,.13);
+        border: 1px solid rgba(255,255,255,.18);
+        box-shadow: 0 8px 18px rgba(0,0,0,.08);
+        display: flex;
+        align-items: center;
+        gap: 9px;
+    }
+
+    .sic-hero-counter-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 11px;
+        background: rgba(255,255,255,.18);
+        border: 1px solid rgba(255,255,255,.20);
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        font-size: 14px;
+    }
+
+    .sic-hero-counter label {
+        display: block;
+        margin: 0;
+        color: rgba(255,255,255,.78);
+        font-size: 10px;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: .2px;
+        line-height: 1.1;
+    }
+
+    .sic-hero-counter strong {
+        display: block;
+        color: #ffffff;
+        font-size: 15px;
+        font-weight: 900;
+        line-height: 1.15;
+        margin-top: 3px;
+    }
+
+    .sic-hero-counter.alerta {
+        background: rgba(255, 241, 242, .96);
+        border-color: #fecdd3;
+    }
+
+        .sic-hero-counter.alerta .sic-hero-counter-icon {
+            background: #ffe4e6;
+            border-color: #fecdd3;
+            color: #dc2626;
+        }
+
+        .sic-hero-counter.alerta label {
+            color: #9f1239;
+        }
+
+        .sic-hero-counter.alerta strong {
+            color: #be123c;
+        }
+
+    .sic-section-grid {
+        display: grid;
+        grid-template-columns: 1.1fr .9fr;
+        gap: 16px;
+        margin-bottom: 16px;
+    }
+
+    .sic-card {
+        background: #ffffff;
+        border: 1px solid #e8eef8;
+        border-radius: 16px;
+        box-shadow: 0 5px 16px rgba(15, 35, 75, .06);
+        overflow: hidden;
+    }
+
+    .sic-card-header {
+        padding: 14px 16px;
+        border-bottom: 1px solid #e8eef8;
+        background: #f8fafc;
+    }
+
+        .sic-card-header h5 {
+            margin: 0;
+            font-size: 15px;
+            font-weight: 900;
+            color: #102f55;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+    .sic-card-body {
+        padding: 16px;
+    }
+
+    .sic-info-list {
+        display: grid;
+        grid-template-columns: 170px minmax(0, 1fr);
+        row-gap: 10px;
+        column-gap: 14px;
+    }
+
+    .sic-info-label {
+        color: #64748b;
+        font-size: 12px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: .2px;
+    }
+
+    .sic-info-value {
+        color: #111827;
+        font-size: 14px;
+        font-weight: 700;
+        word-break: break-word;
+    }
+
+    .sic-text-box {
+        background: #f8fafc;
+        border: 1px solid #e5eaf1;
+        border-radius: 12px;
+        padding: 12px;
+        color: #111827;
+        font-weight: 600;
+        min-height: 74px;
+    }
+
+    .sic-media-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+    }
+
+    .sic-media-box {
+        border: 1px dashed #cbd5e1;
+        border-radius: 14px;
+        background: #f8fafc;
+        min-height: 170px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        color: #64748b;
+        text-align: center;
+        padding: 12px;
+        overflow: hidden;
+    }
+
+        .sic-media-box i {
+            font-size: 46px;
+            color: #94a3b8;
+        }
+
+        .sic-media-box strong {
+            color: #334155;
+            font-size: 13px;
+        }
+
+    .sic-location-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-top: 12px;
+    }
+
+    .sic-small-btn {
+        border: 1px solid #dbe3ef;
+        background: #ffffff;
+        color: #102f55;
+        border-radius: 10px;
+        padding: 8px 11px;
+        font-size: 13px;
+        font-weight: 800;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+    }
+
+        .sic-small-btn:hover {
+            background: #eef4ff;
+            text-decoration: none;
+        }
+
+    .sic-muted-note {
+        color: #64748b;
+        font-size: 12px;
+        margin-top: 10px;
+    }
+
+    @@media (max-width: 1400px) {
+        .sic-hero-content {
+            grid-template-columns: 210px minmax(0, 1fr) 390px;
+        }
+
+        .sic-hero-info h2 {
+            font-size: 42px;
+        }
+    }
+
+    @@media (max-width: 1200px) {
+        .sic-hero-content {
+            grid-template-columns: 210px minmax(0, 1fr);
+        }
+
+        .sic-hero-counters {
+            grid-column: 1 / -1;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+    }
+
+    @@media (max-width: 992px) {
+        .sic-hero-content {
+            grid-template-columns: 1fr;
+        }
+
+        .sic-main-info-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            max-width: none;
+        }
+
+        .sic-hero-counters {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .sic-section-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .sic-hero-info h2 {
+            font-size: 32px;
+        }
+
+        .sic-main-info-grid,
+        .sic-hero-counters,
+        .sic-media-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .sic-info-list {
+            grid-template-columns: 1fr;
+        }
+
+        .sic-page-title-actions {
+            flex-wrap: wrap;
+            justify-content: flex-start;
+        }
+    }
+    .sic-tabs-card .sic-card-body {
+        padding: 0;
+    }
+
+    .sic-source-tabs {
+        display: flex;
+        align-items: flex-end;
+        gap: 0;
+        border-bottom: 1px solid #dbe3ef;
+        background: #ffffff;
+        padding: 0 12px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        white-space: nowrap;
+    }
+
+    .sic-source-tab {
+        position: relative;
+        border: 1px solid transparent;
+        border-bottom: none;
+        background: transparent;
+        color: #003cff;
+        padding: 14px 16px;
+        font-size: 13px;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        cursor: pointer;
+        border-radius: 8px 8px 0 0;
+        margin-bottom: -1px;
+    }
+
+        .sic-source-tab i {
+            color: #003cff;
+            font-size: 13px;
+        }
+
+        .sic-source-tab:hover {
+            color: #001f8f;
+            background: #f8fafc;
+        }
+
+            .sic-source-tab:hover i {
+                color: #001f8f;
+            }
+
+        .sic-source-tab.active {
+            background: #ffffff;
+            color: #000000;
+            border-color: #dbe3ef;
+            border-bottom: 1px solid #ffffff;
+            font-weight: 900;
+        }
+
+            .sic-source-tab.active i {
+                color: #000000;
+            }
+
+    .sic-source-tab-content {
+        display: none;
+        padding: 18px 16px 16px 16px;
+    }
+
+        .sic-source-tab-content.active {
+            display: block;
+        }
+
+    .sic-empty-source {
+        min-height: 130px;
+        border: 1px dashed #cbd5e1;
+        background: #f8fafc;
+        border-radius: 14px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        color: #64748b;
+        text-align: center;
+        padding: 18px;
+    }
+
+        .sic-empty-source i {
+            font-size: 38px;
+            color: #94a3b8;
+        }
+
+        .sic-empty-source strong {
+            color: #102f55;
+            font-size: 14px;
+            font-weight: 900;
+        }
+
+        .sic-empty-source span {
+            font-size: 12px;
+            font-weight: 700;
+        }
+        .sic-capea-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.sic-capea-card {
+    display: grid;
+    grid-template-columns: 150px minmax(0, 1fr);
+    gap: 16px;
+    border: 1px solid #e8eef8;
+    border-radius: 14px;
+    background: #ffffff;
+    padding: 14px;
+    box-shadow: 0 4px 12px rgba(15, 35, 75, .05);
+}
+
+.sic-capea-photo {
+    width: 150px;
+    height: 190px;
+    border-radius: 12px;
+    background: #f1f5f9;
+    border: 1px solid #dbe3ef;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.sic-capea-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.sic-capea-photo i {
+    font-size: 52px;
+    color: #94a3b8;
+}
+
+.sic-capea-info {
+    min-width: 0;
+}
+
+.sic-capea-title {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+    border-bottom: 1px solid #e8eef8;
+    padding-bottom: 10px;
+}
+
+.sic-capea-title h5 {
+    margin: 0;
+    color: #102f55;
+    font-size: 17px;
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+.sic-capea-title span {
+    display: block;
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 700;
+    margin-top: 2px;
+}
+
+.sic-capea-badge {
+    background: #fff1f2;
+    color: #be123c;
+    border: 1px solid #fecdd3;
+    border-radius: 999px;
+    padding: 6px 10px;
+    font-size: 12px;
+    font-weight: 900;
+    white-space: nowrap;
+}
+
+    .sic-capea-grid {
+        display: grid;
+        grid-template-columns: 135px minmax(0, 1fr) 135px minmax(0, 1fr);
+        row-gap: 9px;
+        column-gap: 12px;
+    }
+
+    .sic-capea-title-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-shrink: 0;
+    }
+
+    .sic-capea-carousel-actions {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .sic-capea-nav {
+        width: 34px;
+        height: 34px;
+        border-radius: 999px;
+        border: 1px solid #dbe3ef;
+        background: #ffffff;
+        color: #102f55;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+    }
+
+        .sic-capea-nav:hover {
+            background: #eef4ff;
+        }
+
+    .sic-capea-counter {
+        font-size: 12px;
+        font-weight: 900;
+        color: #334155;
+        white-space: nowrap;
+    }
+
+    @@media (max-width: 992px) {
+        .sic-capea-grid {
+            grid-template-columns: 135px minmax(0, 1fr);
+        }
+
+        .sic-capea-title {
+            flex-direction: column;
+        }
+
+        .sic-capea-title-actions {
+            align-items: flex-start;
+            flex-wrap: wrap;
+        }
+    }
+
+
+    .sic-top-grid {
+        grid-template-columns: minmax(0, 1fr) 580px !important;
+        align-items: stretch;
+    }
+        .sic-top-grid > .sic-card {
+            height: 100%;
+        }
+
+        .sic-top-grid > .sic-tabs-card {
+            min-width: 0;
+        }
+
+        .sic-top-grid > .sic-card:not(.sic-tabs-card) .sic-info-list {
+            grid-template-columns: 160px minmax(0, 1fr);
+        }
+
+    @@media (max-width: 1200px) {
+        .sic-top-grid {
+            grid-template-columns: 1fr !important;
+        }
+    }
+
+    .sic-capea-carousel {
+        width: 100%;
+    }
+
+    .sic-capea-slide {
+        display: none;
+    }
+
+        .sic-capea-slide.active {
+            display: block;
+        }
+
+    .sic-capea-card {
+        display: grid;
+        grid-template-columns: 150px minmax(0, 1fr);
+        gap: 16px;
+        border: 1px solid #e8eef8;
+        border-radius: 14px;
+        background: #ffffff;
+        padding: 14px;
+        box-shadow: 0 4px 12px rgba(15, 35, 75, .05);
+    }
+
+    .sic-capea-photo {
+        width: 150px;
+        height: 190px;
+        border-radius: 12px;
+        background: #f1f5f9;
+        border: 1px solid #dbe3ef;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+
+        .sic-capea-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .sic-capea-photo i {
+            font-size: 52px;
+            color: #94a3b8;
+        }
+
+    .sic-capea-info {
+        min-width: 0;
+    }
+
+    .sic-capea-title {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 12px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #e8eef8;
+    }
+
+        .sic-capea-title h5 {
+            margin: 0;
+            color: #102f55;
+            font-size: 17px;
+            font-weight: 900;
+            text-transform: uppercase;
+        }
+
+        .sic-capea-title span {
+            display: block;
+            color: #64748b;
+            font-size: 12px;
+            font-weight: 700;
+            margin-top: 2px;
+        }
+
+    .sic-capea-badge {
+        background: #fff1f2;
+        color: #be123c;
+        border: 1px solid #fecdd3;
+        border-radius: 999px;
+        padding: 8px 12px;
+        font-size: 12px;
+        font-weight: 900;
+        white-space: nowrap;
+    }
+
+    .sic-capea-grid {
+        display: grid;
+        grid-template-columns: 135px minmax(0, 1fr) 135px minmax(0, 1fr);
+        row-gap: 9px;
+        column-gap: 12px;
+    }
+
+    .sic-capea-carousel-footer {
+        margin-top: 12px;
+        padding-top: 12px;
+        border-top: 1px solid #e8eef8;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 8px;
+    }
+
+    .sic-capea-nav {
+        width: 34px;
+        height: 34px;
+        border-radius: 999px;
+        border: 1px solid #dbe3ef;
+        background: #ffffff;
+        color: #102f55;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+    }
+
+        .sic-capea-nav:hover {
+            background: #eef4ff;
+        }
+
+    .sic-capea-counter {
+        font-size: 12px;
+        font-weight: 900;
+        color: #334155;
+        white-space: nowrap;
+    }
+
+    @@media (max-width: 1400px) {
+        .sic-capea-grid {
+            grid-template-columns: 135px minmax(0, 1fr);
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .sic-capea-card {
+            grid-template-columns: 1fr;
+        }
+
+        .sic-capea-photo {
+            width: 100%;
+            height: 240px;
+        }
+
+        .sic-capea-title {
+            flex-direction: column;
+        }
+    }
+
+    .sic-mandamientos-list {
+        max-height: 360px;
+        overflow-y: auto;
+        padding-right: 6px;
+    }
+
+        .sic-mandamientos-list::-webkit-scrollbar {
+            width: 7px;
+        }
+
+        .sic-mandamientos-list::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 999px;
+        }
+
+        .sic-mandamientos-list::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 999px;
+        }
+
+    .sic-mandamiento-card {
+        border: 1px solid #e8eef8;
+        border-radius: 14px;
+        background: #ffffff;
+        padding: 14px;
+        box-shadow: 0 4px 12px rgba(15, 35, 75, .05);
+    }
+
+    .sic-mandamiento-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+        padding-bottom: 10px;
+        margin-bottom: 12px;
+        border-bottom: 1px solid #e8eef8;
+    }
+
+        .sic-mandamiento-header h5 {
+            margin: 0;
+            color: #102f55;
+            font-size: 16px;
+            font-weight: 900;
+            text-transform: uppercase;
+        }
+
+        .sic-mandamiento-header span {
+            display: block;
+            color: #64748b;
+            font-size: 12px;
+            font-weight: 700;
+            margin-top: 2px;
+        }
+
+    .sic-mandamiento-badge {
+        background: #eff6ff;
+        color: #1d4ed8;
+        border: 1px solid #bfdbfe;
+        border-radius: 999px;
+        padding: 7px 11px;
+        font-size: 12px;
+        font-weight: 900;
+        white-space: nowrap;
+    }
+
+    .sic-mandamiento-grid {
+        display: grid;
+        grid-template-columns: 145px minmax(0, 1fr) 145px minmax(0, 1fr);
+        row-gap: 9px;
+        column-gap: 12px;
+    }
+
+    @@media (max-width: 992px) {
+        .sic-mandamiento-grid {
+            grid-template-columns: 145px minmax(0, 1fr);
+        }
+
+        .sic-mandamiento-header {
+            flex-direction: column;
+        }
+    }
+
+    .sic-detencion-compact {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .sic-detencion-compact-head {
+        display: grid;
+        grid-template-columns: 38px minmax(0, 1fr) auto;
+        align-items: center;
+        gap: 10px;
+        background: #f8fafc;
+        border: 1px solid #e8eef8;
+        border-radius: 12px;
+        padding: 10px 12px;
+    }
+
+    .sic-detencion-compact-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 11px;
+        background: #eff6ff;
+        border: 1px solid #bfdbfe;
+        color: #1d4ed8;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 15px;
+    }
+
+    .sic-detencion-compact-title {
+        min-width: 0;
+    }
+
+        .sic-detencion-compact-title strong {
+            display: block;
+            color: #102f55;
+            font-size: 15px;
+            font-weight: 900;
+            text-transform: uppercase;
+            line-height: 1.1;
+        }
+
+        .sic-detencion-compact-title span {
+            display: block;
+            margin-top: 3px;
+            color: #334155;
+            font-size: 12px;
+            font-weight: 700;
+            line-height: 1.25;
+            word-break: break-word;
+        }
+
+    .sic-detencion-map-btn {
+        padding: 7px 10px;
+        font-size: 12px;
+        white-space: nowrap;
+    }
+
+    .sic-detencion-compact-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        column-gap: 14px;
+        row-gap: 7px;
+    }
+
+    .sic-detencion-line {
+        display: grid;
+        grid-template-columns: 125px minmax(0, 1fr);
+        align-items: baseline;
+        gap: 8px;
+        border-bottom: 1px solid #eef2f7;
+        padding: 4px 0;
+    }
+
+        .sic-detencion-line label {
+            margin: 0;
+            color: #64748b;
+            font-size: 11px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: .2px;
+        }
+
+        .sic-detencion-line strong {
+            color: #111827;
+            font-size: 12px;
+            font-weight: 800;
+            word-break: break-word;
+        }
+
+    @@media (max-width: 768px) {
+        .sic-detencion-compact-head {
+            grid-template-columns: 38px minmax(0, 1fr);
+        }
+
+        .sic-detencion-map-btn {
+            grid-column: 1 / -1;
+            justify-content: center;
+        }
+
+        .sic-detencion-compact-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .sic-detencion-line {
+            grid-template-columns: 120px minmax(0, 1fr);
+        }
+    }
+
+
+    .sic-map-card {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .sic-map-info {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+        background: #f8fafc;
+        border: 1px solid #e8eef8;
+        border-radius: 12px;
+        padding: 10px 12px;
+    }
+
+        .sic-map-info div {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .sic-map-info label {
+            margin: 0;
+            color: #64748b;
+            font-size: 11px;
+            font-weight: 900;
+            text-transform: uppercase;
+        }
+
+        .sic-map-info strong {
+            color: #111827;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+    .sic-map-frame {
+        width: 100%;
+        height: 260px;
+        border-radius: 14px;
+        overflow: hidden;
+        border: 1px solid #dbe3ef;
+        background: #f1f5f9;
+    }
+
+
+    .sic-detenido-c5 {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.sic-detenido-c5-head {
+    display: grid;
+    grid-template-columns: 38px minmax(0, 1fr);
+    align-items: center;
+    gap: 10px;
+    background: #f8fafc;
+    border: 1px solid #e8eef8;
+    border-radius: 12px;
+    padding: 10px 12px;
+}
+
+.sic-detenido-c5-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 11px;
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    color: #1d4ed8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+}
+
+.sic-detenido-c5-head strong {
+    display: block;
+    color: #102f55;
+    font-size: 15px;
+    font-weight: 900;
+    text-transform: uppercase;
+    line-height: 1.1;
+}
+
+.sic-detenido-c5-head span {
+    display: block;
+    margin-top: 3px;
+    color: #334155;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.sic-detenido-c5-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 14px;
+    row-gap: 7px;
+}
+
+.sic-detenido-line {
+    display: grid;
+    grid-template-columns: 105px minmax(0, 1fr);
+    align-items: baseline;
+    gap: 8px;
+    border-bottom: 1px solid #eef2f7;
+    padding: 4px 0;
+}
+
+.sic-detenido-line label,
+.sic-detenido-c5-extra label {
+    margin: 0;
+    color: #64748b;
+    font-size: 11px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: .2px;
+}
+
+.sic-detenido-line strong,
+.sic-detenido-c5-extra strong {
+    color: #111827;
+    font-size: 12px;
+    font-weight: 800;
+    word-break: break-word;
+}
+
+.sic-detenido-c5-extra {
+    border: 1px solid #e8eef8;
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 10px 12px;
+    display: grid;
+    grid-template-columns: 125px minmax(0, 1fr);
+    gap: 8px;
+}
+
+@@media (max-width: 768px) {
+    .sic-detenido-c5-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .sic-detenido-line {
+        grid-template-columns: 110px minmax(0, 1fr);
+    }
+
+    .sic-detenido-c5-extra {
+        grid-template-columns: 1fr;
+    }
+}
+
+    .sic-hero {
+        position: sticky;
+        top: 75px; /* Ajusta según la altura de tu navbar/header */
+        z-index: 50;
+    }
+
+    .sic-gallery-box {
+        align-items: stretch;
+        justify-content: flex-start;
+        text-align: left;
+    }
+
+    .sic-gallery-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 12px;
+    }
+
+        .sic-gallery-header strong {
+            display: block;
+            color: #102f55;
+            font-size: 14px;
+            font-weight: 900;
+        }
+
+        .sic-gallery-header span {
+            display: block;
+            color: #64748b;
+            font-size: 12px;
+            font-weight: 700;
+            margin-top: 2px;
+        }
+
+    .sic-gallery-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(115px, 1fr));
+        gap: 10px;
+        max-height: 310px;
+        overflow-y: auto;
+        padding-right: 4px;
+    }
+
+    .sic-gallery-item {
+        border: 1px solid #e8eef8;
+        background: #ffffff;
+        border-radius: 12px;
+        overflow: hidden;
+        min-height: 145px;
+        display: flex;
+        flex-direction: column;
+    }
+
+        .sic-gallery-item img {
+            width: 100%;
+            height: 115px;
+            object-fit: cover;
+            background: #f1f5f9;
+        }
+
+        .sic-gallery-item i {
+            height: 115px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 38px;
+            color: #94a3b8;
+            background: #f1f5f9;
+        }
+
+    .sic-gallery-caption {
+        padding: 7px 8px;
+        border-top: 1px solid #e8eef8;
+        background: #f8fafc;
+    }
+
+        .sic-gallery-caption span {
+            display: block;
+            color: #334155;
+            font-size: 11px;
+            font-weight: 800;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+    .sic-gallery-grid::-webkit-scrollbar {
+        width: 7px;
+    }
+
+    .sic-gallery-grid::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 999px;
+    }
+
+    .sic-gallery-grid::-webkit-scrollbar-track {
+        background: #f1f5f9;
+        border-radius: 999px;
+    }
+
+
+    .sic-hero-counter.revisada {
+        background: rgba(240, 253, 244, .96);
+        border-color: #bbf7d0;
+    }
+
+        .sic-hero-counter.revisada .sic-hero-counter-icon {
+            background: #dcfce7;
+            border-color: #bbf7d0;
+            color: #16a34a;
+        }
+
+        .sic-hero-counter.revisada label {
+            color: #166534;
+        }
+
+        .sic-hero-counter.revisada strong {
+            color: #15803d;
+        }
+
+    .sic-btn-alerta-desactivada {
+        border-radius: 10px;
+        padding: 9px 13px;
+        font-weight: 800;
+        font-size: 13px;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        background: #f0fdf4;
+        color: #15803d;
+        border: 1px solid #bbf7d0;
+        cursor: not-allowed;
+        opacity: .95;
+    }
+
+
+    .sic-btn-alerta-desactivada {
+        border-radius: 10px;
+        padding: 9px 13px;
+        font-weight: 800;
+        font-size: 13px;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        background: #f0fdf4;
+        color: #15803d;
+        border: 1px solid #bbf7d0;
+        cursor: pointer;
+        opacity: .95;
+    }
+
+
+</style>
+
+<div class="sic-ficha-page">
+
+    <div class="sic-hero">
+        <div class="sic-hero-content">
+
+            <div class="sic-photo-main-wrap">
+                <div class="sic-photo-main">
+                    <img src="@fotoPrincipalUrl"
+                         alt="Foto de frente detenido en Municipio"
+                         onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=&quot;fa fa-user&quot;></i>';" />
+                </div>
+            </div>
+
+            <div class="sic-hero-info">
+                <h2>@nombreCompleto</h2>
+
+                <div class="sic-hero-meta">
+                    <span class="sic-pill sic-pill-alerta">
+                        <i class="fa fa-exclamation-triangle"></i>
+                        @totalAlertas Alerta(s) Totales
+                    </span>
+
+                    <span class="sic-pill">
+                        <i class="fa fa-id-card"></i>
+                        ID Detenido: @idDetenido
+                    </span>
+
+                    <span class="sic-pill">
+                        <i class="fa fa-file-text"></i>
+                        Folio: @folio
+                    </span>
+                </div>
+
+                <div class="sic-main-info-grid">
+                    <div class="sic-main-info-item">
+                        <div class="sic-main-info-icon">
+                            <i class="fa fa-map-marker"></i>
+                        </div>
+                        <div>
+                            <label>Municipio detención</label>
+                            <strong>@municipioDetencion</strong>
+                        </div>
+                    </div>
+
+                    <div class="sic-main-info-item">
+                        <div class="sic-main-info-icon">
+                            <i class="fa fa-user-secret"></i>
+                        </div>
+                        <div>
+                            <label>Alias</label>
+                            <strong>@alias</strong>
+                        </div>
+                    </div>
+
+                    <div class="sic-main-info-item">
+                        <div class="sic-main-info-icon">
+                            <i class="fa fa-venus-mars"></i>
+                        </div>
+                        <div>
+                            <label>Sexo</label>
+                            <strong>@sexo</strong>
+                        </div>
+                    </div>
+
+                    <div class="sic-main-info-item">
+                        <div class="sic-main-info-icon">
+                            <i class="fa fa-birthday-cake"></i>
+                        </div>
+                        <div>
+                            <label>Edad</label>
+                            <strong>@edad</strong>
+                        </div>
+                    </div>
+
+                    <div class="sic-main-info-item">
+                        <div class="sic-main-info-icon">
+                            <i class="fa fa-picture-o"></i>
+                        </div>
+                        <div>
+                            <label>Fotos en Municipio</label>
+                            <strong>@totalFotos</strong>
+                        </div>
+                    </div>
+
+                    <div class="sic-main-info-item">
+                        <div class="sic-main-info-icon">
+                            <i class="fa fa-hand-paper-o"></i>
+                        </div>
+                        <div>
+                            <label>Huellas</label>
+                            <strong>@totalHuellas</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sic-hero-counters">
+                <div class="sic-hero-counter alerta">
+                    <div class="sic-hero-counter-icon">
+                        <i class="fa fa-bell"></i>
+                    </div>
+                    <div>
+                        <label>Alertas activas</label>
+                        <strong id="contadorAlertasActivas">@totalAlertasActivas</strong>
+                    </div>
+                </div>
+
+                <div class="sic-hero-counter revisada">
+                    <div class="sic-hero-counter-icon">
+                        <i class="fa fa-check-circle"></i>
+                    </div>
+                    <div>
+                        <label>Alertas revisadas</label>
+                        <strong id="contadorAlertasRevisadas">@totalAlertasRevisadas</strong>
+                    </div>
+                </div>
+
+                <div class="sic-hero-counter">
+                    <div class="sic-hero-counter-icon">
+                        <i class="fa fa-database"></i>
+                    </div>
+                    <div>
+                        <label>Total detenciones</label>
+                        <strong>@totalRegistrosDetenido</strong>
+                    </div>
+                </div>
+
+                <div class="sic-hero-counter">
+                    <div class="sic-hero-counter-icon">
+                        <i class="fa fa-user"></i>
+                    </div>
+                    <div>
+                        <label>Coincidencia nombre</label>
+                        <strong>@totalCoincidenciaNombre</strong>
+                    </div>
+                </div>
+
+                <div class="sic-hero-counter">
+                    <div class="sic-hero-counter-icon">
+                        <i class="fa fa-picture-o"></i>
+                    </div>
+                    <div>
+                        <label>Coincidencia foto</label>
+                        <strong>@totalCoincidenciaFoto</strong>
+                    </div>
+                </div>
+
+                <div class="sic-hero-counter">
+                    <div class="sic-hero-counter-icon">
+                        <i class="fa fa-hand-paper-o"></i>
+                    </div>
+                    <div>
+                        <label>Coincidencia huella</label>
+                        <strong>@totalCoincidenciaHuella</strong>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="sic-section-grid sic-top-grid">
+        <div class="sic-card sic-tabs-card">
+            <div class="sic-card-body">
+
+                <div class="sic-source-tabs">
+
+
+                    <button type="button" class="sic-source-tab active" data-tab="tab-capea">
+                        <i class="fa fa-search"></i>
+                        FEMDLP
+                    </button>
+
+                    <button type="button" class="sic-source-tab" data-tab="tab-persona-interes">
+                        <i class="fa fa-user-circle"></i>
+                        Persona Interés
+                    </button>
+
+                    <button type="button" class="sic-source-tab" data-tab="tab-mandamientos">
+                        <i class="fa fa-gavel"></i>
+                        Mandamientos Judiciales
+                    </button>
+
+                    <button type="button" class="sic-source-tab" data-tab="tab-objetivos">
+                        <i class="fa fa-crosshairs"></i>
+                        Objetivos Prioritarios
+                    </button>
+
+                    <button type="button" class="sic-source-tab" data-tab="tab-fgea-detenidos">
+                        <i class="fa fa-id-badge"></i>
+                        Detenidos
+                    </button>
+                </div>
+
+
+                <div class="sic-source-tab-content active" id="tab-capea">
+
+                    @if (capeas != null && capeas.Count > 0)
+                    {
+
+                        <div class="sic-capea-carousel">
+
+                            <div class="sic-capea-slides">
+
+                                @for (int i = 0; i < capeas.Count; i++)
+                                {
+                                    var item = capeas[i];
+
+                                    string nombreCapea = (ParteNombre(item.nombre) + " " + ParteNombre(item.a_paterno) + " " + ParteNombre(item.a_materno)).Trim();
+
+                                    if (string.IsNullOrWhiteSpace(nombreCapea))
+                                    {
+                                        nombreCapea = "SIN INFORMACIÓN";
+                                    }
+
+                                    <div class="sic-capea-slide @(i == 0 ? "active" : "")" data-index="@i">
+
+                                        <div class="sic-capea-card">
+
+                                            <div class="sic-capea-photo-wrap">
+
+                                                <div class="sic-capea-photo">
+                                                    @if (!string.IsNullOrWhiteSpace(item.url_imagen))
+                                                    {
+                                                        <img src="@Url.Action("FotoCapea", "SIC", new { idCapea = item.id_boletin_busqueda })"
+                                                             alt="Imagen boletín Capea"
+                                                             onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=&quot;fa fa-user&quot;></i>';" />
+                                                    }
+                                                    else
+                                                    {
+                                                        <i class="fa fa-user"></i>
+                                                    }
+                                                </div>
+
+                                                @if (capeas.Count > 1)
+                                                {
+                                                    <div class="sic-capea-carousel-footer">
+                                                        <button type="button" class="sic-capea-nav sic-capea-prev">
+                                                            <i class="fa fa-chevron-left"></i>
+                                                        </button>
+
+                                                        <span class="sic-capea-counter">
+                                                            <span class="sic-capea-current">1</span> / @capeas.Count
+                                                        </span>
+
+                                                        <button type="button" class="sic-capea-nav sic-capea-next">
+                                                            <i class="fa fa-chevron-right"></i>
+                                                        </button>
+                                                    </div>
+                                                }
+
+                                            </div>
+
+
+                                            <div class="sic-capea-info">
+
+                                                <div class="sic-capea-title">
+                                                    <div>
+                                                        <h5>@nombreCapea</h5>
+                                                        <span>Boletín de búsqueda Fiscalía Especializada en Materia de Desaparición y Localización de Personas</span>
+                                                    </div>
+
+                                                    @{
+                                                        int idOrigenCapea = Convert.ToInt32(item.id_boletin_busqueda);
+                                                        int estatusAlertaCapea = ObtenerEstatusAlerta(idOrigenCapea, 2);
+                                                    }
+
+                                                    @if (estatusAlertaCapea == 1)
+                                                    {
+                                                        <button type="button"
+                                                                class="sic-btn-warning-soft sic-btn-apagar-alerta"
+                                                                data-id-detenido="@Model.IDDETENIDO"
+                                                                data-id-origen="@idOrigenCapea"
+                                                                data-id-fuente="2">
+                                                            <i class="fa fa-bell-slash"></i>
+                                                            Apagar notificación
+                                                        </button>
+                                                    }
+                                                    else
+                                                    {
+                                                        <button type="button"
+                                                                class="sic-btn-alerta-desactivada sic-btn-reactivar-alerta"
+                                                                data-id-detenido="@Model.IDDETENIDO"
+                                                                data-id-origen="@idOrigenCapea"
+                                                                data-id-fuente="2"
+                                                                title="Clic para reactivar la alerta">
+                                                            <i class="fa fa-check-circle"></i>
+                                                            Alerta desactivada
+                                                        </button>
+                                                    }
+                                                </div>
+
+                                                <div class="sic-capea-grid">
+                                                    <div class="sic-info-label">ID Boletín</div>
+                                                    <div class="sic-info-value">@Texto(item.id_boletin_busqueda)</div>
+
+                                                    <div class="sic-info-label">Edad</div>
+                                                    <div class="sic-info-value">@Texto(item.edad)</div>
+
+                                                    <div class="sic-info-label">Sexo</div>
+                                                    <div class="sic-info-value">@Texto(item.sexo)</div>
+
+                                                    <div class="sic-info-label">Fecha nacimiento</div>
+                                                    <div class="sic-info-value">@Fecha(item.fecha_nacimiento)</div>
+
+                                                    <div class="sic-info-label">Fecha ausencia</div>
+                                                    <div class="sic-info-value">@Fecha(item.fecha_ausencia)</div>
+
+                                                    <div class="sic-info-label">Lugar ausencia</div>
+                                                    <div class="sic-info-value">@Texto(item.lugar_ausencia)</div>
+
+                                                    <div class="sic-info-label">Estatura</div>
+                                                    <div class="sic-info-value">@Texto(item.estatura)</div>
+
+                                                    <div class="sic-info-label">Peso</div>
+                                                    <div class="sic-info-value">@Texto(item.peso)</div>
+
+                                                    <div class="sic-info-label">Complexión</div>
+                                                    <div class="sic-info-value">@Texto(item.complexion)</div>
+
+                                                    <div class="sic-info-label">Color cabello</div>
+                                                    <div class="sic-info-value">@Texto(item.tipo_color_cabello)</div>
+
+                                                    <div class="sic-info-label">Color ojos</div>
+                                                    <div class="sic-info-value">@Texto(item.tipo_color_ojos)</div>
+
+                                                    <div class="sic-info-label">Señas particulares</div>
+                                                    <div class="sic-info-value">@Texto(item.senas_particulares)</div>
+
+                                                    <div class="sic-info-label">Observaciones</div>
+                                                    <div class="sic-info-value">@Texto(item.observaciones)</div>
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+                                }
+
+                            </div>
+
+
+                        </div>
+
+                    }
+                    else
+                    {
+                        <div class="sic-empty-source">
+                            <i class="fa fa-search"></i>
+                            <strong>FGEA - FEMDLP Boletín Búsqueda</strong>
+                            <span>Sin información cargada por el momento.</span>
+                        </div>
+                    }
+
+                </div>
+
+                <div class="sic-source-tab-content" id="tab-persona-interes">
+                    <div class="sic-empty-source">
+                        <i class="fa fa-user-circle"></i>
+                        <strong>FGEA - Persona Interés</strong>
+                        <span>Sin información cargada por el momento.</span>
+                    </div>
+                </div>
+
+                <div class="sic-source-tab-content" id="tab-mandamientos">
+
+                    @if (mandamientos != null && mandamientos.Rows.Count > 0)
+                    {
+                        <div class="sic-mandamientos-list">
+
+                            @foreach (System.Data.DataRow row in mandamientos.Rows)
+                            {
+                                <div class="sic-mandamiento-card">
+
+                                    <div class="sic-mandamiento-header">
+                                        <div>
+                                            <h5>@Texto(row["Nombre"])</h5>
+                                            <span>Mandamiento Judicial</span>
+                                        </div>
+
+                                        @{
+                                            int idOrigenMandamiento = Convert.ToInt32(row["IdOrigenAlerta"]);
+                                            int estatusAlertaMandamiento = ObtenerEstatusAlerta(idOrigenMandamiento, 4);
+                                        }
+
+                                        @if (estatusAlertaMandamiento == 1)
+                                        {
+                                            <button type="button"
+                                                    class="sic-btn-warning-soft sic-btn-apagar-alerta"
+                                                    data-id-detenido="@Model.IDDETENIDO"
+                                                    data-id-origen="@idOrigenMandamiento"
+                                                    data-id-fuente="4">
+                                                <i class="fa fa-bell-slash"></i>
+                                                Apagar notificación
+                                            </button>
+                                        }
+                                        else
+                                        {
+                                            <button type="button"
+                                                    class="sic-btn-alerta-desactivada sic-btn-reactivar-alerta"
+                                                    data-id-detenido="@Model.IDDETENIDO"
+                                                    data-id-origen="@idOrigenMandamiento"
+                                                    data-id-fuente="4"
+                                                    title="Clic para reactivar la alerta">
+                                                <i class="fa fa-check-circle"></i>
+                                                Alerta desactivada
+                                            </button>
+                                        }
+                                    </div>
+
+                                    <div class="sic-mandamiento-grid">
+
+                                        <div class="sic-info-label">ID</div>
+                                        <div class="sic-info-value">@Texto(row["id"])</div>
+
+                                        <div class="sic-info-label">Número control</div>
+                                        <div class="sic-info-value">@Texto(row["numero_control"])</div>
+
+                                        <div class="sic-info-label">Expediente</div>
+                                        <div class="sic-info-value">@Texto(row["numero_expediente"])</div>
+
+                                        <div class="sic-info-label">Mandamiento</div>
+                                        <div class="sic-info-value">@Texto(row["mandamiento"])</div>
+
+                                        <div class="sic-info-label">Fecha expedición</div>
+                                        <div class="sic-info-value">@Fecha(row["fecha_expedicion"])</div>
+
+                                        <div class="sic-info-label">Fecha alta</div>
+                                        <div class="sic-info-value">@Fecha(row["fecha_alta"])</div>
+
+                                    </div>
+
+                                </div>
+                            }
+
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="sic-empty-source">
+                            <i class="fa fa-gavel"></i>
+                            <strong>FGEA - Mandamientos Judiciales</strong>
+                            <span>Sin información cargada por el momento.</span>
+                        </div>
+                    }
+
+                </div>
+
+                <div class="sic-source-tab-content" id="tab-objetivos">
+                    <div class="sic-empty-source">
+                        <i class="fa fa-crosshairs"></i>
+                        <strong>FGEA - Objetivos Prioritarios</strong>
+                        <span>Sin información cargada por el momento.</span>
+                    </div>
+                </div>
+
+                <div class="sic-source-tab-content" id="tab-fgea-detenidos">
+                    <div class="sic-empty-source">
+                        <i class="fa fa-id-badge"></i>
+                        <strong>FGEA - Detenidos</strong>
+                        <span>Sin información cargada por el momento.</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="sic-card">
+            <div class="sic-card-header">
+                <h5>
+                    <i class="fa fa-user"></i>
+                    Datos del detenido en Municipio
+                </h5>
+            </div>
+
+            <div class="sic-card-body">
+
+                @if (datosDetenidoC5 != null)
+                {
+                    string detNombre = Texto(datosDetenidoC5.NOMBRE);
+                    string detPaterno = Texto(datosDetenidoC5.Ap_Paterno);
+                    string detMaterno = Texto(datosDetenidoC5.Ap_Materno);
+
+                    string detNombreCompleto = (
+                        (detNombre == "SIN INFORMACIÓN" ? "" : detNombre) + " " +
+                        (detPaterno == "SIN INFORMACIÓN" ? "" : detPaterno) + " " +
+                        (detMaterno == "SIN INFORMACIÓN" ? "" : detMaterno)
+                    ).Trim();
+
+                    if (string.IsNullOrWhiteSpace(detNombreCompleto))
+                    {
+                        detNombreCompleto = "SIN INFORMACIÓN";
+                    }
+
+                    string detAlias = Texto(datosDetenidoC5.ALIAS);
+                    string detEdad = Texto(datosDetenidoC5.EDAD);
+                    string detOriginario = Texto(datosDetenidoC5.ORIGINARIO);
+                    string detSexo = Texto(datosDetenidoC5.SEXO);
+                    string detFechaNacimiento = Fecha(datosDetenidoC5.FECHA_NACIMIENTO);
+                    string detCalle = Texto(datosDetenidoC5.CALLE);
+                    string detColonia = Texto(datosDetenidoC5.COLONIA);
+                    string detCp = Texto(datosDetenidoC5.CP);
+                    string detMunicipio = Texto(datosDetenidoC5.MUNICIPIO);
+                    string detNumExt = Texto(datosDetenidoC5.NUMEXT);
+                    string detNumInt = Texto(datosDetenidoC5.NUMINT);
+                    string detOcupacion = Texto(datosDetenidoC5.Ocupacion);
+                    string detCaracteristicas = Texto(datosDetenidoC5.CaracteristicasDetenido);
+                    string detEstado = Texto(datosDetenidoC5.Estado);
+
+                    <div class="sic-detenido-c5">
+
+                        <div class="sic-detenido-c5-head">
+                            <div class="sic-detenido-c5-icon">
+                                <i class="fa fa-user"></i>
+                            </div>
+
+                            <div>
+                                <strong>@detNombreCompleto</strong>
+                                <span>
+                                    @detSexo
+                                    @if (detEdad != "SIN INFORMACIÓN")
+                                    {
+                                        <text> · @detEdad años</text>
+                                    }
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="sic-detenido-c5-grid">
+
+                            <div class="sic-detenido-line">
+                                <label>Nombre:</label>
+                                <strong>@detNombre</strong>
+                            </div>
+
+                            <div class="sic-detenido-line">
+                                <label>Ap. paterno:</label>
+                                <strong>@detPaterno</strong>
+                            </div>
+
+                            <div class="sic-detenido-line">
+                                <label>Ap. materno:</label>
+                                <strong>@detMaterno</strong>
+                            </div>
+
+                            <div class="sic-detenido-line">
+                                <label>Alias:</label>
+                                <strong>@detAlias</strong>
+                            </div>
+
+                            <div class="sic-detenido-line">
+                                <label>Edad:</label>
+                                <strong>@detEdad</strong>
+                            </div>
+
+                            <div class="sic-detenido-line">
+                                <label>Sexo:</label>
+                                <strong>@detSexo</strong>
+                            </div>
+
+                            <div class="sic-detenido-line">
+                                <label>Fecha nac.:</label>
+                                <strong>@detFechaNacimiento</strong>
+                            </div>
+
+                            <div class="sic-detenido-line">
+                                <label>Originario:</label>
+                                <strong>@detOriginario</strong>
+                            </div>
+
+                            <div class="sic-detenido-line">
+                                <label>Ocupación:</label>
+                                <strong>@detOcupacion</strong>
+                            </div>
+
+                            <div class="sic-detenido-line">
+                                <label>Estado:</label>
+                                <strong>@detEstado</strong>
+                            </div>
+
+                            <div class="sic-detenido-line">
+                                <label>Calle:</label>
+                                <strong>@detCalle</strong>
+                            </div>
+
+                            <div class="sic-detenido-line">
+                                <label>Colonia:</label>
+                                <strong>@detColonia</strong>
+                            </div>
+
+                            <div class="sic-detenido-line">
+                                <label>Núm. ext.:</label>
+                                <strong>@detNumExt</strong>
+                            </div>
+
+                            <div class="sic-detenido-line">
+                                <label>Núm. int.:</label>
+                                <strong>@detNumInt</strong>
+                            </div>
+
+                            <div class="sic-detenido-line">
+                                <label>C.P.:</label>
+                                <strong>@detCp</strong>
+                            </div>
+
+                            <div class="sic-detenido-line">
+                                <label>Municipio:</label>
+                                <strong>@detMunicipio</strong>
+                            </div>
+
+                        </div>
+
+                        <div class="sic-detenido-c5-extra">
+                            <label>Características:</label>
+                            <strong>@detCaracteristicas</strong>
+                        </div>
+
+                    </div>
+                }
+                else
+                {
+                    <div class="sic-empty-source">
+                        <i class="fa fa-user"></i>
+                        <strong>Datos del detenido en Municipio</strong>
+                        <span>Sin información cargada por el momento.</span>
+                    </div>
+                }
+
+            </div>
+        </div>
+    </div>  
+    <div class="sic-section-grid">
+
+        <div class="sic-card">
+            <div class="sic-card-header">
+                <h5>
+                    <i class="fa fa-car"></i>
+                    Información de detención en Municipio
+                </h5>
+            </div>
+
+            <div class="sic-card-body">
+
+                @if (detencionC5 != null)
+                {
+                    string detConsecutivo = TextoDetencion(detencionC5.CONSECUTIVO);
+                    string detFecha = FechaHoraDetencion(detencionC5.FECHA_DETENCION);
+                    string detCalle = TextoDetencion(detencionC5.CALLE);
+                    string detColonia = TextoDetencion(detencionC5.COLONIA);
+                    string detCp = TextoDetencion(detencionC5.CP);
+                    string detMunicipio = TextoDetencion(detencionC5.MUNICIPIO);
+                    string detNumExt = TextoDetencion(detencionC5.NUMEXT);
+                    string detNumInt = TextoDetencion(detencionC5.NUMINT);
+                    string detLatitud = TextoDetencion(detencionC5.Latitud);
+                    string detLongitud = TextoDetencion(detencionC5.Longitud);
+
+                    <div class="sic-detencion-compact">
+
+                        <div class="sic-detencion-compact-head">
+                            <div class="sic-detencion-compact-icon">
+                                <i class="fa fa-map-marker"></i>
+                            </div>
+
+                            <div class="sic-detencion-compact-title">
+                                <strong>@detMunicipio</strong>
+                                <span>
+                                    @detCalle
+                                    @if (detNumExt != "SIN INFORMACIÓN")
+                                    {
+                                        <text> #@detNumExt</text>
+                                    }
+                                    @if (detNumInt != "SIN INFORMACIÓN")
+                                    {
+                                        <text> Int. @detNumInt</text>
+                                    }
+                                    , Col. @detColonia, C.P. @detCp
+                                </span>
+                            </div>
+
+                            @if (detLatitud != "SIN INFORMACIÓN" && detLongitud != "SIN INFORMACIÓN")
+                            {
+                                <a class="sic-small-btn sic-detencion-map-btn"
+                                   href="https://www.google.com/maps?q=@detLatitud,@detLongitud"
+                                   target="_blank">
+                                    <i class="fa fa-map"></i>
+                                    Ubicación
+                                </a>
+                            }
+                        </div>
+
+                        <div class="sic-detencion-compact-grid">
+
+                            <div class="sic-detencion-line">
+                                <label>Consecutivo:</label>
+                                <strong>@detConsecutivo</strong>
+                            </div>
+
+                            <div class="sic-detencion-line">
+                                <label>Fecha detención:</label>
+                                <strong>@detFecha</strong>
+                            </div>
+
+                            <div class="sic-detencion-line">
+                                <label>Calle:</label>
+                                <strong>@detCalle</strong>
+                            </div>
+
+                            <div class="sic-detencion-line">
+                                <label>Colonia:</label>
+                                <strong>@detColonia</strong>
+                            </div>
+
+                            <div class="sic-detencion-line">
+                                <label>Núm. exterior:</label>
+                                <strong>@detNumExt</strong>
+                            </div>
+
+                            <div class="sic-detencion-line">
+                                <label>Núm. interior:</label>
+                                <strong>@detNumInt</strong>
+                            </div>
+
+                            <div class="sic-detencion-line">
+                                <label>Código postal:</label>
+                                <strong>@detCp</strong>
+                            </div>
+
+                            <div class="sic-detencion-line">
+                                <label>Municipio:</label>
+                                <strong>@detMunicipio</strong>
+                            </div>
+
+                            <div class="sic-detencion-line">
+                                <label>Latitud:</label>
+                                <strong>@detLatitud</strong>
+                            </div>
+
+                            <div class="sic-detencion-line">
+                                <label>Longitud:</label>
+                                <strong>@detLongitud</strong>
+                            </div>
+
+                        </div>
+
+                    </div>
+                }
+                else
+                {
+                    <div class="sic-empty-source">
+                        <i class="fa fa-car"></i>
+                        <strong>Información de detención C5</strong>
+                        <span>Sin información cargada por el momento.</span>
+                    </div>
+                }
+
+            </div>
+        </div>
+
+        <div class="sic-card">
+            <div class="sic-card-header">
+                <h5>
+                    <i class="fa fa-map-marker"></i>
+                    Ubicación de detención
+                </h5>
+            </div>
+
+            <div class="sic-card-body">
+
+                @if (tieneCoordenadasMapa)
+                {
+                    <div class="sic-map-card">
+
+                        <div class="sic-map-info">
+                            <div>
+                                <label>Latitud:</label>
+                                <strong>@mapaLatitud</strong>
+                            </div>
+
+                            <div>
+                                <label>Longitud:</label>
+                                <strong>@mapaLongitud</strong>
+                            </div>
+
+                            <a class="sic-small-btn"
+                               href="https://www.google.com/maps?q=@mapaLatitud,@mapaLongitud"
+                               target="_blank">
+                                <i class="fa fa-map"></i>
+                                Abrir en Google Maps
+                            </a>
+                        </div>
+
+                        <div class="sic-map-frame">
+                            <iframe src="https://maps.google.com/maps?q=@mapaLatitud,@mapaLongitud&z=16&output=embed"
+                                    width="100%"
+                                    height="100%"
+                                    style="border:0;"
+                                    allowfullscreen=""
+                                    loading="lazy">
+                            </iframe>
+                        </div>
+
+                    </div>
+                }
+                else
+                {
+                    <div class="sic-empty-source">
+                        <i class="fa fa-map-marker"></i>
+                        <strong>Ubicación de detención</strong>
+                        <span>Sin coordenadas registradas por el momento.</span>
+                    </div>
+                }
+
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+    <div class="sic-card">
+        <div class="sic-card-header">
+            <h5>
+                <i class="fa fa-picture-o"></i>
+                Biométricos y multimedia
+            </h5>
+        </div>
+
+        <div class="sic-card-body">
+            <div class="sic-media-grid">
+                <div class="sic-media-box sic-gallery-box">
+
+                    <div class="sic-gallery-header">
+                        <div>
+                            <strong>Galería de fotos en Municipio</strong>
+                            <span>@fotosC5.Count foto(s) registrada(s)</span>
+                        </div>
+                    </div>
+
+                    @if (fotosC5.Count > 0)
+                    {
+                        <div class="sic-gallery-grid">
+                            @foreach (var foto in fotosC5)
+                            {
+                                <div class="sic-gallery-item">
+                                    <img src="@Url.Action("FotoGaleriaC5", "SIC", new { idFoto = foto.IDFOTO })"
+                                         alt="@Texto(foto.TIPO)"
+                                         onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=&quot;fa fa-picture-o&quot;></i>';" />
+
+                                    <div class="sic-gallery-caption">
+                                        <span>@Texto(foto.TIPO)</span>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="sic-empty-source">
+                            <i class="fa fa-picture-o"></i>
+                            <strong>Galería de fotos en Municipio</strong>
+                            <span>Sin fotos registradas por el momento.</span>
+                        </div>
+                    }
+
+                </div>
+
+                <div class="sic-media-box sic-gallery-box">
+
+                    <div class="sic-gallery-header">
+                        <div>
+                            <strong>Huellas en Municipio</strong>
+                            <span>@huellasC5.Count huella(s) registrada(s)</span>
+                        </div>
+                    </div>
+
+                    @if (huellasC5.Count > 0)
+                    {
+                        <div class="sic-gallery-grid">
+                            @foreach (var huella in huellasC5)
+                            {
+                                <div class="sic-gallery-item">
+                                    <img src="@Url.Action("HuellaGaleriaC5", "SIC", new { idHuella = huella.IdHuella })"
+                                         alt="Huella en Municipio"
+                                         onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=&quot;fa fa-hand-paper-o&quot;></i>';" />
+
+                                    <div class="sic-gallery-caption">
+                                        <span>Huella @huella.IdHuella</span>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="sic-empty-source">
+                            <i class="fa fa-hand-paper-o"></i>
+                            <strong>Huellas en Municipio</strong>
+                            <span>Sin huellas registradas por el momento.</span>
+                        </div>
+                    }
+
+                </div>
+
+                <div class="sic-media-box sic-gallery-box">
+
+                    <div class="sic-gallery-header">
+                        <div>
+                            <strong>Rasgos en Municipio</strong>
+                            <span>@rasgosC5.Count rasgo(s) registrado(s)</span>
+                        </div>
+                    </div>
+
+                    @if (rasgosC5.Count > 0)
+                    {
+                        <div class="sic-gallery-grid">
+                            @foreach (var rasgo in rasgosC5)
+                            {
+                                <div class="sic-gallery-item">
+                                    <img src="@Url.Action("FotoGaleriaC5", "SIC", new { idFoto = rasgo.IDFOTO })"
+                                         alt="@Texto(rasgo.TIPO)"
+                                         onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=&quot;fa fa-picture-o&quot;></i>';" />
+
+                                    <div class="sic-gallery-caption">
+                                        <span>@Texto(rasgo.TIPO)</span>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="sic-empty-source">
+                            <i class="fa fa-picture-o"></i>
+                            <strong>Rasgos en Municipio</strong>
+                            <span>Sin rasgos registrados por el momento.</span>
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+    <script>
+    $(document).ready(function () {
+        var titulo = $('.pagetitle h1').first();
+
+        if (titulo.length === 0) {
+            return;
+        }
+
+        var contenedorTitulo = titulo.closest('.pagetitle');
+
+        if (contenedorTitulo.length === 0) {
+            return;
+        }
+
+        contenedorTitulo.css({
+            'display': 'flex',
+            'align-items': 'center',
+            'justify-content': 'space-between',
+            'gap': '12px'
+        });
+
+        titulo.css({
+            'margin': '0'
+        });
+
+        if (contenedorTitulo.find('.sic-page-title-actions').length > 0) {
+            return;
+        }
+
+        contenedorTitulo.append(`
+            <div class="sic-page-title-actions">
+                <a href="@Url.Action("Index", "SIC")" class="sic-btn-light">
+                    <i class="fa fa-arrow-left"></i>
+                    Volver
+                </a>
+
+                <button type="button" class="sic-btn-warning-soft">
+                    <i class="fa fa-bell-slash"></i>
+                    Apagar notificación
+                </button>
+            </div>
+        `);
+    });
+
+    $(document).on('click', '.sic-source-tab', function () {
+        var tabId = $(this).data('tab');
+
+        $('.sic-source-tab').removeClass('active');
+        $(this).addClass('active');
+
+        $('.sic-source-tab-content').removeClass('active');
+        $('#' + tabId).addClass('active');
+    });
+
+    $(document).on('click', '.sic-capea-next, .sic-capea-prev', function (e) {
+        e.preventDefault();
+
+        var carousel = $(this).closest('.sic-capea-carousel');
+        var slides = carousel.find('.sic-capea-slide');
+        var total = slides.length;
+
+        if (total <= 1) {
+            return;
+        }
+
+        var active = slides.filter('.active');
+        var index = active.index();
+
+        if ($(this).hasClass('sic-capea-next')) {
+            index++;
+        } else {
+            index--;
+        }
+
+        if (index >= total) {
+            index = 0;
+        }
+
+        if (index < 0) {
+            index = total - 1;
+        }
+
+        slides.removeClass('active');
+        slides.eq(index).addClass('active');
+
+        carousel.find('.sic-capea-current').text(index + 1);
+    });
+
+
+    $(document).on('click', '.sic-btn-apagar-alerta', function () {
+        var boton = $(this);
+
+        var idDetenido = boton.data('id-detenido');
+        var idOrigen = boton.data('id-origen');
+        var idFuente = boton.data('id-fuente');
+
+        if (!confirm('¿Seguro que deseas apagar esta notificación?')) {
+            return;
+        }
+
+        boton.prop('disabled', true);
+        boton.html('<i class="fa fa-spinner fa-spin"></i> Apagando...');
+
+        var idDetenido = boton.data('id-detenido');
+        var idOrigen = boton.data('id-origen');
+        var idFuente = boton.data('id-fuente');
+
+        console.log('Mandando:', {
+            idDetenido: idDetenido,
+            idOrigen: idOrigen,
+            idFuente: idFuente
+        });
+
+        if (!idDetenido || !idOrigen || !idFuente) {
+            alert('Faltan datos para apagar la notificación. Revisa data-id-detenido, data-id-origen o data-id-fuente.');
+            return;
+        }
+
+        $.ajax({
+            url: '@Url.Action("ApagarNotificacion", "SIC")',
+            type: 'POST',
+            data: {
+                idDetenido: idDetenido,
+                idOrigen: idOrigen,
+                idFuente: idFuente
+            },
+            success: function (resp) {
+                if (resp.success) {
+                    boton.removeClass('sic-btn-warning-soft sic-btn-apagar-alerta');
+                    boton.addClass('sic-btn-alerta-desactivada');
+                    boton.html('<i class="fa fa-check-circle"></i> Alerta desactivada');
+                    boton.prop('disabled', true);
+                    actualizarContadoresAlertas(-1, 1);
+                } else {
+                    alert(resp.message);
+
+                    boton.prop('disabled', false);
+                    boton.html('<i class="fa fa-bell-slash"></i> Apagar notificación');
+                }
+            },
+            error: function (xhr) {
+                console.log(xhr.responseText);
+                alert('Error del servidor. Revisa la consola.');
+
+                boton.prop('disabled', false);
+                boton.html('<i class="fa fa-bell-slash"></i> Apagar notificación');
+            }
+        });
+    });
+
+
+    $(document).on('click', '.sic-btn-reactivar-alerta', function () {
+    var boton = $(this);
+
+    var idDetenido = boton.data('id-detenido');
+    var idOrigen = boton.data('id-origen');
+    var idFuente = boton.data('id-fuente');
+
+    if (!confirm('¿Seguro que deseas reactivar esta notificación?')) {
+        return;
+    }
+
+    boton.prop('disabled', true);
+    boton.html('<i class="fa fa-spinner fa-spin"></i> Alerta desactivada');
+
+    $.ajax({
+        url: '@Url.Action("ReactivarNotificacion", "SIC")',
+        type: 'POST',
+        data: {
+            idDetenido: idDetenido,
+            idOrigen: idOrigen,
+            idFuente: idFuente
+        },
+        success: function (resp) {
+            if (resp.success) {
+                boton.removeClass('sic-btn-alerta-desactivada sic-btn-reactivar-alerta');
+                boton.addClass('sic-btn-warning-soft sic-btn-apagar-alerta');
+
+                boton.html('<i class="fa fa-bell-slash"></i> Apagar notificación');
+                boton.prop('disabled', false);
+
+                actualizarContadoresAlertas(1, -1);
+            } else {
+                alert(resp.message);
+
+                boton.prop('disabled', false);
+                boton.html('<i class="fa fa-check-circle"></i> Alerta desactivada');
+            }
+        },
+        error: function (xhr) {
+            console.log(xhr.responseText);
+            alert('Error del servidor. Revisa la consola.');
+
+            boton.prop('disabled', false);
+            boton.html('<i class="fa fa-check-circle"></i> Alerta desactivada');
+        }
+    });
+    });
+
+        function actualizarContadoresAlertas(cambioActivas, cambioRevisadas) {
+            var activas = parseInt($('#contadorAlertasActivas').text()) || 0;
+            var revisadas = parseInt($('#contadorAlertasRevisadas').text()) || 0;
+
+            activas = activas + cambioActivas;
+            revisadas = revisadas + cambioRevisadas;
+
+            if (activas < 0) {
+                activas = 0;
+            }
+
+            if (revisadas < 0) {
+                revisadas = 0;
+            }
+
+            $('#contadorAlertasActivas').text(activas);
+            $('#contadorAlertasRevisadas').text(revisadas);
+            $('#pillAlertasActivas').text(activas);
+        }
+
+    </script>

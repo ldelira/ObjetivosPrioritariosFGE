@@ -155,6 +155,7 @@
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="ControllersServices\FiliacionMunicipalService.cs" />
     <Compile Include="ControllersServices\MapaRelacionesService.cs" />
     <Compile Include="ControllersServices\BaseService.cs" />
     <Compile Include="ControllersServices\AsuntoService.cs" />
@@ -171,11 +172,15 @@
     <Compile Include="Controllers\LoginController.cs" />
     <Compile Include="Controllers\MapaRelacionesController.cs" />
     <Compile Include="Controllers\ObjetivoController.cs" />
+    <Compile Include="Controllers\SICController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\Calles.cs">
       <DependentUpon>Catalogos.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Capea_boletin_busqueda.cs">
+      <DependentUpon>FiscaliaWeb.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Catalogos.Context.cs">
       <AutoGen>True</AutoGen>
@@ -192,11 +197,20 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Catalogos.edmx</DependentUpon>
     </Compile>
+    <Compile Include="Models\catalogo_estado_proceso.cs">
+      <DependentUpon>Mandamientos.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\cat_EstatusAsunto.cs">
       <DependentUpon>ObjetivosPrioritarios.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\cat_EstatusProceso.cs">
       <DependentUpon>ObjetivosPrioritarios.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Cat_Faltas.cs">
+      <DependentUpon>SIC.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\CAT_Municipio.cs">
+      <DependentUpon>SIC.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\cat_Nivel_Organizacion.cs">
       <DependentUpon>ObjetivosPrioritarios.tt</DependentUpon>
@@ -204,14 +218,29 @@
     <Compile Include="Models\cat_RolParticipacionAsunto.cs">
       <DependentUpon>ObjetivosPrioritarios.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\cat_TbFuente.cs">
+      <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\cat_TipoActividadDelictiva.cs">
       <DependentUpon>ObjetivosPrioritarios.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\cat_TipoAgrupacion.cs">
       <DependentUpon>ObjetivosPrioritarios.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\cat_TipoAlerta.cs">
+      <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\Colonia.cs">
       <DependentUpon>Catalogos.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\delitos_mandamiento.cs">
+      <DependentUpon>Mandamientos.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\DETENCION.cs">
+      <DependentUpon>SIC.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\DETENIDO.cs">
+      <DependentUpon>SIC.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Estado.cs">
       <DependentUpon>Catalogos.tt</DependentUpon>
@@ -233,6 +262,39 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Filiacion.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="Models\FiliacionMunicipal.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>FiliacionMunicipal.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\FiliacionMunicipal.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\FiliacionMunicipal.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>FiliacionMunicipal.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="Models\FiscaliaWeb.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>FiscaliaWeb.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\FiscaliaWeb.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>FiscaliaWeb.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\FiscaliaWeb.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>FiscaliaWeb.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="Models\FOTO.cs">
+      <DependentUpon>SIC.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\getInfoObjetivoListById_Result.cs">
       <DependentUpon>ObjetivosPrioritarios.tt</DependentUpon>
@@ -261,6 +323,9 @@
     <Compile Include="Models\getNamePhotoList_Result.cs">
       <DependentUpon>ObjetivosPrioritarios.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\Huella.cs">
+      <DependentUpon>SIC.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\Mandamientos.Context.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -276,8 +341,14 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Mandamientos.edmx</DependentUpon>
     </Compile>
+    <Compile Include="Models\mandamiento_judicial.cs">
+      <DependentUpon>Mandamientos.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\Municipio.cs">
       <DependentUpon>Catalogos.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\nombres_mandamiento.cs">
+      <DependentUpon>Mandamientos.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Nom_perso.cs">
       <DependentUpon>Filiacion.tt</DependentUpon>
@@ -300,6 +371,21 @@
     <Compile Include="Models\Persona.cs">
       <DependentUpon>Filiacion.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\SIC.Context1.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SIC.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\SIC.Designer.cs">
+      <DependentUpon>SIC.edmx</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="Models\SIC1.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SIC.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\SIPJ.Context.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -314,6 +400,12 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>SIPJ.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="Models\sp_Alertas_Result.cs">
+      <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\sp_BuscarDetenido_Result.cs">
+      <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Sp_ObjPri_getCarpetasList_Result.cs">
       <DependentUpon>SIPJ.tt</DependentUpon>
@@ -339,6 +431,9 @@
     <Compile Include="Models\tb_AlbumFichaObjetivoDetalle.cs">
       <DependentUpon>ObjetivosPrioritarios.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\tb_Alerta.cs">
+      <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\tb_AliasObjetivo.cs">
       <DependentUpon>ObjetivosPrioritarios.tt</DependentUpon>
     </Compile>
@@ -351,11 +446,17 @@
     <Compile Include="Models\tb_CarpetasObjetivo.cs">
       <DependentUpon>ObjetivosPrioritarios.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\tb_DETENCION_C5.cs">
+      <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\tb_Detenido.cs">
       <DependentUpon>ObjetivosPrioritarios.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\tb_Detenidos_DelitoIngreso.cs">
       <DependentUpon>ObjetivosPrioritarios.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\tb_DETENIDO_C5.cs">
+      <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\tb_FichaAsunto.cs">
       <DependentUpon>ObjetivosPrioritarios.tt</DependentUpon>
@@ -363,11 +464,17 @@
     <Compile Include="Models\tb_FichaObjetivo.cs">
       <DependentUpon>ObjetivosPrioritarios.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\tb_FOTO_C5.cs">
+      <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\tb_GrupoTipoActividadDelictiva.cs">
       <DependentUpon>ObjetivosPrioritarios.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\tb_Grupo_Delictivo.cs">
       <DependentUpon>ObjetivosPrioritarios.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\tb_HUELLA_C5.cs">
+      <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\tb_InformacionObjetivo.cs">
       <DependentUpon>ObjetivosPrioritarios.tt</DependentUpon>
@@ -383,6 +490,9 @@
     </Compile>
     <Compile Include="Models\tb_OrdenAprehension.cs">
       <DependentUpon>ObjetivosPrioritarios.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\tb_PersonaBusqueda.cs">
+      <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\tb_Usuarios.cs">
       <DependentUpon>ObjetivosPrioritarios.tt</DependentUpon>
@@ -2628,6 +2738,26 @@
       <DependentUpon>Filiacion.edmx</DependentUpon>
       <LastGenOutput>Filiacion.cs</LastGenOutput>
     </Content>
+    <Content Include="Models\FiliacionMunicipal.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>FiliacionMunicipal.edmx</DependentUpon>
+      <LastGenOutput>FiliacionMunicipal.Context.cs</LastGenOutput>
+    </Content>
+    <Content Include="Models\FiliacionMunicipal.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>FiliacionMunicipal.edmx</DependentUpon>
+      <LastGenOutput>FiliacionMunicipal.cs</LastGenOutput>
+    </Content>
+    <Content Include="Models\FiscaliaWeb.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>FiscaliaWeb.edmx</DependentUpon>
+      <LastGenOutput>FiscaliaWeb.Context.cs</LastGenOutput>
+    </Content>
+    <Content Include="Models\FiscaliaWeb.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>FiscaliaWeb.edmx</DependentUpon>
+      <LastGenOutput>FiscaliaWeb.cs</LastGenOutput>
+    </Content>
     <Content Include="Models\Mandamientos.Context.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <DependentUpon>Mandamientos.edmx</DependentUpon>
@@ -2647,6 +2777,14 @@
       <Generator>TextTemplatingFileGenerator</Generator>
       <DependentUpon>ObjetivosPrioritarios.edmx</DependentUpon>
       <LastGenOutput>ObjetivosPrioritarios.cs</LastGenOutput>
+    </Content>
+    <Content Include="Models\SIC.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>SIC.Context1.cs</LastGenOutput>
+    </Content>
+    <Content Include="Models\SIC.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>SIC1.cs</LastGenOutput>
     </Content>
     <Content Include="Models\SIPJ.Context.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
@@ -3014,6 +3152,27 @@
     <Content Include="Plantillas\plantilla_base.pptx" />
     <Content Include="Salidas\informe_detenidos.pptx" />
     <Content Include="Plantillas\plantilla_base_vicefiscalia.pptx" />
+    <EntityDeploy Include="Models\SIC.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>SIC.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <Content Include="Models\SIC.edmx.diagram">
+      <DependentUpon>SIC.edmx</DependentUpon>
+    </Content>
+    <EntityDeploy Include="Models\FiliacionMunicipal.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>FiliacionMunicipal.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <Content Include="Models\FiliacionMunicipal.edmx.diagram">
+      <DependentUpon>FiliacionMunicipal.edmx</DependentUpon>
+    </Content>
+    <EntityDeploy Include="Models\FiscaliaWeb.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>FiscaliaWeb.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <Content Include="Models\FiscaliaWeb.edmx.diagram">
+      <DependentUpon>FiscaliaWeb.edmx</DependentUpon>
+    </Content>
     <None Include="Scripts\jquery-3.4.1.intellisense.js" />
     <Content Include="Scripts\DataTables\autoFill.bootstrap.js" />
     <Content Include="Scripts\DataTables\autoFill.bootstrap.min.js" />
@@ -3259,6 +3418,8 @@
     <Content Include="Views\Asuntos\AsuntosRelacionados\AsuntosObjetivoListPartial.cshtml" />
     <Content Include="Views\Shared\_Layout - BACKUP.cshtml" />
     <Content Include="Views\MapaRelaciones\Index.cshtml" />
+    <Content Include="Views\SIC\Index.cshtml" />
+    <Content Include="Views\SIC\DetalleDetenidoC5.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

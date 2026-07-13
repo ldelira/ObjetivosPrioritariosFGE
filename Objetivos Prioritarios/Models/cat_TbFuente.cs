@@ -17,6 +17,7 @@ namespace Objetivos_Prioritarios.Models
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public cat_TbFuente()
         {
+            this.tb_PersonaBusqueda = new HashSet<tb_PersonaBusqueda>();
             this.tb_Alerta = new HashSet<tb_Alerta>();
         }
     
@@ -24,6 +25,8 @@ namespace Objetivos_Prioritarios.Models
         public string Fuente { get; set; }
         public Nullable<bool> Activo { get; set; }
     
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<tb_PersonaBusqueda> tb_PersonaBusqueda { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<tb_Alerta> tb_Alerta { get; set; }
     }

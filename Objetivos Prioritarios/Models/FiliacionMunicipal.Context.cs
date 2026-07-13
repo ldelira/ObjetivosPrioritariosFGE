@@ -12,6 +12,8 @@ namespace Objetivos_Prioritarios.Models
     using System;
     using System.Data.Entity;
     using System.Data.Entity.Infrastructure;
+    using System.Data.Entity.Core.Objects;
+    using System.Linq;
     
     public partial class Filiacion_MunicipiosEntities : DbContext
     {
@@ -28,5 +30,24 @@ namespace Objetivos_Prioritarios.Models
         public virtual DbSet<cat_TbFuente> cat_TbFuente { get; set; }
         public virtual DbSet<cat_TipoAlerta> cat_TipoAlerta { get; set; }
         public virtual DbSet<tb_Alerta> tb_Alerta { get; set; }
+        public virtual DbSet<tb_DETENCION_C5> tb_DETENCION_C5 { get; set; }
+        public virtual DbSet<tb_DETENIDO_C5> tb_DETENIDO_C5 { get; set; }
+        public virtual DbSet<tb_FOTO_C5> tb_FOTO_C5 { get; set; }
+        public virtual DbSet<tb_HUELLA_C5> tb_HUELLA_C5 { get; set; }
+        public virtual DbSet<tb_PersonaBusqueda> tb_PersonaBusqueda { get; set; }
+    
+        public virtual ObjectResult<sp_Alertas_Result> sp_Alertas()
+        {
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<sp_Alertas_Result>("sp_Alertas");
+        }
+    
+        public virtual ObjectResult<sp_BuscarDetenido_Result> sp_BuscarDetenido(Nullable<int> iDDETENIDO)
+        {
+            var iDDETENIDOParameter = iDDETENIDO.HasValue ?
+                new ObjectParameter("IDDETENIDO", iDDETENIDO) :
+                new ObjectParameter("IDDETENIDO", typeof(int));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<sp_BuscarDetenido_Result>("sp_BuscarDetenido", iDDETENIDOParameter);
+        }
     }
 }

@@ -190,13 +190,21 @@ namespace Objetivos_Prioritarios.Controllers
         {
             var objetivosAlias = ObjetivoService.getAliasObjetivoList(active, int_id_objetivo);
 
-            var objetivosAliasList = objetivosAlias.Select(u => new
+            if (objetivosAlias[0].nvarchar_alias != "No hay alias asignados")
             {
-                id_alias = u.int_id_alias,
-                alias = u.nvarchar_alias
-            }).ToList();
 
-            return Json(objetivosAliasList, JsonRequestBehavior.AllowGet);
+                var objetivosAliasList = objetivosAlias.Select(u => new
+                {
+                    id_alias = u.int_id_alias,
+                    alias = u.nvarchar_alias
+                }).ToList();
+
+                return Json(objetivosAliasList, JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                return Json(new List<tb_AliasObjetivo>(), JsonRequestBehavior.AllowGet);
+            }
         }
 
         public PartialViewResult AddObjetivoAliasPartial()
@@ -398,7 +406,7 @@ namespace Objetivos_Prioritarios.Controllers
             return Json(gruposDisponibles, JsonRequestBehavior.AllowGet);
         }
 
-        public JsonResult GetGrupoDelictivoNotinObjetivoListEdit(int int_id_objetivo, int int_grupo_actual)
+        public JsonResult GetGrupoDelictivoNotinObjetivoListEdit(int? int_id_objetivo, int? int_grupo_actual)
         {
 
             // 1. Grupos que ya están asignados al objetivo
@@ -411,6 +419,12 @@ namespace Objetivos_Prioritarios.Controllers
             var gruposDisponibles = ObjetivoService.db.tb_Grupo_Delictivo
                 .Where(g => g.bit_estatus == true &&
                            (!gruposAsignados.Contains(g.int_id_grupo) || g.int_id_grupo == int_grupo_actual))
+                .Select(x=> new
+                {
+                    x.int_id_grupo,
+                    x.nvarchar_alias,
+                    x.nvarchar_grupo
+                })
                 .ToList();
 
 

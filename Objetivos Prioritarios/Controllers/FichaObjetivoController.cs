@@ -132,9 +132,10 @@ namespace Objetivos_Prioritarios.Controllers
 
 
             ViewBag.CountNombres = ObjetivoService.getNombreObetivoList(true, idObjetivo).Count();
-            ViewBag.CountAlias = ObjetivoService.getAliasObjetivoList(true, idObjetivo).Count();
+            var aliasContador = ObjetivoService.getAliasObjetivoList(true, idObjetivo);
+            ViewBag.CountAlias = aliasContador.Count()==1?( aliasContador[0].nvarchar_alias== "No hay alias asignados"?0:aliasContador.Count):alias.Count;
             ViewBag.CountDomicilios = ObjetivoService.getDomicilioObjetivoList(true, idObjetivo).Count();
-            ViewBag.CountGrupos = ObjetivoService.GetGruposDelictivosObjetivo(idObjetivo).Count();
+            ViewBag.CountGrupos = ObjetivoService.GetObjetivoGrupoList(true,idObjetivo).Count();
 
             ViewBag.CountCarpetas = FichaObjetivoService.GetCarpetasList(true, idObjetivo).Count();
             ViewBag.CountOrdenes = FichaObjetivoService.GetOrdenesList(true, idObjetivo).Count();

@@ -3,6 +3,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Web.Mvc;
+using Objetivos_Prioritarios.Helpers;
 
 namespace Objetivos_Prioritarios.Controllers
 {
@@ -140,7 +141,6 @@ namespace Objetivos_Prioritarios.Controllers
             }
 
             string rutaFotoBD = "";
-
             var propiedadFoto = detenido.GetType().GetProperty("Foto");
 
             if (propiedadFoto != null)
@@ -162,33 +162,129 @@ namespace Objetivos_Prioritarios.Controllers
                 .Replace("/", "\\");
 
             string rutaCompleta = Path.Combine(RutaBaseFotosC5, rutaFotoBD);
+            string extension = Path.GetExtension(rutaCompleta).ToLower();
+            string contentType = ObtenerContentType(extension);
 
-            if (!System.IO.File.Exists(rutaCompleta))
+            try
+            {
+                byte[] fileBytes;
+                // Se abre la conexión con credenciales
+                using (new NetworkConnection(RutaBaseFotosC5, @"10.13.1.232\Fiscalia1", "A1b2c3d4"))
+                {
+                    if (!System.IO.File.Exists(rutaCompleta))
+                    {
+                        return HttpNotFound();
+                    }
+                    // Se lee el archivo mientras la conexión está activa
+                    fileBytes = System.IO.File.ReadAllBytes(rutaCompleta);
+                }
+
+                return File(fileBytes, contentType);
+            }
+            catch (Exception)
+            {
+                return HttpNotFound("Error al acceder al servidor de imágenes C5.");
+            }
+        }
+
+
+        public ActionResult FotoGaleriaC5(int idFoto)
+        {
+            var foto = _filiacionService.GetFotoC5PorId(idFoto);
+
+            if (foto == null)
             {
                 return HttpNotFound();
             }
 
+            string rutaFotoBD = foto.FOTO;
+
+            if (string.IsNullOrWhiteSpace(rutaFotoBD))
+            {
+                return HttpNotFound();
+            }
+
+            rutaFotoBD = rutaFotoBD
+                .Trim()
+                .Trim('"')
+                .Trim()
+                .TrimStart('/', '\\')
+                .Replace("/", "\\");
+
+            string rutaCompleta = Path.Combine(RutaBaseFotosC5, rutaFotoBD);
             string extension = Path.GetExtension(rutaCompleta).ToLower();
-            string contentType = "image/jpeg";
+            string contentType = ObtenerContentType(extension);
 
-            if (extension == ".png")
+            try
             {
-                contentType = "image/png";
+                byte[] fileBytes;
+                // Se abre la conexión con credenciales
+                using (new NetworkConnection(RutaBaseFotosC5, @"10.13.1.232\Fiscalia1", "A1b2c3d4"))
+                {
+                    if (!System.IO.File.Exists(rutaCompleta))
+                    {
+                        return HttpNotFound();
+                    }
+                    // Se lee el archivo mientras la conexión está activa
+                    fileBytes = System.IO.File.ReadAllBytes(rutaCompleta);
+                }
+
+                return File(fileBytes, contentType);
             }
-            else if (extension == ".gif")
+            catch (Exception)
             {
-                contentType = "image/gif";
+                return HttpNotFound("Error al acceder al servidor de imágenes C5.");
             }
-            else if (extension == ".bmp")
+        }
+
+
+        public ActionResult HuellaGaleriaC5(int idHuella)
+        {
+            var huella = _filiacionService.GetHuellaC5PorId(idHuella);
+
+            if (huella == null)
             {
-                contentType = "image/bmp";
-            }
-            else if (extension == ".webp")
-            {
-                contentType = "image/webp";
+                return HttpNotFound();
             }
 
-            return File(rutaCompleta, contentType);
+            string rutaHuellaBD = huella.Huellas;
+
+            if (string.IsNullOrWhiteSpace(rutaHuellaBD))
+            {
+                return HttpNotFound();
+            }
+
+            rutaHuellaBD = rutaHuellaBD
+                .Trim()
+                .Trim('"')
+                .Trim()
+                .TrimStart('/', '\\')
+                .Replace("/", "\\");
+
+            string rutaCompleta = Path.Combine(RutaBaseFotosC5, rutaHuellaBD);
+            string extension = Path.GetExtension(rutaCompleta).ToLower();
+            string contentType = ObtenerContentType(extension);
+
+            try
+            {
+                byte[] fileBytes;
+                // Se abre la conexión con credenciales
+                using (new NetworkConnection(RutaBaseFotosC5, @"10.13.1.232\Fiscalia1", "A1b2c3d4"))
+                {
+                    if (!System.IO.File.Exists(rutaCompleta))
+                    {
+                        return HttpNotFound();
+                    }
+                    // Se lee el archivo mientras la conexión está activa
+                    fileBytes = System.IO.File.ReadAllBytes(rutaCompleta);
+                }
+
+                return File(fileBytes, contentType);
+            }
+            catch (Exception)
+            {
+                return HttpNotFound("Error al acceder al servidor de imágenes C5.");
+            }
         }
 
         [HttpPost]
@@ -217,113 +313,17 @@ namespace Objetivos_Prioritarios.Controllers
             }
         }
 
-        public ActionResult FotoGaleriaC5(int idFoto)
+        private string ObtenerContentType(string extension)
         {
-            var foto = _filiacionService.GetFotoC5PorId(idFoto);
-
-            if (foto == null)
+            switch (extension)
             {
-                return HttpNotFound();
+                case ".png": return "image/png";
+                case ".gif": return "image/gif";
+                case ".bmp": return "image/bmp";
+                case ".webp": return "image/webp";
+                default: return "image/jpeg";
             }
-
-            string rutaFotoBD = foto.FOTO;
-
-            if (string.IsNullOrWhiteSpace(rutaFotoBD))
-            {
-                return HttpNotFound();
-            }
-
-            rutaFotoBD = rutaFotoBD
-                .Trim()
-                .Trim('"')
-                .Trim()
-                .TrimStart('/', '\\')
-                .Replace("/", "\\");
-
-            string rutaCompleta = Path.Combine(RutaBaseFotosC5, rutaFotoBD);
-
-            if (!System.IO.File.Exists(rutaCompleta))
-            {
-                return HttpNotFound();
-            }
-
-            string extension = Path.GetExtension(rutaCompleta).ToLower();
-            string contentType = "image/jpeg";
-
-            if (extension == ".png")
-            {
-                contentType = "image/png";
-            }
-            else if (extension == ".gif")
-            {
-                contentType = "image/gif";
-            }
-            else if (extension == ".bmp")
-            {
-                contentType = "image/bmp";
-            }
-            else if (extension == ".webp")
-            {
-                contentType = "image/webp";
-            }
-
-            return File(rutaCompleta, contentType);
         }
-
-
-        public ActionResult HuellaGaleriaC5(int idHuella)
-        {
-            var huella = _filiacionService.GetHuellaC5PorId(idHuella);
-
-            if (huella == null)
-            {
-                return HttpNotFound();
-            }
-
-            string rutaHuellaBD = huella.Huellas;
-
-            if (string.IsNullOrWhiteSpace(rutaHuellaBD))
-            {
-                return HttpNotFound();
-            }
-
-            rutaHuellaBD = rutaHuellaBD
-                .Trim()
-                .Trim('"')
-                .Trim()
-                .TrimStart('/', '\\')
-                .Replace("/", "\\");
-
-            string rutaCompleta = Path.Combine(RutaBaseFotosC5, rutaHuellaBD);
-
-            if (!System.IO.File.Exists(rutaCompleta))
-            {
-                return HttpNotFound();
-            }
-
-            string extension = Path.GetExtension(rutaCompleta).ToLower();
-            string contentType = "image/jpeg";
-
-            if (extension == ".png")
-            {
-                contentType = "image/png";
-            }
-            else if (extension == ".gif")
-            {
-                contentType = "image/gif";
-            }
-            else if (extension == ".bmp")
-            {
-                contentType = "image/bmp";
-            }
-            else if (extension == ".webp")
-            {
-                contentType = "image/webp";
-            }
-
-            return File(rutaCompleta, contentType);
-        }
-
 
 
         public ActionResult FotoCapea(int idCapea)

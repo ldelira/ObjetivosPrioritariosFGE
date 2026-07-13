@@ -3,284 +3,316 @@
 @{
     ViewBag.Title = Model.int_id_asunto_relacionado == 0 ? "Agregar Asunto" : "Editar Asunto";
     Layout = "~/Views/Shared/_Layout.cshtml";
+
+    bool esNuevo = Model == null || Model.int_id_asunto_relacionado == 0;
+    string tituloPantalla = esNuevo ? "Crear asunto" : "Editar asunto";
+    string subtituloPantalla = esNuevo
+        ? "Primero guarda los datos generales. Después podrás relacionar objetivos prioritarios y víctimas."
+        : "Consulta y actualiza los datos, objetivos relacionados y víctimas del asunto.";
 }
 
+<section class="section asunto-page">
 
-<section class="section">
-    <div class="card">
-        <div class="card-body">
-            <br />
-            <ul class="nav nav-tabs" id="asuntoTabs" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="datos-tab" data-bs-toggle="tab" data-bs-target="#datos" type="button" role="tab">Datos del Asunto</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="objetivo-tab" data-bs-toggle="tab" data-bs-target="#objetivo" type="button" role="tab">Objetvos Prioritarios Relacionados</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="victimas-tab" data-bs-toggle="tab" data-bs-target="#victimas" type="button" role="tab">Víctimas</button>
-                </li>
-            </ul>
+    <div class="asunto-hero">
+        <div>
+            <div class="asunto-breadcrumb">Asuntos relacionados / @tituloPantalla</div>
+            <h2>@tituloPantalla</h2>
+            <p>@subtituloPantalla</p>
+        </div>
 
-            <div class="tab-content pt-3" id="asuntoTabsContent">
-                <!-- 🧩 TAB 1: Datos del Asunto -->
-                <div class="tab-pane fade show active" id="datos" role="tabpanel" aria-labelledby="datos-tab">
+        <div class="asunto-hero-actions">
+            <a href="@Url.Action("Index", "Asuntos")" class="btn btn-outline-secondary">
+                <i class="fa fa-arrow-left"></i> Volver al listado
+            </a>
+        </div>
+    </div>
 
-                    @Html.HiddenFor(m => m.int_id_asunto_relacionado)
+    <div class="asunto-stepper-card">
 
+        <div class="asunto-stepper" role="tablist">
+            <button class="asunto-step active"
+                    id="datos-tab"
+                    data-bs-toggle="tab"
+                    data-bs-target="#datos"
+                    type="button"
+                    role="tab">
+                <span>1</span>
+                <strong>Datos del asunto</strong>
+            </button>
 
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="nvarchar_alias" class="form-label">Alias <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="nvarchar_alias" name="nvarchar_alias"
-                                       value="@(Model != null ? Model.nvarchar_alias : String.Empty)" maxlength="300" />
+            <button class="asunto-step @(esNuevo ? "disabled" : "")"
+                    id="objetivo-tab"
+                    data-bs-toggle="tab"
+                    data-bs-target="#objetivo"
+                    type="button"
+                    role="tab"
+                    @(esNuevo ? "disabled=\"disabled\"" : "")>
+                <span>2</span>
+                <strong>Objetivos relacionados</strong>
+            </button>
+
+            <button class="asunto-step @(esNuevo ? "disabled" : "")"
+                    id="victimas-tab"
+                    data-bs-toggle="tab"
+                    data-bs-target="#victimas"
+                    type="button"
+                    role="tab"
+                    @(esNuevo ? "disabled=\"disabled\"" : "")>
+                <span>3</span>
+                <strong>Víctimas relacionadas</strong>
+            </button>
+        </div>
+
+        @if (esNuevo)
+        {
+            <div class="asunto-alert" id="avisoGuardarAsunto">
+                <i class="fa fa-info-circle"></i>
+                <div>
+                    <strong>Guarda primero el asunto.</strong>
+                    <span>Cuando se genere el ID del asunto se habilitarán los pasos de objetivos y víctimas.</span>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="asunto-alert asunto-alert-ok" id="avisoGuardarAsunto">
+                <i class="fa fa-check-circle"></i>
+                <div>
+                    <strong>Asunto guardado.</strong>
+                    <span>Ya puedes relacionar objetivos prioritarios y víctimas.</span>
+                </div>
+            </div>
+        }
+
+        <div class="tab-content" id="asuntoTabsContent">
+
+            <!-- PASO 1 -->
+            <div class="tab-pane fade show active" id="datos" role="tabpanel" aria-labelledby="datos-tab">
+
+                @Html.HiddenFor(m => m.int_id_asunto_relacionado)
+
+                <div class="asunto-form-grid">
+
+                    <div class="asunto-card">
+                        <div class="asunto-card-header">
+                            <div>
+                                <h4>Datos generales</h4>
+                                <p>Información principal del caso, carpeta o investigación.</p>
                             </div>
+                        </div>
 
-                            <div class="mb-3">
-                                <label for="numavp" class="form-label">CI</label>
-                                <input type="text" class="form-control" id="numavp" name="numavp"
-                                       value="@(Model != null ? Model.numavp : String.Empty)" maxlength="50" />
-                            </div>
+                        <div class="mb-3">
+                            <label for="nvarchar_alias" class="form-label">Alias / título <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="nvarchar_alias" name="nvarchar_alias"
+                                   value="@(Model != null ? Model.nvarchar_alias : String.Empty)" maxlength="300"
+                                   placeholder="Ej. Caso doña Juana" />
+                        </div>
 
-                            <div class="mb-3">
-                                <label for="date_fecha_asunto" class="form-label">Fecha del Asunto</label>
-                                <input type="datetime-local" class="form-control" id="date_fecha_asunto" name="date_fecha_asunto"
-                                       value="@(Model?.date_fecha_asunto.HasValue == true ? Model.date_fecha_asunto.Value.ToString("yyyy-MM-ddTHH:mm") : "")" />
-                            </div>
+                        <div class="mb-3">
+                            <label for="numavp" class="form-label">CI</label>
+                            <input type="text" class="form-control" id="numavp" name="numavp"
+                                   value="@(Model != null ? Model.numavp : String.Empty)" maxlength="50"
+                                   placeholder="Ej. CI/AGS/00000/00-00" />
+                        </div>
 
-                            <div class="mb-3">
-                                <label for="int_id_estatus_asunto" class="form-label">Estatus</label>
-                                <select id="int_id_estatus_asunto" name="int_id_estatus_asunto" class="form-control">
-                                    <option value="">-- Seleccionar --</option>
-                                    @* Si tienes lista de cat_EstatusAsunto en ViewBag, la puedes poblar así *@
-                                    @if (ViewBag.EstatusAsuntoList != null)
+                        <div class="mb-3">
+                            <label for="date_fecha_asunto" class="form-label">Fecha del asunto</label>
+                            <input type="datetime-local" class="form-control" id="date_fecha_asunto" name="date_fecha_asunto"
+                                   value="@(Model?.date_fecha_asunto.HasValue == true ? Model.date_fecha_asunto.Value.ToString("yyyy-MM-ddTHH:mm") : "")" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="int_id_estatus_asunto" class="form-label">Estatus del asunto</label>
+                            <select id="int_id_estatus_asunto" name="int_id_estatus_asunto" class="form-control">
+                                <option value="">-- Seleccionar --</option>
+                                @if (ViewBag.EstatusAsuntoList != null)
+                                {
+                                    foreach (var e in (List<Objetivos_Prioritarios.Models.cat_EstatusAsunto>)ViewBag.EstatusAsuntoList)
                                     {
-                                        foreach (var e in (List<Objetivos_Prioritarios.Models.cat_EstatusAsunto>)ViewBag.EstatusAsuntoList)
-                                        {
-
-                                            <option value="@e.int_id_estatus_asunto" @(e.int_id_estatus_asunto == Model.int_id_estatus_asunto ? "selected" : "")>@e.nvarchar_estatus</option>
-                                        }
+                                        <option value="@e.int_id_estatus_asunto" @(e.int_id_estatus_asunto == Model.int_id_estatus_asunto ? "selected" : "")>@e.nvarchar_estatus</option>
                                     }
-                                </select>
-                            </div>
-
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="mb-3 h-100">
-                                <label for="nvarchar_descripcion" class="form-label">Descripción</label>
-                                <textarea class="form-control" id="nvarchar_descripcion" name="nvarchar_descripcion" rows="10"
-                                          maxlength="max">@Html.Raw(Model != null ? Model.nvarchar_descripcion : String.Empty)</textarea>
-                            </div>
+                                }
+                            </select>
                         </div>
                     </div>
 
-                    <div class="mt-3 d-flex gap-2">
-                        <button type="button" id="btnSaveAsunto" class="btn btn-primary">Guardar</button>
-                        <a href="@Url.Action("Index", "Asuntos")" class="btn btn-secondary">Cancelar</a>
-                        <span id="saveSpinner" style="display:none; align-self:center;"><i class="fa fa-spinner fa-spin"></i> Guardando...</span>
+                    <div class="asunto-card">
+                        <div class="asunto-card-header">
+                            <div>
+                                <h4>Descripción</h4>
+                                <p>Narrativa, antecedentes u observaciones generales del asunto.</p>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="nvarchar_descripcion" class="form-label">Descripción del asunto</label>
+                            <textarea class="form-control asunto-textarea" id="nvarchar_descripcion" name="nvarchar_descripcion"
+                                      rows="13" maxlength="max" placeholder="Describe el asunto...">@Html.Raw(Model != null ? Model.nvarchar_descripcion : String.Empty)</textarea>
+                        </div>
                     </div>
-
-
 
                 </div>
 
+                <div class="asunto-footer-actions">
+                    <button type="button" id="btnSaveAsunto" class="btn btn-primary">
+                        <i class="fa fa-save"></i>
+                        @(esNuevo ? "Guardar y continuar" : "Guardar cambios")
+                    </button>
 
-                <!-- 🧩 TAB 2: Objetivo -->
-                <div class="tab-pane fade" id="objetivo" role="tabpanel" aria-labelledby="objetivo-tab">
+                    <button type="button" id="btnIrObjetivos" class="btn btn-outline-primary" @(esNuevo ? "disabled=\"disabled\"" : "")>
+                        Siguiente: objetivos <i class="fa fa-arrow-right"></i>
+                    </button>
 
-                    <div class="row">
+                    <a href="@Url.Action("Index", "Asuntos")" class="btn btn-secondary">
+                        Cancelar
+                    </a>
 
-                        <div class="col-lg-6">
+                    <span id="saveSpinner" style="display:none; align-self:center;">
+                        <i class="fa fa-spinner fa-spin"></i> Guardando...
+                    </span>
+                </div>
 
-                            <div class="card">
-                                <div class="card-body">
-                                    <h5 class="card-title">Búsqueda de Objetivo Prioritario</h5>
-
-                                    <!-- Campos de búsqueda por nombre -->
-                                    <div id="busquedaPorNombre">
-                                        <div class="row">
-                                            <div class="col-md-4">
-                                                <label for="searchName" class="form-label">Nombre</label>
-                                                <input type="text" class="form-control" id="txtNombreObjAsunto" placeholder="Nombre">
-                                            </div>
-                                            <div class="col-md-4">
-                                                <label for="searchPaterno" class="form-label">Apellido Paterno</label>
-                                                <input type="text" class="form-control" id="txtPaternoObjAsunto" placeholder="Paterno">
-                                            </div>
-                                            <div class="col-md-4">
-                                                <label for="searchMaterno" class="form-label">Apellido Materno</label>
-                                                <input type="text" class="form-control" id="txtMaternoObjAsunto" placeholder="Materno">
-                                            </div>
-                                        </div>
-                                        <br>
-                                    </div>
-
-                                
-                                    <div class="mb-3">
-                                        <button type="button" id="btnBuscarObjetivoAsunto" class="btn btn-primary w-100">
-                                            🔍 Buscar
-                                        </button>
-                                    </div>
-
-                                    <div id="busquedaObjetivoAsunto"></div>
-                                </div>
-                            </div>
-
-                        </div>
-                        <div class="col-lg-6">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h5 class="card-title">Objetivos Prioritarios Relacionados al Asunto</h5>
-
-                                    <div id="ObjetivoRelacionadoAsunto"></div>
-
-                                </div>
-                            </div>
-                        </div>
-
-
-
-                    </div>
-
-
-
-
-
-
-                </div> <!-- Fin pestaña Víctimas -->
-                <!-- 🧩 TAB 2: Víctimas -->
-                <div class="tab-pane fade" id="victimas" role="tabpanel" aria-labelledby="victimas-tab">
-
-
-                    <ul class="nav nav-tabs" id="asuntoTabs" role="tablist">
-
-
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link active"
-                                    id="relacionarVictimas-tab"
-                                    data-bs-toggle="tab"
-                                    data-bs-target="#relacionarVictimas"
-                                    type="button" role="tab"
-                                    aria-controls="relacionarVictimas"
-                                    aria-selected="true">
-                                Relacionar Víctimas con Asunto
-                            </button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link "
-                                    id="victimasAgregadas-tab"
-                                    data-bs-toggle="tab"
-                                    data-bs-target="#victimasAgregadas"
-                                    type="button" role="tab"
-                                    aria-controls="victimasAgregadas"
-                                    aria-selected="false">
-                                Víctimas Agregadas
-                            </button>
-                        </li>
-                    </ul>
-
-
-                    <div class="tab-content mt-3" id="asuntoTabsContent">
-
-
-                        <!-- TAB 2: Relacionar Víctimas con Asunto -->
-                        <div class="tab-pane fade show active" id="relacionarVictimas" role="tabpanel" aria-labelledby="relacionarVictimas-tab">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h5 class="card-title">Relacionar Víctimas con Asunto</h5>
-                                    <div class="row">
-                                        <!-- 🔍 Buscar y agregar víctimas -->
-                                        <div class="col-lg-6">
-                                            <div class="card mt-3">
-                                                <div class="card-body">
-                                                    <h5 class="card-title">Agregar Víctima</h5>
-                                                    <div class="row mb-2">
-                                                        <div class="col-md-4">
-                                                            <input type="text" id="txtNombreVictima" class="form-control" placeholder="Nombre">
-                                                        </div>
-                                                        <div class="col-md-4">
-                                                            <input type="text" id="txtPaterno" class="form-control" placeholder="Paterno">
-                                                        </div>
-                                                        <div class="col-md-4">
-                                                            <input type="text" id="txtMaterno" class="form-control" placeholder="Materno">
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-12">
-                                                        <button type="button" class="btn btn-primary w-100" id="btnBuscarVictima">
-                                                            <i class="fa fa-search"></i> Buscar
-                                                        </button>
-                                                    </div>
-                                                    <div id="busquedaVictimas" class="mt-2"></div>
-                                                    <div id="busquedaDetenidos" class="mt-2"></div>
-                                                    <div id="busquedaObjetivos" class="mt-2"></div>
-
-
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- 📋 Víctimas relacionadas -->
-                                        <div class="col-lg-6">
-                                            <div class="card mt-3">
-                                                <div class="card-body">
-                                                    <h5 class="card-title">Víctimas Relacionadas</h5>
-                                                    <div id="victimasRelacionadas" class="mt-2"></div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-
-                        <!-- TAB 1: Víctimas Agregadas -->
-                        <div class="tab-pane fade  " id="victimasAgregadas" role="tabpanel" aria-labelledby="victimasAgregadas-tab">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h5 class="card-title">Listado de Víctimas Agregadas</h5>
-                                    <div id="victimasAgregadasContent">
-                                        <!-- Aquí se cargará la lista de víctimas (PartialView) -->
-                                        <div class="text-center p-3">
-                                            <div class="row">
-                                                <div class="col-md-2">
-                                                    <label class="control-label">Estado:</label>
-                                                </div>
-                                                <div class="col-md-4">
-                                                    <select class="form-control" onchange="refreshListaVictimas(this.value)">
-                                                        <option value="1" id="1" @((bool)ViewBag.Actives ? "selected" : "")>Activo</option>
-                                                        <option value="0" id="0" @(!(bool)ViewBag.Actives ? "selected" : "")>Inactivo</option>
-                                                    </select>
-                                                </div>
-                                                <div class="col-md-6" style="text-align:right">
-                                                    <button class="btn btn-primary" onclick="abrirModalVictima(0)">Agregar Víctima</button>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <table id="listaVictimasDataTable" class="dataTable table table-striped" style="width:100%"></table>
-                                            </div>
-
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-
-                    </div>
-
-
-
-
-                </div> <!-- Fin pestaña Víctimas -->
             </div>
+
+            <!-- PASO 2 -->
+            <div class="tab-pane fade" id="objetivo" role="tabpanel" aria-labelledby="objetivo-tab">
+
+                <div class="asunto-section-title">
+                    <div>
+                        <h3>Objetivos prioritarios relacionados</h3>
+                        <p>Busca un objetivo existente y define su rol o participación dentro del asunto.</p>
+                    </div>
+                </div>
+
+                <div class="asunto-two-columns">
+
+                    <div class="asunto-card">
+                        <div class="asunto-card-header">
+                            <div>
+                                <h4>Buscar objetivo prioritario</h4>
+                                <p>Consulta por nombre o apellidos.</p>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4 mb-2">
+                                <label class="form-label">Nombre</label>
+                                <input type="text" class="form-control" id="txtNombreObjAsunto" placeholder="Nombre">
+                            </div>
+                            <div class="col-md-4 mb-2">
+                                <label class="form-label">Apellido paterno</label>
+                                <input type="text" class="form-control" id="txtPaternoObjAsunto" placeholder="Paterno">
+                            </div>
+                            <div class="col-md-4 mb-2">
+                                <label class="form-label">Apellido materno</label>
+                                <input type="text" class="form-control" id="txtMaternoObjAsunto" placeholder="Materno">
+                            </div>
+                        </div>
+
+                        <button type="button" id="btnBuscarObjetivoAsunto" class="btn btn-primary w-100 mt-2">
+                            <i class="fa fa-search"></i> Buscar objetivo
+                        </button>
+
+                        <div id="busquedaObjetivoAsunto" class="mt-3"></div>
+                    </div>
+
+                    <div class="asunto-card">
+                        <div class="asunto-card-header">
+                            <div>
+                                <h4>Objetivos vinculados al asunto</h4>
+                                <p>Listado de objetivos ya relacionados.</p>
+                            </div>
+                        </div>
+
+                        <div id="ObjetivoRelacionadoAsunto"></div>
+                    </div>
+
+                </div>
+
+                <div class="asunto-footer-actions">
+                    <button type="button" class="btn btn-outline-secondary" onclick="mostrarTab('#datos-tab')">
+                        <i class="fa fa-arrow-left"></i> Regresar a datos
+                    </button>
+                    <button type="button" class="btn btn-primary" id="btnIrVictimas">
+                        Siguiente: víctimas <i class="fa fa-arrow-right"></i>
+                    </button>
+                </div>
+
+            </div>
+
+            <!-- PASO 3 -->
+            <div class="tab-pane fade" id="victimas" role="tabpanel" aria-labelledby="victimas-tab">
+
+                <div class="asunto-section-title">
+                    <div>
+                        <h3>Víctimas relacionadas</h3>
+                        <p>Relaciona víctimas existentes, detenidos importados o registra una víctima nueva.</p>
+                    </div>
+                </div>
+
+                <div class="asunto-two-columns">
+
+                    <div class="asunto-card">
+                        <div class="asunto-card-header">
+                            <div>
+                                <h4>Buscar víctima</h4>
+                                <p>La búsqueda consulta víctimas registradas, detenidos y objetivos.</p>
+                            </div>
+                        </div>
+
+                        <div class="row mb-2">
+                            <div class="col-md-4 mb-2">
+                                <label class="form-label">Nombre</label>
+                                <input type="text" id="txtNombreVictima" class="form-control" placeholder="Nombre">
+                            </div>
+                            <div class="col-md-4 mb-2">
+                                <label class="form-label">Apellido paterno</label>
+                                <input type="text" id="txtPaterno" class="form-control" placeholder="Paterno">
+                            </div>
+                            <div class="col-md-4 mb-2">
+                                <label class="form-label">Apellido materno</label>
+                                <input type="text" id="txtMaterno" class="form-control" placeholder="Materno">
+                            </div>
+                        </div>
+
+                        <button type="button" class="btn btn-primary w-100" id="btnBuscarVictima">
+                            <i class="fa fa-search"></i> Buscar víctima
+                        </button>
+
+                        <div id="busquedaVictimas" class="mt-3"></div>
+                        <div id="busquedaDetenidos" class="mt-3"></div>
+                        <div id="busquedaObjetivos" class="mt-3"></div>
+                    </div>
+
+                    <div class="asunto-card">
+                        <div class="asunto-card-header">
+                            <div>
+                                <h4>Víctimas vinculadas al asunto</h4>
+                                <p>Listado de víctimas relacionadas con este asunto.</p>
+                            </div>
+                        </div>
+
+                        <div id="victimasRelacionadas" class="mt-2"></div>
+                    </div>
+
+                </div>
+
+                <div class="asunto-footer-actions">
+                    <button type="button" class="btn btn-outline-secondary" onclick="mostrarTab('#objetivo-tab')">
+                        <i class="fa fa-arrow-left"></i> Regresar a objetivos
+                    </button>
+                    <a href="@Url.Action("Index", "Asuntos")" class="btn btn-primary">
+                        Finalizar y volver al listado
+                    </a>
+                </div>
+
+            </div>
+
         </div>
+
     </div>
+
 </section>
-
-
 
 <div class="modal fade" id="ModalGenerico" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
@@ -288,19 +320,218 @@
     </div>
 </div>
 
+<style>
+    .asunto-page {
+        padding-bottom: 28px;
+    }
+
+    .asunto-hero {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        gap: 16px;
+        margin-bottom: 16px;
+    }
+
+    .asunto-breadcrumb {
+        color: #64748b;
+        font-size: 12px;
+        font-weight: 600;
+        margin-bottom: 8px;
+    }
+
+    .asunto-hero h2 {
+        color: #0b2364;
+        font-size: 26px;
+        font-weight: 900;
+        margin: 0;
+    }
+
+    .asunto-hero p {
+        color: #64748b;
+        font-size: 13px;
+        margin: 6px 0 0 0;
+    }
+
+    .asunto-stepper-card {
+        background: #fff;
+        border: 1px solid #e8eef8;
+        border-radius: 16px;
+        box-shadow: 0 8px 24px rgba(15, 35, 75, .06);
+        padding: 18px;
+    }
+
+    .asunto-stepper {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 10px;
+        margin-bottom: 14px;
+    }
+
+    .asunto-step {
+        border: 1px solid #dbe3ef;
+        background: #f8fbff;
+        color: #0b2364;
+        border-radius: 12px;
+        padding: 12px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        text-align: left;
+        transition: all .15s ease;
+    }
+
+        .asunto-step span {
+            width: 32px;
+            height: 32px;
+            min-width: 32px;
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: #eef4ff;
+            color: #2f5bff;
+            font-weight: 900;
+        }
+
+        .asunto-step strong {
+            font-size: 13px;
+            font-weight: 900;
+        }
+
+        .asunto-step.active {
+            border-color: #2f5bff;
+            background: #eef4ff;
+            box-shadow: 0 4px 14px rgba(47, 91, 255, .12);
+        }
+
+        .asunto-step.disabled,
+        .asunto-step:disabled {
+            opacity: .55;
+            cursor: not-allowed;
+        }
+
+    .asunto-alert {
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+        background: #fff8e6;
+        border: 1px solid #f5d889;
+        color: #7a4d00;
+        border-radius: 12px;
+        padding: 12px 14px;
+        margin-bottom: 16px;
+    }
+
+    .asunto-alert-ok {
+        background: #e8f7ee;
+        border-color: #c5edd4;
+        color: #18864b;
+    }
+
+    .asunto-alert strong {
+        display: block;
+        font-size: 13px;
+    }
+
+    .asunto-alert span {
+        display: block;
+        font-size: 12px;
+        margin-top: 2px;
+    }
+
+    .asunto-form-grid,
+    .asunto-two-columns {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        gap: 16px;
+    }
+
+    .asunto-card {
+        background: #fff;
+        border: 1px solid #e8eef8;
+        border-radius: 14px;
+        padding: 16px;
+        box-shadow: 0 4px 14px rgba(15, 35, 75, .04);
+        min-width: 0;
+    }
+
+    .asunto-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        border-bottom: 1px solid #e8eef8;
+        padding-bottom: 12px;
+        margin-bottom: 14px;
+    }
+
+        .asunto-card-header h4,
+        .asunto-section-title h3 {
+            color: #0b2364;
+            font-size: 17px;
+            font-weight: 900;
+            margin: 0;
+        }
+
+        .asunto-card-header p,
+        .asunto-section-title p {
+            color: #64748b;
+            font-size: 12px;
+            margin: 5px 0 0 0;
+        }
+
+    .asunto-section-title {
+        margin: 8px 0 14px 0;
+    }
+
+    .asunto-textarea {
+        min-height: 310px;
+        resize: vertical;
+    }
+
+    .asunto-footer-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 16px;
+    }
+
+        .asunto-footer-actions .btn {
+            font-weight: 800;
+            border-radius: 8px;
+        }
+
+    @@media (max-width: 992px) {
+        .asunto-form-grid,
+        .asunto-two-columns {
+            grid-template-columns: 1fr;
+        }
+
+        .asunto-stepper {
+            grid-template-columns: 1fr;
+        }
+
+        .asunto-hero {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+    }
+</style>
 
 @section Scripts {
     <script>
+        var asuntoInicialGuardado = @Html.Raw(Json.Encode(!esNuevo));
+
         $(document).ready(function () {
-            // Cargar lista inicial de víctimas relacionadas
-            refreshVictimasRelacionadasList();
-            refreshObjetivoRelacionadoAsuntoList(true);
-            refreshListaVictimas(true);
-            // 🔍 Buscar víctimas
-            $("#btnBuscarVictima").click(function () {
+
+            if (asuntoEstaGuardado()) {
+                cargarRelacionesAsunto();
+            }
+
+            $("#btnBuscarVictima").off("click").on("click", function () {
+                if (!validarAsuntoGuardado()) return;
+
                 let nombre = $("#txtNombreVictima").val().trim();
-                let paterno = $("#txtPaterno").val().trim();
-                let materno = $("#txtMaterno").val().trim();
 
                 if (nombre.length < 2) {
                     swal("Atención", "Escribe al menos 2 caracteres para buscar.", "info");
@@ -311,11 +542,11 @@
                 refreshObjetivo();
                 refreshVictimas();
             });
-            $("#btnBuscarObjetivoAsunto").click(function () {
-                 
+
+            $("#btnBuscarObjetivoAsunto").off("click").on("click", function () {
+                if (!validarAsuntoGuardado()) return;
+
                 let nombre = $("#txtNombreObjAsunto").val().trim();
-                let paterno = $("#txtPaternoObjAsunto").val().trim();
-                let materno = $("#txtMaternoObjAsunto").val().trim();
 
                 if (nombre.length < 2) {
                     swal("Atención", "Escribe al menos 2 caracteres para buscar.", "info");
@@ -324,21 +555,100 @@
 
                 refreshObjetivoRelacionadoAsunto();
             });
+
+            $('#btnSaveAsunto').off('click').on('click', function () {
+                saveAsunto();
+            });
+
+            $("#btnIrObjetivos").off("click").on("click", function () {
+                if (!validarAsuntoGuardado()) return;
+                mostrarTab("#objetivo-tab");
+            });
+
+            $("#btnIrVictimas").off("click").on("click", function () {
+                if (!validarAsuntoGuardado()) return;
+                mostrarTab("#victimas-tab");
+            });
         });
 
+        function asuntoEstaGuardado() {
+            var id = parseInt($("#int_id_asunto_relacionado").val() || "0", 10);
+            return id > 0;
+        }
 
+        function validarAsuntoGuardado() {
+            if (!asuntoEstaGuardado()) {
+                swal("Guarda primero", "Primero guarda los datos del asunto para poder relacionar objetivos y víctimas.", "warning");
+                return false;
+            }
 
+            return true;
+        }
 
+        function habilitarRelaciones() {
+            $("#objetivo-tab, #victimas-tab")
+                .prop("disabled", false)
+                .removeAttr("disabled")
+                .removeClass("disabled");
+
+            $("#btnIrObjetivos").prop("disabled", false);
+
+            $("#avisoGuardarAsunto")
+                .removeClass("asunto-alert")
+                .addClass("asunto-alert asunto-alert-ok")
+                .html(`
+                    <i class="fa fa-check-circle"></i>
+                    <div>
+                        <strong>Asunto guardado.</strong>
+                        <span>Ya puedes relacionar objetivos prioritarios y víctimas.</span>
+                    </div>
+                `);
+        }
+
+        function mostrarTab(selector) {
+            var trigger = document.querySelector(selector);
+
+            if (!trigger) {
+                return;
+            }
+
+            if (trigger.disabled || trigger.classList.contains("disabled")) {
+                return;
+            }
+
+            var targetSelector = trigger.getAttribute("data-bs-target");
+
+            if (!targetSelector) {
+                return;
+            }
+
+            var target = document.querySelector(targetSelector);
+
+            if (!target) {
+                return;
+            }
+
+            $(".asunto-step").removeClass("active").attr("aria-selected", "false");
+            $("#asuntoTabsContent .tab-pane").removeClass("show active");
+
+            $(trigger).addClass("active").attr("aria-selected", "true");
+            $(target).addClass("show active");
+        }
+
+        function cargarRelacionesAsunto() {
+            refreshVictimasRelacionadasList(true);
+            refreshObjetivoRelacionadoAsuntoList(true);
+        }
 
         function refreshDetenido() {
             var datos = {
                 nombre: $("#txtNombreVictima").val().trim(),
-                paterno : $("#txtPaterno").val().trim(),
-                materno : $("#txtMaterno").val().trim()
+                paterno: $("#txtPaterno").val().trim(),
+                materno: $("#txtMaterno").val().trim()
             };
+
             $("#busquedaDetenidos").empty();
             $("#busquedaDetenidos").load("@Url.Action("DetenidoListPartial", "Asuntos")", datos);
-
         }
 
         function refreshObjetivoRelacionadoAsunto() {
@@ -346,24 +656,25 @@
                 nombre: $("#txtNombreObjAsunto").val().trim(),
                 paterno: $("#txtPaternoObjAsunto").val().trim(),
                 materno: $("#txtMaternoObjAsunto").val().trim(),
-                opcion:1
+                opcion: 1
             };
+
             $("#busquedaObjetivoAsunto").empty();
             $("#busquedaObjetivoAsunto").load("@Url.Action("ObjetivoPrioritarioListPartial", "Asuntos")", datos);
         }
-
 
         function refreshObjetivo() {
             var datos = {
                 nombre: $("#txtNombreVictima").val().trim(),
                 paterno: $("#txtPaterno").val().trim(),
                 materno: $("#txtMaterno").val().trim(),
-                opcion:2
-
+                opcion: 2
             };
+
             $("#busquedaObjetivos").empty();
             $("#busquedaObjetivos").load("@Url.Action("ObjetivoPrioritarioListPartial", "Asuntos")", datos);
         }
+
         function refreshVictimas() {
             var datos = {
                 opcion: 1,
@@ -371,193 +682,121 @@
                 paterno: $("#txtPaterno").val().trim(),
                 materno: $("#txtMaterno").val().trim(),
                 active: true
-
             };
+
             $("#busquedaVictimas").empty();
             $("#busquedaVictimas").load("@Url.Action("VictimasListPartial", "Asuntos")", datos);
         }
 
-        function refreshListaVictimas(active) {
-             
-            var band = true;
-            if (active=="0" || active=="1") {
-                band = active == "1" ? true : false;
-            } else {
-                band = active
-            }
-
-            var datos = {
-            nombre: $("#txtNombreVictima").val().trim(),
-            paterno: $("#txtPaterno").val().trim(),
-            materno: $("#txtMaterno").val().trim(),
-            opcion: 2,
-            active: band
-            };
-            $("#listaVictimasDataTable").empty();
-            $("#listaVictimasDataTable").load("@Url.Action("VictimasListPartial", "Asuntos")", datos);
-        }
-
-
         function refreshObjetivoRelacionadoAsuntoList(actives) {
+            if (!asuntoEstaGuardado()) return;
+
             var datos = {
                 actives: actives
             };
+
             $("#ObjetivoRelacionadoAsunto").html('<div class="text-center p-3"><div class="spinner-border text-primary"></div></div>');
             $("#ObjetivoRelacionadoAsunto").load("@Url.Action("ObjetivoRelacionadoAsuntoListPartial", "Asuntos")", datos);
         }
 
-
-
-    $(function () {
-        $('#btnSaveAsunto').on('click', function () {
-            saveAsunto();
-        });
-    });
-
-    function validateAsunto() {
-        var alias = $('#nvarchar_alias').val().trim();
-        // ejemplo: alias requerido
-        if (!alias) {
-            swal("Campo requerido", "El campo Alias es obligatorio.", "warning");
-            return false;
-        }
-        // agrega validaciones adicionales si quieres (longitud, formato de fecha, etc.)
-        return true;
-    }
-
-    function buildModelFromForm() {
-        var id = parseInt($('#int_id_asunto_relacionado').val() || "0", 10);
-        var fechaCreacion = $('#date_fecha_creacion').val();
-        var bitEstatus = ($('#bit_estatus').val() === "true");
-
-        var fechaAsuntoVal = $('#date_fecha_asunto').val();
-        // Convertir datetime-local (yyyy-MM-ddTHH:mm) a formato que el servidor acepte (ISO)
-        var fechaAsunto = fechaAsuntoVal ? new Date(fechaAsuntoVal).toISOString() : null;
-
-        return {
-            int_id_asunto_relacionado: id,
-            nvarchar_alias: $('#nvarchar_alias').val(),
-            nvarchar_descripcion: $('#nvarchar_descripcion').val(),
-            date_fecha_asunto: fechaAsunto,
-            numavp: $('#numavp').val(),
-            int_id_estatus_asunto: $('#int_id_estatus_asunto').val() ? parseInt($('#int_id_estatus_asunto').val()) : null,
-            date_fecha_creacion: fechaCreacion ? fechaCreacion : null,
-            bit_estatus: bitEstatus
-        };
-    }
-
-        function saveAsunto() {
-        if (!validateAsunto()) return;
-
-        var model = buildModelFromForm();
-
-        $('#btnSaveAsunto').prop('disabled', true);
-        $('#saveSpinner').show();
-
-        $.ajax({
-            url: '@Url.Action("SaveAsunto", "Asuntos")',
-            type: 'POST',
-            contentType: 'application/json; charset=utf-8',
-            data: JSON.stringify(model),
-            success: function (resp) {
-                if (resp && resp.IsSuccess) {
-                    swal({
-                        title: "",
-                        text: resp.Message || "Guardado correctamente.",
-                        type: "success"
-                    }, function () {
-                        window.location.href = '@Url.Action("Index", "Asuntos")';
-                    });
-                } else {
-                    swal("Error", resp && resp.Message ? resp.Message : "Ocurrió un error al guardar.", "error");
-                    $('#btnSaveAsunto').prop('disabled', false);
-                }
-            },
-            error: function (xhr, status, err) {
-                swal("Error", "Ocurrió un error en la petición: " + err, "error");
-                $('#btnSaveAsunto').prop('disabled', false);
-            },
-            complete: function () {
-                $('#saveSpinner').hide();
-            }
-        });
-    }
-
-
-        // 📋 Refrescar lista de víctimas relacionadas
         function refreshVictimasRelacionadasList(actives) {
+            if (!asuntoEstaGuardado()) return;
+
             var datos = {
                 actives: actives
             };
+
             $("#victimasRelacionadas").html('<div class="text-center p-3"><div class="spinner-border text-primary"></div></div>');
             $("#victimasRelacionadas").load("@Url.Action("VictimasRelacionadasListPartial", "Asuntos")", datos);
         }
 
-        @*// ➕ Agregar víctima al asunto
-        function addVictimaToAsunto(idVictima) {
-            var idAsunto = $("#int_id_asunto_relacionado").val();
-
-            $.post("@Url.Action("AddVictimaToAsunto", "Asuntos")",
-                { int_id_asunto_relacionado: idAsunto, int_id_victima: idVictima },
-                function (resp) {
-                    if (resp.IsSuccess) {
-                        swal("", resp.Message, "success");
-                        refreshVictimasRelacionadasList();
-                    } else {
-                        swal("Error", resp.Message, "error");
-                    }
-                });
+        function refreshListaVictimas(active) {
+            // Se deja por compatibilidad con partials antiguos.
+            // En este nuevo flujo las víctimas se consultan desde el buscador y la lista relacionada.
         }
 
-        // 🗑️ Quitar víctima del asunto
-        function removeVictima(idRelacion) {
-            swal({
-                title: "¿Eliminar víctima?",
-                text: "Esta acción quitará la relación del asunto.",
-                icon: "warning",
-                buttons: ["Cancelar", "Sí, eliminar"],
-                dangerMode: true
-            }).then((ok) => {
-                if (ok) {
-                    $.post("@Url.Action("RemoveVictimaFromAsunto", "Asuntos")", { int_id_asunto_victima: idRelacion }, function (resp) {
-                        if (resp.IsSuccess) {
-                            swal("", resp.Message, "success");
-                            refreshVictimasRelacionadasList();
-                        } else {
-                            swal("Error", resp.Message, "error");
+        function validateAsunto() {
+            var alias = $('#nvarchar_alias').val().trim();
+
+            if (!alias) {
+                swal("Campo requerido", "El campo Alias / título es obligatorio.", "warning");
+                return false;
+            }
+
+            return true;
+        }
+
+        function buildModelFromForm() {
+            var id = parseInt($('#int_id_asunto_relacionado').val() || "0", 10);
+            var fechaAsuntoVal = $('#date_fecha_asunto').val();
+            var fechaAsunto = fechaAsuntoVal ? new Date(fechaAsuntoVal).toISOString() : null;
+
+            return {
+                int_id_asunto_relacionado: id,
+                nvarchar_alias: $('#nvarchar_alias').val(),
+                nvarchar_descripcion: $('#nvarchar_descripcion').val(),
+                date_fecha_asunto: fechaAsunto,
+                numavp: $('#numavp').val(),
+                int_id_estatus_asunto: $('#int_id_estatus_asunto').val() ? parseInt($('#int_id_estatus_asunto').val()) : null
+            };
+        }
+
+        function saveAsunto() {
+            if (!validateAsunto()) return;
+
+            var model = buildModelFromForm();
+            var eraNuevo = model.int_id_asunto_relacionado === 0;
+
+            $('#btnSaveAsunto').prop('disabled', true);
+            $('#saveSpinner').show();
+
+            $.ajax({
+                url: '@Url.Action("SaveAsunto", "Asuntos")',
+                type: 'POST',
+                contentType: 'application/json; charset=utf-8',
+                data: JSON.stringify(model),
+                success: function (resp) {
+                    if (resp && resp.IsSuccess) {
+
+                        if (resp.Id && resp.Id > 0) {
+                            $("#int_id_asunto_relacionado").val(resp.Id);
+
+                            var nuevaUrl = '@Url.Action("AddEditAsuntos", "Asuntos")' + '?int_id_asunto_relacionado=' + resp.Id;
+                            window.history.replaceState(null, "", nuevaUrl);
                         }
-                    });
+
+                        habilitarRelaciones();
+                        cargarRelacionesAsunto();
+
+                        swal({
+                            title: "",
+                            text: resp.Message || "Asunto guardado correctamente.",
+                            type: "success",
+                            confirmButtonText: eraNuevo ? "Continuar" : "Aceptar"
+                        }, function () {
+                            if (eraNuevo) {
+                                mostrarTab("#objetivo-tab");
+                            }
+                        });
+
+                    } else {
+                        swal("Error", resp && resp.Message ? resp.Message : "Ocurrió un error al guardar.", "error");
+                    }
+                },
+                error: function (xhr, status, err) {
+                    console.log(xhr.responseText);
+                    swal("Error", "Ocurrió un error en la petición: " + err, "error");
+                },
+                complete: function () {
+                    $('#btnSaveAsunto').prop('disabled', false);
+                    $('#saveSpinner').hide();
                 }
             });
         }
-
-
-        function addObjetivoVictima(id_objetivo) {
-
-            $.post("@Url.Action("RemoveVictimaFromAsunto", "Asuntos")", { int_id_asunto_victima: id_objetivo }, function (resp) {
-                if (resp.IsSuccess) {
-                    swal("", resp.Message, "success");
-                    refreshVictimasRelacionadasList();
-                } else {
-                    swal("Error", resp.Message, "error");
-                }
-            });
-
-        }
-        function addVictima(id_victima) {
-
-            $.post("@Url.Action("RemoveVictimaFromAsunto", "Asuntos")", { int_id_asunto_victima: idRelacion }, function (resp) {
-                if (resp.IsSuccess) {
-                    swal("", resp.Message, "success");
-                    refreshVictimasRelacionadasList();
-                } else {
-                    swal("Error", resp.Message, "error");
-                }
-            });
-
-        }*@
 
         function abrirModalVictima(id) {
+            if (!validarAsuntoGuardado()) return;
+
             var int_id_asunto_relacionado = $("#int_id_asunto_relacionado").val();
             var idllamada = 0;
             var idasunto = int_id_asunto_relacionado;
@@ -571,28 +810,5 @@
                 $("#ModalGenerico").modal("show");
             });
         }
-
-
-
-        @*function AddVictimaRelacionada(id) {
-    var int_id_asunto_relacionado = $("#int_id_asunto_relacionado").val();
-
-$.get('@Url.Action("AddEditVictimaPartial", "Asuntos")',
-    {
-        id: id,
-        idllamada: 1,
-        idasunto: int_id_asunto_relacionado
-    },
-    function (html) {
-        $("#ModalGenericoContent").html(html);
-        $("#ModalGenerico").modal("show");
-    }
-
-);*@
-
-
-
-
-
     </script>
 }

@@ -18,6 +18,11 @@
 
     var isObjetivos = controllerName.Equals("Objetivo", StringComparison.OrdinalIgnoreCase)
                       || (controllerName.Equals("FichaObjetivo", StringComparison.OrdinalIgnoreCase) && !isAlbum);
+
+    var isModuloObjetivos = isMapa || isObjetivos || isAsuntos || isAlbum;
+    var isModuloSic = isSic;
+    var moduloActivo = isModuloSic ? "Sistema de Identificación Criminal" : "Objetivos Prioritarios";
+    var moduloActivoSubtitulo = isModuloSic ? "Personas de interés y filiación" : "Gestión de inteligencia";
 }
 
 <!DOCTYPE html>
@@ -900,34 +905,37 @@
         border-radius: 4px;
         margin-bottom: 4px;
     }
-    .sidebar-nav .nav-link i {
-        color: #b0c4d9 !important; /* Iconos en gris claro */
-    }
 
-    /* 4. Efecto Hover y Activo en el menú lateral */
-    .sidebar-nav .nav-link:hover,
-    .sidebar-nav .nav-link:focus,
-    .sidebar-nav .nav-item .nav-link:not(.collapsed) {
-        background-color: #1a497c !important; /* Azul un poco más claro al pasar el mouse */
-        color: #ffffff !important;
-    }
-    .sidebar-nav .nav-link:hover i,
-    .sidebar-nav .nav-link:focus i,
-    .sidebar-nav .nav-item .nav-link:not(.collapsed) i {
-        color: #ffffff !important;
-    }
+        .sidebar-nav .nav-link i {
+            color: #b0c4d9 !important; /* Iconos en gris claro */
+        }
+
+        /* 4. Efecto Hover y Activo en el menú lateral */
+        .sidebar-nav .nav-link:hover,
+        .sidebar-nav .nav-link:focus,
+        .sidebar-nav .nav-item .nav-link:not(.collapsed) {
+            background-color: #1a497c !important; /* Azul un poco más claro al pasar el mouse */
+            color: #ffffff !important;
+        }
+
+            .sidebar-nav .nav-link:hover i,
+            .sidebar-nav .nav-link:focus i,
+            .sidebar-nav .nav-item .nav-link:not(.collapsed) i {
+                color: #ffffff !important;
+            }
 
     /* 5. Barra Superior (Header) más limpia */
     .header {
         background-color: #ffffff !important;
         box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05) !important; /* Sombra más suave */
     }
+
     .toggle-sidebar-btn {
         color: #113255 !important; /* Botón de hamburguesa en azul oscuro */
     }
 
     /* 6. Botones principales (Como el de "Agregar Nuevo Objetivo") */
-    .btn-primary, 
+    .btn-primary,
     .dt-button { /* Aplica también a los botones de DataTables */
         background-color: #1d63d3 !important; /* Azul rey del mockup */
         border-color: #1d63d3 !important;
@@ -936,16 +944,314 @@
         box-shadow: 0 2px 6px rgba(29, 99, 211, 0.3) !important;
         transition: all 0.2s ease;
     }
-    .btn-primary:hover {
-        background-color: #154bad !important;
-        transform: translateY(-1px);
-    }
+
+        .btn-primary:hover {
+            background-color: #154bad !important;
+            transform: translateY(-1px);
+        }
 
     /* 7. Contenedores de las tablas (Cards) */
     .card {
         border-radius: 8px !important;
         border: none !important;
         box-shadow: 0 2px 12px rgba(0,0,0,0.04) !important;
+    }
+
+
+    /* ======================================================================
+       MEJORA FINAL: BRAND SUPERIOR Y MENÚ LATERAL POR MÓDULOS
+       ====================================================================== */
+
+    :root {
+        --op-sidebar-width: 288px;
+        --op-sidebar-bg: #16375b;
+        --op-sidebar-bg-2: #102a48;
+        --op-sidebar-active: #3e57ff;
+        --op-sidebar-text: #d7e4f5;
+        --op-sidebar-muted: #91a7c2;
+    }
+
+    .header {
+        background: linear-gradient(90deg, #c9eff8 0%, #dff7fc 100%) !important;
+        border-bottom: 1px solid rgba(11, 35, 100, .10) !important;
+    }
+
+    .op-header-left {
+        gap: 12px !important;
+    }
+
+    .toggle-sidebar-btn {
+        width: 42px !important;
+        height: 42px !important;
+        border-radius: 14px !important;
+        background: rgba(255, 255, 255, .60) !important;
+        border: 1px solid rgba(11, 35, 100, .10) !important;
+        box-shadow: 0 5px 14px rgba(15, 35, 75, .08) !important;
+    }
+
+    .op-brand-modern {
+        padding: 6px 12px 6px 7px;
+        border-radius: 16px;
+        background: rgba(255, 255, 255, .34);
+        border: 1px solid rgba(255, 255, 255, .55);
+        transition: .16s ease;
+    }
+
+        .op-brand-modern:hover {
+            background: rgba(255, 255, 255, .62);
+            transform: translateY(-1px);
+        }
+
+    .op-brand-logo-wrap {
+        width: 42px;
+        height: 42px;
+        min-width: 42px;
+        border-radius: 14px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: #ffffff;
+        box-shadow: 0 6px 16px rgba(15, 35, 75, .10);
+        overflow: hidden;
+    }
+
+        .op-brand-logo-wrap img {
+            width: 34px !important;
+            height: 34px !important;
+            padding: 0 !important;
+            background: transparent !important;
+            border-radius: 0 !important;
+        }
+
+    .op-brand-title strong {
+        font-size: 16px !important;
+        letter-spacing: .1px !important;
+    }
+
+    .op-brand-title small {
+        color: #50617b !important;
+        font-size: 10.5px !important;
+    }
+
+    .sidebar {
+        width: var(--op-sidebar-width) !important;
+        background: linear-gradient(180deg, var(--op-sidebar-bg) 0%, var(--op-sidebar-bg-2) 100%) !important;
+        border-right: none !important;
+        padding: 16px 14px !important;
+        box-shadow: 8px 0 24px rgba(5, 18, 45, .18) !important;
+    }
+
+    .op-sidebar-title-modern {
+        margin: 0 0 16px 0 !important;
+        padding: 14px 14px 15px !important;
+        border-radius: 18px !important;
+        background: linear-gradient(135deg, #2636a7 0%, #4054f6 100%) !important;
+        border: 1px solid rgba(255, 255, 255, .12) !important;
+        box-shadow: 0 14px 28px rgba(47, 91, 255, .28) !important;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .op-sidebar-title-modern::after {
+            content: "";
+            position: absolute;
+            width: 130px;
+            height: 130px;
+            right: -60px;
+            top: -65px;
+            background: rgba(255, 255, 255, .13);
+            border-radius: 50%;
+        }
+
+    .op-sidebar-title-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+        position: relative;
+        z-index: 1;
+    }
+
+        .op-sidebar-title-top span {
+            display: inline-flex;
+            align-items: center;
+            padding: 3px 7px;
+            border-radius: 8px;
+            background: rgba(255,255,255,.12);
+            color: rgba(255,255,255,.82);
+            font-size: 10px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: .7px;
+        }
+
+        .op-sidebar-title-top i {
+            color: rgba(255,255,255,.72);
+            font-size: 16px;
+        }
+
+    .op-sidebar-title-modern strong {
+        color: #fff !important;
+        font-size: 16px !important;
+        line-height: 1.25 !important;
+        position: relative;
+        z-index: 1;
+    }
+
+    .op-sidebar-title-modern small {
+        color: rgba(255,255,255,.72) !important;
+        font-size: 11px !important;
+        margin-top: 4px;
+        margin-bottom: 0 !important;
+        text-transform: none !important;
+        letter-spacing: 0 !important;
+        position: relative;
+        z-index: 1;
+    }
+
+    .op-sidebar-nav-modern .nav-heading {
+        color: var(--op-sidebar-muted) !important;
+        font-size: 11px !important;
+        margin: 18px 10px 8px !important;
+        letter-spacing: .8px !important;
+    }
+
+    .op-module-item {
+        margin-bottom: 8px !important;
+    }
+
+    .op-module-toggle {
+        min-height: 48px !important;
+        border-radius: 14px !important;
+        padding: 12px 12px !important;
+        color: var(--op-sidebar-text) !important;
+        background: rgba(255,255,255,.035) !important;
+        border: 1px solid rgba(255,255,255,.06) !important;
+        box-shadow: none !important;
+    }
+
+        .op-module-toggle i:first-child {
+            width: 30px !important;
+            height: 30px !important;
+            min-width: 30px !important;
+            border-radius: 11px !important;
+            color: #ffffff !important;
+            background: rgba(255,255,255,.12) !important;
+        }
+
+        .op-module-toggle span {
+            flex: 1;
+            font-weight: 800;
+        }
+
+        .op-module-toggle .op-module-chevron {
+            width: auto !important;
+            height: auto !important;
+            min-width: auto !important;
+            background: transparent !important;
+            color: rgba(255,255,255,.58) !important;
+            font-size: 11px !important;
+            transition: transform .18s ease;
+        }
+
+        .op-module-toggle:not(.collapsed) {
+            background: rgba(255,255,255,.075) !important;
+            color: #ffffff !important;
+            border-color: rgba(255,255,255,.12) !important;
+        }
+
+            .op-module-toggle:not(.collapsed) .op-module-chevron {
+                transform: rotate(180deg);
+            }
+
+    .op-sidebar-nav-modern .nav-content {
+        list-style: none;
+        margin: 6px 0 0 0;
+        padding: 0 0 0 12px;
+        border-left: 1px dashed rgba(255,255,255,.13);
+    }
+
+        .op-sidebar-nav-modern .nav-content li {
+            margin: 4px 0 4px 10px;
+        }
+
+        .op-sidebar-nav-modern .nav-content a {
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 10px;
+            border-radius: 12px;
+            color: #c9d7ea !important;
+            font-size: 13px;
+            font-weight: 700;
+            text-decoration: none;
+            border: 1px solid transparent;
+            transition: .15s ease;
+        }
+
+            .op-sidebar-nav-modern .nav-content a i {
+                width: 24px;
+                height: 24px;
+                min-width: 24px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 9px;
+                background: rgba(255,255,255,.08) !important;
+                color: #d7e4f5 !important;
+                font-size: 12px;
+            }
+
+            .op-sidebar-nav-modern .nav-content a:hover {
+                background: rgba(255,255,255,.07) !important;
+                color: #ffffff !important;
+                transform: translateX(2px);
+            }
+
+            .op-sidebar-nav-modern .nav-content a.active {
+                background: linear-gradient(135deg, #3652ff 0%, #4f64ff 100%) !important;
+                color: #ffffff !important;
+                border-color: rgba(255,255,255,.16) !important;
+                box-shadow: 0 10px 20px rgba(47, 91, 255, .24) !important;
+            }
+
+                .op-sidebar-nav-modern .nav-content a.active i {
+                    background: rgba(255,255,255,.18) !important;
+                    color: #fff !important;
+                }
+
+            .op-sidebar-nav-modern .nav-content a.disabled {
+                opacity: .48;
+                cursor: not-allowed;
+                pointer-events: none;
+            }
+
+            .op-sidebar-nav-modern .nav-content a em {
+                margin-left: auto;
+                font-size: 10px;
+                font-style: normal;
+                color: rgba(255,255,255,.55);
+                background: rgba(255,255,255,.08);
+                padding: 2px 6px;
+                border-radius: 999px;
+            }
+
+    @@media (min-width: 1200px) {
+        #main,
+        #footer {
+            margin-left: var(--op-sidebar-width) !important;
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .op-brand-modern {
+            padding-right: 8px;
+        }
+
+        .op-brand-title small {
+            display: none !important;
+        }
     }
 </style>
 
@@ -954,11 +1260,13 @@
         <div class="op-header-left">
             <i class="bi bi-list toggle-sidebar-btn"></i>
 
-            <a href="@Url.Action("Index", "Objetivo")" class="op-brand">
-                <img src="@Url.Content("~/assets/images/logoIcono.png")" alt="Logo" />
+            <a href="@Url.Action("Index", "Objetivo")" class="op-brand op-brand-modern">
+                <span class="op-brand-logo-wrap">
+                    <img src="@Url.Content("~/assets/images/logoIcono.png")" alt="Logo" />
+                </span>
                 <span class="op-brand-title">
                     <strong>Objetivos Prioritarios</strong>
-                    <small>Sistema de gestión de fichas</small>
+                    <small>Gestión de inteligencia e identificación</small>
                 </span>
             </a>
         </div>
@@ -994,51 +1302,103 @@
     </header>
 
     <aside id="sidebar" class="sidebar">
-        <div class="op-sidebar-title">
-            <small>Módulo</small>
-            <strong>Objetivos Prioritarios</strong>
+        <div class="op-sidebar-title op-sidebar-title-modern">
+            <div class="op-sidebar-title-top">
+                <span>Módulo activo</span>
+                <i class="fa fa-cubes"></i>
+            </div>
+            <strong>@moduloActivo</strong>
+            <small>@moduloActivoSubtitulo</small>
         </div>
 
-        <ul class="sidebar-nav" id="sidebar-nav">
-            <li class="nav-heading">Principal</li>
+        <ul class="sidebar-nav op-sidebar-nav-modern" id="sidebar-nav">
+            <li class="nav-heading">Módulos del sistema</li>
 
-            <li class="nav-item">
-                <a class="nav-link @(isMapa ? "active" : "collapsed")" href="@Url.Action("Index", "MapaRelaciones")">
-                    <i class="fa fa-sitemap"></i>
-                    <span>Red de inteligencia</span>
+            <li class="nav-item op-module-item">
+                <a class="nav-link op-module-toggle @(isModuloObjetivos ? "" : "collapsed")"
+                   data-bs-target="#menuObjetivosPrioritarios"
+                   data-bs-toggle="collapse"
+                   href="#"
+                   aria-expanded="@(isModuloObjetivos ? "true" : "false")">
+                    <i class="fa fa-shield"></i>
+                    <span>Objetivos Prioritarios</span>
+                    <i class="fa fa-chevron-down op-module-chevron"></i>
                 </a>
+
+                <ul id="menuObjetivosPrioritarios"
+                    class="nav-content collapse @(isModuloObjetivos ? "show" : "")"
+                    data-bs-parent="#sidebar-nav">
+                    <li>
+                        <a class="@(isMapa ? "active" : "")" href="@Url.Action("Index", "MapaRelaciones")">
+                            <i class="fa fa-sitemap"></i>
+                            <span>Red de inteligencia</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="@(isObjetivos ? "active" : "")" href="@Url.Action("Index", "Objetivo")">
+                            <i class="fa fa-user"></i>
+                            <span>Objetivos</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="@(isAsuntos ? "active" : "")" href="@Url.Action("Index", "Asuntos")">
+                            <i class="fa fa-link"></i>
+                            <span>Asuntos relacionados</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="@(isAlbum ? "active" : "")" href="@Url.Action("IndexAlbum", "FichaObjetivo")">
+                            <i class="fa fa-folder-open"></i>
+                            <span>Álbum de fichas</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="disabled" href="javascript:void(0);" title="Pendiente de enlazar a la ruta de catálogos">
+                            <i class="fa fa-list"></i>
+                            <span>Catálogos</span>
+                            <em>Próximo</em>
+                        </a>
+                    </li>
+                </ul>
             </li>
 
-            <li class="nav-item">
-                <a class="nav-link @(isObjetivos ? "active" : "collapsed")" href="@Url.Action("Index", "Objetivo")">
-                    <i class="fa fa-user"></i>
-                    <span>Objetivos</span>
-                </a>
-            </li>
+            <li class="nav-heading">Identificación criminal</li>
 
-            <li class="nav-item">
-                <a class="nav-link @(isAsuntos ? "active" : "collapsed")" href="@Url.Action("Index", "Asuntos")">
-                    <i class="fa fa-link"></i>
-                    <span>Asuntos relacionados</span>
-                </a>
-            </li>
-
-            <li class="nav-heading">Consultas</li>
-
-            <li class="nav-item">
-                <a class="nav-link @(isAlbum ? "active" : "collapsed")" href="@Url.Action("IndexAlbum", "FichaObjetivo")">
-                    <i class="fa fa-folder-open"></i>
-                    <span>Álbum de fichas</span>
-                </a>
-            </li>
-
-            <li class="nav-heading">Sistema de Identificación Criminal</li>
-
-            <li class="nav-item">
-                <a class="nav-link @(isSic ? "active" : "collapsed")" href="@Url.Action("Index", "SIC")">
-                    <i class="fa fa-bell"></i>
+            <li class="nav-item op-module-item">
+                <a class="nav-link op-module-toggle @(isModuloSic ? "" : "collapsed")"
+                   data-bs-target="#menuSic"
+                   data-bs-toggle="collapse"
+                   href="#"
+                   aria-expanded="@(isModuloSic ? "true" : "false")">
+                    <i class="fa fa-user-secret"></i>
                     <span>SIC</span>
+                    <i class="fa fa-chevron-down op-module-chevron"></i>
                 </a>
+
+                <ul id="menuSic"
+                    class="nav-content collapse @(isModuloSic ? "show" : "")"
+                    data-bs-parent="#sidebar-nav">
+                    <li>
+                        <a class="@(isSic ? "active" : "")" href="@Url.Action("Index", "SIC")">
+                            <i class="fa fa-id-card-o"></i>
+                            <span>Personas de interés</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="disabled" href="javascript:void(0);">
+                            <i class="fa fa-search"></i>
+                            <span>Búsqueda avanzada</span>
+                            <em>Próximo</em>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="disabled" href="javascript:void(0);">
+                            <i class="fa fa-tags"></i>
+                            <span>Catálogos SIC</span>
+                            <em>Próximo</em>
+                        </a>
+                    </li>
+                </ul>
             </li>
         </ul>
     </aside>
@@ -1066,7 +1426,7 @@
         <i class="bi bi-arrow-up-short"></i>
     </a>
 
-   
+
 
     <!-- Plugins JS -->
     <script src="@Url.Content("~/assets/plugins/chartjs/Chart.min.js")"></script>

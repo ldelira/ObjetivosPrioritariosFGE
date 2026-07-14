@@ -1541,6 +1541,42 @@
         opacity: .95;
     }
 
+    .sic-photo-placeholder-wrap {
+        position: relative;
+    }
+
+    .sic-photo-no-existe {
+        width: 100%;
+        height: 100%;
+        min-height: 230px;
+        position: relative;
+        background: #f1f5f9;
+        border: 2px dashed #cbd5e1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+
+        .sic-photo-no-existe i {
+            font-size: 70px;
+            color: #94a3b8;
+            opacity: 100;
+        }
+
+        .sic-photo-no-existe span {
+            position: absolute;
+            width: 100%;
+            text-align: center;
+            background: rgba(185, 28, 28, .88);
+            color: #ffffff;
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            padding: 9px 0;
+            text-transform: uppercase;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, .18);
+        }
 
 </style>
 
@@ -1550,10 +1586,20 @@
         <div class="sic-hero-content">
 
             <div class="sic-photo-main-wrap">
-                <div class="sic-photo-main">
-                    <img src="@fotoPrincipalUrl"
-                         alt="Foto de frente detenido en Municipio"
-                         onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=&quot;fa fa-user&quot;></i>';" />
+                <div class="sic-photo-main sic-photo-placeholder-wrap">
+                    @if (!string.IsNullOrWhiteSpace(fotoPrincipalUrl))
+                    {
+                        <img src="@fotoPrincipalUrl"
+                             alt="Foto de frente detenido en Municipio"
+                             onerror="mostrarFotoNoExiste(this);" />
+                    }
+                    else
+                    {
+                        <div class="sic-photo-no-existe">
+                            <i class="fa fa-user"></i>
+                            <span>NO EXISTE FOTO EN ARCHIVO</span>
+                        </div>
+                    }
                 </div>
             </div>
 
@@ -1714,7 +1760,7 @@
 
                     <button type="button" class="sic-source-tab active" data-tab="tab-capea">
                         <i class="fa fa-search"></i>
-                        FEMDLP
+                        FEMDLP (@capeas.Count)
                     </button>
 
                     <button type="button" class="sic-source-tab" data-tab="tab-persona-interes">
@@ -1724,7 +1770,7 @@
 
                     <button type="button" class="sic-source-tab" data-tab="tab-mandamientos">
                         <i class="fa fa-gavel"></i>
-                        Mandamientos Judiciales
+                        Mandamientos Judiciales (@(mandamientos != null ? mandamientos.Rows.Count : 0))
                     </button>
 
                     <button type="button" class="sic-source-tab" data-tab="tab-objetivos">
@@ -2709,5 +2755,17 @@
             $('#contadorAlertasRevisadas').text(revisadas);
             $('#pillAlertasActivas').text(activas);
         }
+    function mostrarFotoNoExiste(img) {
+        var contenedor = img.parentElement;
+
+        img.style.display = 'none';
+
+        contenedor.innerHTML = `
+            <div class="sic-photo-no-existe">
+                <i class="fa fa-user"></i>
+                <span>NO EXISTE FOTO EN ARCHIVO</span>
+            </div>
+        `;
+    }
 
     </script>

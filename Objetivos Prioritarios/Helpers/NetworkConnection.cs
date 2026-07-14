@@ -7,9 +7,16 @@ namespace Objetivos_Prioritarios.Helpers
     public class NetworkConnection : IDisposable
     {
         private readonly string _networkName;
+        private bool _disposed;
 
         public NetworkConnection(string networkName, string userName, string password)
         {
+            if (string.IsNullOrWhiteSpace(networkName))
+                throw new ArgumentException("La ruta de red no puede estar vacía.", nameof(networkName));
+
+            if (string.IsNullOrWhiteSpace(userName))
+                throw new ArgumentException("El usuario de red no puede estar vacío.", nameof(userName));
+
             _networkName = networkName;
 
             var netResource = new NetResource
@@ -26,6 +33,19 @@ namespace Objetivos_Prioritarios.Helpers
                 userName,
                 0
             );
+
+            // 1219 = Ya existe conexión al recurso con otras credenciales
+            if (result == 1219)
+            {
+                WNetCancelConnection2(_networkName, 0, true);
+
+                result = WNetAddConnection2(
+                    netResource,
+                    password,
+                    userName,
+                    0
+                );
+            }
 
             if (result != 0)
             {
@@ -46,7 +66,11 @@ namespace Objetivos_Prioritarios.Helpers
 
         protected virtual void Dispose(bool disposing)
         {
+            if (_disposed)
+                return;
+
             WNetCancelConnection2(_networkName, 0, true);
+            _disposed = true;
         }
 
         [DllImport("mpr.dll")]

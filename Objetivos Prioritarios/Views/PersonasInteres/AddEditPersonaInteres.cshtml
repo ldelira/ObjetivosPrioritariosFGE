@@ -60,16 +60,38 @@
     <div class="pi-hero">
 
         <div class="pi-photo-card">
-            <div class="pi-photo-box">
-                <div class="pi-photo-empty">
-                    <i class="fa fa-user"></i>
-                    <span>Sin foto</span>
-                </div>
+
+            <div class="pi-photo-box pi-photo-clickable"
+                 id="boxFotoPrincipalPersonaInteres"
+                 title="Ver o agregar fotografías">
+
+                @if (Model.idPersona > 0)
+                {
+                    <img id="imgFotoPrincipalPersonaInteres"
+                         src="@Url.Action("VerFotoPrincipalPersonaInteres", "PersonasInteres", new { idPersona = Model.idPersona, v = DateTime.Now.Ticks })"
+                         alt="Foto principal"
+                         onerror="mostrarPlaceholderFotoPrincipalPersonaInteres();" />
+
+                    <div id="placeholderFotoPrincipalPersonaInteres" class="pi-photo-empty" style="display:none;">
+                        <i class="fa fa-user"></i>
+                        <span>Sin foto</span>
+                    </div>
+                }
+                else
+                {
+                    <div id="placeholderFotoPrincipalPersonaInteres" class="pi-photo-empty">
+                        <i class="fa fa-user"></i>
+                        <span>Sin foto</span>
+                    </div>
+                }
+
             </div>
 
-            <button type="button" class="pi-photo-btn" disabled>
-                <i class="fa fa-camera"></i> Foto pendiente
-            </button>
+            <div class="pi-photo-help">
+                <i class="fa fa-camera"></i>
+                Clic para administrar fotos
+            </div>
+
         </div>
 
         <div class="pi-main">
@@ -94,7 +116,9 @@
 
                 <div class="pi-info-item">
                     <div class="pi-info-icon">
-                        <i class="fa fa-id-card-o"></i>
+                        <img class="pi-info-icon-img"
+                             src="@Url.Content("~/images/icons8-id-card-48.png")"
+                             alt="ID Persona" />
                     </div>
                     <div>
                         <label>ID Persona</label>
@@ -135,25 +159,48 @@
             </div>
         </div>
 
-        <div class="pi-side">
-            <div>
-                <h4 style="color:white">Resumen rápido</h4>
-                <p>Este registro puede iniciar sin nombre, solo con datos aproximados, fotografía o huellas.</p>
+        <div class="pi-side pi-search-status-card">
 
-                <div class="pi-side-box">
-                    <label>Estado del registro</label>
-                    <strong>@(Model.idPersona > 0 ? "Capturado" : "Pendiente")</strong>
+            <div>
+                <div class="pi-side-header">
+                    <span class="pi-side-kicker">Estado de búsqueda</span>
+                    <i class="fa fa-search"></i>
+                </div>
+
+                <div class="pi-search-main-status" id="boxEstadoBusquedaResumen">
+                    <span id="lblEstadoBusquedaResumen">Sin periodo</span>
                 </div>
 
                 <div class="pi-side-box">
+                    <label>Periodo vigente</label>
+                    <strong id="lblPeriodoBusquedaResumen">Sin periodo</strong>
+                </div>
+
+                <div class="pi-side-box pi-days-box">
+                    <label>Días restantes</label>
+                    <strong id="lblDiasRestantesBusquedaResumen">-</strong>
+                </div>
+
+                <input type="hidden" id="idPeriodoBusquedaActivoResumen" value="0" />
+
+                <button type="button"
+                        class="pi-cancel-search-btn"
+                        id="btnCancelarBusquedaResumen"
+                        style="display:none;">
+                    <i class="fa fa-ban"></i> Cancelar búsqueda
+                </button>
+
+
+                <div class="pi-side-mini">
                     <label>Fecha de registro</label>
-                    <strong>@(Model.FechaRegistro.HasValue ? Model.FechaRegistro.Value.ToString("dd/MM/yyyy") : "Hoy")</strong>
+                    <span>@(Model.FechaRegistro.HasValue ? Model.FechaRegistro.Value.ToString("dd/MM/yyyy") : "Hoy")</span>
                 </div>
             </div>
 
             <a class="pi-back" href="@Url.Action("Index", "PersonasInteres")">
                 <i class="fa fa-arrow-left"></i> Regresar
             </a>
+
         </div>
 
     </div>
@@ -164,6 +211,11 @@
             <li class="nav-item">
                 <a class="nav-link active pi-tab-link" href="#tabDatosGenerales">
                     <i class="fa fa-user"></i> Datos generales
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link pi-tab-link @(Model.idPersona == 0 ? "disabled" : "")" href="#tabPeriodoBusqueda">
+                    <i class="fa fa-calendar"></i> Periodo de búsqueda
                 </a>
             </li>
 
@@ -283,32 +335,73 @@
 
             </div>
 
-            <div class="pi-tab-pane" id="tabFotografias">
-                <div class="pi-section-title">
-                    <h3>Fotografías</h3>
-                    <p>Agrega imágenes frontales, laterales o adicionales de la persona.</p>
-                </div>
+            <div class="pi-tab-pane" id="tabPeriodoBusqueda">
 
-                <div class="pi-empty">
-                    <i class="fa fa-camera"></i>
-                    <strong>Pendiente de implementar carga de fotografías.</strong>
-                    <br />
-                    Primero dejaremos listo el guardado general y después conectamos fotos en BD y carpeta del servidor.
-                </div>
+                @if (Model.idPersona > 0)
+                {
+                    <div id="contenedorPeriodosBusquedaPersonaInteres"></div>
+                }
+                else
+                {
+                    <div class="pi-section-title">
+                        <h3>Periodo de búsqueda</h3>
+                        <p>Define el rango de tiempo en que esta persona estará activa para búsqueda.</p>
+                    </div>
+
+                    <div class="pi-empty">
+                        <i class="fa fa-calendar"></i>
+                        <strong>Primero guarda la persona de interés.</strong>
+                        <br />
+                        Después podrás agregar el periodo de búsqueda.
+                    </div>
+                }
+
+            </div>
+
+            <div class="pi-tab-pane" id="tabFotografias">
+
+                @if (Model.idPersona > 0)
+                {
+                    <div id="contenedorFotografiasPersonaInteres"></div>
+                }
+                else
+                {
+                    <div class="pi-section-title">
+                        <h3>Fotografías</h3>
+                        <p>Agrega imágenes frontales, laterales o adicionales de la persona.</p>
+                    </div>
+
+                    <div class="pi-empty">
+                        <i class="fa fa-camera"></i>
+                        <strong>Primero guarda la persona de interés.</strong>
+                        <br />
+                        Después podrás agregar fotografías.
+                    </div>
+                }
+
             </div>
 
             <div class="pi-tab-pane" id="tabHuellas">
-                <div class="pi-section-title">
-                    <h3>Huellas</h3>
-                    <p>Agrega imágenes de huellas para procesamiento biométrico.</p>
-                </div>
 
-                <div class="pi-empty">
-                    <i class="fa fa-hand-paper-o"></i>
-                    <strong>Pendiente de implementar carga de huellas.</strong>
-                    <br />
-                    Después conectamos SourceAFIS y guardado en servidor de archivos.
-                </div>
+                @if (Model.idPersona > 0)
+                {
+                    <div id="contenedorHuellasPersonaInteres"></div>
+                }
+                else
+                {
+                    <div class="pi-section-title">
+                        <h3>Huellas</h3>
+                        <p>Agrega imágenes de huellas para procesamiento biométrico.</p>
+                    </div>
+
+                    <div class="pi-empty">
+                        <i class="fa fa-hand-paper-o"></i>
+                        <strong>Primero guarda la persona de interés.</strong>
+                        <br />
+                        Después podrás agregar huellas.
+                    </div>
+                }
+
             </div>
 
         </div>
@@ -319,6 +412,11 @@
 
 <script>
     $(document).ready(function () {
+
+        cargarResumenPeriodoBusquedaInicial();
+        $("#btnCancelarBusquedaResumen").off("click").on("click", function () {
+            cancelarBusquedaDesdeResumen();
+        });
 
         $(document).off("click", ".pi-tab-link").on("click", ".pi-tab-link", function (e) {
             e.preventDefault();
@@ -335,6 +433,15 @@
 
             $(".pi-tab-pane").removeClass("active").hide();
             $(target).addClass("active").fadeIn(120);
+            if (target === "#tabFotografias") {
+                cargarTabFotografiasPersonaInteres();
+            }
+            if (target === "#tabHuellas") {
+                cargarTabHuellasPersonaInteres();
+            }
+            if (target === "#tabPeriodoBusqueda") {
+                cargarTabPeriodosBusquedaPersonaInteres();
+            }
         });
 
         $("#btnGuardarPersonaInteres").off("click").on("click", function () {
@@ -408,4 +515,276 @@
             }
         });
     }
+
+    function cargarTabFotografiasPersonaInteres() {
+
+    var idPersona = parseInt($("#idPersona").val() || "0");
+
+    if (idPersona <= 0) {
+        return;
+    }
+
+    if ($("#contenedorFotografiasPersonaInteres").data("cargado") === true) {
+        return;
+    }
+
+    $("#contenedorFotografiasPersonaInteres")
+        .html('<div class="pi-empty"><i class="fa fa-spinner fa-spin"></i><strong>Cargando fotografías...</strong></div>');
+
+    $("#contenedorFotografiasPersonaInteres").load(
+        "@Url.Action("FotografiasPersonaInteresPartial", "PersonasInteres")",
+        {},
+        function () {
+            $("#contenedorFotografiasPersonaInteres").data("cargado", true);
+        }
+    );
+}
+function cargarTabHuellasPersonaInteres() {
+
+    var idPersona = parseInt($("#idPersona").val() || "0");
+
+    if (idPersona <= 0) {
+        return;
+    }
+
+    if ($("#contenedorHuellasPersonaInteres").data("cargado") === true) {
+        return;
+    }
+
+    $("#contenedorHuellasPersonaInteres")
+        .html('<div class="pi-empty"><i class="fa fa-spinner fa-spin"></i><strong>Cargando huellas...</strong></div>');
+
+    $("#contenedorHuellasPersonaInteres").load(
+        "@Url.Action("HuellasPersonaInteresPartial", "PersonasInteres")",
+        {},
+        function () {
+            $("#contenedorHuellasPersonaInteres").data("cargado", true);
+        }
+    );
+}
+
+
+function mostrarPlaceholderFotoPrincipalPersonaInteres() {
+    $("#imgFotoPrincipalPersonaInteres").hide();
+    $("#placeholderFotoPrincipalPersonaInteres").show();
+}
+
+function actualizarFotoPrincipalPersonaInteres() {
+
+    var idPersona = parseInt($("#idPersona").val() || "0");
+
+    if (idPersona <= 0) {
+        return;
+    }
+
+    var urlFoto = '@Url.Action("VerFotoPrincipalPersonaInteres", "PersonasInteres")'
+        + '?idPersona=' + idPersona
+        + '&v=' + new Date().getTime();
+
+    $("#placeholderFotoPrincipalPersonaInteres").hide();
+
+    if ($("#imgFotoPrincipalPersonaInteres").length === 0) {
+        $("#boxFotoPrincipalPersonaInteres").prepend(`
+            <img id="imgFotoPrincipalPersonaInteres"
+                 alt="Foto principal"
+                 onerror="mostrarPlaceholderFotoPrincipalPersonaInteres();" />
+        `);
+    }
+
+    $("#imgFotoPrincipalPersonaInteres")
+        .attr("src", urlFoto)
+        .show();
+}
+
+
+    $("#boxFotoPrincipalPersonaInteres").off("click").on("click", function () {
+        var idPersona = parseInt($("#idPersona").val() || "0");
+
+        if (idPersona <= 0) {
+            swal("Aviso", "Primero guarda la persona de interés.", "warning");
+            return;
+        }
+
+        $(".pi-tab-link[href='#tabFotografias']").trigger("click");
+    });
+
+
+   function cargarTabPeriodosBusquedaPersonaInteres() {
+
+    var idPersona = parseInt($("#idPersona").val() || "0");
+
+    if (idPersona <= 0) {
+        return;
+    }
+
+    if ($("#contenedorPeriodosBusquedaPersonaInteres").data("cargado") === true) {
+        return;
+    }
+
+    $("#contenedorPeriodosBusquedaPersonaInteres")
+        .html('<div class="pi-empty"><i class="fa fa-spinner fa-spin"></i><strong>Cargando periodo de búsqueda...</strong></div>');
+
+    $("#contenedorPeriodosBusquedaPersonaInteres").load(
+        "@Url.Action("PeriodosBusquedaPersonaInteresPartial", "PersonasInteres")",
+        {},
+        function () {
+            $("#contenedorPeriodosBusquedaPersonaInteres").data("cargado", true);
+        }
+    );
+}
+    function actualizarResumenPeriodoBusqueda(data) {
+
+        var activo = null;
+
+        if (data && data.length > 0) {
+            activo = data.find(x => x.activo === true);
+        }
+
+        $("#boxEstadoBusquedaResumen")
+            .removeClass("activo vencido cancelado sin-busqueda");
+
+        $("#idPeriodoBusquedaActivoResumen").val("0");
+        $("#btnCancelarBusquedaResumen").hide();
+
+        if (!activo) {
+            $("#lblEstadoBusquedaResumen").text("Sin búsqueda");
+            $("#lblPeriodoBusquedaResumen").text("Sin periodo vigente");
+            $("#lblDiasRestantesBusquedaResumen").text("-");
+            $("#boxEstadoBusquedaResumen").addClass("sin-busqueda");
+            return;
+        }
+
+        var estatus = activo.estatusVisual || "Activo";
+
+        $("#idPeriodoBusquedaActivoResumen").val(activo.idPeriodoBusqueda);
+
+        $("#lblEstadoBusquedaResumen").text(estatus);
+
+        $("#lblPeriodoBusquedaResumen").text(
+            activo.fechaInicioBusqueda + " al " + activo.fechaFinBusqueda
+        );
+
+        $("#lblDiasRestantesBusquedaResumen").text(
+            activo.diasRestantes + " días"
+        );
+
+        if (estatus === "Activo") {
+            $("#boxEstadoBusquedaResumen").addClass("activo");
+            $("#btnCancelarBusquedaResumen").show();
+        }
+        else if (estatus === "Vencido") {
+            $("#boxEstadoBusquedaResumen").addClass("vencido");
+            $("#btnCancelarBusquedaResumen").show();
+        }
+        else if (estatus === "Cancelado") {
+            $("#boxEstadoBusquedaResumen").addClass("cancelado");
+        }
+        else {
+            $("#boxEstadoBusquedaResumen").addClass("sin-busqueda");
+        }
+    }
+    function cargarResumenPeriodoBusquedaInicial() {
+
+    var idPersona = parseInt($("#idPersona").val() || "0");
+
+    if (idPersona <= 0) {
+        actualizarResumenPeriodoBusqueda([]);
+        return;
+    }
+
+    $.ajax({
+        type: "POST",
+        url: "@Url.Action("FillPeriodosBusquedaPersonaInteres", "PersonasInteres")",
+        data: {
+            idPersona: idPersona
+        },
+        success: function (data) {
+            actualizarResumenPeriodoBusqueda(data);
+        },
+        error: function (xhr) {
+            console.log(xhr.responseText);
+
+            $("#lblEstadoBusquedaResumen").text("Sin búsqueda");
+            $("#lblPeriodoBusquedaResumen").text("Sin periodo");
+            $("#lblDiasRestantesBusquedaResumen").text("-");
+            $("#boxEstadoBusquedaResumen")
+                .removeClass("activo vencido cancelado")
+                .addClass("sin-busqueda");
+        }
+    });
+    }
+
+    function cancelarBusquedaDesdeResumen() {
+
+    var idPeriodoBusqueda = parseInt($("#idPeriodoBusquedaActivoResumen").val() || "0");
+
+    if (idPeriodoBusqueda <= 0) {
+        swal("Aviso", "No hay un periodo activo para cancelar.", "warning");
+        return;
+    }
+
+    swal({
+        title: "Cancelar búsqueda",
+        text: "Escribe el motivo de cancelación:",
+        type: "input",
+        showCancelButton: true,
+        closeOnConfirm: false,
+        animation: "slide-from-top",
+        inputPlaceholder: "Motivo de cancelación"
+    }, function (motivo) {
+
+        if (motivo === false) {
+            return;
+        }
+
+        if (!motivo || motivo.trim() === "") {
+            swal.showInputError("Captura el motivo de cancelación.");
+            return;
+        }
+
+        $("#btnCancelarBusquedaResumen")
+            .prop("disabled", true)
+            .html('<i class="fa fa-spinner fa-spin"></i> Cancelando...');
+
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("CancelarPeriodoBusquedaPersonaInteres", "PersonasInteres")",
+            data: {
+                idPeriodoBusqueda: idPeriodoBusqueda,
+                motivoCancelacion: motivo
+            },
+            success: function (resp) {
+
+                $("#btnCancelarBusquedaResumen")
+                    .prop("disabled", false)
+                    .html('<i class="fa fa-ban"></i> Cancelar búsqueda');
+
+                if (resp.IsSuccess) {
+
+                    swal("", resp.Message, "success");
+
+                    cargarResumenPeriodoBusquedaInicial();
+
+                    if ($("#contenedorPeriodosBusquedaPersonaInteres").data("cargado") === true) {
+                        $("#contenedorPeriodosBusquedaPersonaInteres").data("cargado", false);
+                        cargarTabPeriodosBusquedaPersonaInteres();
+                    }
+
+                } else {
+                    swal("Error", resp.Message, "error");
+                }
+            },
+            error: function (xhr) {
+                console.log(xhr.responseText);
+
+                $("#btnCancelarBusquedaResumen")
+                    .prop("disabled", false)
+                    .html('<i class="fa fa-ban"></i> Cancelar búsqueda');
+
+                swal("Error", "Ocurrió un error al cancelar la búsqueda.", "error");
+            }
+        });
+    });
+}
+
 </script>

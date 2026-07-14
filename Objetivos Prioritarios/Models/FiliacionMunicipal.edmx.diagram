@@ -20,6 +20,10 @@
         <EntityTypeShape EntityType="Filiacion_MunicipiosModel.tb_Fotografia" Width="1.5" PointX="3" PointY="11.25" />
         <EntityTypeShape EntityType="Filiacion_MunicipiosModel.tb_Persona" Width="1.5" PointX="0.75" PointY="11" />
         <AssociationConnector Association="Filiacion_MunicipiosModel.FK_tb_Fotografia_tb_Persona" />
+        <EntityTypeShape EntityType="Filiacion_MunicipiosModel.cat_EstatusPeriodoBusqueda" Width="1.5" PointX="3.75" PointY="14.625" />
+        <EntityTypeShape EntityType="Filiacion_MunicipiosModel.tb_PersonaPeriodoBusqueda" Width="1.5" PointX="6" PointY="10.75" />
+        <AssociationConnector Association="Filiacion_MunicipiosModel.FK_tb_PersonaPeriodoBusqueda_cat_EstatusPeriodoBusqueda" />
+        <AssociationConnector Association="Filiacion_MunicipiosModel.FK_tb_PersonaPeriodoBusqueda_tb_Persona" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

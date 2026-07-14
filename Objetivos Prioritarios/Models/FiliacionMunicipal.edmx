@@ -5,6 +5,16 @@
     <!-- SSDL content -->
     <edmx:StorageModels>
     <Schema Namespace="Filiacion_MunicipiosModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="cat_EstatusPeriodoBusqueda">
+          <Key>
+            <PropertyRef Name="idEstatusPeriodoBusqueda" />
+          </Key>
+          <Property Name="idEstatusPeriodoBusqueda" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Nombre" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="Descripcion" Type="nvarchar" MaxLength="300" />
+          <Property Name="FechaRegistro" Type="datetime" Nullable="false" />
+          <Property Name="Activo" Type="bit" Nullable="false" />
+        </EntityType>
         <EntityType Name="cat_TbFuente">
           <Key>
             <PropertyRef Name="IdTbFuente" />
@@ -166,6 +176,23 @@ advertencia 6002: La tabla o vista 'Filiacion_Municipios.dbo.tb_PersonaBusqueda'
           <Property Name="Materno" Type="nvarchar" MaxLength="50" />
           <Property Name="IdTbFuente" Type="int" Nullable="false" />
         </EntityType>
+        <EntityType Name="tb_PersonaPeriodoBusqueda">
+          <Key>
+            <PropertyRef Name="idPeriodoBusqueda" />
+          </Key>
+          <Property Name="idPeriodoBusqueda" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="idPersona" Type="int" Nullable="false" />
+          <Property Name="FechaInicioBusqueda" Type="datetime" Nullable="false" />
+          <Property Name="FechaFinBusqueda" Type="datetime" />
+          <Property Name="FechaRegistro" Type="datetime" Nullable="false" />
+          <Property Name="UsuarioRegistro" Type="int" Nullable="false" />
+          <Property Name="Activo" Type="bit" Nullable="false" />
+          <Property Name="Observaciones" Type="nvarchar" MaxLength="500" />
+          <Property Name="FechaCancelacion" Type="datetime" />
+          <Property Name="UsuarioCancelacion" Type="int" />
+          <Property Name="MotivoCancelacion" Type="nvarchar" MaxLength="500" />
+          <Property Name="idEstatusPeriodoBusqueda" Type="int" Nullable="false" />
+        </EntityType>
         <Association Name="FK_Alerta_cat_TipoAlerta">
           <End Role="cat_TipoAlerta" Type="Self.cat_TipoAlerta" Multiplicity="0..1" />
           <End Role="tb_Alerta" Type="Self.tb_Alerta" Multiplicity="*" />
@@ -202,6 +229,30 @@ advertencia 6002: La tabla o vista 'Filiacion_Municipios.dbo.tb_PersonaBusqueda'
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_tb_PersonaPeriodoBusqueda_cat_EstatusPeriodoBusqueda">
+          <End Role="cat_EstatusPeriodoBusqueda" Type="Self.cat_EstatusPeriodoBusqueda" Multiplicity="1" />
+          <End Role="tb_PersonaPeriodoBusqueda" Type="Self.tb_PersonaPeriodoBusqueda" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="cat_EstatusPeriodoBusqueda">
+              <PropertyRef Name="idEstatusPeriodoBusqueda" />
+            </Principal>
+            <Dependent Role="tb_PersonaPeriodoBusqueda">
+              <PropertyRef Name="idEstatusPeriodoBusqueda" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tb_PersonaPeriodoBusqueda_tb_Persona">
+          <End Role="tb_Persona" Type="Self.tb_Persona" Multiplicity="1" />
+          <End Role="tb_PersonaPeriodoBusqueda" Type="Self.tb_PersonaPeriodoBusqueda" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tb_Persona">
+              <PropertyRef Name="idPersona" />
+            </Principal>
+            <Dependent Role="tb_PersonaPeriodoBusqueda">
+              <PropertyRef Name="idPersona" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_tbAlerta_catTbFuente">
           <End Role="cat_TbFuente" Type="Self.cat_TbFuente" Multiplicity="1" />
           <End Role="tb_Alerta" Type="Self.tb_Alerta" Multiplicity="*" />
@@ -219,6 +270,7 @@ advertencia 6002: La tabla o vista 'Filiacion_Municipios.dbo.tb_PersonaBusqueda'
           <Parameter Name="IDDETENIDO" Type="int" Mode="In" />
         </Function>
         <EntityContainer Name="Filiacion_MunicipiosModelStoreContainer">
+          <EntitySet Name="cat_EstatusPeriodoBusqueda" EntityType="Self.cat_EstatusPeriodoBusqueda" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="cat_TbFuente" EntityType="Self.cat_TbFuente" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="cat_TipoAlerta" EntityType="Self.cat_TipoAlerta" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="tb_Alerta" EntityType="Self.tb_Alerta" Schema="dbo" store:Type="Tables" />
@@ -229,6 +281,7 @@ advertencia 6002: La tabla o vista 'Filiacion_Municipios.dbo.tb_PersonaBusqueda'
           <EntitySet Name="tb_Fotografia" EntityType="Self.tb_Fotografia" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="tb_HUELLA_C5" EntityType="Self.tb_HUELLA_C5" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="tb_Persona" EntityType="Self.tb_Persona" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tb_PersonaPeriodoBusqueda" EntityType="Self.tb_PersonaPeriodoBusqueda" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="tb_PersonaBusqueda" EntityType="Self.tb_PersonaBusqueda" store:Type="Tables" store:Schema="dbo">
             <DefiningQuery>SELECT 
     [tb_PersonaBusqueda].[Id_Persona] AS [Id_Persona], 
@@ -249,6 +302,14 @@ advertencia 6002: La tabla o vista 'Filiacion_Municipios.dbo.tb_PersonaBusqueda'
           <AssociationSet Name="FK_tb_PersonaBusqueda_cat_TbFuente" Association="Self.FK_tb_PersonaBusqueda_cat_TbFuente">
             <End Role="cat_TbFuente" EntitySet="cat_TbFuente" />
             <End Role="tb_PersonaBusqueda" EntitySet="tb_PersonaBusqueda" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tb_PersonaPeriodoBusqueda_cat_EstatusPeriodoBusqueda" Association="Self.FK_tb_PersonaPeriodoBusqueda_cat_EstatusPeriodoBusqueda">
+            <End Role="cat_EstatusPeriodoBusqueda" EntitySet="cat_EstatusPeriodoBusqueda" />
+            <End Role="tb_PersonaPeriodoBusqueda" EntitySet="tb_PersonaPeriodoBusqueda" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tb_PersonaPeriodoBusqueda_tb_Persona" Association="Self.FK_tb_PersonaPeriodoBusqueda_tb_Persona">
+            <End Role="tb_Persona" EntitySet="tb_Persona" />
+            <End Role="tb_PersonaPeriodoBusqueda" EntitySet="tb_PersonaPeriodoBusqueda" />
           </AssociationSet>
           <AssociationSet Name="FK_tbAlerta_catTbFuente" Association="Self.FK_tbAlerta_catTbFuente">
             <End Role="cat_TbFuente" EntitySet="cat_TbFuente" />
@@ -290,6 +351,16 @@ advertencia 6002: La tabla o vista 'Filiacion_Municipios.dbo.tb_PersonaBusqueda'
           <AssociationSet Name="FK_tb_Fotografia_tb_Persona" Association="Filiacion_MunicipiosModel.FK_tb_Fotografia_tb_Persona">
             <End Role="tb_Persona" EntitySet="tb_Persona" />
             <End Role="tb_Fotografia" EntitySet="tb_Fotografia" />
+          </AssociationSet>
+          <EntitySet Name="cat_EstatusPeriodoBusqueda" EntityType="Filiacion_MunicipiosModel.cat_EstatusPeriodoBusqueda" />
+          <EntitySet Name="tb_PersonaPeriodoBusqueda" EntityType="Filiacion_MunicipiosModel.tb_PersonaPeriodoBusqueda" />
+          <AssociationSet Name="FK_tb_PersonaPeriodoBusqueda_cat_EstatusPeriodoBusqueda" Association="Filiacion_MunicipiosModel.FK_tb_PersonaPeriodoBusqueda_cat_EstatusPeriodoBusqueda">
+            <End Role="cat_EstatusPeriodoBusqueda" EntitySet="cat_EstatusPeriodoBusqueda" />
+            <End Role="tb_PersonaPeriodoBusqueda" EntitySet="tb_PersonaPeriodoBusqueda" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tb_PersonaPeriodoBusqueda_tb_Persona" Association="Filiacion_MunicipiosModel.FK_tb_PersonaPeriodoBusqueda_tb_Persona">
+            <End Role="tb_Persona" EntitySet="tb_Persona" />
+            <End Role="tb_PersonaPeriodoBusqueda" EntitySet="tb_PersonaPeriodoBusqueda" />
           </AssociationSet>
         </EntityContainer>
         <ComplexType Name="sp_Alertas_Result">
@@ -517,6 +588,7 @@ advertencia 6002: La tabla o vista 'Filiacion_Municipios.dbo.tb_PersonaBusqueda'
           <Property Name="UsuarioRegistro" Type="Int32" Nullable="false" />
           <Property Name="Observaciones" Type="String" MaxLength="300" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="tb_Fotografia" Relationship="Filiacion_MunicipiosModel.FK_tb_Fotografia_tb_Persona" FromRole="tb_Persona" ToRole="tb_Fotografia" />
+          <NavigationProperty Name="tb_PersonaPeriodoBusqueda" Relationship="Filiacion_MunicipiosModel.FK_tb_PersonaPeriodoBusqueda_tb_Persona" FromRole="tb_Persona" ToRole="tb_PersonaPeriodoBusqueda" />
         </EntityType>
         <Association Name="FK_tb_Fotografia_tb_Persona">
           <End Type="Filiacion_MunicipiosModel.tb_Persona" Role="tb_Persona" Multiplicity="1" />
@@ -526,6 +598,60 @@ advertencia 6002: La tabla o vista 'Filiacion_Municipios.dbo.tb_PersonaBusqueda'
               <PropertyRef Name="idPersona" />
             </Principal>
             <Dependent Role="tb_Fotografia">
+              <PropertyRef Name="idPersona" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="cat_EstatusPeriodoBusqueda">
+          <Key>
+            <PropertyRef Name="idEstatusPeriodoBusqueda" />
+          </Key>
+          <Property Name="idEstatusPeriodoBusqueda" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Nombre" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="Descripcion" Type="String" MaxLength="300" FixedLength="false" Unicode="true" />
+          <Property Name="FechaRegistro" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="Activo" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="tb_PersonaPeriodoBusqueda" Relationship="Filiacion_MunicipiosModel.FK_tb_PersonaPeriodoBusqueda_cat_EstatusPeriodoBusqueda" FromRole="cat_EstatusPeriodoBusqueda" ToRole="tb_PersonaPeriodoBusqueda" />
+        </EntityType>
+        <EntityType Name="tb_PersonaPeriodoBusqueda">
+          <Key>
+            <PropertyRef Name="idPeriodoBusqueda" />
+          </Key>
+          <Property Name="idPeriodoBusqueda" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="idPersona" Type="Int32" Nullable="false" />
+          <Property Name="FechaInicioBusqueda" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="FechaFinBusqueda" Type="DateTime" Precision="3" />
+          <Property Name="FechaRegistro" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="UsuarioRegistro" Type="Int32" Nullable="false" />
+          <Property Name="Activo" Type="Boolean" Nullable="false" />
+          <Property Name="Observaciones" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="FechaCancelacion" Type="DateTime" Precision="3" />
+          <Property Name="UsuarioCancelacion" Type="Int32" />
+          <Property Name="MotivoCancelacion" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="idEstatusPeriodoBusqueda" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="cat_EstatusPeriodoBusqueda" Relationship="Filiacion_MunicipiosModel.FK_tb_PersonaPeriodoBusqueda_cat_EstatusPeriodoBusqueda" FromRole="tb_PersonaPeriodoBusqueda" ToRole="cat_EstatusPeriodoBusqueda" />
+          <NavigationProperty Name="tb_Persona" Relationship="Filiacion_MunicipiosModel.FK_tb_PersonaPeriodoBusqueda_tb_Persona" FromRole="tb_PersonaPeriodoBusqueda" ToRole="tb_Persona" />
+        </EntityType>
+        <Association Name="FK_tb_PersonaPeriodoBusqueda_cat_EstatusPeriodoBusqueda">
+          <End Type="Filiacion_MunicipiosModel.cat_EstatusPeriodoBusqueda" Role="cat_EstatusPeriodoBusqueda" Multiplicity="1" />
+          <End Type="Filiacion_MunicipiosModel.tb_PersonaPeriodoBusqueda" Role="tb_PersonaPeriodoBusqueda" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="cat_EstatusPeriodoBusqueda">
+              <PropertyRef Name="idEstatusPeriodoBusqueda" />
+            </Principal>
+            <Dependent Role="tb_PersonaPeriodoBusqueda">
+              <PropertyRef Name="idEstatusPeriodoBusqueda" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tb_PersonaPeriodoBusqueda_tb_Persona">
+          <End Type="Filiacion_MunicipiosModel.tb_Persona" Role="tb_Persona" Multiplicity="1" />
+          <End Type="Filiacion_MunicipiosModel.tb_PersonaPeriodoBusqueda" Role="tb_PersonaPeriodoBusqueda" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tb_Persona">
+              <PropertyRef Name="idPersona" />
+            </Principal>
+            <Dependent Role="tb_PersonaPeriodoBusqueda">
               <PropertyRef Name="idPersona" />
             </Dependent>
           </ReferentialConstraint>
@@ -733,6 +859,35 @@ advertencia 6002: La tabla o vista 'Filiacion_Municipios.dbo.tb_PersonaBusqueda'
                 <ScalarProperty Name="Paterno" ColumnName="Paterno" />
                 <ScalarProperty Name="Nombre" ColumnName="Nombre" />
                 <ScalarProperty Name="idPersona" ColumnName="idPersona" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="cat_EstatusPeriodoBusqueda">
+            <EntityTypeMapping TypeName="Filiacion_MunicipiosModel.cat_EstatusPeriodoBusqueda">
+              <MappingFragment StoreEntitySet="cat_EstatusPeriodoBusqueda">
+                <ScalarProperty Name="Activo" ColumnName="Activo" />
+                <ScalarProperty Name="FechaRegistro" ColumnName="FechaRegistro" />
+                <ScalarProperty Name="Descripcion" ColumnName="Descripcion" />
+                <ScalarProperty Name="Nombre" ColumnName="Nombre" />
+                <ScalarProperty Name="idEstatusPeriodoBusqueda" ColumnName="idEstatusPeriodoBusqueda" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tb_PersonaPeriodoBusqueda">
+            <EntityTypeMapping TypeName="Filiacion_MunicipiosModel.tb_PersonaPeriodoBusqueda">
+              <MappingFragment StoreEntitySet="tb_PersonaPeriodoBusqueda">
+                <ScalarProperty Name="idEstatusPeriodoBusqueda" ColumnName="idEstatusPeriodoBusqueda" />
+                <ScalarProperty Name="MotivoCancelacion" ColumnName="MotivoCancelacion" />
+                <ScalarProperty Name="UsuarioCancelacion" ColumnName="UsuarioCancelacion" />
+                <ScalarProperty Name="FechaCancelacion" ColumnName="FechaCancelacion" />
+                <ScalarProperty Name="Observaciones" ColumnName="Observaciones" />
+                <ScalarProperty Name="Activo" ColumnName="Activo" />
+                <ScalarProperty Name="UsuarioRegistro" ColumnName="UsuarioRegistro" />
+                <ScalarProperty Name="FechaRegistro" ColumnName="FechaRegistro" />
+                <ScalarProperty Name="FechaFinBusqueda" ColumnName="FechaFinBusqueda" />
+                <ScalarProperty Name="FechaInicioBusqueda" ColumnName="FechaInicioBusqueda" />
+                <ScalarProperty Name="idPersona" ColumnName="idPersona" />
+                <ScalarProperty Name="idPeriodoBusqueda" ColumnName="idPeriodoBusqueda" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

@@ -38,6 +38,8 @@ namespace Objetivos_Prioritarios.Models
         public virtual DbSet<tb_FichaDecadactilar> tb_FichaDecadactilar { get; set; }
         public virtual DbSet<tb_Fotografia> tb_Fotografia { get; set; }
         public virtual DbSet<tb_Persona> tb_Persona { get; set; }
+        public virtual DbSet<cat_EstatusPeriodoBusqueda> cat_EstatusPeriodoBusqueda { get; set; }
+        public virtual DbSet<tb_PersonaPeriodoBusqueda> tb_PersonaPeriodoBusqueda { get; set; }
     
         public virtual ObjectResult<sp_Alertas_Result> sp_Alertas()
         {

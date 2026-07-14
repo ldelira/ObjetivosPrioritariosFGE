@@ -1,0 +1,393 @@
+﻿<div class="pi-section-title">
+    <h3>Periodo de búsqueda</h3>
+    <p>Define el rango de tiempo en que esta persona estará activa para búsqueda.</p>
+</div>
+
+<div class="pi-upload-card">
+
+    <div class="row">
+
+        <div class="col-md-3">
+            <div class="form-group">
+                <label>Fecha inicio</label>
+                <input type="date" id="txtFechaInicioBusqueda" class="form-control" />
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="form-group">
+                <label>Fecha fin</label>
+                <input type="date" id="txtFechaFinBusqueda" class="form-control" />
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="form-group">
+                <label>Observaciones</label>
+                <input type="text"
+                       id="txtObservacionesPeriodoBusqueda"
+                       class="form-control"
+                       placeholder="Ej. búsqueda por 10 días, seguimiento especial, etc." />
+            </div>
+        </div>
+
+        <div class="col-md-2 d-flex align-items-end">
+            <button type="button" class="btn btn-primary btn-block" id="btnGuardarPeriodoBusqueda">
+                <i class="fa fa-save"></i> Guardar
+            </button>
+        </div>
+
+    </div>
+
+    <div class="pi-periodo-aviso">
+        <i class="fa fa-info-circle"></i>
+        Al guardar un nuevo periodo, el periodo activo anterior será marcado como reemplazado.
+    </div>
+
+</div>
+
+<hr />
+
+<div id="contenedorPeriodoActivoBusqueda"></div>
+
+<br />
+
+<table id="periodosBusquedaDataTable" class="table table-striped" style="width:100%">
+    <thead>
+        <tr>
+            <th>Estatus</th>
+            <th>Inicio</th>
+            <th>Fin</th>
+            <th>Días totales</th>
+            <th>Días restantes</th>
+            <th>Observaciones</th>
+            <th>Fecha registro</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<script>
+    $(document).ready(function () {
+        inicializarFechasPeriodoBusqueda();
+        cargarPeriodosBusquedaPersonaInteres();
+
+        $("#btnGuardarPeriodoBusqueda").off("click").on("click", function () {
+            guardarPeriodoBusquedaPersonaInteres();
+        });
+    });
+
+    function inicializarFechasPeriodoBusqueda() {
+        var hoy = new Date();
+        var fin = new Date();
+        fin.setDate(hoy.getDate() + 9);
+
+        $("#txtFechaInicioBusqueda").val(formatoFechaInput(hoy));
+        $("#txtFechaFinBusqueda").val(formatoFechaInput(fin));
+    }
+
+    function formatoFechaInput(fecha) {
+        var yyyy = fecha.getFullYear();
+        var mm = ("0" + (fecha.getMonth() + 1)).slice(-2);
+        var dd = ("0" + fecha.getDate()).slice(-2);
+
+        return yyyy + "-" + mm + "-" + dd;
+    }
+
+    function cargarPeriodosBusquedaPersonaInteres() {
+
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("FillPeriodosBusquedaPersonaInteres", "PersonasInteres")",
+            data: {
+                idPersona: $("#idPersona").val()
+            },
+            success: function (data) {
+
+                pintarPeriodoActivo(data);
+                pintarTablaPeriodosBusqueda(data);
+
+                if (typeof actualizarResumenPeriodoBusqueda === "function") {
+                    actualizarResumenPeriodoBusqueda(data);
+                }
+            },
+            error: function (xhr) {
+                console.log(xhr.responseText);
+                swal("Error", "Ocurrió un error al cargar los periodos de búsqueda.", "error");
+            }
+        });
+    }
+
+    function pintarPeriodoActivo(data) {
+
+        var activo = null;
+
+        if (data && data.length > 0) {
+            activo = data.find(x => x.activo === true);
+        }
+
+        if (!activo) {
+            $("#contenedorPeriodoActivoBusqueda").html(`
+                <div class="pi-empty pi-empty-small">
+                    <i class="fa fa-calendar"></i>
+                    <strong>Sin periodo activo.</strong>
+                    <br />
+                    Captura un periodo para activar esta persona en búsqueda.
+                </div>
+            `);
+            return;
+        }
+
+        var clase = activo.diasRestantes <= 0 ? "pi-periodo-activo vencido" : "pi-periodo-activo";
+
+        $("#contenedorPeriodoActivoBusqueda").html(`
+            <div class="${clase}">
+                <div>
+                    <span>Periodo activo</span>
+                    <strong>${activo.fechaInicioBusqueda} al ${activo.fechaFinBusqueda}</strong>
+                    <small>${activo.observaciones || "Sin observaciones"}</small>
+                </div>
+
+                <div class="pi-periodo-dias">
+                    <label>Días restantes</label>
+                    <strong>${activo.diasRestantes}</strong>
+                </div>
+            </div>
+        `);
+    }
+
+    function pintarTablaPeriodosBusqueda(data) {
+
+        if ($.fn.DataTable.isDataTable("#periodosBusquedaDataTable")) {
+            $("#periodosBusquedaDataTable").DataTable().clear().destroy();
+            $("#periodosBusquedaDataTable tbody").empty();
+        }
+
+        $("#periodosBusquedaDataTable").DataTable({
+            destroy: true,
+            searching: true,
+            responsive: false,
+            scrollX: true,
+            autoWidth: false,
+            data: data,
+            columns: [
+                {
+                    title: "Estatus",
+                    data: "estatusVisual",
+                    render: function (data, type, row) {
+
+                        if (data === "Activo") {
+                            return `<span class="op-badge op-badge-success">Activo</span>`;
+                        }
+
+                        if (data === "Vencido") {
+                            return `<span class="op-badge op-badge-danger">Vencido</span>`;
+                        }
+
+                        if (data === "Cancelado") {
+                            return `<span class="op-badge op-badge-danger">Cancelado</span>`;
+                        }
+
+                        return `<span class="op-badge op-badge-muted">${data || "Inactivo"}</span>`;
+                    }
+                },
+                {
+                    title: "Inicio",
+                    data: "fechaInicioBusqueda"
+                },
+                {
+                    title: "Fin",
+                    data: "fechaFinBusqueda"
+                },
+                {
+                    title: "Días totales",
+                    data: "diasTotales"
+                },
+                {
+                    title: "Días restantes",
+                    data: "diasRestantes"
+                },
+                {
+                    title: "Observaciones",
+                    data: "observaciones",
+                    defaultContent: ""
+                },
+                {
+                    title: "Fecha registro",
+                    data: "fechaRegistro"
+                },
+                {
+                    title: "Acciones",
+                    data: "idPeriodoBusqueda",
+                    orderable: false,
+                    searchable: false,
+                    className: "text-center dt-nowrap",
+                    render: function (data, type, row) {
+
+                        if (row.activo === true) {
+                            return `
+                                <div class="dt-actions">
+                                    <button type="button"
+                                            class="btn btn-sm btn-danger"
+                                            onclick="cancelarPeriodoBusquedaPersonaInteres(${data})"
+                                            title="Cancelar periodo">
+                                        <i class="fa fa-ban"></i>
+                                    </button>
+                                </div>
+                            `;
+                        }
+
+                        return "";
+                    }
+                }
+            ],
+            language: {
+                sProcessing: "Procesando...",
+                sLengthMenu: "Mostrar _MENU_ registros",
+                sZeroRecords: "No se encontraron resultados",
+                sEmptyTable: "Ningún dato disponible en esta tabla",
+                sInfo: "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                sInfoEmpty: "Mostrando registros del 0 al 0 de un total de 0 registros",
+                sInfoFiltered: "(filtrado de un total de _MAX_ registros)",
+                sSearch: "Buscar:",
+                sLoadingRecords: "Cargando...",
+                oPaginate: {
+                    sFirst: "Primero",
+                    sLast: "Último",
+                    sNext: "Siguiente",
+                    sPrevious: "Anterior"
+                }
+            }
+        });
+    }
+
+    function guardarPeriodoBusquedaPersonaInteres() {
+
+        var idPersona = parseInt($("#idPersona").val() || "0");
+        var fechaInicio = $("#txtFechaInicioBusqueda").val();
+        var fechaFin = $("#txtFechaFinBusqueda").val();
+
+        if (idPersona <= 0) {
+            swal("Aviso", "Primero guarda la persona de interés.", "warning");
+            return;
+        }
+
+        if (!fechaInicio) {
+            swal("Validación", "Captura la fecha inicio.", "warning");
+            return;
+        }
+
+        if (!fechaFin) {
+            swal("Validación", "Captura la fecha fin.", "warning");
+            return;
+        }
+
+        if (fechaFin < fechaInicio) {
+            swal("Validación", "La fecha fin no puede ser menor a la fecha inicio.", "warning");
+            return;
+        }
+
+        swal({
+            title: "¿Guardar periodo?",
+            text: "Si ya existe un periodo activo, será reemplazado por este nuevo periodo.",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#2f5bff",
+            cancelButtonColor: "#6c757d",
+            confirmButtonText: "Sí, guardar",
+            cancelButtonText: "Cancelar"
+        }, function (isConfirm) {
+
+            if (!isConfirm) {
+                return;
+            }
+
+            $("#btnGuardarPeriodoBusqueda")
+                .prop("disabled", true)
+                .html('<i class="fa fa-spinner fa-spin"></i> Guardando...');
+
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("SavePeriodoBusquedaPersonaInteres", "PersonasInteres")",
+                data: {
+                    idPersona: idPersona,
+                    fechaInicioBusqueda: fechaInicio,
+                    fechaFinBusqueda: fechaFin,
+                    observaciones: $("#txtObservacionesPeriodoBusqueda").val()
+                },
+                success: function (resp) {
+
+                    $("#btnGuardarPeriodoBusqueda")
+                        .prop("disabled", false)
+                        .html('<i class="fa fa-save"></i> Guardar');
+
+                    if (resp.IsSuccess) {
+                        swal("", resp.Message, "success");
+
+                        $("#txtObservacionesPeriodoBusqueda").val("");
+
+                        cargarPeriodosBusquedaPersonaInteres();
+                    } else {
+                        swal("Error", resp.Message, "error");
+                    }
+                },
+                error: function (xhr) {
+                    console.log(xhr.responseText);
+
+                    $("#btnGuardarPeriodoBusqueda")
+                        .prop("disabled", false)
+                        .html('<i class="fa fa-save"></i> Guardar');
+
+                    swal("Error", "Ocurrió un error al guardar el periodo.", "error");
+                }
+            });
+
+        });
+    }
+
+    function cancelarPeriodoBusquedaPersonaInteres(idPeriodoBusqueda) {
+
+        swal({
+            title: "Cancelar periodo",
+            text: "Escribe el motivo de cancelación:",
+            type: "input",
+            showCancelButton: true,
+            closeOnConfirm: false,
+            animation: "slide-from-top",
+            inputPlaceholder: "Motivo de cancelación"
+        }, function (motivo) {
+
+            if (motivo === false) {
+                return;
+            }
+
+            if (!motivo || motivo.trim() === "") {
+                swal.showInputError("Captura el motivo de cancelación.");
+                return;
+            }
+
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("CancelarPeriodoBusquedaPersonaInteres", "PersonasInteres")",
+                data: {
+                    idPeriodoBusqueda: idPeriodoBusqueda,
+                    motivoCancelacion: motivo
+                },
+                success: function (resp) {
+
+                    if (resp.IsSuccess) {
+                        swal("", resp.Message, "success");
+                        cargarPeriodosBusquedaPersonaInteres();
+                    } else {
+                        swal("Error", resp.Message, "error");
+                    }
+                },
+                error: function (xhr) {
+                    console.log(xhr.responseText);
+                    swal("Error", "Ocurrió un error al cancelar el periodo.", "error");
+                }
+            });
+        });
+    }
+</script>

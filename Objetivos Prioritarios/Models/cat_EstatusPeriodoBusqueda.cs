@@ -12,28 +12,20 @@ namespace Objetivos_Prioritarios.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class tb_Persona
+    public partial class cat_EstatusPeriodoBusqueda
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public tb_Persona()
+        public cat_EstatusPeriodoBusqueda()
         {
-            this.tb_Fotografia = new HashSet<tb_Fotografia>();
             this.tb_PersonaPeriodoBusqueda = new HashSet<tb_PersonaPeriodoBusqueda>();
         }
     
-        public int idPersona { get; set; }
+        public int idEstatusPeriodoBusqueda { get; set; }
         public string Nombre { get; set; }
-        public string Paterno { get; set; }
-        public string Materno { get; set; }
-        public Nullable<System.DateTime> FechaNacimiento { get; set; }
-        public string Estatura { get; set; }
-        public string Sexo { get; set; }
-        public Nullable<System.DateTime> FechaRegistro { get; set; }
-        public int UsuarioRegistro { get; set; }
-        public string Observaciones { get; set; }
+        public string Descripcion { get; set; }
+        public System.DateTime FechaRegistro { get; set; }
+        public bool Activo { get; set; }
     
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<tb_Fotografia> tb_Fotografia { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<tb_PersonaPeriodoBusqueda> tb_PersonaPeriodoBusqueda { get; set; }
     }

@@ -1269,6 +1269,36 @@
             display: none !important;
         }
     }
+
+    .op-module-toggle .op-module-custom-icon {
+        width: 30px !important;
+        height: 30px !important;
+        min-width: 30px !important;
+        max-width: 30px !important;
+        flex: 0 0 30px !important;
+        border-radius: 11px !important;
+        background: rgba(255,255,255,.12) !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 0 !important;
+    }
+
+        .op-module-toggle .op-module-custom-icon img {
+            width: 18px !important;
+            height: 18px !important;
+            object-fit: contain !important;
+            display: block !important;
+            filter: brightness(0) invert(1);
+        }
+
+    .op-module-toggle .op-module-label {
+        flex: 1 !important;
+        font-weight: 800 !important;
+        min-width: 0 !important;
+        white-space: normal !important;
+        line-height: 1.25 !important;
+    }
 </style>
 
 <body>
@@ -1436,8 +1466,14 @@
                    data-bs-toggle="collapse"
                    href="#"
                    aria-expanded="@(isModuloPersonasInteres ? "true" : "false")">
-                    <i class="fa fa-address-card"></i>
-                    <span>Personas de Interés</span>
+
+                    <span class="op-module-custom-icon">
+                        <img src="@Url.Content("~/images/icons8-target-audience-24.png")"
+                             alt="Personas de Interés" />
+                    </span>
+
+                    <span class="op-module-label">Personas de Interés</span>
+
                     <i class="fa fa-chevron-down op-module-chevron"></i>
                 </a>
 

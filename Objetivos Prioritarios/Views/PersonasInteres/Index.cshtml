@@ -1,0 +1,166 @@
+﻿@{
+    ViewBag.Title = "Personas de Interés";
+}
+
+<div class="op-page">
+
+    <div class="op-page-title">
+        <h2>Personas de Interés</h2>
+        <div class="op-breadcrumb">
+            Personas de Interés / Listado general
+        </div>
+    </div>
+
+    <div class="op-card">
+
+        <div class="op-section-header">
+            <div>
+                <h3>Registro de personas de interés</h3>
+                <p>Consulta, registra o actualiza personas con información parcial, fotografía o huellas.</p>
+            </div>
+
+            <a class="btn btn-primary" href="@Url.Action("AddEditPersonaInteres", "PersonasInteres")">
+                <i class="fa fa-plus"></i> Registrar persona
+            </a>
+        </div>
+
+        <table id="personasInteresDataTable" class="table table-striped" style="width:100%">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Persona</th>
+                    <th>Edad aprox.</th>
+                    <th>Sexo</th>
+                    <th>Estatura</th>
+                    <th>Observaciones</th>
+                    <th>Fecha registro</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+
+    </div>
+
+</div>
+
+<script>
+    $(document).ready(function () {
+        FillPersonasInteres();
+    });
+
+    function FillPersonasInteres() {
+
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("FillPersonasInteresList", "PersonasInteres")",
+            success: function (data) {
+
+                if ($.fn.DataTable.isDataTable("#personasInteresDataTable")) {
+                    $("#personasInteresDataTable").DataTable().clear().destroy();
+                    $("#personasInteresDataTable tbody").empty();
+                }
+
+                $("#personasInteresDataTable").DataTable({
+                    destroy: true,
+                    searching: true,
+                    responsive: false,
+                    scrollX: true,
+                    autoWidth: false,
+                    data: data,
+                    columns: [
+                        {
+                            title: "ID",
+                            data: "idPersona",
+                            width: "70px"
+                        },
+                        {
+                            title: "Persona",
+                            data: "nombreMostrar",
+                            render: function (data, type, row) {
+                                if (!data || data.trim() === "") {
+                                    return `<strong>Persona sin identificar</strong>`;
+                                }
+
+                                if (data === "Persona sin identificar") {
+                                    return `<strong class="text-muted">${data}</strong>`;
+                                }
+
+                                return `<strong>${data}</strong>`;
+                            }
+                        },
+                        {
+                            title: "Edad aprox.",
+                            data: "edadAproximada",
+                            defaultContent: "Sin edad"
+                        },
+                        {
+                            title: "Sexo",
+                            data: "sexo",
+                            defaultContent: "Sin dato"
+                        },
+                        {
+                            title: "Estatura",
+                            data: "estatura",
+                            defaultContent: "Sin dato"
+                        },
+                        {
+                            title: "Observaciones",
+                            data: "observacionesCorta",
+                            defaultContent: ""
+                        },
+                        {
+                            title: "Fecha registro",
+                            data: "fechaRegistro",
+                            defaultContent: ""
+                        },
+                        {
+                            title: "Acciones",
+                            data: "idPersona",
+                            orderable: false,
+                            searchable: false,
+                            className: "text-center dt-nowrap",
+                            render: function (data) {
+                                return `
+                                    <div class="dt-actions">
+                                        <button type="button"
+                                                class="btn btn-sm btn-primary"
+                                                onclick="abrirPersonaInteres(${data})"
+                                                title="Abrir ficha">
+                                            <i class="fa fa-eye"></i>
+                                        </button>
+                                    </div>
+                                `;
+                            }
+                        }
+                    ],
+                    language: {
+                        sProcessing: "Procesando...",
+                        sLengthMenu: "Mostrar _MENU_ registros",
+                        sZeroRecords: "No se encontraron resultados",
+                        sEmptyTable: "Ningún dato disponible en esta tabla",
+                        sInfo: "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                        sInfoEmpty: "Mostrando registros del 0 al 0 de un total de 0 registros",
+                        sInfoFiltered: "(filtrado de un total de _MAX_ registros)",
+                        sSearch: "Buscar:",
+                        sLoadingRecords: "Cargando...",
+                        oPaginate: {
+                            sFirst: "Primero",
+                            sLast: "Último",
+                            sNext: "Siguiente",
+                            sPrevious: "Anterior"
+                        }
+                    }
+                });
+            },
+            error: function (xhr) {
+                console.log(xhr.responseText);
+                swal("Error", "Ocurrió un error al cargar las personas de interés.", "error");
+            }
+        });
+    }
+
+    function abrirPersonaInteres(idPersona) {
+        window.location.href = "@Url.Action("AddEditPersonaInteres", "PersonasInteres")?idPersona=" + idPersona;
+    }
+</script>

@@ -267,6 +267,7 @@
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="ControllersServices\PersonaInteresService.cs" />
     <Compile Include="ControllersServices\FiliacionMunicipalService.cs" />
     <Compile Include="ControllersServices\MapaRelacionesService.cs" />
     <Compile Include="ControllersServices\BaseService.cs" />
@@ -277,6 +278,7 @@
     <Compile Include="ControllersServices\ObjetivoService.cs" />
     <Compile Include="ControllersServices\ReporteService.cs" />
     <Compile Include="Controllers\ABaseController.cs" />
+    <Compile Include="Controllers\PersonasInteresController.cs" />
     <Compile Include="Controllers\AsuntosController.cs" />
     <Compile Include="Controllers\CatalogoController.cs" />
     <Compile Include="Controllers\DashboardController.cs" />
@@ -574,8 +576,14 @@
     <Compile Include="Models\tb_FichaAsunto.cs">
       <DependentUpon>ObjetivosPrioritarios.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\tb_FichaDecadactilar.cs">
+      <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\tb_FichaObjetivo.cs">
       <DependentUpon>ObjetivosPrioritarios.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\tb_Fotografia.cs">
+      <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\tb_FOTO_C5.cs">
       <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
@@ -603,6 +611,9 @@
     </Compile>
     <Compile Include="Models\tb_OrdenAprehension.cs">
       <DependentUpon>ObjetivosPrioritarios.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\tb_Persona.cs">
+      <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\tb_PersonaBusqueda.cs">
       <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
@@ -2635,6 +2646,7 @@
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\bootstrap.rtl.css" />
     <Content Include="Content\bootstrap.rtl.min.css" />
+    <Content Include="Content\css\PersonasInteres\personas-interes.css" />
     <Content Include="Content\DataTables\css\autoFill.bootstrap.css" />
     <Content Include="Content\DataTables\css\autoFill.bootstrap.min.css" />
     <Content Include="Content\DataTables\css\autoFill.bootstrap4.css" />
@@ -3533,6 +3545,8 @@
     <Content Include="Views\MapaRelaciones\Index.cshtml" />
     <Content Include="Views\SIC\Index.cshtml" />
     <Content Include="Views\SIC\DetalleDetenidoC5.cshtml" />
+    <Content Include="Views\PersonasInteres\Index.cshtml" />
+    <Content Include="Views\PersonasInteres\AddEditPersonaInteres.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

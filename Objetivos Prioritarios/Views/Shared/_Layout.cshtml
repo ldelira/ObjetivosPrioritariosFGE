@@ -13,6 +13,8 @@
             || controllerName.Equals("Sic", StringComparison.OrdinalIgnoreCase)
             || controllerName.Equals("SicNotificador", StringComparison.OrdinalIgnoreCase);
 
+    var isPersonasInteres = controllerName.Equals("PersonasInteres", StringComparison.OrdinalIgnoreCase);
+
     var isAlbum = controllerName.Equals("FichaObjetivo", StringComparison.OrdinalIgnoreCase)
           && actionName.Equals("IndexAlbum", StringComparison.OrdinalIgnoreCase);
 
@@ -21,8 +23,22 @@
 
     var isModuloObjetivos = isMapa || isObjetivos || isAsuntos || isAlbum;
     var isModuloSic = isSic;
-    var moduloActivo = isModuloSic ? "Sistema de Identificación Criminal" : "Objetivos Prioritarios";
-    var moduloActivoSubtitulo = isModuloSic ? "Personas de interés y filiación" : "Gestión de inteligencia";
+    var isModuloPersonasInteres = isPersonasInteres;
+
+    var moduloActivo = "Objetivos Prioritarios";
+    var moduloActivoSubtitulo = "Gestión de inteligencia";
+
+    if (isModuloSic)
+    {
+        moduloActivo = "Sistema de Identificación Criminal";
+        moduloActivoSubtitulo = "Consulta y filiación";
+    }
+
+    if (isModuloPersonasInteres)
+    {
+        moduloActivo = "Personas de Interés";
+        moduloActivoSubtitulo = "Registros parciales, fotos y huellas";
+    }
 }
 
 <!DOCTYPE html>
@@ -1302,6 +1318,7 @@
     </header>
 
     <aside id="sidebar" class="sidebar">
+
         <div class="op-sidebar-title op-sidebar-title-modern">
             <div class="op-sidebar-title-top">
                 <span>Módulo activo</span>
@@ -1312,8 +1329,10 @@
         </div>
 
         <ul class="sidebar-nav op-sidebar-nav-modern" id="sidebar-nav">
+
             <li class="nav-heading">Módulos del sistema</li>
 
+            <!-- OBJETIVOS PRIORITARIOS -->
             <li class="nav-item op-module-item">
                 <a class="nav-link op-module-toggle @(isModuloObjetivos ? "" : "collapsed")"
                    data-bs-target="#menuObjetivosPrioritarios"
@@ -1328,30 +1347,35 @@
                 <ul id="menuObjetivosPrioritarios"
                     class="nav-content collapse @(isModuloObjetivos ? "show" : "")"
                     data-bs-parent="#sidebar-nav">
+
                     <li>
                         <a class="@(isMapa ? "active" : "")" href="@Url.Action("Index", "MapaRelaciones")">
                             <i class="fa fa-sitemap"></i>
                             <span>Red de inteligencia</span>
                         </a>
                     </li>
+
                     <li>
                         <a class="@(isObjetivos ? "active" : "")" href="@Url.Action("Index", "Objetivo")">
                             <i class="fa fa-user"></i>
                             <span>Objetivos</span>
                         </a>
                     </li>
+
                     <li>
                         <a class="@(isAsuntos ? "active" : "")" href="@Url.Action("Index", "Asuntos")">
                             <i class="fa fa-link"></i>
                             <span>Asuntos relacionados</span>
                         </a>
                     </li>
+
                     <li>
                         <a class="@(isAlbum ? "active" : "")" href="@Url.Action("IndexAlbum", "FichaObjetivo")">
                             <i class="fa fa-folder-open"></i>
                             <span>Álbum de fichas</span>
                         </a>
                     </li>
+
                     <li>
                         <a class="disabled" href="javascript:void(0);" title="Pendiente de enlazar a la ruta de catálogos">
                             <i class="fa fa-list"></i>
@@ -1359,11 +1383,11 @@
                             <em>Próximo</em>
                         </a>
                     </li>
+
                 </ul>
             </li>
 
-            <li class="nav-heading">Identificación criminal</li>
-
+            <!-- SIC -->
             <li class="nav-item op-module-item">
                 <a class="nav-link op-module-toggle @(isModuloSic ? "" : "collapsed")"
                    data-bs-target="#menuSic"
@@ -1378,12 +1402,14 @@
                 <ul id="menuSic"
                     class="nav-content collapse @(isModuloSic ? "show" : "")"
                     data-bs-parent="#sidebar-nav">
+
                     <li>
                         <a class="@(isSic ? "active" : "")" href="@Url.Action("Index", "SIC")">
                             <i class="fa fa-id-card-o"></i>
-                            <span>Personas de interés</span>
+                            <span>Consulta SIC</span>
                         </a>
                     </li>
+
                     <li>
                         <a class="disabled" href="javascript:void(0);">
                             <i class="fa fa-search"></i>
@@ -1391,6 +1417,7 @@
                             <em>Próximo</em>
                         </a>
                     </li>
+
                     <li>
                         <a class="disabled" href="javascript:void(0);">
                             <i class="fa fa-tags"></i>
@@ -1398,11 +1425,71 @@
                             <em>Próximo</em>
                         </a>
                     </li>
+
                 </ul>
             </li>
+
+            <!-- PERSONAS DE INTERÉS -->
+            <li class="nav-item op-module-item">
+                <a class="nav-link op-module-toggle @(isModuloPersonasInteres ? "" : "collapsed")"
+                   data-bs-target="#menuPersonasInteres"
+                   data-bs-toggle="collapse"
+                   href="#"
+                   aria-expanded="@(isModuloPersonasInteres ? "true" : "false")">
+                    <i class="fa fa-address-card"></i>
+                    <span>Personas de Interés</span>
+                    <i class="fa fa-chevron-down op-module-chevron"></i>
+                </a>
+
+                <ul id="menuPersonasInteres"
+                    class="nav-content collapse @(isModuloPersonasInteres ? "show" : "")"
+                    data-bs-parent="#sidebar-nav">
+
+                    <li>
+                        <a class="@(isPersonasInteres && actionName.Equals("Index", StringComparison.OrdinalIgnoreCase) ? "active" : "")"
+                           href="@Url.Action("Index", "PersonasInteres")">
+                            <i class="fa fa-users"></i>
+                            <span>Personas</span>
+                        </a>
+                    </li>
+
+                    @*<li>
+                        <a class="@(isPersonasInteres && actionName.Equals("AddEditPersonaInteres", StringComparison.OrdinalIgnoreCase) ? "active" : "")"
+                           href="@Url.Action("AddEditPersonaInteres", "PersonasInteres")">
+                            <i class="fa fa-plus"></i>
+                            <span>Registrar persona</span>
+                        </a>
+                    </li>
+
+                    <li>
+                        <a class="disabled" href="javascript:void(0);">
+                            <i class="fa fa-camera"></i>
+                            <span>Fotografías</span>
+                            <em>Próximo</em>
+                        </a>
+                    </li>
+
+                    <li>
+                        <a class="disabled" href="javascript:void(0);">
+                            <i class="fa fa-hand-paper-o"></i>
+                            <span>Huellas</span>
+                            <em>Próximo</em>
+                        </a>
+                    </li>
+
+                    <li>
+                        <a class="disabled" href="javascript:void(0);">
+                            <i class="fa fa-search"></i>
+                            <span>Búsqueda biométrica</span>
+                            <em>Próximo</em>
+                        </a>
+                    </li>*@
+
+                </ul>
+            </li>
+
         </ul>
     </aside>
-
     <main id="main" class="main">
         @if (!string.IsNullOrWhiteSpace(pageTitle))
         {

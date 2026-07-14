@@ -1,0 +1,411 @@
+﻿@model Objetivos_Prioritarios.Models.tb_Persona
+
+@{
+    ViewBag.Title = "Ficha de Persona de Interés";
+
+    var nombreMostrar = ViewBag.NombreMostrar as string;
+    if (string.IsNullOrWhiteSpace(nombreMostrar))
+    {
+        nombreMostrar = "Persona sin identificar";
+    }
+
+    int? edadAproximada = null;
+    if (ViewBag.EdadAproximada != null)
+    {
+        int edadTemp;
+        if (int.TryParse(ViewBag.EdadAproximada.ToString(), out edadTemp))
+        {
+            edadAproximada = edadTemp;
+        }
+    }
+
+    string fechaNacimientoExacta = "";
+    if (Model.FechaNacimiento.HasValue)
+    {
+        if (!(Model.FechaNacimiento.Value.Day == 1 && Model.FechaNacimiento.Value.Month == 1))
+        {
+            fechaNacimientoExacta = Model.FechaNacimiento.Value.ToString("yyyy-MM-dd");
+        }
+    }
+
+    var sexoTexto = "Sin dato";
+    if (Model.Sexo == "M")
+    {
+        sexoTexto = "Masculino";
+    }
+    else if (Model.Sexo == "F")
+    {
+        sexoTexto = "Femenino";
+    }
+    else if (Model.Sexo == "ND")
+    {
+        sexoTexto = "No determinado";
+    }
+
+    var estaturaTexto = string.IsNullOrWhiteSpace(Model.Estatura) ? "Sin dato" : Model.Estatura;
+}
+
+@section styles {
+    <link href="@Url.Content("~/Content/css/PersonasInteres/personas-interes.css?v=1.0.0")" rel="stylesheet" />
+}
+<input type="hidden" id="idPersona" value="@Model.idPersona" />
+
+<div class="pi-page">
+
+    @*<div class="pi-title">
+        <h2>Ficha de Persona de Interés</h2>
+        <p>Personas de Interés / Ficha</p>
+    </div>*@
+
+    <div class="pi-hero">
+
+        <div class="pi-photo-card">
+            <div class="pi-photo-box">
+                <div class="pi-photo-empty">
+                    <i class="fa fa-user"></i>
+                    <span>Sin foto</span>
+                </div>
+            </div>
+
+            <button type="button" class="pi-photo-btn" disabled>
+                <i class="fa fa-camera"></i> Foto pendiente
+            </button>
+        </div>
+
+        <div class="pi-main">
+            <h1>@nombreMostrar</h1>
+            <div class="pi-subtitle">
+                Registro preliminar para persona con información completa o parcial.
+            </div>
+
+            <div class="pi-status-row">
+                <span class="pi-pill @(Model.idPersona > 0 ? "" : "pi-new")">
+                    <i class="fa fa-circle"></i>
+                    @(Model.idPersona > 0 ? "Registrado" : "Nuevo registro")
+                </span>
+
+                <span class="pi-pill">
+                    <i class="fa fa-database"></i>
+                    Fuente: Personas de Interés
+                </span>
+            </div>
+
+            <div class="pi-info-grid">
+
+                <div class="pi-info-item">
+                    <div class="pi-info-icon">
+                        <i class="fa fa-id-card-o"></i>
+                    </div>
+                    <div>
+                        <label>ID Persona</label>
+                        <strong>@(Model.idPersona > 0 ? Model.idPersona.ToString() : "Pendiente")</strong>
+                    </div>
+                </div>
+
+                <div class="pi-info-item">
+                    <div class="pi-info-icon">
+                        <i class="fa fa-calendar"></i>
+                    </div>
+                    <div>
+                        <label>Edad aproximada</label>
+                        <strong>@(edadAproximada.HasValue ? edadAproximada.Value + " años" : "Sin edad")</strong>
+                    </div>
+                </div>
+
+                <div class="pi-info-item">
+                    <div class="pi-info-icon">
+                        <i class="fa fa-venus-mars"></i>
+                    </div>
+                    <div>
+                        <label>Sexo</label>
+                        <strong>@sexoTexto</strong>
+                    </div>
+                </div>
+
+                <div class="pi-info-item">
+                    <div class="pi-info-icon">
+                        <i class="fa fa-arrows-v"></i>
+                    </div>
+                    <div>
+                        <label>Estatura</label>
+                        <strong>@estaturaTexto</strong>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="pi-side">
+            <div>
+                <h4 style="color:white">Resumen rápido</h4>
+                <p>Este registro puede iniciar sin nombre, solo con datos aproximados, fotografía o huellas.</p>
+
+                <div class="pi-side-box">
+                    <label>Estado del registro</label>
+                    <strong>@(Model.idPersona > 0 ? "Capturado" : "Pendiente")</strong>
+                </div>
+
+                <div class="pi-side-box">
+                    <label>Fecha de registro</label>
+                    <strong>@(Model.FechaRegistro.HasValue ? Model.FechaRegistro.Value.ToString("dd/MM/yyyy") : "Hoy")</strong>
+                </div>
+            </div>
+
+            <a class="pi-back" href="@Url.Action("Index", "PersonasInteres")">
+                <i class="fa fa-arrow-left"></i> Regresar
+            </a>
+        </div>
+
+    </div>
+
+    <div class="pi-tabs-card">
+
+        <ul class="nav nav-tabs pi-tabs" id="tabsPersonaInteres">
+            <li class="nav-item">
+                <a class="nav-link active pi-tab-link" href="#tabDatosGenerales">
+                    <i class="fa fa-user"></i> Datos generales
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link pi-tab-link @(Model.idPersona == 0 ? "disabled" : "")" href="#tabFotografias">
+                    <i class="fa fa-camera"></i> Fotografías
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link pi-tab-link @(Model.idPersona == 0 ? "disabled" : "")" href="#tabHuellas">
+                    <i class="fa fa-hand-paper-o"></i> Huellas
+                </a>
+            </li>
+        </ul>
+
+        <div class="pi-tab-content">
+
+            <div class="pi-tab-pane active" id="tabDatosGenerales">
+
+                <div class="pi-section-title">
+                    <h3>Datos generales</h3>
+                    <p>Captura la información disponible. Puede registrarse aunque no tenga nombre.</p>
+                </div>
+
+                <div class="pi-alert">
+                    <i class="fa fa-info-circle"></i>
+                    Si no se conoce el nombre, puedes dejarlo vacío. El sistema guardará el registro como persona sin identificar.
+                </div>
+
+                <div class="pi-form">
+                    <div class="row">
+
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Nombre</label>
+                                <input type="text" id="txtNombre" class="form-control" value="@Model.Nombre" placeholder="Opcional" />
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Apellido paterno</label>
+                                <input type="text" id="txtPaterno" class="form-control" value="@Model.Paterno" placeholder="Opcional" />
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Apellido materno</label>
+                                <input type="text" id="txtMaterno" class="form-control" value="@Model.Materno" placeholder="Opcional" />
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Edad aproximada</label>
+                                <input type="number"
+                                       id="txtEdadAproximada"
+                                       class="form-control"
+                                       value="@(edadAproximada.HasValue ? edadAproximada.Value.ToString() : "")"
+                                       placeholder="Ej. 20" />
+                                <small>Se guardará como fecha aproximada 01/01/año calculado.</small>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Fecha nacimiento exacta</label>
+                                <input type="date"
+                                       id="txtFechaNacimientoExacta"
+                                       class="form-control"
+                                       value="@fechaNacimientoExacta" />
+                                <small>Si capturas fecha exacta, se usará esta en lugar de la edad aproximada.</small>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Sexo</label>
+                                <select id="ddlSexo" class="form-control">
+                                    <option value="">Seleccione...</option>
+                                    <option value="M" @(Model.Sexo == "M" ? "selected" : "")>Masculino</option>
+                                    <option value="F" @(Model.Sexo == "F" ? "selected" : "")>Femenino</option>
+                                    <option value="ND" @(Model.Sexo == "ND" ? "selected" : "")>No determinado</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Estatura</label>
+                                <input type="text" id="txtEstatura" class="form-control" value="@Model.Estatura" placeholder="Ej. 1.70 m" />
+                            </div>
+                        </div>
+
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Observaciones / señas / datos relevantes</label>
+                                <textarea id="txtObservaciones"
+                                          class="form-control"
+                                          rows="5"
+                                          placeholder="Ej. tatuajes, cicatrices, complexión, vestimenta, zona donde fue visto, etc.">@Model.Observaciones</textarea>
+                            </div>
+                        </div>
+
+                        <div class="col-md-12">
+                            <div class="pi-actions">
+                                <button type="button" class="pi-btn-primary" id="btnGuardarPersonaInteres">
+                                    <i class="fa fa-save"></i> Guardar persona de interés
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="pi-tab-pane" id="tabFotografias">
+                <div class="pi-section-title">
+                    <h3>Fotografías</h3>
+                    <p>Agrega imágenes frontales, laterales o adicionales de la persona.</p>
+                </div>
+
+                <div class="pi-empty">
+                    <i class="fa fa-camera"></i>
+                    <strong>Pendiente de implementar carga de fotografías.</strong>
+                    <br />
+                    Primero dejaremos listo el guardado general y después conectamos fotos en BD y carpeta del servidor.
+                </div>
+            </div>
+
+            <div class="pi-tab-pane" id="tabHuellas">
+                <div class="pi-section-title">
+                    <h3>Huellas</h3>
+                    <p>Agrega imágenes de huellas para procesamiento biométrico.</p>
+                </div>
+
+                <div class="pi-empty">
+                    <i class="fa fa-hand-paper-o"></i>
+                    <strong>Pendiente de implementar carga de huellas.</strong>
+                    <br />
+                    Después conectamos SourceAFIS y guardado en servidor de archivos.
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+    $(document).ready(function () {
+
+        $(document).off("click", ".pi-tab-link").on("click", ".pi-tab-link", function (e) {
+            e.preventDefault();
+
+            if ($(this).hasClass("disabled")) {
+                swal("Aviso", "Primero guarda la persona de interés.", "warning");
+                return;
+            }
+
+            var target = $(this).attr("href");
+
+            $(".pi-tab-link").removeClass("active");
+            $(this).addClass("active");
+
+            $(".pi-tab-pane").removeClass("active").hide();
+            $(target).addClass("active").fadeIn(120);
+        });
+
+        $("#btnGuardarPersonaInteres").off("click").on("click", function () {
+            guardarPersonaInteres();
+        });
+    });
+
+    function guardarPersonaInteres() {
+
+        var edad = $("#txtEdadAproximada").val();
+
+        if (edad && (parseInt(edad) < 0 || parseInt(edad) > 130)) {
+            swal("Validación", "La edad aproximada no es válida.", "warning");
+            return;
+        }
+
+        $("#btnGuardarPersonaInteres")
+            .prop("disabled", true)
+            .html('<i class="fa fa-spinner fa-spin"></i> Guardando...');
+
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("SavePersonaInteres", "PersonasInteres")",
+            data: {
+                idPersona: $("#idPersona").val(),
+                nombre: $("#txtNombre").val(),
+                paterno: $("#txtPaterno").val(),
+                materno: $("#txtMaterno").val(),
+                edadAproximada: $("#txtEdadAproximada").val(),
+                fechaNacimientoExacta: $("#txtFechaNacimientoExacta").val(),
+                estatura: $("#txtEstatura").val(),
+                sexo: $("#ddlSexo").val(),
+                observaciones: $("#txtObservaciones").val()
+            },
+            success: function (resp) {
+
+                $("#btnGuardarPersonaInteres")
+                    .prop("disabled", false)
+                    .html('<i class="fa fa-save"></i> Guardar persona de interés');
+
+                if (resp.IsSuccess) {
+
+                    swal({
+                        title: "",
+                        text: resp.Message,
+                        type: "success",
+                        confirmButtonText: "Continuar"
+                    }, function () {
+
+                        var id = resp.Id || resp.id || $("#idPersona").val();
+
+                        if (id && parseInt(id) > 0) {
+                            window.location.href = "@Url.Action("AddEditPersonaInteres", "PersonasInteres")?idPersona=" + id;
+                        } else {
+                            location.reload();
+                        }
+                    });
+
+                } else {
+                    swal("Error", resp.Message, "error");
+                }
+            },
+            error: function (xhr) {
+                console.log(xhr.responseText);
+
+                $("#btnGuardarPersonaInteres")
+                    .prop("disabled", false)
+                    .html('<i class="fa fa-save"></i> Guardar persona de interés');
+
+                swal("Error", "Ocurrió un error al guardar la persona de interés.", "error");
+            }
+        });
+    }
+</script>

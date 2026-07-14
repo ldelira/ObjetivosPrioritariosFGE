@@ -35,6 +35,9 @@ namespace Objetivos_Prioritarios.Models
         public virtual DbSet<tb_FOTO_C5> tb_FOTO_C5 { get; set; }
         public virtual DbSet<tb_HUELLA_C5> tb_HUELLA_C5 { get; set; }
         public virtual DbSet<tb_PersonaBusqueda> tb_PersonaBusqueda { get; set; }
+        public virtual DbSet<tb_FichaDecadactilar> tb_FichaDecadactilar { get; set; }
+        public virtual DbSet<tb_Fotografia> tb_Fotografia { get; set; }
+        public virtual DbSet<tb_Persona> tb_Persona { get; set; }
     
         public virtual ObjectResult<sp_Alertas_Result> sp_Alertas()
         {

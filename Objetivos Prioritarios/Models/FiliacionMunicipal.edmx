@@ -95,6 +95,17 @@
           <Property Name="Situacion" Type="varchar" MaxLength="1" />
           <Property Name="Telefono" Type="varchar" MaxLength="20" />
         </EntityType>
+        <EntityType Name="tb_FichaDecadactilar">
+          <Key>
+            <PropertyRef Name="idFicha" />
+          </Key>
+          <Property Name="idFicha" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="idPersona" Type="int" Nullable="false" />
+          <Property Name="RutaHuella" Type="nvarchar(max)" />
+          <Property Name="FechaRegistro" Type="datetime" />
+          <Property Name="Activo" Type="bit" />
+          <Property Name="IdTbFuente" Type="int" />
+        </EntityType>
         <EntityType Name="tb_FOTO_C5">
           <Key>
             <PropertyRef Name="IDFOTO" />
@@ -106,6 +117,18 @@
           <Property Name="TIPO" Type="varchar" MaxLength="150" />
           <Property Name="VECTOR_EMBEDDING" Type="nvarchar(max)" />
         </EntityType>
+        <EntityType Name="tb_Fotografia">
+          <Key>
+            <PropertyRef Name="idFoto" />
+          </Key>
+          <Property Name="idFoto" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="idPersona" Type="int" Nullable="false" />
+          <Property Name="idTipoFoto" Type="int" Nullable="false" />
+          <Property Name="RutaArchivo" Type="nvarchar" MaxLength="500" />
+          <Property Name="ArchivoB64" Type="nvarchar(max)" />
+          <Property Name="FechaRegistro" Type="datetime" />
+          <Property Name="UsuarioRegistro" Type="int" Nullable="false" />
+        </EntityType>
         <EntityType Name="tb_HUELLA_C5">
           <Key>
             <PropertyRef Name="IdHuella" />
@@ -114,6 +137,21 @@
           <Property Name="IdDetenido" Type="int" />
           <Property Name="Huellas" Type="text" />
           <Property Name="VECTOR_EMBEDDING" Type="nvarchar(max)" />
+        </EntityType>
+        <EntityType Name="tb_Persona">
+          <Key>
+            <PropertyRef Name="idPersona" />
+          </Key>
+          <Property Name="idPersona" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Nombre" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="Paterno" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="Materno" Type="nvarchar" MaxLength="100" />
+          <Property Name="FechaNacimiento" Type="datetime" />
+          <Property Name="Estatura" Type="nvarchar" MaxLength="5" />
+          <Property Name="Sexo" Type="char" MaxLength="1" />
+          <Property Name="FechaRegistro" Type="datetime" />
+          <Property Name="UsuarioRegistro" Type="int" Nullable="false" />
+          <Property Name="Observaciones" Type="nvarchar" MaxLength="300" />
         </EntityType>
         <!--Errores durante la generación:
 advertencia 6002: La tabla o vista 'Filiacion_Municipios.dbo.tb_PersonaBusqueda' no tiene definida ninguna clave principal. Se ha inferido la clave y la definición se creado como una vista o tabla de solo lectura.-->
@@ -137,6 +175,18 @@ advertencia 6002: La tabla o vista 'Filiacion_Municipios.dbo.tb_PersonaBusqueda'
             </Principal>
             <Dependent Role="tb_Alerta">
               <PropertyRef Name="idTipoAlerta" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tb_Fotografia_tb_Persona">
+          <End Role="tb_Persona" Type="Self.tb_Persona" Multiplicity="1" />
+          <End Role="tb_Fotografia" Type="Self.tb_Fotografia" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tb_Persona">
+              <PropertyRef Name="idPersona" />
+            </Principal>
+            <Dependent Role="tb_Fotografia">
+              <PropertyRef Name="idPersona" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -174,8 +224,11 @@ advertencia 6002: La tabla o vista 'Filiacion_Municipios.dbo.tb_PersonaBusqueda'
           <EntitySet Name="tb_Alerta" EntityType="Self.tb_Alerta" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="tb_DETENCION_C5" EntityType="Self.tb_DETENCION_C5" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="tb_DETENIDO_C5" EntityType="Self.tb_DETENIDO_C5" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tb_FichaDecadactilar" EntityType="Self.tb_FichaDecadactilar" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="tb_FOTO_C5" EntityType="Self.tb_FOTO_C5" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tb_Fotografia" EntityType="Self.tb_Fotografia" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="tb_HUELLA_C5" EntityType="Self.tb_HUELLA_C5" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tb_Persona" EntityType="Self.tb_Persona" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="tb_PersonaBusqueda" EntityType="Self.tb_PersonaBusqueda" store:Type="Tables" store:Schema="dbo">
             <DefiningQuery>SELECT 
     [tb_PersonaBusqueda].[Id_Persona] AS [Id_Persona], 
@@ -188,6 +241,10 @@ advertencia 6002: La tabla o vista 'Filiacion_Municipios.dbo.tb_PersonaBusqueda'
           <AssociationSet Name="FK_Alerta_cat_TipoAlerta" Association="Self.FK_Alerta_cat_TipoAlerta">
             <End Role="cat_TipoAlerta" EntitySet="cat_TipoAlerta" />
             <End Role="tb_Alerta" EntitySet="tb_Alerta" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tb_Fotografia_tb_Persona" Association="Self.FK_tb_Fotografia_tb_Persona">
+            <End Role="tb_Persona" EntitySet="tb_Persona" />
+            <End Role="tb_Fotografia" EntitySet="tb_Fotografia" />
           </AssociationSet>
           <AssociationSet Name="FK_tb_PersonaBusqueda_cat_TbFuente" Association="Self.FK_tb_PersonaBusqueda_cat_TbFuente">
             <End Role="cat_TbFuente" EntitySet="cat_TbFuente" />
@@ -225,8 +282,15 @@ advertencia 6002: La tabla o vista 'Filiacion_Municipios.dbo.tb_PersonaBusqueda'
             <End Role="tb_Alerta" EntitySet="tb_Alerta" />
           </AssociationSet>
           <FunctionImport Name="sp_BuscarDetenido" ReturnType="Collection(Filiacion_MunicipiosModel.sp_BuscarDetenido_Result)">
-            <Parameter Name="IDDETENIDO" Mode="In" Type="Int32" />
+          <Parameter Name="IDDETENIDO" Mode="In" Type="Int32" />
           </FunctionImport>
+          <EntitySet Name="tb_FichaDecadactilar" EntityType="Filiacion_MunicipiosModel.tb_FichaDecadactilar" />
+          <EntitySet Name="tb_Fotografia" EntityType="Filiacion_MunicipiosModel.tb_Fotografia" />
+          <EntitySet Name="tb_Persona" EntityType="Filiacion_MunicipiosModel.tb_Persona" />
+          <AssociationSet Name="FK_tb_Fotografia_tb_Persona" Association="Filiacion_MunicipiosModel.FK_tb_Fotografia_tb_Persona">
+            <End Role="tb_Persona" EntitySet="tb_Persona" />
+            <End Role="tb_Fotografia" EntitySet="tb_Fotografia" />
+          </AssociationSet>
         </EntityContainer>
         <ComplexType Name="sp_Alertas_Result">
           <Property Type="Int32" Name="IdDetenidoC5" Nullable="true" />
@@ -414,6 +478,58 @@ advertencia 6002: La tabla o vista 'Filiacion_Municipios.dbo.tb_PersonaBusqueda'
           <Property Type="Int32" Name="TotalRegistroAlertas" Nullable="false" />
           <Property Type="String" Name="Foto" Nullable="true" />
         </ComplexType>
+        <EntityType Name="tb_FichaDecadactilar">
+          <Key>
+            <PropertyRef Name="idFicha" />
+          </Key>
+          <Property Name="idFicha" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="idPersona" Type="Int32" Nullable="false" />
+          <Property Name="RutaHuella" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="FechaRegistro" Type="DateTime" Precision="3" />
+          <Property Name="Activo" Type="Boolean" />
+          <Property Name="IdTbFuente" Type="Int32" />
+        </EntityType>
+        <EntityType Name="tb_Fotografia">
+          <Key>
+            <PropertyRef Name="idFoto" />
+          </Key>
+          <Property Name="idFoto" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="idPersona" Type="Int32" Nullable="false" />
+          <Property Name="idTipoFoto" Type="Int32" Nullable="false" />
+          <Property Name="RutaArchivo" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="ArchivoB64" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="FechaRegistro" Type="DateTime" Precision="3" />
+          <Property Name="UsuarioRegistro" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="tb_Persona" Relationship="Filiacion_MunicipiosModel.FK_tb_Fotografia_tb_Persona" FromRole="tb_Fotografia" ToRole="tb_Persona" />
+        </EntityType>
+        <EntityType Name="tb_Persona">
+          <Key>
+            <PropertyRef Name="idPersona" />
+          </Key>
+          <Property Name="idPersona" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Nombre" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="Paterno" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="Materno" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="FechaNacimiento" Type="DateTime" Precision="3" />
+          <Property Name="Estatura" Type="String" MaxLength="5" FixedLength="false" Unicode="true" />
+          <Property Name="Sexo" Type="String" MaxLength="1" FixedLength="true" Unicode="false" />
+          <Property Name="FechaRegistro" Type="DateTime" Precision="3" />
+          <Property Name="UsuarioRegistro" Type="Int32" Nullable="false" />
+          <Property Name="Observaciones" Type="String" MaxLength="300" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="tb_Fotografia" Relationship="Filiacion_MunicipiosModel.FK_tb_Fotografia_tb_Persona" FromRole="tb_Persona" ToRole="tb_Fotografia" />
+        </EntityType>
+        <Association Name="FK_tb_Fotografia_tb_Persona">
+          <End Type="Filiacion_MunicipiosModel.tb_Persona" Role="tb_Persona" Multiplicity="1" />
+          <End Type="Filiacion_MunicipiosModel.tb_Fotografia" Role="tb_Fotografia" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tb_Persona">
+              <PropertyRef Name="idPersona" />
+            </Principal>
+            <Dependent Role="tb_Fotografia">
+              <PropertyRef Name="idPersona" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -579,6 +695,47 @@ advertencia 6002: La tabla o vista 'Filiacion_Municipios.dbo.tb_PersonaBusqueda'
               </ComplexTypeMapping>
             </ResultMapping>
           </FunctionImportMapping>
+          <EntitySetMapping Name="tb_FichaDecadactilar">
+            <EntityTypeMapping TypeName="Filiacion_MunicipiosModel.tb_FichaDecadactilar">
+              <MappingFragment StoreEntitySet="tb_FichaDecadactilar">
+                <ScalarProperty Name="IdTbFuente" ColumnName="IdTbFuente" />
+                <ScalarProperty Name="Activo" ColumnName="Activo" />
+                <ScalarProperty Name="FechaRegistro" ColumnName="FechaRegistro" />
+                <ScalarProperty Name="RutaHuella" ColumnName="RutaHuella" />
+                <ScalarProperty Name="idPersona" ColumnName="idPersona" />
+                <ScalarProperty Name="idFicha" ColumnName="idFicha" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tb_Fotografia">
+            <EntityTypeMapping TypeName="Filiacion_MunicipiosModel.tb_Fotografia">
+              <MappingFragment StoreEntitySet="tb_Fotografia">
+                <ScalarProperty Name="UsuarioRegistro" ColumnName="UsuarioRegistro" />
+                <ScalarProperty Name="FechaRegistro" ColumnName="FechaRegistro" />
+                <ScalarProperty Name="ArchivoB64" ColumnName="ArchivoB64" />
+                <ScalarProperty Name="RutaArchivo" ColumnName="RutaArchivo" />
+                <ScalarProperty Name="idTipoFoto" ColumnName="idTipoFoto" />
+                <ScalarProperty Name="idPersona" ColumnName="idPersona" />
+                <ScalarProperty Name="idFoto" ColumnName="idFoto" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tb_Persona">
+            <EntityTypeMapping TypeName="Filiacion_MunicipiosModel.tb_Persona">
+              <MappingFragment StoreEntitySet="tb_Persona">
+                <ScalarProperty Name="Observaciones" ColumnName="Observaciones" />
+                <ScalarProperty Name="UsuarioRegistro" ColumnName="UsuarioRegistro" />
+                <ScalarProperty Name="FechaRegistro" ColumnName="FechaRegistro" />
+                <ScalarProperty Name="Sexo" ColumnName="Sexo" />
+                <ScalarProperty Name="Estatura" ColumnName="Estatura" />
+                <ScalarProperty Name="FechaNacimiento" ColumnName="FechaNacimiento" />
+                <ScalarProperty Name="Materno" ColumnName="Materno" />
+                <ScalarProperty Name="Paterno" ColumnName="Paterno" />
+                <ScalarProperty Name="Nombre" ColumnName="Nombre" />
+                <ScalarProperty Name="idPersona" ColumnName="idPersona" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>

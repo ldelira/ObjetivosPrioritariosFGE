@@ -13,7 +13,7 @@
 
 <br />
 
-<table id="asuntosObjetivoDataTable" class="table table-striped " style="width:100%">
+<table id="asuntosObjetivoDataTable" class="table table-striped" style="width:100%">
     <thead>
         <tr>
             <th>Alias</th>
@@ -37,6 +37,14 @@
             FillGridAsuntosObjetivo();
         });
     });
+
+    function textoSeguroData(valor) {
+        return encodeURIComponent(valor || "");
+    }
+
+    function textoNormalData(valor) {
+        return decodeURIComponent(valor || "");
+    }
 
     var asuntosObjetivoColumns = [
         {
@@ -64,7 +72,11 @@
             data: "rol_participacion",
             defaultContent: "Por definir",
             render: function (data) {
-                return data ? `<span class="op-badge op-badge-muted">${data}</span>` : `<span class="op-badge op-badge-muted">Por definir</span>`;
+                if (data) {
+                    return `<span class="op-badge op-badge-muted">${data}</span>`;
+                }
+
+                return `<span class="op-badge op-badge-muted">Por definir</span>`;
             }
         },
         {
@@ -82,43 +94,68 @@
             data: "int_id_ficha_asunto",
             orderable: false,
             searchable: false,
+            className: "dt-nowrap text-center",
             render: function (data, type, row) {
 
                 var activo = $("#estadoAsuntosObjetivo").val() === "1";
 
+                var aliasSeguro = textoSeguroData(row.alias);
+                var descripcionSeguro = textoSeguroData(row.descripcion_participacion);
+                var observacionesSeguro = textoSeguroData(row.observaciones_relacion);
+                var idRol = row.int_id_rol_participacion || "";
+
                 if (activo) {
                     return `
-    <div class="btn-group">
-        <button type="button"
-                class="btn btn-sm btn-primary"
-                onclick="verAsuntoRelacionado(${row.int_id_asunto_relacionado})"
-                title="Ver asunto">
-            <i class="fa fa-eye"></i>
-        </button>
+                        <div class="dt-actions">
 
-        <button type="button"
-                class="btn btn-sm btn-info"
-                onclick="abrirModalVictimasDesdeFicha(${row.int_id_asunto_relacionado}, '${(row.alias || "").replace(/'/g, "\\'")}')"
-                title="Víctimas">
-            <i class="fa fa-users"></i>
-        </button>
+                            <button type="button"
+                                    class="btn btn-sm btn-primary"
+                                    onclick="verAsuntoRelacionado(${row.int_id_asunto_relacionado})"
+                                    title="Ver asunto"
+                                    aria-label="Ver asunto">
+                                <i class="fa fa-eye"></i>
+                            </button>
 
-        <button type="button"
-                class="btn btn-sm btn-danger"
-                onclick="DisableAsuntoObjetivo(${data})"
-                title="Desactivar relación">
-            <i class="fa fa-trash"></i>
-        </button>
-    </div>
-`;
+                            <button type="button"
+                                    class="btn btn-sm btn-warning btnEditarParticipacionAsuntoObjetivo"
+                                    data-id-ficha-asunto="${data}"
+                                    data-alias="${aliasSeguro}"
+                                    data-id-rol="${idRol}"
+                                    data-descripcion="${descripcionSeguro}"
+                                    data-observaciones="${observacionesSeguro}"
+                                    title="Editar rol y participación"
+                                    aria-label="Editar rol y participación">
+                                <i class="fa fa-edit"></i>
+                            </button>
+
+                            <button type="button"
+                                    class="btn btn-sm btn-info btnAbrirVictimasAsunto"
+                                    data-id-asunto="${row.int_id_asunto_relacionado}"
+                                    data-alias="${aliasSeguro}"
+                                    title="Víctimas"
+                                    aria-label="Víctimas">
+                                <i class="fa fa-users"></i>
+                            </button>
+
+                            <button type="button"
+                                    class="btn btn-sm btn-danger"
+                                    onclick="DisableAsuntoObjetivo(${data})"
+                                    title="Desactivar relación"
+                                    aria-label="Desactivar relación">
+                                <i class="fa fa-trash"></i>
+                            </button>
+
+                        </div>
+                    `;
                 }
 
                 return `
-                    <div class="btn-group">
+                    <div class="dt-actions">
                         <button type="button"
                                 class="btn btn-sm btn-success"
                                 onclick="ActivateAsuntoObjetivo(${data})"
-                                title="Reactivar relación">
+                                title="Reactivar relación"
+                                aria-label="Reactivar relación">
                             <i class="fa fa-power-off"></i>
                         </button>
                     </div>
@@ -146,8 +183,9 @@
                 $("#asuntosObjetivoDataTable").DataTable({
                     destroy: true,
                     searching: true,
-                    responsive: true,
+                    responsive: false,
                     scrollX: true,
+                    scrollCollapse: true,
                     autoWidth: false,
                     data: data,
                     columns: asuntosObjetivoColumns,
@@ -167,15 +205,42 @@
                             sNext: "Siguiente",
                             sPrevious: "Anterior"
                         }
+                    },
+                    initComplete: function () {
+                        setTimeout(function () {
+                            $("#asuntosObjetivoDataTable").DataTable().columns.adjust();
+                        }, 150);
                     }
                 });
             },
             error: function (xhr) {
                 console.log(xhr.responseText);
-                alert("Ocurrió un error al cargar los asuntos relacionados.");
+                swal("Error", "Ocurrió un error al cargar los asuntos relacionados.", "error");
             }
         });
     }
+
+    $(document).off("click", ".btnEditarParticipacionAsuntoObjetivo").on("click", ".btnEditarParticipacionAsuntoObjetivo", function () {
+
+        var $btn = $(this);
+        abrirEditarParticipacionObjetivoAsunto(
+            $btn.attr("data-id-ficha-asunto"),
+            textoNormalData($btn.attr("data-alias")),
+            $btn.attr("data-id-rol"),
+            textoNormalData($btn.attr("data-descripcion")),
+            textoNormalData($btn.attr("data-observaciones"))
+        );
+    });
+
+    $(document).off("click", ".btnAbrirVictimasAsunto").on("click", ".btnAbrirVictimasAsunto", function () {
+
+        var $btn = $(this);
+
+        abrirModalVictimasDesdeFicha(
+            $btn.attr("data-id-asunto"),
+            textoNormalData($btn.attr("data-alias"))
+        );
+    });
 
     function DisableAsuntoObjetivo(id) {
         $.post("@Url.Action("DisableAsuntoObjetivo", "Asuntos")",

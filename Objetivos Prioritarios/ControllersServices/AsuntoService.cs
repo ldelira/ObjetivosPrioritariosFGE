@@ -1260,6 +1260,49 @@ namespace Objetivos_Prioritarios.ControllersServices
         }
 
 
+        public BasicOperationResponse EditarParticipacionObjetivoAsunto(
+    int int_id_ficha_asunto,
+    int? int_id_rol_participacion,
+    string descripcionParticipacion,
+    string observaciones)
+        {
+            try
+            {
+                var relacion = db.tb_FichaAsunto
+                    .FirstOrDefault(x => x.int_id_ficha_asunto == int_id_ficha_asunto);
+
+                if (relacion == null)
+                {
+                    return new BasicOperationResponse
+                    {
+                        IsSuccess = false,
+                        Message = "No se encontró la relación del objetivo con el asunto."
+                    };
+                }
+
+                relacion.int_id_rol_participacion = int_id_rol_participacion;
+                relacion.nvarchar_descripcion_participacion = descripcionParticipacion;
+                relacion.nvarchar_observaciones = observaciones;
+
+                db.SaveChanges();
+
+                return new BasicOperationResponse
+                {
+                    IsSuccess = true,
+                    Message = "Se actualizó la participación del objetivo en el asunto correctamente."
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BasicOperationResponse
+                {
+                    IsSuccess = false,
+                    Message = "Ocurrió un error al actualizar la participación: " + ex.Message
+                };
+            }
+        }
+
+
 
     }
 }

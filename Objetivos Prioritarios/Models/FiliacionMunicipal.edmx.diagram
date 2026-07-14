@@ -16,6 +16,10 @@
         <AssociationConnector Association="Filiacion_MunicipiosModel.FK_tb_PersonaBusqueda_cat_TbFuente" />
         <AssociationConnector Association="Filiacion_MunicipiosModel.FK_tbAlerta_catTbFuente" />
         <AssociationConnector Association="Filiacion_MunicipiosModel.FK_Alerta_cat_TipoAlerta" />
+        <EntityTypeShape EntityType="Filiacion_MunicipiosModel.tb_FichaDecadactilar" Width="1.5" PointX="10.75" PointY="4.75" />
+        <EntityTypeShape EntityType="Filiacion_MunicipiosModel.tb_Fotografia" Width="1.5" PointX="3" PointY="11.25" />
+        <EntityTypeShape EntityType="Filiacion_MunicipiosModel.tb_Persona" Width="1.5" PointX="0.75" PointY="11" />
+        <AssociationConnector Association="Filiacion_MunicipiosModel.FK_tb_Fotografia_tb_Persona" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

@@ -169,7 +169,7 @@ namespace Objetivos_Prioritarios.Controllers
             {
                 byte[] fileBytes;
                 // Se abre la conexión con credenciales
-                using (new NetworkConnection(RutaBaseFotosC5, @"10.13.1.232\Fiscalia1", "A1b2c3d4"))
+                using (new NetworkConnection(RutaBaseFotosC5, @"Fiscalia1", "A1b2c3d4"))
                 {
                     if (!System.IO.File.Exists(rutaCompleta))
                     {
@@ -219,7 +219,7 @@ namespace Objetivos_Prioritarios.Controllers
             {
                 byte[] fileBytes;
                 // Se abre la conexión con credenciales
-                using (new NetworkConnection(RutaBaseFotosC5, @"10.13.1.232\Fiscalia1", "A1b2c3d4"))
+                using (new NetworkConnection(RutaBaseFotosC5, @"Fiscalia1", "A1b2c3d4"))
                 {
                     if (!System.IO.File.Exists(rutaCompleta))
                     {
@@ -269,7 +269,7 @@ namespace Objetivos_Prioritarios.Controllers
             {
                 byte[] fileBytes;
                 // Se abre la conexión con credenciales
-                using (new NetworkConnection(RutaBaseFotosC5, @"10.13.1.232\Fiscalia1", "A1b2c3d4"))
+                using (new NetworkConnection(RutaBaseFotosC5, @"Fiscalia1", "A1b2c3d4"))
                 {
                     if (!System.IO.File.Exists(rutaCompleta))
                     {

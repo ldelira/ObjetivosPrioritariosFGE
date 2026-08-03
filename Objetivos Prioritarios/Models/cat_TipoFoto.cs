@@ -12,18 +12,19 @@ namespace Objetivos_Prioritarios.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class tb_Fotografia
+    public partial class cat_TipoFoto
     {
-        public int idFoto { get; set; }
-        public int idPersona { get; set; }
-        public int idTipoFoto { get; set; }
-        public string RutaArchivo { get; set; }
-        public string ArchivoB64 { get; set; }
-        public Nullable<System.DateTime> FechaRegistro { get; set; }
-        public int UsuarioRegistro { get; set; }
-        public bool Activo { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
+        public cat_TipoFoto()
+        {
+            this.tb_Fotografia = new HashSet<tb_Fotografia>();
+        }
     
-        public virtual cat_TipoFoto cat_TipoFoto { get; set; }
-        public virtual tb_Persona tb_Persona { get; set; }
+        public int idTipoFoto { get; set; }
+        public string TipoFoto { get; set; }
+        public Nullable<bool> Activo { get; set; }
+    
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<tb_Fotografia> tb_Fotografia { get; set; }
     }
 }

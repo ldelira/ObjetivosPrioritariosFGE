@@ -358,6 +358,15 @@
     <Compile Include="Models\cat_TipoAlerta.cs">
       <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\cat_TipoFoto.cs">
+      <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\cat_TipoSena.cs">
+      <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\cat_ZonaCuerpo.cs">
+      <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\Colonia.cs">
       <DependentUpon>Catalogos.tt</DependentUpon>
     </Compile>
@@ -586,6 +595,9 @@
     <Compile Include="Models\tb_DETENIDO_C5.cs">
       <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\tb_Domicilio.cs">
+      <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\tb_FichaAsunto.cs">
       <DependentUpon>ObjetivosPrioritarios.tt</DependentUpon>
     </Compile>
@@ -626,6 +638,9 @@
       <DependentUpon>ObjetivosPrioritarios.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\tb_Persona.cs">
+      <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\tb_PersonaAlias.cs">
       <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\tb_PersonaBusqueda.cs">

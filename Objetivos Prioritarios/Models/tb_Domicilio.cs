@@ -12,18 +12,17 @@ namespace Objetivos_Prioritarios.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class tb_Fotografia
+    public partial class tb_Domicilio
     {
-        public int idFoto { get; set; }
+        public int idDomicilio { get; set; }
         public int idPersona { get; set; }
-        public int idTipoFoto { get; set; }
-        public string RutaArchivo { get; set; }
-        public string ArchivoB64 { get; set; }
+        public Nullable<int> Cve_Calle { get; set; }
+        public Nullable<int> NumInt { get; set; }
+        public Nullable<int> NumExt { get; set; }
         public Nullable<System.DateTime> FechaRegistro { get; set; }
         public int UsuarioRegistro { get; set; }
-        public bool Activo { get; set; }
+        public Nullable<int> Tipo { get; set; }
     
-        public virtual cat_TipoFoto cat_TipoFoto { get; set; }
         public virtual tb_Persona tb_Persona { get; set; }
     }
 }

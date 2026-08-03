@@ -25,6 +25,8 @@ namespace Objetivos_Prioritarios.Models
         public int UsuarioRegistro { get; set; }
         public Nullable<bool> Activo { get; set; }
     
+        public virtual cat_TipoSena cat_TipoSena { get; set; }
+        public virtual cat_ZonaCuerpo cat_ZonaCuerpo { get; set; }
         public virtual tb_Persona tb_Persona { get; set; }
     }
 }

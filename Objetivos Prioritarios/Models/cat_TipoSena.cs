@@ -12,13 +12,19 @@ namespace Objetivos_Prioritarios.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class tb_FichaDecadactilar
+    public partial class cat_TipoSena
     {
-        public int idFicha { get; set; }
-        public int idPersona { get; set; }
-        public Nullable<System.DateTime> FechaRegistro { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
+        public cat_TipoSena()
+        {
+            this.tb_SenasParticulares = new HashSet<tb_SenasParticulares>();
+        }
+    
+        public int IdTipoSena { get; set; }
+        public string Descripcion { get; set; }
         public Nullable<bool> Activo { get; set; }
-        public string RutaHuella { get; set; }
-        public Nullable<int> IdTbFuente { get; set; }
+    
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<tb_SenasParticulares> tb_SenasParticulares { get; set; }
     }
 }

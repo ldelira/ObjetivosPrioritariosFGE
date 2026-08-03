@@ -4,7 +4,68 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-      <Schema Namespace="fiscalia_webModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+    <Schema Namespace="fiscalia_webModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="A_Alba_alertas_alba">
+          <Key>
+            <PropertyRef Name="id_alerta_alba" />
+          </Key>
+          <Property Name="id_alerta_alba" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="id_estatus_alerta" Type="int" Nullable="false" />
+          <Property Name="nombre" Type="nvarchar" MaxLength="200" Nullable="false" />
+          <Property Name="a_paterno" Type="nvarchar" MaxLength="200" Nullable="false" />
+          <Property Name="a_materno" Type="nvarchar" MaxLength="200" Nullable="false" />
+          <Property Name="id_tipo_edad" Type="int" Nullable="false" />
+          <Property Name="edad" Type="int" Nullable="false" />
+          <Property Name="fecha_desaparicion" Type="date" Nullable="false" />
+          <Property Name="lugar_desaparicion" Type="nvarchar" MaxLength="200" Nullable="false" />
+          <Property Name="id_tipo_estatura" Type="int" Nullable="false" />
+          <Property Name="estatura" Type="float" Nullable="false" />
+          <Property Name="peso" Type="int" Nullable="false" />
+          <Property Name="complexion" Type="nvarchar" MaxLength="200" Nullable="false" />
+          <Property Name="tez" Type="nvarchar" MaxLength="200" Nullable="false" />
+          <Property Name="ojos" Type="nvarchar" MaxLength="200" Nullable="false" />
+          <Property Name="nariz" Type="nvarchar" MaxLength="200" Nullable="false" />
+          <Property Name="boca" Type="nvarchar" MaxLength="200" Nullable="false" />
+          <Property Name="cabello" Type="nvarchar" MaxLength="200" Nullable="false" />
+          <Property Name="senas_particulares" Type="nvarchar" MaxLength="500" Nullable="false" />
+          <Property Name="vestimenta" Type="nvarchar" MaxLength="500" Nullable="false" />
+          <Property Name="resumen_hechos" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="url_imagen" Type="nvarchar" MaxLength="200" Nullable="false" />
+          <Property Name="fecha_alta" Type="datetime" Nullable="false" />
+          <Property Name="prioridad" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="A_Amber_alertas_amber">
+          <Key>
+            <PropertyRef Name="id_alerta_amber" />
+          </Key>
+          <Property Name="id_alerta_amber" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="id_estatus_alerta" Type="int" Nullable="false" />
+          <Property Name="nombre" Type="nvarchar" MaxLength="200" Nullable="false" />
+          <Property Name="a_paterno" Type="nvarchar" MaxLength="200" Nullable="false" />
+          <Property Name="a_materno" Type="nvarchar" MaxLength="200" Nullable="false" />
+          <Property Name="fecha_nacimiento" Type="date" Nullable="false" />
+          <Property Name="fecha_hechos" Type="date" Nullable="false" />
+          <Property Name="id_tipo_edad" Type="int" />
+          <Property Name="edad" Type="int" Nullable="false" />
+          <Property Name="nacionalidad" Type="nvarchar" MaxLength="200" Nullable="false" />
+          <Property Name="genero" Type="int" Nullable="false" />
+          <Property Name="cabello" Type="nvarchar" MaxLength="200" Nullable="false" />
+          <Property Name="ojos" Type="nvarchar" MaxLength="200" Nullable="false" />
+          <Property Name="id_tipo_estatura" Type="int" />
+          <Property Name="estatura" Type="float" Nullable="false" />
+          <Property Name="peso" Type="int" Nullable="false" />
+          <Property Name="senas_particulares" Type="nvarchar" MaxLength="500" Nullable="false" />
+          <Property Name="lugar_hechos" Type="nvarchar" MaxLength="500" Nullable="false" />
+          <Property Name="resumen_hechos" Type="nvarchar" MaxLength="4000" Nullable="false" />
+          <Property Name="url_imagen" Type="nvarchar" MaxLength="200" Nullable="false" />
+          <Property Name="fecha_alta" Type="datetime" Nullable="false" />
+          <Property Name="prioridad" Type="int" Nullable="false" />
+          <Property Name="tiene_info_adicional" Type="bit" />
+          <Property Name="id_tipo_calidad" Type="int" />
+          <Property Name="url_imagen_adicional" Type="nvarchar" MaxLength="200" />
+          <Property Name="nombre_adicional" Type="nvarchar" MaxLength="1000" />
+          <Property Name="descripcion_adicional" Type="nvarchar" MaxLength="3000" />
+        </EntityType>
         <EntityType Name="Capea_boletin_busqueda">
           <Key>
             <PropertyRef Name="id_boletin_busqueda" />
@@ -39,10 +100,11 @@
           <Property Name="prioridad" Type="int" Nullable="false" />
         </EntityType>
         <EntityContainer Name="fiscalia_webModelStoreContainer">
+          <EntitySet Name="A_Alba_alertas_alba" EntityType="Self.A_Alba_alertas_alba" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="A_Amber_alertas_amber" EntityType="Self.A_Amber_alertas_amber" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Capea_boletin_busqueda" EntityType="Self.Capea_boletin_busqueda" Schema="dbo" store:Type="Tables" />
         </EntityContainer>
-      </Schema>
-    </edmx:StorageModels>
+      </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="fiscalia_webModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
@@ -81,7 +143,70 @@
         </EntityType>
         <EntityContainer Name="fiscalia_webEntities" annotation:LazyLoadingEnabled="true">
           <EntitySet Name="Capea_boletin_busqueda" EntityType="Self.Capea_boletin_busqueda" />
+          <EntitySet Name="A_Alba_alertas_alba" EntityType="fiscalia_webModel.A_Alba_alertas_alba" />
+          <EntitySet Name="A_Amber_alertas_amber" EntityType="fiscalia_webModel.A_Amber_alertas_amber" />
         </EntityContainer>
+        <EntityType Name="A_Alba_alertas_alba">
+          <Key>
+            <PropertyRef Name="id_alerta_alba" />
+          </Key>
+          <Property Name="id_alerta_alba" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="id_estatus_alerta" Type="Int32" Nullable="false" />
+          <Property Name="nombre" Type="String" Nullable="false" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="a_paterno" Type="String" Nullable="false" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="a_materno" Type="String" Nullable="false" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="id_tipo_edad" Type="Int32" Nullable="false" />
+          <Property Name="edad" Type="Int32" Nullable="false" />
+          <Property Name="fecha_desaparicion" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="lugar_desaparicion" Type="String" Nullable="false" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="id_tipo_estatura" Type="Int32" Nullable="false" />
+          <Property Name="estatura" Type="Double" Nullable="false" />
+          <Property Name="peso" Type="Int32" Nullable="false" />
+          <Property Name="complexion" Type="String" Nullable="false" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="tez" Type="String" Nullable="false" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="ojos" Type="String" Nullable="false" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="nariz" Type="String" Nullable="false" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="boca" Type="String" Nullable="false" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="cabello" Type="String" Nullable="false" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="senas_particulares" Type="String" Nullable="false" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="vestimenta" Type="String" Nullable="false" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="resumen_hechos" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="url_imagen" Type="String" Nullable="false" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="fecha_alta" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="prioridad" Type="Int32" Nullable="false" />
+        </EntityType>
+        <EntityType Name="A_Amber_alertas_amber">
+          <Key>
+            <PropertyRef Name="id_alerta_amber" />
+          </Key>
+          <Property Name="id_alerta_amber" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="id_estatus_alerta" Type="Int32" Nullable="false" />
+          <Property Name="nombre" Type="String" Nullable="false" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="a_paterno" Type="String" Nullable="false" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="a_materno" Type="String" Nullable="false" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="fecha_nacimiento" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="fecha_hechos" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="id_tipo_edad" Type="Int32" />
+          <Property Name="edad" Type="Int32" Nullable="false" />
+          <Property Name="nacionalidad" Type="String" Nullable="false" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="genero" Type="Int32" Nullable="false" />
+          <Property Name="cabello" Type="String" Nullable="false" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="ojos" Type="String" Nullable="false" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="id_tipo_estatura" Type="Int32" />
+          <Property Name="estatura" Type="Double" Nullable="false" />
+          <Property Name="peso" Type="Int32" Nullable="false" />
+          <Property Name="senas_particulares" Type="String" Nullable="false" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="lugar_hechos" Type="String" Nullable="false" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="resumen_hechos" Type="String" Nullable="false" MaxLength="4000" FixedLength="false" Unicode="true" />
+          <Property Name="url_imagen" Type="String" Nullable="false" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="fecha_alta" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="prioridad" Type="Int32" Nullable="false" />
+          <Property Name="tiene_info_adicional" Type="Boolean" />
+          <Property Name="id_tipo_calidad" Type="Int32" />
+          <Property Name="url_imagen_adicional" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="nombre_adicional" Type="String" MaxLength="1000" FixedLength="false" Unicode="true" />
+          <Property Name="descripcion_adicional" Type="String" MaxLength="3000" FixedLength="false" Unicode="true" />
+        </EntityType>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -119,6 +244,69 @@
                 <ScalarProperty Name="url_imagen" ColumnName="url_imagen" />
                 <ScalarProperty Name="fecha_alta" ColumnName="fecha_alta" />
                 <ScalarProperty Name="prioridad" ColumnName="prioridad" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="A_Alba_alertas_alba">
+            <EntityTypeMapping TypeName="fiscalia_webModel.A_Alba_alertas_alba">
+              <MappingFragment StoreEntitySet="A_Alba_alertas_alba">
+                <ScalarProperty Name="prioridad" ColumnName="prioridad" />
+                <ScalarProperty Name="fecha_alta" ColumnName="fecha_alta" />
+                <ScalarProperty Name="url_imagen" ColumnName="url_imagen" />
+                <ScalarProperty Name="resumen_hechos" ColumnName="resumen_hechos" />
+                <ScalarProperty Name="vestimenta" ColumnName="vestimenta" />
+                <ScalarProperty Name="senas_particulares" ColumnName="senas_particulares" />
+                <ScalarProperty Name="cabello" ColumnName="cabello" />
+                <ScalarProperty Name="boca" ColumnName="boca" />
+                <ScalarProperty Name="nariz" ColumnName="nariz" />
+                <ScalarProperty Name="ojos" ColumnName="ojos" />
+                <ScalarProperty Name="tez" ColumnName="tez" />
+                <ScalarProperty Name="complexion" ColumnName="complexion" />
+                <ScalarProperty Name="peso" ColumnName="peso" />
+                <ScalarProperty Name="estatura" ColumnName="estatura" />
+                <ScalarProperty Name="id_tipo_estatura" ColumnName="id_tipo_estatura" />
+                <ScalarProperty Name="lugar_desaparicion" ColumnName="lugar_desaparicion" />
+                <ScalarProperty Name="fecha_desaparicion" ColumnName="fecha_desaparicion" />
+                <ScalarProperty Name="edad" ColumnName="edad" />
+                <ScalarProperty Name="id_tipo_edad" ColumnName="id_tipo_edad" />
+                <ScalarProperty Name="a_materno" ColumnName="a_materno" />
+                <ScalarProperty Name="a_paterno" ColumnName="a_paterno" />
+                <ScalarProperty Name="nombre" ColumnName="nombre" />
+                <ScalarProperty Name="id_estatus_alerta" ColumnName="id_estatus_alerta" />
+                <ScalarProperty Name="id_alerta_alba" ColumnName="id_alerta_alba" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="A_Amber_alertas_amber">
+            <EntityTypeMapping TypeName="fiscalia_webModel.A_Amber_alertas_amber">
+              <MappingFragment StoreEntitySet="A_Amber_alertas_amber">
+                <ScalarProperty Name="descripcion_adicional" ColumnName="descripcion_adicional" />
+                <ScalarProperty Name="nombre_adicional" ColumnName="nombre_adicional" />
+                <ScalarProperty Name="url_imagen_adicional" ColumnName="url_imagen_adicional" />
+                <ScalarProperty Name="id_tipo_calidad" ColumnName="id_tipo_calidad" />
+                <ScalarProperty Name="tiene_info_adicional" ColumnName="tiene_info_adicional" />
+                <ScalarProperty Name="prioridad" ColumnName="prioridad" />
+                <ScalarProperty Name="fecha_alta" ColumnName="fecha_alta" />
+                <ScalarProperty Name="url_imagen" ColumnName="url_imagen" />
+                <ScalarProperty Name="resumen_hechos" ColumnName="resumen_hechos" />
+                <ScalarProperty Name="lugar_hechos" ColumnName="lugar_hechos" />
+                <ScalarProperty Name="senas_particulares" ColumnName="senas_particulares" />
+                <ScalarProperty Name="peso" ColumnName="peso" />
+                <ScalarProperty Name="estatura" ColumnName="estatura" />
+                <ScalarProperty Name="id_tipo_estatura" ColumnName="id_tipo_estatura" />
+                <ScalarProperty Name="ojos" ColumnName="ojos" />
+                <ScalarProperty Name="cabello" ColumnName="cabello" />
+                <ScalarProperty Name="genero" ColumnName="genero" />
+                <ScalarProperty Name="nacionalidad" ColumnName="nacionalidad" />
+                <ScalarProperty Name="edad" ColumnName="edad" />
+                <ScalarProperty Name="id_tipo_edad" ColumnName="id_tipo_edad" />
+                <ScalarProperty Name="fecha_hechos" ColumnName="fecha_hechos" />
+                <ScalarProperty Name="fecha_nacimiento" ColumnName="fecha_nacimiento" />
+                <ScalarProperty Name="a_materno" ColumnName="a_materno" />
+                <ScalarProperty Name="a_paterno" ColumnName="a_paterno" />
+                <ScalarProperty Name="nombre" ColumnName="nombre" />
+                <ScalarProperty Name="id_estatus_alerta" ColumnName="id_estatus_alerta" />
+                <ScalarProperty Name="id_alerta_amber" ColumnName="id_alerta_amber" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

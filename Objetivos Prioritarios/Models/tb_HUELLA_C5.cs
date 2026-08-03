@@ -17,6 +17,5 @@ namespace Objetivos_Prioritarios.Models
         public int IdHuella { get; set; }
         public Nullable<int> IdDetenido { get; set; }
         public string Huellas { get; set; }
-        public string VECTOR_EMBEDDING { get; set; }
     }
 }

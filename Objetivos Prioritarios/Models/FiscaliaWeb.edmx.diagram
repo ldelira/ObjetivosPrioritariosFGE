@@ -6,6 +6,8 @@
     <edmx:Diagrams>
       <Diagram DiagramId="6e5955bf93e344b5a8aa50eef8d84c77" Name="Diagram1">
         <EntityTypeShape EntityType="fiscalia_webModel.Capea_boletin_busqueda" Width="1.5" PointX="0.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="fiscalia_webModel.A_Alba_alertas_alba" Width="1.5" PointX="3.375" PointY="0.75" />
+        <EntityTypeShape EntityType="fiscalia_webModel.A_Amber_alertas_amber" Width="1.5" PointX="5.375" PointY="0.75" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

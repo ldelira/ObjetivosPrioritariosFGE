@@ -398,6 +398,7 @@ namespace Objetivos_Prioritarios.ControllersServices
         {
             string fotoBase64 = "";
             var fili = dbFili.Persona.AsNoTracking().Where(x => x.CLAVE_PERSO == clave_persona).FirstOrDefault();
+
             if (fili != null)
             {
                 var numFili = fili.NUM_FILIA == null ? "" : fili.NUM_FILIA.Replace("/", "").Trim();
@@ -408,32 +409,66 @@ namespace Objetivos_Prioritarios.ControllersServices
                     return fotoBase64;
                 }
 
-                if (fili.NUM_FILIA == null || fili.NUM_FILIA.Length < 2)
+                if (string.IsNullOrEmpty(numFili) || numFili.Length < 2)
                 {
                     fotoBase64 = "/Content/imagenes/Nodisponible.jpg";
                     return fotoBase64;
                 }
 
-                var anio = fili.NUM_FILIA.Substring(0, 2);
+                var anio = numFili.Substring(0, 2);
                 string path = "";
-                var file1 = new byte[] { 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20 };
-                var file2 = new byte[] { 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20 };
-                var file3 = new byte[] { 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20 };
+                byte[] fotoEncontrada = null;
 
-                NetworkShare net = new NetworkShare();
-                UserCredentials credentials = new UserCredentials("pgj.gob", "IIS_AEIC", "d8J!BKGzIH9Q@Ox");
-                SafeAccessTokenHandle userHandle = credentials.LogonUser(LogonType.Interactive);
-                var someResult = WindowsIdentity.RunImpersonated(userHandle, async () =>
+                try
                 {
-                    path = "\\\\59pgje\\fotos_det$\\" + anio + "\\" + numFili + "1.jpg";
-                    file1 = System.IO.File.ReadAllBytes(path);
-                    path = "\\\\59pgje\\fotos_det$\\" + anio + "\\" + numFili + "2.jpg";
-                    file2 = System.IO.File.ReadAllBytes(path);
-                    path = "\\\\59pgje\\fotos_det$\\" + anio + "\\" + numFili + "3.jpg";
-                    file3 = System.IO.File.ReadAllBytes(path);
+                    NetworkShare net = new NetworkShare();
+                    UserCredentials credentials = new UserCredentials("pgj.gob", "IIS_AEIC", "d8J!BKGzIH9Q@Ox");
 
-                    fotoBase64 = Convert.ToBase64String(file1);
-                });
+                    using (SafeAccessTokenHandle userHandle = credentials.LogonUser(LogonType.Interactive))
+                    {
+                        WindowsIdentity.RunImpersonated(userHandle, () =>
+                        {
+                            // 1. Prioridad: Foto 2 (Default)
+                            path = "\\\\59pgje\\fotos_det$\\" + anio + "\\" + numFili + "1.jpg";
+                            if (System.IO.File.Exists(path))
+                            {
+                                fotoEncontrada = System.IO.File.ReadAllBytes(path);
+                            }
+                            else
+                            {
+                                // 2. Si no existe la 2, intenta con la 1
+                                path = "\\\\59pgje\\fotos_det$\\" + anio + "\\" + numFili + "2.jpg";
+                                if (System.IO.File.Exists(path))
+                                {
+                                    fotoEncontrada = System.IO.File.ReadAllBytes(path);
+                                }
+                                else
+                                {
+                                    // 3. Si tampoco existe la 1, intenta con la 3
+                                    path = "\\\\59pgje\\fotos_det$\\" + anio + "\\" + numFili + "3.jpg";
+                                    if (System.IO.File.Exists(path))
+                                    {
+                                        fotoEncontrada = System.IO.File.ReadAllBytes(path);
+                                    }
+                                }
+                            }
+
+                            // Solo convierte a Base64 la foto que realmente se encontró
+                            if (fotoEncontrada != null && fotoEncontrada.Length > 0)
+                            {
+                                fotoBase64 = Convert.ToBase64String(fotoEncontrada);
+                            }
+                            else
+                            {
+                                fotoBase64 = "/Content/imagenes/Nodisponible.jpg";
+                            }
+                        });
+                    }
+                }
+                catch
+                {
+                    fotoBase64 = "/Content/imagenes/Nodisponible.jpg";
+                }
             }
             else
             {

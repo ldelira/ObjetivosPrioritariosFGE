@@ -5,6 +5,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Data.Entity.Core.EntityClient;
 using System.Linq;
+using System.Web.UI.WebControls;
 
 namespace Objetivos_Prioritarios.ControllersServices
 {
@@ -20,35 +21,66 @@ namespace Objetivos_Prioritarios.ControllersServices
             return dbFiliMuni.sp_BuscarDetenido(idDetenido).FirstOrDefault();
         }
 
-        public List<Tuple<int, int, int>> GetAlertaTipo(int ID_DETENIDO)
+        public List<Tuple<int, int, int, int, int, string>> GetAlertaTipo(
+    int idDetenido
+)
         {
             using (var db = new Filiacion_MunicipiosEntities())
             {
                 var lista = db.tb_Alerta
-                    .Where(x => x.idDetenidoC5 == ID_DETENIDO
-                             && x.idPersonaFGEA != null)
+                    .Where(x =>
+                        x.idDetenidoC5 == idDetenido &&
+                        x.idPersonaFGEA != null
+                    )
                     .Select(x => new
                     {
                         IdPersonaFGEA = x.idPersonaFGEA.Value,
                         IdTbFuente = x.IdTbFuente,
-                        Estatus = x.Estatus
+                        Estatus = x.Estatus,
+                        Porcentaje = x.Porcentaje,
+                        IdTipoAlerta = x.idTipoAlerta,
+
+                        NombreTipoAlerta =
+                            x.cat_TipoAlerta != null
+                                ? x.cat_TipoAlerta.Alerta
+                                : null
                     })
                     .ToList();
 
                 var resultado = lista
                     .Select(x =>
                     {
-                        int estatus = 0;
+                        int idPersonaFGEA =
+                            x.IdPersonaFGEA;
 
-                        if (x.Estatus != null)
-                        {
-                            estatus = Convert.ToInt32(x.Estatus);
-                        }
+                        int idTbFuente =
+                            Convert.ToInt32(x.IdTbFuente);
+
+                        int estatus =
+                            x.Estatus == null
+                                ? 0
+                                : Convert.ToInt32(x.Estatus);
+
+                        int porcentaje =
+                            x.Porcentaje == null
+                                ? 0
+                                : Convert.ToInt32(x.Porcentaje);
+
+                        int idTipoAlerta =
+                            Convert.ToInt32(x.IdTipoAlerta);
+
+                        string nombreTipoAlerta =
+                            string.IsNullOrWhiteSpace(x.NombreTipoAlerta)
+                                ? "SIN TIPO DE ALERTA"
+                                : x.NombreTipoAlerta.Trim();
 
                         return Tuple.Create(
-                            x.IdPersonaFGEA,
-                            x.IdTbFuente,
-                            estatus
+                            idPersonaFGEA,       // Item1
+                            idTbFuente,          // Item2
+                            estatus,             // Item3
+                            porcentaje,          // Item4
+                            idTipoAlerta,        // Item5
+                            nombreTipoAlerta     // Item6
                         );
                     })
                     .ToList();
@@ -57,24 +89,450 @@ namespace Objetivos_Prioritarios.ControllersServices
             }
         }
 
-        public List<Capea_boletin_busqueda> GetInfoCapeas(List<int> idsCapea)
+        public List<Capea_boletin_busqueda> GetInfoCapeas(
+    List<int> idsCapea,
+    List<int> idsAmber,
+    List<int> idsAlba
+)
         {
             using (var db = new fiscalia_webEntities())
             {
-                if (idsCapea == null || idsCapea.Count == 0)
+                var resultado =
+                    new List<Capea_boletin_busqueda>();
+
+                idsCapea = idsCapea == null
+                    ? new List<int>()
+                    : idsCapea
+                        .Where(x => x > 0)
+                        .Distinct()
+                        .ToList();
+
+                idsAmber = idsAmber == null
+                    ? new List<int>()
+                    : idsAmber
+                        .Where(x => x > 0)
+                        .Distinct()
+                        .ToList();
+
+                idsAlba = idsAlba == null
+                    ? new List<int>()
+                    : idsAlba
+                        .Where(x => x > 0)
+                        .Distinct()
+                        .ToList();
+
+                if (
+                    idsCapea.Count == 0 &&
+                    idsAmber.Count == 0 &&
+                    idsAlba.Count == 0
+                )
                 {
-                    return new List<Capea_boletin_busqueda>();
+                    return resultado;
                 }
 
-                idsCapea = idsCapea
-                    .Distinct()
-                    .ToList();
 
-                var resultado = db.Capea_boletin_busqueda
-                    .Where(x => idsCapea.Contains(x.id_boletin_busqueda))
-                    .ToList();
+                /* ============================================================
+                   FUENTE 2: CAPEA
+                   ============================================================ */
+
+                if (idsCapea.Count > 0)
+                {
+                    var registrosCapea =
+                        db.Capea_boletin_busqueda
+                            .Where(x =>
+                                idsCapea.Contains(
+                                    x.id_boletin_busqueda
+                                )
+                            )
+                            .ToList();
+
+                    resultado.AddRange(
+                        registrosCapea
+                    );
+                }
+
+
+                /* ============================================================
+                   FUENTE 7: ALERTA AMBER
+                   ============================================================ */
+
+                if (idsAmber.Count > 0)
+                {
+                    var registrosAmber =
+                        db.A_Amber_alertas_amber
+                            .Where(x =>
+                                idsAmber.Contains(
+                                    x.id_alerta_amber
+                                )
+                            )
+                            .ToList();
+
+                    foreach (var item in registrosAmber)
+                    {
+                        var registro =
+                            new Capea_boletin_busqueda();
+
+                        AsignarValorCompatible(
+                            registro,
+                            "id_boletin_busqueda",
+                            item.id_alerta_amber
+                        );
+
+                        AsignarValorCompatible(
+                            registro,
+                            "nombre",
+                            item.nombre
+                        );
+
+                        AsignarValorCompatible(
+                            registro,
+                            "a_paterno",
+                            item.a_paterno
+                        );
+
+                        AsignarValorCompatible(
+                            registro,
+                            "a_materno",
+                            item.a_materno
+                        );
+
+                        AsignarValorCompatible(
+                            registro,
+                            "edad",
+                            item.edad
+                        );
+
+                        AsignarValorCompatible(
+                            registro,
+                            "sexo",
+                            item.genero
+                        );
+
+                        AsignarValorCompatible(
+                            registro,
+                            "fecha_nacimiento",
+                            item.fecha_nacimiento
+                        );
+
+                        AsignarValorCompatible(
+                            registro,
+                            "fecha_ausencia",
+                            item.fecha_hechos
+                        );
+
+                        AsignarValorCompatible(
+                            registro,
+                            "lugar_ausencia",
+                            item.lugar_hechos
+                        );
+
+                        AsignarValorCompatible(
+                            registro,
+                            "estatura",
+                            item.estatura
+                        );
+
+                        AsignarValorCompatible(
+                            registro,
+                            "peso",
+                            item.peso
+                        );
+
+                        AsignarValorCompatible(
+                            registro,
+                            "tipo_color_cabello",
+                            item.cabello
+                        );
+
+                        AsignarValorCompatible(
+                            registro,
+                            "tipo_color_ojos",
+                            item.ojos
+                        );
+
+                        AsignarValorCompatible(
+                            registro,
+                            "senas_particulares",
+                            item.senas_particulares
+                        );
+
+                        AsignarValorCompatible(
+                            registro,
+                            "observaciones",
+                            item.resumen_hechos
+                        );
+
+                        AsignarValorCompatible(
+                            registro,
+                            "url_imagen",
+                            item.url_imagen
+                        );
+
+                        AsignarValorCompatible(
+                            registro,
+                            "fecha_alta",
+                            item.fecha_alta
+                        );
+
+                        AsignarValorCompatible(
+                            registro,
+                            "prioridad",
+                            item.prioridad
+                        );
+
+                        resultado.Add(
+                            registro
+                        );
+                    }
+                }
+
+
+                /* ============================================================
+                   FUENTE 8: ALERTA ALBA
+                   ============================================================ */
+
+                if (idsAlba.Count > 0)
+                {
+                    var registrosAlba =
+                        db.A_Alba_alertas_alba
+                            .Where(x =>
+                                idsAlba.Contains(
+                                    x.id_alerta_alba
+                                )
+                            )
+                            .ToList();
+
+                    foreach (var item in registrosAlba)
+                    {
+                        var registro =
+                            new Capea_boletin_busqueda();
+
+                        AsignarValorCompatible(
+                            registro,
+                            "id_boletin_busqueda",
+                            item.id_alerta_alba
+                        );
+
+                        AsignarValorCompatible(
+                            registro,
+                            "nombre",
+                            item.nombre
+                        );
+
+                        AsignarValorCompatible(
+                            registro,
+                            "a_paterno",
+                            item.a_paterno
+                        );
+
+                        AsignarValorCompatible(
+                            registro,
+                            "a_materno",
+                            item.a_materno
+                        );
+
+                        AsignarValorCompatible(
+                            registro,
+                            "edad",
+                            item.edad
+                        );
+
+                        /*
+                         * ALBA no contiene fecha de nacimiento ni sexo.
+                         * No se asignan para evitar intentar enviar NULL
+                         * a propiedades int o DateTime no anulables.
+                         */
+
+                        AsignarValorCompatible(
+                            registro,
+                            "fecha_ausencia",
+                            item.fecha_desaparicion
+                        );
+
+                        AsignarValorCompatible(
+                            registro,
+                            "lugar_ausencia",
+                            item.lugar_desaparicion
+                        );
+
+                        AsignarValorCompatible(
+                            registro,
+                            "estatura",
+                            item.estatura
+                        );
+
+                        AsignarValorCompatible(
+                            registro,
+                            "peso",
+                            item.peso
+                        );
+
+                        AsignarValorCompatible(
+                            registro,
+                            "complexion",
+                            item.complexion
+                        );
+
+                        AsignarValorCompatible(
+                            registro,
+                            "tez",
+                            item.tez
+                        );
+
+                        AsignarValorCompatible(
+                            registro,
+                            "tipo_color_cabello",
+                            item.cabello
+                        );
+
+                        AsignarValorCompatible(
+                            registro,
+                            "tipo_color_ojos",
+                            item.ojos
+                        );
+
+                        AsignarValorCompatible(
+                            registro,
+                            "nariz",
+                            item.nariz
+                        );
+
+                        AsignarValorCompatible(
+                            registro,
+                            "boca",
+                            item.boca
+                        );
+
+                        AsignarValorCompatible(
+                            registro,
+                            "senas_particulares",
+                            item.senas_particulares
+                        );
+
+                        AsignarValorCompatible(
+                            registro,
+                            "vestimenta",
+                            item.vestimenta
+                        );
+
+                        AsignarValorCompatible(
+                            registro,
+                            "observaciones",
+                            item.resumen_hechos
+                        );
+
+                        AsignarValorCompatible(
+                            registro,
+                            "url_imagen",
+                            item.url_imagen
+                        );
+
+                        AsignarValorCompatible(
+                            registro,
+                            "fecha_alta",
+                            item.fecha_alta
+                        );
+
+                        AsignarValorCompatible(
+                            registro,
+                            "prioridad",
+                            item.prioridad
+                        );
+
+                        resultado.Add(
+                            registro
+                        );
+                    }
+                }
 
                 return resultado;
+            }
+        }
+
+        private static void AsignarValorCompatible(
+    object destino,
+    string nombrePropiedad,
+    object valor
+)
+        {
+            if (
+                destino == null ||
+                string.IsNullOrWhiteSpace(nombrePropiedad) ||
+                valor == null ||
+                valor == DBNull.Value
+            )
+            {
+                return;
+            }
+
+            var propiedad =
+                destino
+                    .GetType()
+                    .GetProperty(
+                        nombrePropiedad
+                    );
+
+            if (
+                propiedad == null ||
+                !propiedad.CanWrite
+            )
+            {
+                return;
+            }
+
+            try
+            {
+                Type tipoPropiedad =
+                    Nullable.GetUnderlyingType(
+                        propiedad.PropertyType
+                    )
+                    ?? propiedad.PropertyType;
+
+                object valorConvertido;
+
+                if (tipoPropiedad == typeof(string))
+                {
+                    valorConvertido =
+                        Convert.ToString(valor);
+                }
+                else if (tipoPropiedad == typeof(Guid))
+                {
+                    valorConvertido =
+                        valor is Guid
+                            ? valor
+                            : Guid.Parse(
+                                Convert.ToString(valor)
+                            );
+                }
+                else if (tipoPropiedad.IsEnum)
+                {
+                    valorConvertido =
+                        Enum.ToObject(
+                            tipoPropiedad,
+                            valor
+                        );
+                }
+                else
+                {
+                    valorConvertido =
+                        Convert.ChangeType(
+                            valor,
+                            tipoPropiedad
+                        );
+                }
+
+                propiedad.SetValue(
+                    destino,
+                    valorConvertido,
+                    null
+                );
+            }
+            catch
+            {
+                /*
+                 * Si un campo no es compatible con el tipo generado por EF,
+                 * se omite sin impedir que se muestre el resto del registro.
+                 */
             }
         }
 
@@ -95,14 +553,10 @@ namespace Objetivos_Prioritarios.ControllersServices
             {
                 string conexion = db.Database.Connection.ConnectionString;
 
-                try
+                if (conexion.TrimStart().StartsWith("metadata=", StringComparison.OrdinalIgnoreCase))
                 {
                     var builder = new EntityConnectionStringBuilder(conexion);
                     conexion = builder.ProviderConnectionString;
-                }
-                catch
-                {
-                    // Si la conexión ya viene como SqlConnection normal, se queda igual.
                 }
 
                 using (SqlConnection cn = new SqlConnection(conexion))
@@ -156,6 +610,112 @@ namespace Objetivos_Prioritarios.ControllersServices
             return tabla;
         }
 
+        private string ConvertirIdsATexto(List<int> ids)
+        {
+            if (ids == null || ids.Count == 0)
+            {
+                return "";
+            }
+
+            return string.Join(",", ids.Distinct());
+        }
+
+        public DataTable GetInfoObjetivosPrioritarios(List<int> idsNombreObjetivo)
+        {
+            DataTable tabla = new DataTable();
+
+            if (idsNombreObjetivo == null || idsNombreObjetivo.Count == 0)
+            {
+                return tabla;
+            }
+
+            idsNombreObjetivo = idsNombreObjetivo
+                .Distinct()
+                .ToList();
+
+            string idsTexto = ConvertirIdsATexto(idsNombreObjetivo);
+
+            using (var db = new Objetivos_PrioritariosEntities())
+            {
+                string conexion = db.Database.Connection.ConnectionString;
+
+                if (conexion.TrimStart().StartsWith("metadata=", StringComparison.OrdinalIgnoreCase))
+                {
+                    var builder = new EntityConnectionStringBuilder(conexion);
+                    conexion = builder.ProviderConnectionString;
+                }
+
+                using (SqlConnection cn = new SqlConnection(conexion))
+                {
+                    cn.Open();
+
+                    using (SqlCommand cmd = new SqlCommand("dbo.SP_SIC_getCoincidenciasDetenidos", cn))
+                    {
+                        cmd.CommandType = CommandType.StoredProcedure;
+
+                        cmd.Parameters.Add("@ids_nombre_objetivo", SqlDbType.NVarChar).Value = idsTexto;
+
+                        using (SqlDataAdapter da = new SqlDataAdapter(cmd))
+                        {
+                            da.Fill(tabla);
+                        }
+                    }
+                }
+            }
+
+            return tabla;
+        }
+
+
+        public DataTable GetInfoDetenidos(List<int> idsDetenidos)
+        {
+            DataTable tabla = new DataTable();
+
+            if (idsDetenidos == null || idsDetenidos.Count == 0)
+            {
+                return tabla;
+            }
+
+            idsDetenidos = idsDetenidos
+                .Distinct()
+                .ToList();
+
+            string clavesTexto = ConvertirIdsATexto(idsDetenidos);
+
+            using (var db = new FiliacionEntities())
+            {
+                string conexion = db.Database.Connection.ConnectionString;
+
+                if (conexion.TrimStart().StartsWith("metadata=", StringComparison.OrdinalIgnoreCase))
+                {
+                    var builder = new EntityConnectionStringBuilder(conexion);
+                    conexion = builder.ProviderConnectionString;
+                }
+
+                using (SqlConnection cn = new SqlConnection(conexion))
+                {
+                    cn.Open();
+
+                    using (SqlCommand cmd = new SqlCommand("dbo.SP_SIC_getCoincidenciasDetenidos", cn))
+                    {
+                        cmd.CommandType = CommandType.StoredProcedure;
+
+                        cmd.CommandTimeout = 300;
+
+                        cmd.Parameters.Add("@ids_nom_perso", SqlDbType.NVarChar).Value = clavesTexto;
+
+                        using (SqlDataAdapter da = new SqlDataAdapter(cmd))
+                        {
+                            da.Fill(tabla);
+                        }
+                    }
+                }
+            }
+
+            return tabla;
+        }
+
+
         public int ApagarNotificacion(int idDetenido, int idOrigen, int idFuente)
         {
             using (var db = new Filiacion_MunicipiosEntities())
@@ -177,6 +737,71 @@ namespace Objetivos_Prioritarios.ControllersServices
                 return alertas.Count;
             }
         }
+        public int ApagarNotificacionDetenidos(int idDetenido, List<int> idsNomPerso)
+        {
+            if (idsNomPerso == null || idsNomPerso.Count == 0)
+            {
+                return 0;
+            }
+
+            idsNomPerso = idsNomPerso
+                .Distinct()
+                .ToList();
+
+            using (var db = new Filiacion_MunicipiosEntities())
+            {
+                var alertas = db.tb_Alerta
+                    .Where(x => x.idDetenidoC5 == idDetenido
+                             && x.IdTbFuente == 6
+                             && x.idPersonaFGEA != null
+                             && idsNomPerso.Contains(x.idPersonaFGEA.Value)
+                             && x.Estatus == 1)
+                    .ToList();
+
+                foreach (var alerta in alertas)
+                {
+                    alerta.Estatus = 0;
+                }
+
+                db.SaveChanges();
+
+                return alertas.Count;
+            }
+        }
+
+
+        public int ReactivarNotificacionDetenidos(int idDetenido, List<int> idsNomPerso)
+        {
+            if (idsNomPerso == null || idsNomPerso.Count == 0)
+            {
+                return 0;
+            }
+
+            idsNomPerso = idsNomPerso
+                .Distinct()
+                .ToList();
+
+            using (var db = new Filiacion_MunicipiosEntities())
+            {
+                var alertas = db.tb_Alerta
+                    .Where(x => x.idDetenidoC5 == idDetenido
+                             && x.IdTbFuente == 6
+                             && x.idPersonaFGEA != null
+                             && idsNomPerso.Contains(x.idPersonaFGEA.Value)
+                             && x.Estatus == 0)
+                    .ToList();
+
+                foreach (var alerta in alertas)
+                {
+                    alerta.Estatus = 1;
+                }
+
+                db.SaveChanges();
+
+                return alertas.Count;
+            }
+        }
+
         public tb_DETENCION_C5 GetInfoDetencionC5(int idDetencion)
         {
             using (var db = new Filiacion_MunicipiosEntities())
@@ -306,21 +931,32 @@ namespace Objetivos_Prioritarios.ControllersServices
             }
         }
 
-        public Tuple<int, int> GetConteoAlertasPorEstatus(int idDetenido)
-        {
-            using (var db = new Filiacion_MunicipiosEntities())
-            {
-                int activas = db.tb_Alerta
-                    .Count(x => x.idDetenidoC5 == idDetenido
-                             && x.Estatus == 1);
+        public Tuple<int, int, int> GetConteoAlertasPorEstatus(int idDetenido)
+{
+    using (var db = new Filiacion_MunicipiosEntities())
+    {
+        int totalActivas = db.tb_Alerta.Count(x =>
+            x.idDetenidoC5 == idDetenido &&
+            x.Estatus == 1
+        );
 
-                int revisadas = db.tb_Alerta
-                    .Count(x => x.idDetenidoC5 == idDetenido
-                             && x.Estatus == 0);
+        int totalRevisadas = db.tb_Alerta.Count(x =>
+            x.idDetenidoC5 == idDetenido &&
+            x.Estatus == 0
+        );
 
-                return Tuple.Create(activas, revisadas);
-            }
-        }
+        int totalConfirmadas = db.tb_Alerta.Count(x =>
+            x.idDetenidoC5 == idDetenido &&
+            x.Estatus == 2
+        );
+
+        return Tuple.Create(
+            totalActivas,
+            totalRevisadas,
+            totalConfirmadas
+        );
+    }
+}
 
 
         public List<Tuple<int, int>> GetTiposAlertas(int idDetenido)
@@ -344,6 +980,81 @@ namespace Objetivos_Prioritarios.ControllersServices
                     .ToList();
 
                 return resultado;
+            }
+        }
+
+        public int ActualizarEstatusNotificacion(
+    int idDetenido,
+    int idOrigen,
+    int idFuente,
+    int nuevoEstatus)
+        {
+            if (nuevoEstatus != 0 &&
+                nuevoEstatus != 1 &&
+                nuevoEstatus != 2)
+            {
+                throw new ArgumentException("El estatus recibido no es válido.");
+            }
+
+            using (var db = new Filiacion_MunicipiosEntities())
+            {
+                var alertas = db.tb_Alerta
+                    .Where(x =>
+                        x.idDetenidoC5 == idDetenido &&
+                        x.idPersonaFGEA == idOrigen &&
+                        x.IdTbFuente == idFuente)
+                    .ToList();
+
+                foreach (var alerta in alertas)
+                {
+                    alerta.Estatus = nuevoEstatus;
+                }
+
+                db.SaveChanges();
+
+                return alertas.Count;
+            }
+        }
+
+        public int ActualizarEstatusNotificacionDetenidos(
+    int idDetenido,
+    List<int> idsNomPerso,
+    int nuevoEstatus)
+        {
+            if (idsNomPerso == null || idsNomPerso.Count == 0)
+            {
+                return 0;
+            }
+
+            if (nuevoEstatus != 0 &&
+                nuevoEstatus != 1 &&
+                nuevoEstatus != 2)
+            {
+                throw new ArgumentException("El estatus recibido no es válido.");
+            }
+
+            idsNomPerso = idsNomPerso
+                .Distinct()
+                .ToList();
+
+            using (var db = new Filiacion_MunicipiosEntities())
+            {
+                var alertas = db.tb_Alerta
+                    .Where(x =>
+                        x.idDetenidoC5 == idDetenido &&
+                        x.IdTbFuente == 6 &&
+                        x.idPersonaFGEA.HasValue &&
+                        idsNomPerso.Contains(x.idPersonaFGEA.Value))
+                    .ToList();
+
+                foreach (var alerta in alertas)
+                {
+                    alerta.Estatus = nuevoEstatus;
+                }
+
+                db.SaveChanges();
+
+                return alertas.Count;
             }
         }
 

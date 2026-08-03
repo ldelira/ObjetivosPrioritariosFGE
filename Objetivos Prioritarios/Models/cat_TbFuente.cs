@@ -18,6 +18,8 @@ namespace Objetivos_Prioritarios.Models
         public cat_TbFuente()
         {
             this.tb_PersonaBusqueda = new HashSet<tb_PersonaBusqueda>();
+            this.tb_PersonaEmbedding = new HashSet<tb_PersonaEmbedding>();
+            this.tb_PersonaSourceAFIS = new HashSet<tb_PersonaSourceAFIS>();
             this.tb_Alerta = new HashSet<tb_Alerta>();
         }
     
@@ -27,6 +29,10 @@ namespace Objetivos_Prioritarios.Models
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<tb_PersonaBusqueda> tb_PersonaBusqueda { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<tb_PersonaEmbedding> tb_PersonaEmbedding { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<tb_PersonaSourceAFIS> tb_PersonaSourceAFIS { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<tb_Alerta> tb_Alerta { get; set; }
     }

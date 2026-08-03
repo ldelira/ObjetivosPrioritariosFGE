@@ -12,15 +12,9 @@ namespace Objetivos_Prioritarios.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class tb_PersonaBusqueda
+    public partial class cat_EstatusAlerta
     {
-        public int Id_Persona { get; set; }
-        public string Nombre { get; set; }
-        public string Paterno { get; set; }
-        public string Materno { get; set; }
-        public int IdTbFuente { get; set; }
-        public bool Activo { get; set; }
-    
-        public virtual cat_TbFuente cat_TbFuente { get; set; }
+        public int idEstatus { get; set; }
+        public string Estatus { get; set; }
     }
 }

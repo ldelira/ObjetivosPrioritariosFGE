@@ -126,6 +126,9 @@
           <Parameter Name="paterno" Type="nvarchar" Mode="In" />
           <Parameter Name="materno" Type="nvarchar" Mode="In" />
         </Function>
+        <Function Name="SP_SIC_getCoincidenciasDetenidos" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="ids_nom_perso" Type="nvarchar(max)" Mode="In" />
+        </Function>
         <EntityContainer Name="FiliacionModelStoreContainer">
           <EntitySet Name="Nom_perso" EntityType="Self.Nom_perso" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Persona" EntityType="Self.Persona" Schema="dbo" store:Type="Tables" />
@@ -152,6 +155,9 @@
             <Parameter Name="nombre" Mode="In" Type="String" />
             <Parameter Name="paterno" Mode="In" Type="String" />
             <Parameter Name="materno" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="SP_SIC_getCoincidenciasDetenidos" ReturnType="Collection(FiliacionModel.SP_SIC_getCoincidenciasDetenidos_Result)">
+            <Parameter Name="ids_nom_perso" Mode="In" Type="String" />
           </FunctionImport>
         </EntityContainer>
         <ComplexType Name="SP_ObjPri_getFiliObjetivoInfo_Result">
@@ -306,6 +312,18 @@
           <Property Type="DateTime" Name="Fec_Captu" Nullable="true" Precision="16" />
           <Property Type="String" Name="Fec_Captu_concat" Nullable="true" MaxLength="8000" />
           <Property Type="String" Name="ObjetivoPrioritario" Nullable="true" MaxLength="20" />
+        </ComplexType>
+        <ComplexType Name="SP_SIC_getCoincidenciasDetenidos_Result">
+          <Property Type="Int32" Name="CLAVE_PERSO" Nullable="false" />
+          <Property Type="String" Name="IdsNomPerso" Nullable="false" />
+          <Property Type="String" Name="IdsNomPersoOrigenAlerta" Nullable="false" />
+          <Property Type="String" Name="NUM_FILIA" Nullable="false" MaxLength="9" />
+          <Property Type="String" Name="NombreCompleto" Nullable="false" />
+          <Property Type="String" Name="ALIAS" Nullable="false" />
+          <Property Type="DateTime" Name="FEC_NAC" Nullable="false" Precision="23" />
+          <Property Type="String" Name="SEXO" Nullable="false" MaxLength="15" />
+          <Property Type="DateTime" Name="FechaUltimoDelito" Nullable="true" Precision="23" />
+          <Property Type="String" Name="UltimoDelito" Nullable="false" MaxLength="500" />
         </ComplexType>
       </Schema>
     </edmx:ConceptualModels>
@@ -477,6 +495,22 @@
                 <ScalarProperty Name="Fec_Captu" ColumnName="Fec_Captu" />
                 <ScalarProperty Name="Fec_Captu_concat" ColumnName="Fec_Captu_concat" />
                 <ScalarProperty Name="ObjetivoPrioritario" ColumnName="ObjetivoPrioritario" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="SP_SIC_getCoincidenciasDetenidos" FunctionName="FiliacionModel.Store.SP_SIC_getCoincidenciasDetenidos">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="FiliacionModel.SP_SIC_getCoincidenciasDetenidos_Result">
+                <ScalarProperty Name="CLAVE_PERSO" ColumnName="CLAVE_PERSO" />
+                <ScalarProperty Name="IdsNomPerso" ColumnName="IdsNomPerso" />
+                <ScalarProperty Name="IdsNomPersoOrigenAlerta" ColumnName="IdsNomPersoOrigenAlerta" />
+                <ScalarProperty Name="NUM_FILIA" ColumnName="NUM_FILIA" />
+                <ScalarProperty Name="NombreCompleto" ColumnName="NombreCompleto" />
+                <ScalarProperty Name="ALIAS" ColumnName="ALIAS" />
+                <ScalarProperty Name="FEC_NAC" ColumnName="FEC_NAC" />
+                <ScalarProperty Name="SEXO" ColumnName="SEXO" />
+                <ScalarProperty Name="FechaUltimoDelito" ColumnName="FechaUltimoDelito" />
+                <ScalarProperty Name="UltimoDelito" ColumnName="UltimoDelito" />
               </ComplexTypeMapping>
             </ResultMapping>
           </FunctionImportMapping>

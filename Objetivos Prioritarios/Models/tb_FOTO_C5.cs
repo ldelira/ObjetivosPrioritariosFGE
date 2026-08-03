@@ -19,6 +19,5 @@ namespace Objetivos_Prioritarios.Models
         public string FOTO { get; set; }
         public Nullable<System.DateTime> FEHCA { get; set; }
         public string TIPO { get; set; }
-        public string VECTOR_EMBEDDING { get; set; }
     }
 }

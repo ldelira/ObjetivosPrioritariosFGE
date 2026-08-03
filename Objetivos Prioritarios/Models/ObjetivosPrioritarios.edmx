@@ -57,16 +57,6 @@
           <Property Name="date_fecha_creacion" Type="datetime" Nullable="false" />
           <Property Name="bit_estatus" Type="bit" Nullable="false" />
         </EntityType>
-        <EntityType Name="sysdiagrams">
-          <Key>
-            <PropertyRef Name="diagram_id" />
-          </Key>
-          <Property Name="name" Type="nvarchar" MaxLength="128" Nullable="false" />
-          <Property Name="principal_id" Type="int" Nullable="false" />
-          <Property Name="diagram_id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="version" Type="int" />
-          <Property Name="definition" Type="varbinary(max)" />
-        </EntityType>
         <EntityType Name="tb_AlbumFichaObjetivo">
           <Key>
             <PropertyRef Name="int_id_album_ficha_objetivo" />
@@ -617,6 +607,9 @@
           <Parameter Name="paterno" Type="nvarchar" Mode="In" />
           <Parameter Name="materno" Type="nvarchar" Mode="In" />
         </Function>
+        <Function Name="SP_SIC_getCoincidenciasDetenidos" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="ids_nombre_objetivo" Type="nvarchar(max)" Mode="In" />
+        </Function>
         <EntityContainer Name="Objetivos_PrioritariosModelStoreContainer">
           <EntitySet Name="cat_EstatusAsunto" EntityType="Self.cat_EstatusAsunto" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="cat_EstatusProceso" EntityType="Self.cat_EstatusProceso" Schema="dbo" store:Type="Tables" />
@@ -624,7 +617,6 @@
           <EntitySet Name="cat_RolParticipacionAsunto" EntityType="Self.cat_RolParticipacionAsunto" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="cat_TipoActividadDelictiva" EntityType="Self.cat_TipoActividadDelictiva" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="cat_TipoAgrupacion" EntityType="Self.cat_TipoAgrupacion" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagrams" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="tb_AlbumFichaObjetivo" EntityType="Self.tb_AlbumFichaObjetivo" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="tb_AlbumFichaObjetivoDetalle" EntityType="Self.tb_AlbumFichaObjetivoDetalle" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="tb_AliasObjetivo" EntityType="Self.tb_AliasObjetivo" Schema="dbo" store:Type="Tables" />
@@ -779,13 +771,15 @@
             <Parameter Name="bit_estatus" Mode="In" Type="Boolean" />
             <Parameter Name="int_id_album_ficha_objetivo" Mode="In" Type="Int32" />
           </FunctionImport>
+          <FunctionImport Name="SP_SIC_getCoincidenciasDetenidos" ReturnType="Collection(Objetivos_PrioritariosModel.SP_SIC_getCoincidenciasDetenidos_Result)">
+          <Parameter Name="ids_nombre_objetivo" Mode="In" Type="String" />
+          </FunctionImport>
           <EntitySet Name="cat_EstatusAsunto" EntityType="Objetivos_PrioritariosModel.cat_EstatusAsunto" />
           <EntitySet Name="cat_EstatusProceso" EntityType="Objetivos_PrioritariosModel.cat_EstatusProceso" />
           <EntitySet Name="cat_Nivel_Organizacion" EntityType="Objetivos_PrioritariosModel.cat_Nivel_Organizacion" />
           <EntitySet Name="cat_RolParticipacionAsunto" EntityType="Objetivos_PrioritariosModel.cat_RolParticipacionAsunto" />
           <EntitySet Name="cat_TipoActividadDelictiva" EntityType="Objetivos_PrioritariosModel.cat_TipoActividadDelictiva" />
           <EntitySet Name="cat_TipoAgrupacion" EntityType="Objetivos_PrioritariosModel.cat_TipoAgrupacion" />
-          <EntitySet Name="sysdiagrams" EntityType="Objetivos_PrioritariosModel.sysdiagrams" />
           <EntitySet Name="tb_AlbumFichaObjetivo" EntityType="Objetivos_PrioritariosModel.tb_AlbumFichaObjetivo" />
           <EntitySet Name="tb_AlbumFichaObjetivoDetalle" EntityType="Objetivos_PrioritariosModel.tb_AlbumFichaObjetivoDetalle" />
           <EntitySet Name="tb_AliasObjetivo" EntityType="Objetivos_PrioritariosModel.tb_AliasObjetivo" />
@@ -1008,6 +1002,24 @@
           <Property Type="Boolean" Name="estatus_objetivo" Nullable="true" />
           <Property Type="String" Name="nvarchar_foto" Nullable="true" />
         </ComplexType>
+        <ComplexType Name="SP_SIC_getCoincidenciasDetenidos_Result">
+          <Property Type="Int32" Name="int_id_objetivo" Nullable="false" />
+          <Property Type="Int32" Name="IdNombreOrigen" Nullable="false" />
+          <Property Type="String" Name="NombreOrigen" Nullable="false" MaxLength="302" />
+          <Property Type="String" Name="IdsNombreObjetivo" Nullable="false" />
+          <Property Type="String" Name="IdsNombreObjetivoOrigenAlerta" Nullable="false" />
+          <Property Type="String" Name="NombreCompleto" Nullable="true" />
+          <Property Type="String" Name="int_clave_perso" Nullable="false" />
+          <Property Type="String" Name="IdsNomPerso" Nullable="false" />
+          <Property Type="String" Name="OtrosNombresDetenidosJson" Nullable="false" />
+          <Property Type="String" Name="nvarchar_alias" Nullable="false" />
+          <Property Type="String" Name="nvarchar_grupo" Nullable="false" />
+          <Property Type="String" Name="EstatusGrupo" Nullable="false" />
+          <Property Type="String" Name="Puesto" Nullable="false" />
+          <Property Type="String" Name="EstatusObjetivo" Nullable="false" MaxLength="11" />
+          <Property Type="String" Name="nvarchar_foto" Nullable="false" />
+          <Property Type="String" Name="date_fecha_nacimiento" Nullable="false" MaxLength="10" />
+        </ComplexType>
         <EntityType Name="cat_EstatusAsunto">
           <Key>
             <PropertyRef Name="int_id_estatus_asunto" />
@@ -1065,16 +1077,6 @@
           <Property Name="date_fecha_creacion" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="bit_estatus" Type="Boolean" Nullable="false" />
           <NavigationProperty Name="tb_Grupo_Delictivo" Relationship="Objetivos_PrioritariosModel.FK_tb_Grupo_Delictivo_cat_TipoAgrupacion" FromRole="cat_TipoAgrupacion" ToRole="tb_Grupo_Delictivo" />
-        </EntityType>
-        <EntityType Name="sysdiagrams">
-          <Key>
-            <PropertyRef Name="diagram_id" />
-          </Key>
-          <Property Name="name" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
-          <Property Name="principal_id" Type="Int32" Nullable="false" />
-          <Property Name="diagram_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="version" Type="Int32" />
-          <Property Name="definition" Type="Binary" MaxLength="Max" FixedLength="false" />
         </EntityType>
         <EntityType Name="tb_AlbumFichaObjetivo">
           <Key>
@@ -1781,6 +1783,28 @@
               </ComplexTypeMapping>
             </ResultMapping>
           </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="SP_SIC_getCoincidenciasDetenidos" FunctionName="Objetivos_PrioritariosModel.Store.SP_SIC_getCoincidenciasDetenidos">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="Objetivos_PrioritariosModel.SP_SIC_getCoincidenciasDetenidos_Result">
+                <ScalarProperty Name="int_id_objetivo" ColumnName="int_id_objetivo" />
+                <ScalarProperty Name="IdNombreOrigen" ColumnName="IdNombreOrigen" />
+                <ScalarProperty Name="NombreOrigen" ColumnName="NombreOrigen" />
+                <ScalarProperty Name="IdsNombreObjetivo" ColumnName="IdsNombreObjetivo" />
+                <ScalarProperty Name="IdsNombreObjetivoOrigenAlerta" ColumnName="IdsNombreObjetivoOrigenAlerta" />
+                <ScalarProperty Name="NombreCompleto" ColumnName="NombreCompleto" />
+                <ScalarProperty Name="int_clave_perso" ColumnName="int_clave_perso" />
+                <ScalarProperty Name="IdsNomPerso" ColumnName="IdsNomPerso" />
+                <ScalarProperty Name="OtrosNombresDetenidosJson" ColumnName="OtrosNombresDetenidosJson" />
+                <ScalarProperty Name="nvarchar_alias" ColumnName="nvarchar_alias" />
+                <ScalarProperty Name="nvarchar_grupo" ColumnName="nvarchar_grupo" />
+                <ScalarProperty Name="EstatusGrupo" ColumnName="EstatusGrupo" />
+                <ScalarProperty Name="Puesto" ColumnName="Puesto" />
+                <ScalarProperty Name="EstatusObjetivo" ColumnName="EstatusObjetivo" />
+                <ScalarProperty Name="nvarchar_foto" ColumnName="nvarchar_foto" />
+                <ScalarProperty Name="date_fecha_nacimiento" ColumnName="date_fecha_nacimiento" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
           <EntitySetMapping Name="cat_EstatusAsunto">
             <EntityTypeMapping TypeName="Objetivos_PrioritariosModel.cat_EstatusAsunto">
               <MappingFragment StoreEntitySet="cat_EstatusAsunto">
@@ -1836,17 +1860,6 @@
                 <ScalarProperty Name="date_fecha_creacion" ColumnName="date_fecha_creacion" />
                 <ScalarProperty Name="nvarchar_agrupacion" ColumnName="nvarchar_agrupacion" />
                 <ScalarProperty Name="int_id_tipo_agrupacion" ColumnName="int_id_tipo_agrupacion" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="sysdiagrams">
-            <EntityTypeMapping TypeName="Objetivos_PrioritariosModel.sysdiagrams">
-              <MappingFragment StoreEntitySet="sysdiagrams">
-                <ScalarProperty Name="definition" ColumnName="definition" />
-                <ScalarProperty Name="version" ColumnName="version" />
-                <ScalarProperty Name="diagram_id" ColumnName="diagram_id" />
-                <ScalarProperty Name="principal_id" ColumnName="principal_id" />
-                <ScalarProperty Name="name" ColumnName="name" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

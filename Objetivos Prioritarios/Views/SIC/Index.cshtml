@@ -1,8 +1,9 @@
 ﻿@{
-    ViewBag.Title = "SIC";
+    ViewBag.Title = "Sistema de Identificación Criminal";
 }
 
 <style>
+
     #tablaSIC {
         width: 100% !important;
         margin-bottom: 0 !important;
@@ -27,74 +28,124 @@
         }
 
         #tablaSIC tbody tr td {
-            background-color: #ffffff !important;
             color: #111827 !important;
             font-weight: 500;
             vertical-align: middle !important;
             padding: 14px 12px !important;
             border-bottom: 1px solid #e5e7eb !important;
+            transition: background-color .20s ease;
         }
 
-        #tablaSIC tbody tr:hover td {
-            background-color: #f8fafc !important;
-            color: #111827 !important;
-        }
 
-        #tablaSIC tbody tr.sic-alerta-activa td {
-            background-color: #fff5f5 !important;
+        /* ============================================================
+   ESTADO: IDENTIDAD CONFIRMADA
+   Azul = estado informativo ya validado.
+   Solo aplica cuando la coincidencia es únicamente en Detenidos.
+   ============================================================ */
+
+        #tablaSIC tbody tr.sic-estado-confirmada td {
+            background-color: #eff6ff !important;
             color: #111827 !important;
             font-weight: 700;
         }
 
-            #tablaSIC tbody tr.sic-alerta-activa td:first-child {
+            #tablaSIC tbody tr.sic-estado-confirmada td:first-child {
+                box-shadow: inset 6px 0 0 #2563eb;
+                padding-left: 20px !important;
+            }
+
+        #tablaSIC tbody tr.sic-estado-confirmada:hover td {
+            background-color: #dbeafe !important;
+        }
+
+
+        /* ============================================================
+   ESTADO: CONFIRMAR IDENTIDAD
+   Ámbar = coincide únicamente con Detenidos y requiere revisión.
+   ============================================================ */
+
+        #tablaSIC tbody tr.sic-estado-detenidos td {
+            background-color: #fffbeb !important;
+            color: #111827 !important;
+            font-weight: 700;
+        }
+
+            #tablaSIC tbody tr.sic-estado-detenidos td:first-child {
+                box-shadow: inset 6px 0 0 #d97706;
+                padding-left: 20px !important;
+            }
+
+        #tablaSIC tbody tr.sic-estado-detenidos:hover td {
+            background-color: #fef3c7 !important;
+        }
+
+
+        /* ============================================================
+   ESTADO: COINCIDENCIA DE INTERÉS
+   Rojo = coincide con una fuente que busca a la persona.
+   ============================================================ */
+
+        #tablaSIC tbody tr.sic-estado-interes td {
+            background-color: #fef2f2 !important;
+            color: #111827 !important;
+            font-weight: 700;
+        }
+
+            #tablaSIC tbody tr.sic-estado-interes td:first-child {
                 box-shadow: inset 6px 0 0 #dc2626;
                 padding-left: 20px !important;
             }
 
-        #tablaSIC tbody tr.sic-alerta-activa:hover td {
-            background-color: #ffe4e6 !important;
-            color: #111827 !important;
+        #tablaSIC tbody tr.sic-estado-interes:hover td {
+            background-color: #fee2e2 !important;
         }
 
-            #tablaSIC tbody tr.sic-alerta-activa:hover td:first-child {
-                box-shadow: inset 6px 0 0 #b91c1c;
+
+        /* ============================================================
+   ESTADO: COINCIDENCIA MIXTA
+   Morado = coincide en Detenidos y en fuentes de interés.
+   ============================================================ */
+
+        #tablaSIC tbody tr.sic-estado-mixta td {
+            background-color: #faf5ff !important;
+            color: #111827 !important;
+            font-weight: 700;
+        }
+
+            #tablaSIC tbody tr.sic-estado-mixta td:first-child {
+                box-shadow: inset 6px 0 0 #7c3aed;
+                padding-left: 20px !important;
             }
 
-    .sic-actions {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 6px;
-    }
-
-        .sic-actions .btn {
-            width: 34px;
-            height: 34px;
-            padding: 0 !important;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 9px !important;
-            box-shadow: 0 4px 10px rgba(47, 91, 255, .20);
+        #tablaSIC tbody tr.sic-estado-mixta:hover td {
+            background-color: #f3e8ff !important;
         }
 
-    .sic-card-title {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        color: #001f5b;
-        font-weight: 800;
-        margin-bottom: 22px;
-    }
 
-        .sic-card-title::before {
-            content: "";
-            width: 5px;
-            height: 36px;
-            background: #dc2626;
-            border-radius: 999px;
-            display: inline-block;
+        /* ============================================================
+   ESTADO: SIN COINCIDENCIAS
+   Gris = no tiene registros de alerta.
+   ============================================================ */
+
+        #tablaSIC tbody tr.sic-estado-sin-alerta td {
+            background-color: #f8fafc !important;
+            color: #475569 !important;
+            font-weight: 500;
         }
+
+            #tablaSIC tbody tr.sic-estado-sin-alerta td:first-child {
+                box-shadow: inset 6px 0 0 #64748b;
+                padding-left: 20px !important;
+            }
+
+        #tablaSIC tbody tr.sic-estado-sin-alerta:hover td {
+            background-color: #f1f5f9 !important;
+        }
+
+
+    /* ============================================================
+   BADGE DE TOTAL DE ALERTAS
+   ============================================================ */
 
     .sic-badge-alertas {
         display: inline-flex;
@@ -104,11 +155,45 @@
         height: 28px;
         padding: 0 10px;
         border-radius: 999px;
-        background: #dc2626;
-        color: #ffffff;
         font-size: 13px;
         font-weight: 800;
+        border: 1px solid transparent;
     }
+
+    .sic-badge-confirmada {
+        background-color: #2563eb !important;
+        border-color: #1d4ed8 !important;
+        color: #ffffff !important;
+    }
+
+    .sic-badge-detenidos {
+        background-color: #f59e0b !important;
+        border-color: #d97706 !important;
+        color: #422006 !important;
+    }
+
+    .sic-badge-interes {
+        background-color: #dc2626 !important;
+        border-color: #b91c1c !important;
+        color: #ffffff !important;
+    }
+
+    .sic-badge-mixta {
+        background-color: #7c3aed !important;
+        border-color: #6d28d9 !important;
+        color: #ffffff !important;
+    }
+
+    .sic-badge-sin-alerta {
+        background-color: #64748b !important;
+        border-color: #475569 !important;
+        color: #ffffff !important;
+    }
+
+
+    /* ============================================================
+       ID DEL DETENIDO
+       ============================================================ */
 
     .sic-id-detenido {
         display: inline-flex;
@@ -124,175 +209,1486 @@
         font-size: 13px;
         font-weight: 800;
     }
+
+
+    /* ============================================================
+       CATÁLOGO DE COLORES Y DIRECTORIO MUNICIPAL
+       ============================================================ */
+
+    .sic-catalogo-colores {
+        display: flex;
+        align-items: stretch;
+        flex-wrap: nowrap;
+        gap: 16px;
+        width: 100%;
+        margin: 0 0 20px 0;
+        padding: 14px;
+        background-color: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        box-sizing: border-box;
+        overflow: hidden;
+    }
+
+    .sic-catalogo-principal {
+        flex: 1 1 auto;
+        min-width: 0;
+    }
+
+    .sic-catalogo-titulo {
+        width: 100%;
+        margin-bottom: 12px;
+        color: #001f5b;
+        font-size: 13px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: .4px;
+    }
+
+    .sic-catalogo-lista {
+        display: flex;
+        align-items: stretch;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+
+    /* ============================================================
+   BOTONES DE FILTRO
+   ============================================================ */
+
+    .sic-catalogo-item {
+        appearance: none;
+        -webkit-appearance: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        min-height: 46px;
+        padding: 8px 12px;
+        background-color: #ffffff;
+        color: #111827;
+        border: 1px solid #dbe3ee;
+        border-radius: 10px;
+        box-sizing: border-box;
+        cursor: pointer;
+        text-align: left;
+        font-family: inherit;
+        transition: transform .16s ease, background-color .16s ease, border-color .16s ease, box-shadow .16s ease;
+    }
+
+        .sic-catalogo-item:hover {
+            transform: translateY(-1px);
+            border-color: #aebdd1;
+            box-shadow: 0 5px 14px rgba(15, 35, 75, .10);
+        }
+
+        .sic-catalogo-item:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0, 62, 139, .13);
+        }
+
+        .sic-catalogo-item.active {
+            font-weight: 800;
+        }
+
+
+        /* Activo: todos */
+
+        .sic-catalogo-item[data-filtro=""].active {
+            background-color: #eef4ff;
+            border-color: #003e8b;
+            box-shadow: 0 0 0 2px rgba(0, 62, 139, .13);
+        }
+
+
+        /* Activo: identidad confirmada */
+
+        .sic-catalogo-item[data-filtro="confirmada"].active {
+            background-color: #eff6ff;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, .13);
+        }
+
+
+        /* Activo: detenidos */
+
+        .sic-catalogo-item[data-filtro="detenidos"].active {
+            background-color: #fffbeb;
+            border-color: #d97706;
+            box-shadow: 0 0 0 2px rgba(217, 119, 6, .14);
+        }
+
+
+        /* Activo: interés */
+
+        .sic-catalogo-item[data-filtro="interes"].active {
+            background-color: #fef2f2;
+            border-color: #dc2626;
+            box-shadow: 0 0 0 2px rgba(220, 38, 38, .13);
+        }
+
+
+        /* Activo: mixta */
+
+        .sic-catalogo-item[data-filtro="mixta"].active {
+            background-color: #faf5ff;
+            border-color: #7c3aed;
+            box-shadow: 0 0 0 2px rgba(124, 58, 237, .13);
+        }
+
+
+        /* Activo: sin coincidencias */
+
+        .sic-catalogo-item[data-filtro="sin-alerta"].active {
+            background-color: #f1f5f9;
+            border-color: #64748b;
+            box-shadow: 0 0 0 2px rgba(100, 116, 139, .13);
+        }
+
+
+    .sic-catalogo-color {
+        display: inline-block;
+        width: 17px;
+        height: 17px;
+        min-width: 17px;
+        border-radius: 50%;
+        border: 1px solid rgba(15, 23, 42, .13);
+    }
+
+    .sic-catalogo-texto {
+        display: flex;
+        flex-direction: column;
+        line-height: 1.2;
+    }
+
+        .sic-catalogo-texto strong {
+            color: #111827;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .sic-catalogo-texto small {
+            margin-top: 2px;
+            color: #64748b;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+
+    /* ============================================================
+   COLORES DE LOS INDICADORES
+   ============================================================ */
+
+    .sic-catalogo-todos {
+        background: conic-gradient( #2563eb 0deg 72deg, #d97706 72deg 144deg, #dc2626 144deg 216deg, #7c3aed 216deg 288deg, #64748b 288deg 360deg );
+    }
+
+    .sic-catalogo-confirmada {
+        background-color: #2563eb;
+    }
+
+    .sic-catalogo-detenidos {
+        background-color: #f59e0b;
+    }
+
+    .sic-catalogo-interes {
+        background-color: #dc2626;
+    }
+
+    .sic-catalogo-mixta {
+        background-color: #7c3aed;
+    }
+
+    .sic-catalogo-sin-alerta {
+        background-color: #64748b;
+    }
+
+    .sic-directorio-municipio {
+        flex: 0 0 400px;
+        width: 400px;
+        max-width: 400px;
+        min-width: 400px;
+        display: grid;
+        grid-template-columns: 170px minmax(0, 1fr);
+        grid-template-rows: auto auto;
+        column-gap: 18px;
+        row-gap: 8px;
+        margin-left: auto;
+        margin-right: 0;
+        padding-left: 12px;
+        padding-right: 0;
+        border-left: 1px solid #dbe3ee;
+        box-sizing: border-box;
+    }
+
+    .sic-directorio-titulo {
+        grid-column: 1;
+        grid-row: 1;
+        display: block;
+        margin: 0;
+        color: #001f5b;
+        font-size: 12px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: .4px;
+        align-self: start;
+    }
+
+    .sic-directorio-select {
+        grid-column: 1;
+        grid-row: 2;
+        align-self: start;
+        display: block;
+        width: 170px;
+        height: 36px;
+        min-width: 0;
+        padding: 5px 28px 5px 9px;
+        background-color: #ffffff;
+        color: #111827;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 600;
+        box-sizing: border-box;
+        outline: none;
+    }
+
+        .sic-directorio-select:focus {
+            border-color: #003e8b;
+            box-shadow: 0 0 0 3px rgba(0, 62, 139, .10);
+        }
+
+    .sic-directorio-lista {
+        grid-column: 2;
+        grid-row: 1 / span 2;
+        align-self: start;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        width: 100%;
+        height: 90px;
+        min-height: 90px;
+        max-height: 90px;
+        padding: 5px;
+        background-color: #ffffff;
+        border: 1px solid #dbe3ee;
+        border-radius: 8px;
+        box-sizing: border-box;
+        overflow-x: hidden;
+        overflow-y: auto;
+    }
+
+    .sic-directorio-item {
+        display: flex;
+        flex-direction: column;
+        gap: 1px;
+        width: 100%;
+        padding: 4px 7px;
+        background-color: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 7px;
+        box-sizing: border-box;
+    }
+
+        .sic-directorio-item strong {
+            display: block;
+            width: 100%;
+            min-width: 0;
+            color: #334155;
+            font-size: 11px;
+            line-height: 1.15;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .sic-directorio-item span {
+            display: block;
+            width: 100%;
+            color: #001f5b;
+            font-size: 12px;
+            font-weight: 800;
+            line-height: 1.2;
+            overflow-wrap: anywhere;
+        }
+
+    .sic-directorio-vacio {
+        grid-column: 1 / -1;
+        padding: 10px;
+        color: #64748b;
+        font-size: 11px;
+        text-align: center;
+    }
+
+    @@media (max-width: 1100px) {
+        .sic-catalogo-colores {
+            flex-direction: column;
+        }
+
+        .sic-directorio-municipio {
+            flex: 1 1 auto;
+            width: 100%;
+            max-width: 100%;
+            grid-template-columns: 190px minmax(0, 1fr);
+            grid-template-rows: auto 160px;
+            padding-top: 14px;
+            padding-left: 0;
+            border-top: 1px solid #dbe3ee;
+            border-left: none;
+        }
+    }
+
+    @@media (max-width: 650px) {
+        .sic-directorio-lista {
+            grid-template-columns: minmax(0, 1fr);
+        }
+    }
+
+    /* ============================================================
+   BARRA DE DATATABLE
+   Solo cantidad de registros y búsqueda
+   ============================================================ */
+
+    .sic-toolbar-tabla {
+        display: grid;
+        grid-template-columns: auto minmax(250px, 1fr);
+        align-items: center;
+        gap: 16px;
+        width: 100%;
+        margin-bottom: 14px;
+    }
+
+    .sic-toolbar-longitud {
+        justify-self: start;
+    }
+
+    .sic-toolbar-busqueda {
+        justify-self: end;
+    }
+
+    .sic-toolbar-tabla .dataTables_length,
+    .sic-toolbar-tabla .dataTables_filter {
+        margin: 0 !important;
+    }
+
+        .sic-toolbar-tabla .dataTables_length label,
+        .sic-toolbar-tabla .dataTables_filter label {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            margin: 0;
+            color: #334155;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .sic-toolbar-tabla .dataTables_length select,
+        .sic-toolbar-tabla .dataTables_filter input {
+            height: 36px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background-color: #ffffff;
+            color: #111827;
+            font-size: 12px;
+            font-weight: 600;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        .sic-toolbar-tabla .dataTables_length select {
+            padding: 5px 28px 5px 10px;
+        }
+
+        .sic-toolbar-tabla .dataTables_filter input {
+            width: 210px;
+            margin-left: 0 !important;
+            padding: 5px 10px;
+        }
+
+            .sic-toolbar-tabla .dataTables_length select:focus,
+            .sic-toolbar-tabla .dataTables_filter input:focus {
+                border-color: #003e8b;
+                box-shadow: 0 0 0 3px rgba(0, 62, 139, .10);
+            }
+
+    @@media (max-width: 900px) {
+        .sic-toolbar-tabla {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 10px;
+        }
+
+        .sic-toolbar-longitud,
+        .sic-toolbar-busqueda {
+            justify-self: auto;
+        }
+
+        .sic-toolbar-tabla .dataTables_filter {
+            text-align: left !important;
+        }
+
+            .sic-toolbar-tabla .dataTables_filter label {
+                width: 100%;
+            }
+
+            .sic-toolbar-tabla .dataTables_filter input {
+                flex: 1 1 auto;
+                width: auto;
+                min-width: 0;
+            }
+    }
+
+    /* ============================================================
+   OBJETIVO CONFIRMADO
+   Rojo vino = coincidencia de interés ya comprobada
+   ============================================================ */
+
+    #tablaSIC tbody tr.sic-estado-objetivo-confirmado td {
+        background-color: #fff1f2 !important;
+        color: #111827 !important;
+        font-weight: 800;
+    }
+
+        #tablaSIC tbody tr.sic-estado-objetivo-confirmado td:first-child {
+            box-shadow: inset 6px 0 0 #9f1239;
+            padding-left: 20px !important;
+        }
+
+    #tablaSIC tbody tr.sic-estado-objetivo-confirmado:hover td {
+        background-color: #ffe4e6 !important;
+    }
+
+    .sic-badge-objetivo-confirmado {
+        background-color: #9f1239 !important;
+        border-color: #881337 !important;
+        color: #ffffff !important;
+    }
+
+    .sic-catalogo-objetivo-confirmado {
+        background-color: #9f1239;
+    }
+
+    .sic-catalogo-item[data-filtro="objetivo-confirmado"].active {
+        background-color: #fff1f2;
+        border-color: #9f1239;
+        box-shadow: 0 0 0 2px rgba(159, 18, 57, .15);
+    }
+
+    /* ============================================================
+   LOADER: CARGANDO FICHA DEL DETENIDO
+   ============================================================ */
+
+.sic-loader-ficha-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+
+    display: none;
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+    background-color: rgba(15, 23, 42, .62);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+}
+
+.sic-loader-ficha-overlay.sic-loader-visible {
+    display: flex;
+}
+
+.sic-loader-ficha-contenido {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+
+    width: 100%;
+    max-width: 330px;
+    min-height: 190px;
+    padding: 28px 24px;
+
+    background-color: #ffffff;
+    border: 1px solid #dbe3ee;
+    border-radius: 16px;
+
+    text-align: center;
+    box-sizing: border-box;
+    box-shadow: 0 24px 60px rgba(15, 23, 42, .28);
+}
+
+.sic-loader-ficha-spinner {
+    width: 56px;
+    height: 56px;
+
+    border: 6px solid #dbeafe;
+    border-top-color: #003e8b;
+    border-radius: 50%;
+
+    animation: sicGirarLoaderFicha .8s linear infinite;
+}
+
+.sic-loader-ficha-contenido strong {
+    display: block;
+    color: #001f5b;
+    font-size: 17px;
+    font-weight: 800;
+    line-height: 1.25;
+}
+
+.sic-loader-ficha-contenido span {
+    display: block;
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.35;
+}
+
+@@keyframes sicGirarLoaderFicha {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
 </style>
 
+
 <div class="card">
+
     <div class="card-body">
-        <div class="sic-card-title">
-            <h5 class="card-title mb-0">Sistema de Identificación Criminal</h5>
+        <div class="sic-catalogo-colores">
+
+            <div class="sic-catalogo-principal">
+
+                <div class="sic-catalogo-titulo">
+                    Filtrar registros por estado
+                </div>
+
+                <div class="sic-catalogo-lista"
+                     role="group"
+                     aria-label="Filtros por estado de coincidencia">
+
+                    <button type="button"
+                            class="sic-catalogo-item js-filtro-estado-sic active"
+                            data-filtro=""
+                            aria-pressed="true">
+
+                        <span class="sic-catalogo-color sic-catalogo-todos"></span>
+
+                        <span class="sic-catalogo-texto">
+                            <strong>Todos</strong>
+                            <small>Mostrar todos los registros</small>
+                        </span>
+
+                    </button>
+
+
+                    <button type="button"
+                            class="sic-catalogo-item js-filtro-estado-sic"
+                            data-filtro="confirmada"
+                            aria-pressed="false">
+
+                        <span class="sic-catalogo-color sic-catalogo-confirmada"></span>
+
+                        <span class="sic-catalogo-texto">
+                            <strong>Identidad confirmada</strong>
+                            <small>Coincidencia revisada y validada</small>
+                        </span>
+
+                    </button>
+
+
+                    <button type="button"
+                            class="sic-catalogo-item js-filtro-estado-sic"
+                            data-filtro="detenidos"
+                            aria-pressed="false">
+
+                        <span class="sic-catalogo-color sic-catalogo-detenidos"></span>
+
+                        <span class="sic-catalogo-texto">
+                            <strong>Confirmar identidad</strong>
+                            <small>Solo coincide en Detenidos FGEA</small>
+                        </span>
+
+                    </button>
+
+
+                    <button type="button"
+                            class="sic-catalogo-item js-filtro-estado-sic"
+                            data-filtro="interes"
+                            aria-pressed="false">
+
+                        <span class="sic-catalogo-color sic-catalogo-interes"></span>
+
+                        <span class="sic-catalogo-texto">
+                            <strong>Coincidencia de interés</strong>
+                            <small>Coincide con una fuente de búsqueda</small>
+                        </span>
+
+                    </button>
+
+
+                    <button type="button"
+                            class="sic-catalogo-item js-filtro-estado-sic"
+                            data-filtro="mixta"
+                            aria-pressed="false">
+
+                        <span class="sic-catalogo-color sic-catalogo-mixta"></span>
+
+                        <span class="sic-catalogo-texto">
+                            <strong>Coincidencia mixta</strong>
+                            <small>Detenidos y fuente de interés</small>
+                        </span>
+
+                    </button>
+
+
+                    <button type="button"
+                            class="sic-catalogo-item js-filtro-estado-sic"
+                            data-filtro="sin-alerta"
+                            aria-pressed="false">
+
+                        <span class="sic-catalogo-color sic-catalogo-sin-alerta"></span>
+
+                        <span class="sic-catalogo-texto">
+                            <strong>Sin coincidencias</strong>
+                            <small>No tiene alertas relacionadas</small>
+                        </span>
+
+                    </button>
+
+                    <button type="button"
+                            class="sic-catalogo-item js-filtro-estado-sic"
+                            data-filtro="objetivo-confirmado"
+                            aria-pressed="false">
+
+                        <span class="sic-catalogo-color sic-catalogo-objetivo-confirmado"></span>
+
+                        <span class="sic-catalogo-texto">
+                            <strong>Objetivo confirmado</strong>
+                            <small>Coincidencia de interés ya comprobada</small>
+                        </span>
+
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <div class="sic-directorio-municipio">
+
+                <label class="sic-directorio-titulo"
+                       for="sicSelectMunicipio">
+                    Teléfonos por municipio
+                </label>
+
+                <select id="sicSelectMunicipio"
+                        class="sic-directorio-select">
+
+                    <option value="AGS">Aguascalientes</option>
+                    <option value="ASI">Asientos</option>
+                    <option value="CAL">Calvillo</option>
+                    <option value="COS">Cosío</option>
+                    <option value="JMA">Jesús María</option>
+                    <option value="PAB">Pabellón de Arteaga</option>
+                    <option value="RIN">Rincón de Romos</option>
+                    <option value="SJG">San José de Gracia</option>
+                    <option value="TEP">Tepezalá</option>
+                    <option value="ELL">El Llano</option>
+                    <option value="SFR">San Francisco de los Romo</option>
+
+                </select>
+
+                <div id="sicTelefonosMunicipio"
+                     class="sic-directorio-lista">
+                </div>
+
+            </div>
+
         </div>
 
+
         <table id="tablaSIC" class="table w-100">
+
             <thead>
+
                 <tr>
+
                     <th>ID Detenido C5</th>
+
                     <th>Nombre</th>
+
                     <th>Fecha detención</th>
+
                     <th>Municipio detención</th>
+
                     <th>Total alertas</th>
+
                     <th>Acciones</th>
+
                 </tr>
+
             </thead>
+
             <tbody></tbody>
+
         </table>
+
     </div>
+
+</div>
+
+<div id="sicLoaderFichaDetenido"
+     class="sic-loader-ficha-overlay"
+     role="status"
+     aria-live="polite"
+     aria-hidden="true">
+
+    <div class="sic-loader-ficha-contenido">
+
+        <div class="sic-loader-ficha-spinner"></div>
+
+        <strong>
+            Cargando ficha del detenido
+        </strong>
+
+        <span>
+            Espere un momento mientras se consulta la información.
+        </span>
+
+    </div>
+
 </div>
 
 @section scripts {
+
     <script>
+
         let tablaSIC = null;
+        let filtroEstadoSic = '';
+
+        var telefonosPorMunicipio = {
+
+            AGS: [
+
+                { area: 'Gabriel Sanchez - Justica Municipal', numero: '449 100 7576' }
+
+            ],
+
+            ASI: [
+
+                { area: 'Juez Claudio - Justica Municipal', numero: '449 128 9598' }
+
+            ],
+
+            CAL: [
+            ],
+
+            COS: [
+
+                { area: 'Justica Municipal', numero: '449 156 2008' }
+
+            ],
+
+            JMA: [
+
+                { area: 'Justica Municipal', numero: '449 963 9973' },
+
+                { area: 'Justica Municipal', numero: ' 449 288 4425' }
+
+            ],
+
+            PAB: [
+
+                { area: 'Justica Municipal', numero: '465 101 5808' },
+
+                { area: 'Justica Municipal', numero: '465 958 0670' }
+
+            ],
+
+            RIN: [
+            ],
+
+            SJG: [
+            ],
+
+            TEP: [
+            ],
+
+            ELL: [
+            ],
+
+            SFR: [
+            ]
+
+        };
+
+
+        function escaparHtml(valor) {
+
+            return $('<div>').text(valor === null || valor === undefined ? '' : valor.toString()).html();
+
+        }
+
+
+        function cargarTelefonosMunicipio() {
+
+            var municipio = $('#sicSelectMunicipio').val();
+
+            var telefonos = telefonosPorMunicipio[municipio] || [];
+
+            var contenido = '';
+
+            if (telefonos.length === 0) {
+
+                contenido = '<div class="sic-directorio-vacio">Sin teléfonos registrados.</div>';
+
+            } else {
+
+                telefonos.forEach(function (telefono) {
+
+                    contenido += '<div class="sic-directorio-item">';
+
+                    contenido += '<strong title="' + escaparHtml(telefono.area) + '">' + escaparHtml(telefono.area) + '</strong>';
+
+                    contenido += '<span>' + escaparHtml(telefono.numero) + '</span>';
+
+                    contenido += '</div>';
+
+                });
+
+            }
+
+            $('#sicTelefonosMunicipio').html(contenido);
+
+        }
+
+
+
+        function obtenerFuentes(valorFuente) {
+
+            if (valorFuente === null || valorFuente === undefined) {
+
+                return [];
+
+            }
+
+            let textoFuente = valorFuente.toString().trim();
+
+            if (textoFuente === '') {
+
+                return [];
+
+            }
+
+            let fuentes = textoFuente.split(',').map(function (valor) {
+
+                return parseInt(valor.trim(), 10);
+
+            }).filter(function (valor) {
+
+                return !isNaN(valor);
+
+            });
+
+            return fuentes.filter(function (valor, indice, arreglo) {
+
+                return arreglo.indexOf(valor) === indice;
+
+            });
+
+        }
+
+
+        function obtenerEstadoVisualSic(registro) {
+
+            let tieneObjetivoConfirmado =
+                registro.TieneObjetivoConfirmado === true ||
+                registro.TieneObjetivoConfirmado === 'true';
+
+            let totalAlertas =
+                Number(registro.TotalAlertas) || 0;
+
+            let tieneConfirmacionDetenidos =
+                registro.TieneConfirmacionDetenidos === true ||
+                registro.TieneConfirmacionDetenidos === 'true';
+
+            let contieneFuente6 =
+                registro.TieneFuente6Activa === true ||
+                registro.TieneFuente6Activa === 'true';
+
+            let contieneOtraFuente =
+                registro.TieneOtraFuenteActiva === true ||
+                registro.TieneOtraFuenteActiva === 'true';
+
+
+            /* ============================================================
+               1. SIN COINCIDENCIAS
+               ============================================================ */
+
+            if (totalAlertas <= 0) {
+
+                return {
+                    codigo: 'sin-alerta',
+                    claseFila: 'sic-estado-sin-alerta',
+                    claseBadge: 'sic-badge-sin-alerta',
+                    descripcion:
+                        'No tiene coincidencias registradas'
+                };
+            }
+
+
+            if (tieneObjetivoConfirmado) {
+
+                return {
+                    codigo: 'objetivo-confirmado',
+                    claseFila: 'sic-estado-objetivo-confirmado',
+                    claseBadge: 'sic-badge-objetivo-confirmado',
+                    descripcion:
+                        'Coincidencia confirmada con una persona de interés'
+                };
+            }
+
+            /* ============================================================
+               2. COINCIDENCIA MIXTA
+               Fuente 6 activa y otra fuente activa.
+               ============================================================ */
+
+            if (contieneFuente6 && contieneOtraFuente) {
+
+                return {
+                    codigo: 'mixta',
+                    claseFila: 'sic-estado-mixta',
+                    claseBadge: 'sic-badge-mixta',
+                    descripcion:
+                        'Coincidencia en Detenidos FGEA y en una fuente de interés'
+                };
+            }
+
+
+            /* ============================================================
+               3. COINCIDENCIA DE INTERÉS
+               Tiene otra fuente activa y no tiene fuente 6 activa.
+               ============================================================ */
+
+            if (!contieneFuente6 && contieneOtraFuente) {
+
+                return {
+                    codigo: 'interes',
+                    claseFila: 'sic-estado-interes',
+                    claseBadge: 'sic-badge-interes',
+                    descripcion:
+                        'Coincide con una fuente donde se busca a la persona'
+                };
+            }
+
+
+            /* ============================================================
+               4. IDENTIDAD CONFIRMADA
+               Solo tiene fuente 6 activa y existe una alerta
+               de Detenidos con Estatus = 2.
+               ============================================================ */
+
+            if (
+                contieneFuente6 &&
+                !contieneOtraFuente &&
+                tieneConfirmacionDetenidos
+            ) {
+                return {
+                    codigo: 'confirmada',
+                    claseFila: 'sic-estado-confirmada',
+                    claseBadge: 'sic-badge-confirmada',
+                    descripcion:
+                        'Identidad confirmada en Detenidos FGEA'
+                };
+            }
+
+
+            /* ============================================================
+               5. CONFIRMAR IDENTIDAD
+               Solo tiene coincidencias activas en Detenidos.
+               ============================================================ */
+
+            if (contieneFuente6 && !contieneOtraFuente) {
+
+                return {
+                    codigo: 'detenidos',
+                    claseFila: 'sic-estado-detenidos',
+                    claseBadge: 'sic-badge-detenidos',
+                    descripcion:
+                        'Coincidencia pendiente en Detenidos FGEA'
+                };
+            }
+
+
+            /*
+             * Tiene alertas, pero todas están descartadas.
+             */
+
+            return {
+                codigo: 'sin-alerta',
+                claseFila: 'sic-estado-sin-alerta',
+                claseBadge: 'sic-badge-sin-alerta',
+                descripcion:
+                    'No tiene coincidencias activas'
+            };
+        }
+
+
+        /* ============================================================
+           FILTRO PERSONALIZADO POR COLOR
+           ============================================================ */
+
+        /* ============================================================
+   FILTRO PERSONALIZADO MEDIANTE LOS BOTONES SUPERIORES
+   ============================================================ */
+
+        $.fn.dataTable.ext.search.push(
+            function (
+                settings,
+                datosBusqueda,
+                indiceRegistro,
+                registroCompleto
+            ) {
+
+                if (
+                    !settings.nTable ||
+                    settings.nTable.id !== 'tablaSIC'
+                ) {
+                    return true;
+                }
+
+                if (!filtroEstadoSic) {
+                    return true;
+                }
+
+                let registro =
+                    registroCompleto;
+
+                if (
+                    !registro &&
+                    settings.aoData &&
+                    settings.aoData[indiceRegistro]
+                ) {
+                    registro =
+                        settings.aoData[indiceRegistro]._aData;
+                }
+
+                if (!registro) {
+                    return true;
+                }
+
+                let estadoVisual =
+                    obtenerEstadoVisualSic(registro);
+
+                return estadoVisual.codigo === filtroEstadoSic;
+            }
+        );
+
 
         $(document).ready(function () {
+
+
+            $('#sicSelectMunicipio').on('change', function () {
+
+                cargarTelefonosMunicipio();
+
+            });
+
+            cargarTelefonosMunicipio();
+
+            $(document)
+                .off('click.sicFiltroEstado', '.js-filtro-estado-sic')
+                .on(
+                    'click.sicFiltroEstado',
+                    '.js-filtro-estado-sic',
+                    function () {
+
+                        let boton =
+                            $(this);
+
+                        filtroEstadoSic =
+                            boton.attr('data-filtro') || '';
+
+                        $('.js-filtro-estado-sic')
+                            .removeClass('active')
+                            .attr(
+                                'aria-pressed',
+                                'false'
+                            );
+
+                        boton
+                            .addClass('active')
+                            .attr(
+                                'aria-pressed',
+                                'true'
+                            );
+
+                        if (tablaSIC) {
+                            tablaSIC.draw();
+                        }
+                    }
+                );
+
             tablaSIC = $('#tablaSIC').DataTable({
+
                 autoWidth: false,
+
                 stripeClasses: [],
+
                 processing: true,
+
                 deferRender: true,
+
                 scrollX: false,
+
+                dom: "<'sic-toolbar-tabla'<'sic-toolbar-longitud'l><'sic-toolbar-busqueda'f>>rt<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+
                 ajax: {
+
                     url: '@Url.Action("ObtenerSIC", "SIC")',
+
                     type: 'GET',
+
                     dataSrc: function (json) {
+
                         if (!json || json.success === false) {
+
                             console.log(json ? json.message : 'No se recibió respuesta.');
+
                             return [];
+
                         }
 
                         return json.data || [];
+
                     }
+
                 },
+
                 columns: [
+
                     {
+
                         data: 'IdDetenidoC5',
+
                         render: function (data) {
+
                             return '<span class="sic-id-detenido">' + textoSeguro(data) + '</span>';
+
                         }
+
                     },
+
                     {
+
                         data: 'NombrePersona',
+
                         render: function (data) {
+
                             return textoSeguro(data);
+
                         }
+
                     },
+
                     {
+
                         data: 'FechaDetencion',
+
                         render: function (data) {
+
                             return formatearFecha(data);
+
                         }
+
                     },
+
                     {
+
                         data: 'MunicipioDetencion',
+
                         render: function (data) {
+
                             return textoSeguro(data);
+
                         }
+
                     },
+
                     {
+
                         data: 'TotalAlertas',
+
                         className: 'text-center',
-                        render: function (data) {
-                            return '<span class="sic-badge-alertas">' + textoSeguro(data) + '</span>';
-                        }
-                    },
-                    {
-                        data: 'IdDetenidoC5',
-                        orderable: false,
-                        searchable: false,
-                        render: function (data) {
-                            if (!data) {
-                                return `
-                                    <div class="sic-actions">
-                                        <button type="button" class="btn btn-secondary btn-sm" disabled title="Sin detenido C5">
-                                            <i class="fa fa-eye-slash"></i>
-                                        </button>
-                                    </div>`;
+
+                        render: function (data, type, row) {
+
+                            if (type === 'sort' || type === 'type') {
+
+                                return Number(data) || 0;
+
                             }
 
-                            return `
-                                <div class="sic-actions">
-                                    <button type="button" class="btn btn-primary btn-sm" onclick="verDetenidoC5(${data})" title="Ver detenido C5">
-                                        <i class="fa fa-eye"></i>
-                                    </button>
-                                </div>`;
+                            let estadoVisual = obtenerEstadoVisualSic(row);
+
+                            let total = data === null || data === undefined ? 0 : data;
+
+                            return '<span class="sic-badge-alertas ' + estadoVisual.claseBadge + '" title="' + estadoVisual.descripcion + '">' + textoSeguro(total) + '</span>';
+
                         }
+
+                    },
+
+                    {
+
+                        data: 'IdDetenidoC5',
+
+                        orderable: false,
+
+                        searchable: false,
+
+                        render: function (data) {
+
+                            if (!data) {
+
+                                return '<div class="sic-actions"><button type="button" class="btn btn-secondary btn-sm" disabled title="Sin detenido C5"><i class="fa fa-eye-slash"></i></button></div>';
+
+                            }
+
+                            return '<div class="sic-actions"><button type="button" class="btn btn-primary btn-sm" onclick="verDetenidoC5(' + data + ')" title="Ver detenido C5"><i class="fa fa-eye"></i></button></div>';
+
+                        }
+
                     }
+
                 ],
+
+
+
                 createdRow: function (row, data) {
-                    if (Number(data.TotalAlertas) > 0) {
-                        $(row).addClass('sic-alerta-activa');
-                    }
+
+                    let estadoVisual =
+                        obtenerEstadoVisualSic(data);
+
+                    $(row).removeClass(
+                        'sic-estado-confirmada ' +
+                        'sic-estado-detenidos ' +
+                        'sic-estado-interes ' +
+                        'sic-estado-mixta ' +
+                        'sic-estado-sin-alerta' +
+                        'sic-estado-objetivo-confirmado '
+                    );
+
+                    $(row)
+                        .addClass(
+                            estadoVisual.claseFila
+                        )
+                        .attr(
+                            'data-estado-sic',
+                            estadoVisual.codigo
+                        )
+                        .attr(
+                            'title',
+                            estadoVisual.descripcion
+                        );
                 },
+
                 order: [[2, 'asc']],
+
                 language: {
-                    emptyTable: "No hay información disponible",
-                    info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
-                    infoEmpty: "Mostrando 0 a 0 de 0 registros",
-                    infoFiltered: "(filtrado de _MAX_ registros totales)",
-                    lengthMenu: "Mostrar _MENU_ registros",
-                    loadingRecords: "Cargando...",
-                    processing: "Procesando...",
-                    search: "Buscar:",
-                    zeroRecords: "No se encontraron registros",
+
+                    emptyTable: 'No hay información disponible',
+
+                    info: 'Mostrando _START_ a _END_ de _TOTAL_ registros',
+
+                    infoEmpty: 'Mostrando 0 a 0 de 0 registros',
+
+                    infoFiltered: '(filtrado de _MAX_ registros totales)',
+
+                    lengthMenu: 'Mostrar _MENU_ registros',
+
+                    loadingRecords: 'Cargando...',
+
+                    processing: 'Procesando...',
+
+                    search: 'Buscar:',
+
+                    zeroRecords: 'No se encontraron registros',
+
                     paginate: {
-                        first: "Primero",
-                        last: "Último",
-                        next: "Siguiente",
-                        previous: "Anterior"
+
+                        first: 'Primero',
+
+                        last: 'Último',
+
+                        next: 'Siguiente',
+
+                        previous: 'Anterior'
+
                     }
+
                 }
+
             });
+
 
             $(window).on('resize', function () {
+
                 if (tablaSIC) {
+
                     tablaSIC.columns.adjust();
+
                 }
+
             });
+
         });
 
+
         function textoSeguro(valor) {
+
             if (valor === null || valor === undefined || valor.toString().trim() === '') {
+
                 return 'SIN INFORMACIÓN';
+
             }
 
             return valor.toString().trim();
+
         }
 
+
         function formatearFecha(valor) {
+
             if (valor === null || valor === undefined || valor.toString().trim() === '') {
+
                 return 'SIN FECHA';
+
             }
 
             let fecha = null;
 
             if (typeof valor === 'string' && valor.indexOf('/Date(') === 0) {
+
                 let milisegundos = parseInt(valor.replace('/Date(', '').replace(')/', ''));
+
                 fecha = new Date(milisegundos);
+
             } else {
+
                 fecha = new Date(valor);
+
             }
 
             if (isNaN(fecha.getTime())) {
+
                 return textoSeguro(valor);
+
             }
 
             let dia = fecha.getDate().toString().padStart(2, '0');
+
             let mes = (fecha.getMonth() + 1).toString().padStart(2, '0');
+
             let anio = fecha.getFullYear();
 
             return dia + '/' + mes + '/' + anio;
+
         }
 
-        function verDetenidoC5(idDetenido) {
-            window.location.href = '@Url.Action("DetalleDetenidoC5", "SIC")' + '?idDetenido=' + idDetenido;
-        }
+
+        let cargandoFichaDetenido = false;
+
+
+function mostrarLoaderFichaDetenido() {
+
+    $('#sicLoaderFichaDetenido')
+        .addClass('sic-loader-visible')
+        .attr('aria-hidden', 'false');
+
+    $('body').css('overflow', 'hidden');
+}
+
+
+function ocultarLoaderFichaDetenido() {
+
+    $('#sicLoaderFichaDetenido')
+        .removeClass('sic-loader-visible')
+        .attr('aria-hidden', 'true');
+
+    $('body').css('overflow', '');
+}
+
+
+function verDetenidoC5(idDetenido) {
+
+    /*
+     * Impide abrir varias veces la ficha si el usuario
+     * presiona repetidamente el botón.
+     */
+
+    if (cargandoFichaDetenido) {
+        return;
+    }
+
+    let id =
+        parseInt(idDetenido, 10);
+
+    if (isNaN(id) || id <= 0) {
+        return;
+    }
+
+    cargandoFichaDetenido =
+        true;
+
+    mostrarLoaderFichaDetenido();
+
+    /*
+     * Se da tiempo al navegador para dibujar el loader
+     * antes de iniciar la navegación.
+     */
+
+    window.requestAnimationFrame(function () {
+
+        window.setTimeout(function () {
+
+            let urlDetalle =
+                '@Url.Action("DetalleDetenidoC5", "SIC")';
+
+            window.location.href =
+                urlDetalle +
+                '?idDetenido=' +
+                encodeURIComponent(id);
+
+        }, 80);
+
+    });
+}
+
+
+/*
+ * Cuando el usuario regresa con el botón Atrás, el navegador
+ * puede restaurar la página desde caché. En ese caso se oculta
+ * nuevamente el loader.
+ */
+
+$(window).on('pageshow', function () {
+
+    cargandoFichaDetenido =
+        false;
+
+    ocultarLoaderFichaDetenido();
+
+});
+
     </script>
+
 }

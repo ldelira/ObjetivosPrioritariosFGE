@@ -289,6 +289,12 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Helpers\NetworkConnection.cs" />
+    <Compile Include="Models\A_Alba_alertas_alba.cs">
+      <DependentUpon>FiscaliaWeb.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\A_Amber_alertas_amber.cs">
+      <DependentUpon>FiscaliaWeb.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\Calles.cs">
       <DependentUpon>Catalogos.tt</DependentUpon>
     </Compile>
@@ -312,6 +318,9 @@
     </Compile>
     <Compile Include="Models\catalogo_estado_proceso.cs">
       <DependentUpon>Mandamientos.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\cat_EstatusAlerta.cs">
+      <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\cat_EstatusAsunto.cs">
       <DependentUpon>ObjetivosPrioritarios.tt</DependentUpon>
@@ -535,8 +544,8 @@
     <Compile Include="Models\sp_ObjPri_getObjetivoInfo_Result.cs">
       <DependentUpon>Mandamientos.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\sysdiagrams.cs">
-      <DependentUpon>ObjetivosPrioritarios.tt</DependentUpon>
+    <Compile Include="Models\SP_SIC_getCoincidenciasDetenidos_Result.cs">
+      <DependentUpon>Filiacion.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\tb_AlbumFichaObjetivo.cs">
       <DependentUpon>ObjetivosPrioritarios.tt</DependentUpon>
@@ -604,7 +613,22 @@
     <Compile Include="Models\tb_OrdenAprehension.cs">
       <DependentUpon>ObjetivosPrioritarios.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\tb_Persona.cs">
+      <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\tb_PersonaBusqueda.cs">
+      <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\tb_PersonaEmbedding.cs">
+      <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\tb_PersonaPeriodoBusqueda.cs">
+      <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\tb_PersonaSourceAFIS.cs">
+      <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\tb_SenasParticulares.cs">
       <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\tb_Usuarios.cs">
@@ -2799,6 +2823,7 @@
     <Content Include="Content\imagenes\no-image.png" />
     <Content Include="Content\imagenes\Nodisponible.jpg" />
     <Content Include="Content\imagenes\principal.jpg" />
+    <Content Include="Content\imagenes\sirena.ico" />
     <Content Include="Content\imagenes\victima1.jpg" />
     <Content Include="Content\imagenes\victima2.jpg" />
     <Content Include="Content\Image\Customer\CustLogo_2.jpg" />
@@ -3533,6 +3558,8 @@
     <Content Include="Views\MapaRelaciones\Index.cshtml" />
     <Content Include="Views\SIC\Index.cshtml" />
     <Content Include="Views\SIC\DetalleDetenidoC5.cshtml" />
+    <Content Include="Views\SIC\DetenidosObjetivoModal.cshtml" />
+    <Content Include="Views\SIC\CoincidenciasAlerta.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

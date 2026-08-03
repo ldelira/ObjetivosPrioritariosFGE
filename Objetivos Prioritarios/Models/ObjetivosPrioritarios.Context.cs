@@ -33,7 +33,6 @@ namespace Objetivos_Prioritarios.Models
         public virtual DbSet<cat_RolParticipacionAsunto> cat_RolParticipacionAsunto { get; set; }
         public virtual DbSet<cat_TipoActividadDelictiva> cat_TipoActividadDelictiva { get; set; }
         public virtual DbSet<cat_TipoAgrupacion> cat_TipoAgrupacion { get; set; }
-        public virtual DbSet<sysdiagrams> sysdiagrams { get; set; }
         public virtual DbSet<tb_AlbumFichaObjetivo> tb_AlbumFichaObjetivo { get; set; }
         public virtual DbSet<tb_AlbumFichaObjetivoDetalle> tb_AlbumFichaObjetivoDetalle { get; set; }
         public virtual DbSet<tb_AliasObjetivo> tb_AliasObjetivo { get; set; }
@@ -173,6 +172,15 @@ namespace Objetivos_Prioritarios.Models
                 new ObjectParameter("int_id_album_ficha_objetivo", typeof(int));
     
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<getListObjetivosRelacionadoGrupo_Result>("getListObjetivosRelacionadoGrupo", bit_estatusParameter, int_id_album_ficha_objetivoParameter);
+        }
+    
+        public virtual ObjectResult<SP_SIC_getCoincidenciasDetenidos_Result> SP_SIC_getCoincidenciasDetenidos(string ids_nombre_objetivo)
+        {
+            var ids_nombre_objetivoParameter = ids_nombre_objetivo != null ?
+                new ObjectParameter("ids_nombre_objetivo", ids_nombre_objetivo) :
+                new ObjectParameter("ids_nombre_objetivo", typeof(string));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<SP_SIC_getCoincidenciasDetenidos_Result>("SP_SIC_getCoincidenciasDetenidos", ids_nombre_objetivoParameter);
         }
     }
 }

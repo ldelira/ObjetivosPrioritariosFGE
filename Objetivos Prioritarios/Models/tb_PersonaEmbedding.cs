@@ -12,12 +12,14 @@ namespace Objetivos_Prioritarios.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class sysdiagrams
+    public partial class tb_PersonaEmbedding
     {
-        public string name { get; set; }
-        public int principal_id { get; set; }
-        public int diagram_id { get; set; }
-        public Nullable<int> version { get; set; }
-        public byte[] definition { get; set; }
+        public Nullable<int> IdPersona { get; set; }
+        public byte[] Embedding { get; set; }
+        public Nullable<int> IdTbFuente { get; set; }
+        public Nullable<bool> Activo { get; set; }
+        public System.DateTime FechaRegistro { get; set; }
+    
+        public virtual cat_TbFuente cat_TbFuente { get; set; }
     }
 }

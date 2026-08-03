@@ -13,10 +13,12 @@ namespace Objetivos_Prioritarios.Models
     
     public partial class sp_Alertas_Result
     {
-        public Nullable<int> IdDetenidoC5 { get; set; }
+        public int IdDetenidoC5 { get; set; }
         public string NombrePersona { get; set; }
-        public Nullable<System.DateTime> FechaDetencion { get; set; }
         public string MunicipioDetencion { get; set; }
         public Nullable<int> TotalAlertas { get; set; }
+        public Nullable<System.DateTime> FechaDetencion { get; set; }
+        public Nullable<int> Estatus { get; set; }
+        public string Fuente { get; set; }
     }
 }

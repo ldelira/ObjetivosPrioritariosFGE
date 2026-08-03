@@ -26,5 +26,7 @@ namespace Objetivos_Prioritarios.Models
         }
     
         public virtual DbSet<Capea_boletin_busqueda> Capea_boletin_busqueda { get; set; }
+        public virtual DbSet<A_Alba_alertas_alba> A_Alba_alertas_alba { get; set; }
+        public virtual DbSet<A_Amber_alertas_amber> A_Amber_alertas_amber { get; set; }
     }
 }

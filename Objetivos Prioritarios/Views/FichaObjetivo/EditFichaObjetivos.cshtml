@@ -1334,11 +1334,15 @@
 </div>
 
 <div class="modal fade" id="modalObjetivo" tabindex="-1" aria-hidden="true">
+    <input type="hidden" id="modoModalObjetivoAsunto" value="add" />
+    <input type="hidden" id="int_id_ficha_asunto_modal" value="0" />
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
 
             <div class="modal-header">
-                <h5 class="modal-title">Información del objetivo en el asunto</h5>
+                <h5 class="modal-title" id="tituloModalObjetivoAsunto">
+                    Información del objetivo en el asunto
+                </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
 
@@ -1375,9 +1379,9 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="txtObservacionRelacionAsunto" class="form-label">Observaciones de la relación:</label>
+                        <label for="txtObservacionRelacionAsuntoModal" class="form-label">Observaciones de la relación:</label>
                         <textarea class="form-control"
-                                  id="txtObservacionRelacionAsunto"
+                                  id="txtObservacionRelacionAsuntoModal"
                                   rows="3"
                                   placeholder="Observaciones generales de la relación con el asunto."></textarea>
                     </div>
@@ -1390,8 +1394,8 @@
                     Cerrar
                 </button>
 
-                <button type="button" class="btn btn-success" onclick="guardarObjetivoModal()">
-                    Aceptar
+                <button type="button" class="btn btn-success" id="btnGuardarObjetivoAsuntoModal" onclick="guardarObjetivoModal()">
+                    <i class="fa fa-save"></i> Aceptar
                 </button>
             </div>
 
@@ -1940,6 +1944,12 @@ function buscarAsuntosExistentes() {
         asuntoSeleccionado = idAsunto;
         ciAsuntoSeleccionado = ci || "";
 
+        $("#modoModalObjetivoAsunto").val("add");
+        $("#int_id_ficha_asunto_modal").val("0");
+
+        $("#tituloModalObjetivoAsunto").text("Información del objetivo en el asunto");
+        $("#btnGuardarObjetivoAsuntoModal").html('<i class="fa fa-save"></i> Aceptar');
+
         $("#selectRolParticipacionAsunto").val("");
         $("#txtDescripcionParticipacionAsunto").val("");
         $("#txtObservacionRelacionAsunto").val("");
@@ -1951,14 +1961,35 @@ function buscarAsuntosExistentes() {
 
     function guardarObjetivoModal() {
 
+        var modo = $("#modoModalObjetivoAsunto").val();
+
+        var idRolParticipacion = $("#selectRolParticipacionAsunto").val();
+        var descripcionParticipacion = $("#txtDescripcionParticipacionAsunto").val();
+        var observaciones = $("#txtObservacionRelacionAsuntoModal").val();
+
+        if (modo === "edit") {
+
+            var idFichaAsunto = parseInt($("#int_id_ficha_asunto_modal").val() || "0");
+
+            if (idFichaAsunto <= 0) {
+                swal("Validación", "No se encontró la relación a editar.", "warning");
+                return;
+            }
+            debugger;
+            editarParticipacionObjetivoAsunto(
+                idFichaAsunto,
+                idRolParticipacion,
+                descripcionParticipacion,
+                observaciones
+            );
+
+            return;
+        }
+
         if (!asuntoSeleccionado) {
             swal("Validación", "Selecciona un asunto para relacionar.", "warning");
             return;
         }
-
-        var idRolParticipacion = $("#selectRolParticipacionAsunto").val();
-        var descripcionParticipacion = $("#txtDescripcionParticipacionAsunto").val();
-        var observaciones = $("#txtObservacionRelacionAsunto").val();
 
         RelacionarAsuntoExistente(
             asuntoSeleccionado,
@@ -1999,7 +2030,7 @@ function RelacionarAsuntoExistente(
 
                 $("#selectRolParticipacionAsunto").val("");
                 $("#txtDescripcionParticipacionAsunto").val("");
-                $("#txtObservacionRelacionAsunto").val("");
+                $("#txtObservacionRelacionAsuntoModal").val("");
 
                 refreshAsuntosObjetivoList(true);
 
@@ -2010,6 +2041,71 @@ function RelacionarAsuntoExistente(
         error: function (xhr) {
             console.log(xhr.responseText);
             swal("Error", "Ocurrió un error al relacionar el asunto.", "error");
+        }
+    });
+    }
+
+    function abrirEditarParticipacionObjetivoAsunto(
+    int_id_ficha_asunto,
+    alias,
+    int_id_rol_participacion,
+    descripcionParticipacion,
+    observaciones
+    ) {
+    $("#modoModalObjetivoAsunto").val("edit");
+    $("#int_id_ficha_asunto_modal").val(int_id_ficha_asunto || 0);
+
+    $("#tituloModalObjetivoAsunto").text("Editar participación del objetivo en el asunto");
+    $("#btnGuardarObjetivoAsuntoModal").html('<i class="fa fa-save"></i> Guardar cambios');
+
+    $("#lblAsuntoSeleccionado").text(alias || "Asunto relacionado");
+
+    $("#selectRolParticipacionAsunto").val(int_id_rol_participacion || "");
+    $("#txtDescripcionParticipacionAsunto").val(descripcionParticipacion || "");
+    $("#txtObservacionRelacionAsuntoModal").val(observaciones || "");
+
+    $("#modalObjetivo").modal("show");
+}
+
+function editarParticipacionObjetivoAsunto(
+    int_id_ficha_asunto,
+    int_id_rol_participacion,
+    descripcionParticipacion,
+    observaciones
+) {
+    $.ajax({
+        type: "POST",
+        url: "@Url.Action("EditarParticipacionObjetivoAsunto", "Asuntos")",
+        data: {
+            int_id_ficha_asunto: int_id_ficha_asunto,
+            int_id_rol_participacion: int_id_rol_participacion,
+            descripcionParticipacion: descripcionParticipacion,
+            observaciones: observaciones
+        },
+        success: function (resp) {
+
+            if (resp.IsSuccess) {
+
+                swal("", resp.Message, "success");
+
+                $("#modalObjetivo").modal("hide");
+
+                $("#modoModalObjetivoAsunto").val("add");
+                $("#int_id_ficha_asunto_modal").val("0");
+
+                $("#selectRolParticipacionAsunto").val("");
+                $("#txtDescripcionParticipacionAsunto").val("");
+                $("#txtObservacionRelacionAsuntoModal").val("");
+
+                refreshAsuntosObjetivoList(true);
+
+            } else {
+                swal("Error", resp.Message, "error");
+            }
+        },
+        error: function (xhr) {
+            console.log(xhr.responseText);
+            swal("Error", "Ocurrió un error al actualizar la participación.", "error");
         }
     });
 }
@@ -2089,7 +2185,7 @@ function guardarNuevoAsuntoYVincular() {
                 });
 
                 $("#txtBuscarAsuntoExistente").val("");
-                $("#txtObservacionRelacionAsunto").val("");
+                $("#txtObservacionRelacionAsuntoModal").val("");
 
                 if ($.fn.DataTable.isDataTable("#asuntosBusquedaDataTable")) {
                     $("#asuntosBusquedaDataTable").DataTable().clear().destroy();

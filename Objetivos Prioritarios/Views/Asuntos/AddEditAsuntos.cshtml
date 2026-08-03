@@ -810,5 +810,86 @@
                 $("#ModalGenerico").modal("show");
             });
         }
+
+
+        function guardarObjetivoModal() {
+
+            debugger;
+            var modo = $("#modoModalObjetivoAsunto").val();
+
+            var idRolParticipacion = $("#selectRolParticipacionAsunto").val();
+            var descripcionParticipacion = $("#txtDescripcionParticipacionAsunto").val();
+            var observaciones = $("#txtObservacionRelacionAsuntoModal").val();
+            debugger;
+            if (modo === "edit") {
+
+                var idFichaAsunto = parseInt($("#int_id_ficha_asunto_modal").val() || "0");
+
+                if (idFichaAsunto <= 0) {
+                    swal("Validación", "No se encontró la relación a editar.", "warning");
+                    return;
+                }
+                debugger;
+                editarParticipacionObjetivoAsunto(
+                    idFichaAsunto,
+                    idRolParticipacion,
+                    descripcionParticipacion,
+                    observaciones
+                );
+
+                return;
+            }
+
+
+        }
+
+        function editarParticipacionObjetivoAsunto(
+    int_id_ficha_asunto,
+    int_id_rol_participacion,
+    descripcionParticipacion,
+    observaciones
+) {
+    $.ajax({
+        type: "POST",
+        url: "@Url.Action("EditarParticipacionObjetivoAsunto", "Asuntos")",
+        data: {
+            int_id_ficha_asunto: int_id_ficha_asunto,
+            int_id_rol_participacion: int_id_rol_participacion,
+            descripcionParticipacion: descripcionParticipacion,
+            observaciones: observaciones
+        },
+        success: function (resp) {
+
+            if (resp.IsSuccess) {
+
+                swal("", resp.Message, "success");
+
+                $("#modalObjetivo").modal("hide");
+
+                $("#modoModalObjetivoAsunto").val("add");
+                $("#int_id_ficha_asunto_modal").val("0");
+
+                $("#selectRolParticipacionAsunto").val("");
+                $("#txtDescripcionParticipacionAsunto").val("");
+                $("#txtObservacionRelacionAsuntoModal").val("");
+
+                refreshObjetivoRelacionadoAsuntoList(true);
+
+            } else {
+                swal("Error", resp.Message, "error");
+            }
+        },
+        error: function (xhr) {
+            console.log(xhr.responseText);
+            swal("Error", "Ocurrió un error al actualizar la participación.", "error");
+        }
+    });
+}
+
+
     </script>
+
+
+
+
 }

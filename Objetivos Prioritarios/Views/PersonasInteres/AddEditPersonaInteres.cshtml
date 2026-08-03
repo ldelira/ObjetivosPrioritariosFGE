@@ -1,0 +1,790 @@
+﻿@model Objetivos_Prioritarios.Models.tb_Persona
+
+@{
+    ViewBag.Title = "Ficha de Persona de Interés";
+
+    var nombreMostrar = ViewBag.NombreMostrar as string;
+    if (string.IsNullOrWhiteSpace(nombreMostrar))
+    {
+        nombreMostrar = "Persona sin identificar";
+    }
+
+    int? edadAproximada = null;
+    if (ViewBag.EdadAproximada != null)
+    {
+        int edadTemp;
+        if (int.TryParse(ViewBag.EdadAproximada.ToString(), out edadTemp))
+        {
+            edadAproximada = edadTemp;
+        }
+    }
+
+    string fechaNacimientoExacta = "";
+    if (Model.FechaNacimiento.HasValue)
+    {
+        if (!(Model.FechaNacimiento.Value.Day == 1 && Model.FechaNacimiento.Value.Month == 1))
+        {
+            fechaNacimientoExacta = Model.FechaNacimiento.Value.ToString("yyyy-MM-dd");
+        }
+    }
+
+    var sexoTexto = "Sin dato";
+    if (Model.Sexo == "M")
+    {
+        sexoTexto = "Masculino";
+    }
+    else if (Model.Sexo == "F")
+    {
+        sexoTexto = "Femenino";
+    }
+    else if (Model.Sexo == "ND")
+    {
+        sexoTexto = "No determinado";
+    }
+
+    var estaturaTexto = string.IsNullOrWhiteSpace(Model.Estatura) ? "Sin dato" : Model.Estatura;
+}
+
+@section styles {
+    <link href="@Url.Content("~/Content/css/PersonasInteres/personas-interes.css?v=1.0.0")" rel="stylesheet" />
+}
+<input type="hidden" id="idPersona" value="@Model.idPersona" />
+
+<div class="pi-page">
+
+    @*<div class="pi-title">
+        <h2>Ficha de Persona de Interés</h2>
+        <p>Personas de Interés / Ficha</p>
+    </div>*@
+
+    <div class="pi-hero">
+
+        <div class="pi-photo-card">
+
+            <div class="pi-photo-box pi-photo-clickable"
+                 id="boxFotoPrincipalPersonaInteres"
+                 title="Ver o agregar fotografías">
+
+                @if (Model.idPersona > 0)
+                {
+                    <img id="imgFotoPrincipalPersonaInteres"
+                         src="@Url.Action("VerFotoPrincipalPersonaInteres", "PersonasInteres", new { idPersona = Model.idPersona, v = DateTime.Now.Ticks })"
+                         alt="Foto principal"
+                         onerror="mostrarPlaceholderFotoPrincipalPersonaInteres();" />
+
+                    <div id="placeholderFotoPrincipalPersonaInteres" class="pi-photo-empty" style="display:none;">
+                        <i class="fa fa-user"></i>
+                        <span>Sin foto</span>
+                    </div>
+                }
+                else
+                {
+                    <div id="placeholderFotoPrincipalPersonaInteres" class="pi-photo-empty">
+                        <i class="fa fa-user"></i>
+                        <span>Sin foto</span>
+                    </div>
+                }
+
+            </div>
+
+            <div class="pi-photo-help">
+                <i class="fa fa-camera"></i>
+                Clic para administrar fotos
+            </div>
+
+        </div>
+
+        <div class="pi-main">
+            <h1>@nombreMostrar</h1>
+            <div class="pi-subtitle">
+                Registro preliminar para persona con información completa o parcial.
+            </div>
+
+            <div class="pi-status-row">
+                <span class="pi-pill @(Model.idPersona > 0 ? "" : "pi-new")">
+                    <i class="fa fa-circle"></i>
+                    @(Model.idPersona > 0 ? "Registrado" : "Nuevo registro")
+                </span>
+
+                <span class="pi-pill">
+                    <i class="fa fa-database"></i>
+                    Fuente: Personas de Interés
+                </span>
+            </div>
+
+            <div class="pi-info-grid">
+
+                <div class="pi-info-item">
+                    <div class="pi-info-icon">
+                        <img class="pi-info-icon-img"
+                             src="@Url.Content("~/images/icons8-id-card-48.png")"
+                             alt="ID Persona" />
+                    </div>
+                    <div>
+                        <label>ID Persona</label>
+                        <strong>@(Model.idPersona > 0 ? Model.idPersona.ToString() : "Pendiente")</strong>
+                    </div>
+                </div>
+
+                <div class="pi-info-item">
+                    <div class="pi-info-icon">
+                        <i class="fa fa-calendar"></i>
+                    </div>
+                    <div>
+                        <label>Edad aproximada</label>
+                        <strong>@(edadAproximada.HasValue ? edadAproximada.Value + " años" : "Sin edad")</strong>
+                    </div>
+                </div>
+
+                <div class="pi-info-item">
+                    <div class="pi-info-icon">
+                        <i class="fa fa-venus-mars"></i>
+                    </div>
+                    <div>
+                        <label>Sexo</label>
+                        <strong>@sexoTexto</strong>
+                    </div>
+                </div>
+
+                <div class="pi-info-item">
+                    <div class="pi-info-icon">
+                        <i class="fa fa-arrows-v"></i>
+                    </div>
+                    <div>
+                        <label>Estatura</label>
+                        <strong>@estaturaTexto</strong>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="pi-side pi-search-status-card">
+
+            <div>
+                <div class="pi-side-header">
+                    <span class="pi-side-kicker">Estado de búsqueda</span>
+                    <i class="fa fa-search"></i>
+                </div>
+
+                <div class="pi-search-main-status" id="boxEstadoBusquedaResumen">
+                    <span id="lblEstadoBusquedaResumen">Sin periodo</span>
+                </div>
+
+                <div class="pi-side-box">
+                    <label>Periodo vigente</label>
+                    <strong id="lblPeriodoBusquedaResumen">Sin periodo</strong>
+                </div>
+
+                <div class="pi-side-box pi-days-box">
+                    <label>Días restantes</label>
+                    <strong id="lblDiasRestantesBusquedaResumen">-</strong>
+                </div>
+
+                <input type="hidden" id="idPeriodoBusquedaActivoResumen" value="0" />
+
+                <button type="button"
+                        class="pi-cancel-search-btn"
+                        id="btnCancelarBusquedaResumen"
+                        style="display:none;">
+                    <i class="fa fa-ban"></i> Cancelar búsqueda
+                </button>
+
+
+                <div class="pi-side-mini">
+                    <label>Fecha de registro</label>
+                    <span>@(Model.FechaRegistro.HasValue ? Model.FechaRegistro.Value.ToString("dd/MM/yyyy") : "Hoy")</span>
+                </div>
+            </div>
+
+            <a class="pi-back" href="@Url.Action("Index", "PersonasInteres")">
+                <i class="fa fa-arrow-left"></i> Regresar
+            </a>
+
+        </div>
+
+    </div>
+
+    <div class="pi-tabs-card">
+
+        <ul class="nav nav-tabs pi-tabs" id="tabsPersonaInteres">
+            <li class="nav-item">
+                <a class="nav-link active pi-tab-link" href="#tabDatosGenerales">
+                    <i class="fa fa-user"></i> Datos generales
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link pi-tab-link @(Model.idPersona == 0 ? "disabled" : "")" href="#tabPeriodoBusqueda">
+                    <i class="fa fa-calendar"></i> Periodo de búsqueda
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link pi-tab-link @(Model.idPersona == 0 ? "disabled" : "")" href="#tabFotografias">
+                    <i class="fa fa-camera"></i> Fotografías
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link pi-tab-link @(Model.idPersona == 0 ? "disabled" : "")" href="#tabHuellas">
+                    <i class="fa fa-hand-paper-o"></i> Huellas
+                </a>
+            </li>
+        </ul>
+
+        <div class="pi-tab-content">
+
+            <div class="pi-tab-pane active" id="tabDatosGenerales">
+
+                <div class="pi-section-title">
+                    <h3>Datos generales</h3>
+                    <p>Captura la información disponible. Puede registrarse aunque no tenga nombre.</p>
+                </div>
+
+                <div class="pi-alert">
+                    <i class="fa fa-info-circle"></i>
+                    Si no se conoce el nombre, puedes dejarlo vacío. El sistema guardará el registro como persona sin identificar.
+                </div>
+
+                <div class="pi-form">
+                    <div class="row">
+
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Nombre</label>
+                                <input type="text" id="txtNombre" class="form-control" value="@Model.Nombre" placeholder="Opcional" />
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Apellido paterno</label>
+                                <input type="text" id="txtPaterno" class="form-control" value="@Model.Paterno" placeholder="Opcional" />
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Apellido materno</label>
+                                <input type="text" id="txtMaterno" class="form-control" value="@Model.Materno" placeholder="Opcional" />
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Edad aproximada</label>
+                                <input type="number"
+                                       id="txtEdadAproximada"
+                                       class="form-control"
+                                       value="@(edadAproximada.HasValue ? edadAproximada.Value.ToString() : "")"
+                                       placeholder="Ej. 20" />
+                                <small>Se guardará como fecha aproximada 01/01/año calculado.</small>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Fecha nacimiento exacta</label>
+                                <input type="date"
+                                       id="txtFechaNacimientoExacta"
+                                       class="form-control"
+                                       value="@fechaNacimientoExacta" />
+                                <small>Si capturas fecha exacta, se usará esta en lugar de la edad aproximada.</small>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Sexo</label>
+                                <select id="ddlSexo" class="form-control">
+                                    <option value="">Seleccione...</option>
+                                    <option value="M" @(Model.Sexo == "M" ? "selected" : "")>Masculino</option>
+                                    <option value="F" @(Model.Sexo == "F" ? "selected" : "")>Femenino</option>
+                                    <option value="ND" @(Model.Sexo == "ND" ? "selected" : "")>No determinado</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Estatura</label>
+                                <input type="text" id="txtEstatura" class="form-control" value="@Model.Estatura" placeholder="Ej. 1.70 m" />
+                            </div>
+                        </div>
+
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Observaciones / señas / datos relevantes</label>
+                                <textarea id="txtObservaciones"
+                                          class="form-control"
+                                          rows="5"
+                                          placeholder="Ej. tatuajes, cicatrices, complexión, vestimenta, zona donde fue visto, etc.">@Model.Observaciones</textarea>
+                            </div>
+                        </div>
+
+                        <div class="col-md-12">
+                            <div class="pi-actions">
+                                <button type="button" class="pi-btn-primary" id="btnGuardarPersonaInteres">
+                                    <i class="fa fa-save"></i> Guardar persona de interés
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="pi-tab-pane" id="tabPeriodoBusqueda">
+
+                @if (Model.idPersona > 0)
+                {
+                    <div id="contenedorPeriodosBusquedaPersonaInteres"></div>
+                }
+                else
+                {
+                    <div class="pi-section-title">
+                        <h3>Periodo de búsqueda</h3>
+                        <p>Define el rango de tiempo en que esta persona estará activa para búsqueda.</p>
+                    </div>
+
+                    <div class="pi-empty">
+                        <i class="fa fa-calendar"></i>
+                        <strong>Primero guarda la persona de interés.</strong>
+                        <br />
+                        Después podrás agregar el periodo de búsqueda.
+                    </div>
+                }
+
+            </div>
+
+            <div class="pi-tab-pane" id="tabFotografias">
+
+                @if (Model.idPersona > 0)
+                {
+                    <div id="contenedorFotografiasPersonaInteres"></div>
+                }
+                else
+                {
+                    <div class="pi-section-title">
+                        <h3>Fotografías</h3>
+                        <p>Agrega imágenes frontales, laterales o adicionales de la persona.</p>
+                    </div>
+
+                    <div class="pi-empty">
+                        <i class="fa fa-camera"></i>
+                        <strong>Primero guarda la persona de interés.</strong>
+                        <br />
+                        Después podrás agregar fotografías.
+                    </div>
+                }
+
+            </div>
+
+            <div class="pi-tab-pane" id="tabHuellas">
+
+                @if (Model.idPersona > 0)
+                {
+                    <div id="contenedorHuellasPersonaInteres"></div>
+                }
+                else
+                {
+                    <div class="pi-section-title">
+                        <h3>Huellas</h3>
+                        <p>Agrega imágenes de huellas para procesamiento biométrico.</p>
+                    </div>
+
+                    <div class="pi-empty">
+                        <i class="fa fa-hand-paper-o"></i>
+                        <strong>Primero guarda la persona de interés.</strong>
+                        <br />
+                        Después podrás agregar huellas.
+                    </div>
+                }
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+    $(document).ready(function () {
+
+        cargarResumenPeriodoBusquedaInicial();
+        $("#btnCancelarBusquedaResumen").off("click").on("click", function () {
+            cancelarBusquedaDesdeResumen();
+        });
+
+        $(document).off("click", ".pi-tab-link").on("click", ".pi-tab-link", function (e) {
+            e.preventDefault();
+
+            if ($(this).hasClass("disabled")) {
+                swal("Aviso", "Primero guarda la persona de interés.", "warning");
+                return;
+            }
+
+            var target = $(this).attr("href");
+
+            $(".pi-tab-link").removeClass("active");
+            $(this).addClass("active");
+
+            $(".pi-tab-pane").removeClass("active").hide();
+            $(target).addClass("active").fadeIn(120);
+            if (target === "#tabFotografias") {
+                cargarTabFotografiasPersonaInteres();
+            }
+            if (target === "#tabHuellas") {
+                cargarTabHuellasPersonaInteres();
+            }
+            if (target === "#tabPeriodoBusqueda") {
+                cargarTabPeriodosBusquedaPersonaInteres();
+            }
+        });
+
+        $("#btnGuardarPersonaInteres").off("click").on("click", function () {
+            guardarPersonaInteres();
+        });
+    });
+
+    function guardarPersonaInteres() {
+
+        var edad = $("#txtEdadAproximada").val();
+
+        if (edad && (parseInt(edad) < 0 || parseInt(edad) > 130)) {
+            swal("Validación", "La edad aproximada no es válida.", "warning");
+            return;
+        }
+
+        $("#btnGuardarPersonaInteres")
+            .prop("disabled", true)
+            .html('<i class="fa fa-spinner fa-spin"></i> Guardando...');
+
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("SavePersonaInteres", "PersonasInteres")",
+            data: {
+                idPersona: $("#idPersona").val(),
+                nombre: $("#txtNombre").val(),
+                paterno: $("#txtPaterno").val(),
+                materno: $("#txtMaterno").val(),
+                edadAproximada: $("#txtEdadAproximada").val(),
+                fechaNacimientoExacta: $("#txtFechaNacimientoExacta").val(),
+                estatura: $("#txtEstatura").val(),
+                sexo: $("#ddlSexo").val(),
+                observaciones: $("#txtObservaciones").val()
+            },
+            success: function (resp) {
+
+                $("#btnGuardarPersonaInteres")
+                    .prop("disabled", false)
+                    .html('<i class="fa fa-save"></i> Guardar persona de interés');
+
+                if (resp.IsSuccess) {
+
+                    swal({
+                        title: "",
+                        text: resp.Message,
+                        type: "success",
+                        confirmButtonText: "Continuar"
+                    }, function () {
+
+                        var id = resp.Id || resp.id || $("#idPersona").val();
+
+                        if (id && parseInt(id) > 0) {
+                            window.location.href = "@Url.Action("AddEditPersonaInteres", "PersonasInteres")?idPersona=" + id;
+                        } else {
+                            location.reload();
+                        }
+                    });
+
+                } else {
+                    swal("Error", resp.Message, "error");
+                }
+            },
+            error: function (xhr) {
+                console.log(xhr.responseText);
+
+                $("#btnGuardarPersonaInteres")
+                    .prop("disabled", false)
+                    .html('<i class="fa fa-save"></i> Guardar persona de interés');
+
+                swal("Error", "Ocurrió un error al guardar la persona de interés.", "error");
+            }
+        });
+    }
+
+    function cargarTabFotografiasPersonaInteres() {
+
+    var idPersona = parseInt($("#idPersona").val() || "0");
+
+    if (idPersona <= 0) {
+        return;
+    }
+
+    if ($("#contenedorFotografiasPersonaInteres").data("cargado") === true) {
+        return;
+    }
+
+    $("#contenedorFotografiasPersonaInteres")
+        .html('<div class="pi-empty"><i class="fa fa-spinner fa-spin"></i><strong>Cargando fotografías...</strong></div>');
+
+    $("#contenedorFotografiasPersonaInteres").load(
+        "@Url.Action("FotografiasPersonaInteresPartial", "PersonasInteres")",
+        {},
+        function () {
+            $("#contenedorFotografiasPersonaInteres").data("cargado", true);
+        }
+    );
+}
+function cargarTabHuellasPersonaInteres() {
+
+    var idPersona = parseInt($("#idPersona").val() || "0");
+
+    if (idPersona <= 0) {
+        return;
+    }
+
+    if ($("#contenedorHuellasPersonaInteres").data("cargado") === true) {
+        return;
+    }
+
+    $("#contenedorHuellasPersonaInteres")
+        .html('<div class="pi-empty"><i class="fa fa-spinner fa-spin"></i><strong>Cargando huellas...</strong></div>');
+
+    $("#contenedorHuellasPersonaInteres").load(
+        "@Url.Action("HuellasPersonaInteresPartial", "PersonasInteres")",
+        {},
+        function () {
+            $("#contenedorHuellasPersonaInteres").data("cargado", true);
+        }
+    );
+}
+
+
+function mostrarPlaceholderFotoPrincipalPersonaInteres() {
+    $("#imgFotoPrincipalPersonaInteres").hide();
+    $("#placeholderFotoPrincipalPersonaInteres").show();
+}
+
+function actualizarFotoPrincipalPersonaInteres() {
+
+    var idPersona = parseInt($("#idPersona").val() || "0");
+
+    if (idPersona <= 0) {
+        return;
+    }
+
+    var urlFoto = '@Url.Action("VerFotoPrincipalPersonaInteres", "PersonasInteres")'
+        + '?idPersona=' + idPersona
+        + '&v=' + new Date().getTime();
+
+    $("#placeholderFotoPrincipalPersonaInteres").hide();
+
+    if ($("#imgFotoPrincipalPersonaInteres").length === 0) {
+        $("#boxFotoPrincipalPersonaInteres").prepend(`
+            <img id="imgFotoPrincipalPersonaInteres"
+                 alt="Foto principal"
+                 onerror="mostrarPlaceholderFotoPrincipalPersonaInteres();" />
+        `);
+    }
+
+    $("#imgFotoPrincipalPersonaInteres")
+        .attr("src", urlFoto)
+        .show();
+}
+
+
+    $("#boxFotoPrincipalPersonaInteres").off("click").on("click", function () {
+        var idPersona = parseInt($("#idPersona").val() || "0");
+
+        if (idPersona <= 0) {
+            swal("Aviso", "Primero guarda la persona de interés.", "warning");
+            return;
+        }
+
+        $(".pi-tab-link[href='#tabFotografias']").trigger("click");
+    });
+
+
+   function cargarTabPeriodosBusquedaPersonaInteres() {
+
+    var idPersona = parseInt($("#idPersona").val() || "0");
+
+    if (idPersona <= 0) {
+        return;
+    }
+
+    if ($("#contenedorPeriodosBusquedaPersonaInteres").data("cargado") === true) {
+        return;
+    }
+
+    $("#contenedorPeriodosBusquedaPersonaInteres")
+        .html('<div class="pi-empty"><i class="fa fa-spinner fa-spin"></i><strong>Cargando periodo de búsqueda...</strong></div>');
+
+    $("#contenedorPeriodosBusquedaPersonaInteres").load(
+        "@Url.Action("PeriodosBusquedaPersonaInteresPartial", "PersonasInteres")",
+        {},
+        function () {
+            $("#contenedorPeriodosBusquedaPersonaInteres").data("cargado", true);
+        }
+    );
+}
+    function actualizarResumenPeriodoBusqueda(data) {
+
+        var activo = null;
+
+        if (data && data.length > 0) {
+            activo = data.find(x => x.activo === true);
+        }
+
+        $("#boxEstadoBusquedaResumen")
+            .removeClass("activo vencido cancelado sin-busqueda");
+
+        $("#idPeriodoBusquedaActivoResumen").val("0");
+        $("#btnCancelarBusquedaResumen").hide();
+
+        if (!activo) {
+            $("#lblEstadoBusquedaResumen").text("Sin búsqueda");
+            $("#lblPeriodoBusquedaResumen").text("Sin periodo vigente");
+            $("#lblDiasRestantesBusquedaResumen").text("-");
+            $("#boxEstadoBusquedaResumen").addClass("sin-busqueda");
+            return;
+        }
+
+        var estatus = activo.estatusVisual || "Activo";
+
+        $("#idPeriodoBusquedaActivoResumen").val(activo.idPeriodoBusqueda);
+
+        $("#lblEstadoBusquedaResumen").text(estatus);
+
+        $("#lblPeriodoBusquedaResumen").text(
+            activo.fechaInicioBusqueda + " al " + activo.fechaFinBusqueda
+        );
+
+        $("#lblDiasRestantesBusquedaResumen").text(
+            activo.diasRestantes + " días"
+        );
+
+        if (estatus === "Activo") {
+            $("#boxEstadoBusquedaResumen").addClass("activo");
+            $("#btnCancelarBusquedaResumen").show();
+        }
+        else if (estatus === "Vencido") {
+            $("#boxEstadoBusquedaResumen").addClass("vencido");
+            $("#btnCancelarBusquedaResumen").show();
+        }
+        else if (estatus === "Cancelado") {
+            $("#boxEstadoBusquedaResumen").addClass("cancelado");
+        }
+        else {
+            $("#boxEstadoBusquedaResumen").addClass("sin-busqueda");
+        }
+    }
+    function cargarResumenPeriodoBusquedaInicial() {
+
+    var idPersona = parseInt($("#idPersona").val() || "0");
+
+    if (idPersona <= 0) {
+        actualizarResumenPeriodoBusqueda([]);
+        return;
+    }
+
+    $.ajax({
+        type: "POST",
+        url: "@Url.Action("FillPeriodosBusquedaPersonaInteres", "PersonasInteres")",
+        data: {
+            idPersona: idPersona
+        },
+        success: function (data) {
+            actualizarResumenPeriodoBusqueda(data);
+        },
+        error: function (xhr) {
+            console.log(xhr.responseText);
+
+            $("#lblEstadoBusquedaResumen").text("Sin búsqueda");
+            $("#lblPeriodoBusquedaResumen").text("Sin periodo");
+            $("#lblDiasRestantesBusquedaResumen").text("-");
+            $("#boxEstadoBusquedaResumen")
+                .removeClass("activo vencido cancelado")
+                .addClass("sin-busqueda");
+        }
+    });
+    }
+
+    function cancelarBusquedaDesdeResumen() {
+
+    var idPeriodoBusqueda = parseInt($("#idPeriodoBusquedaActivoResumen").val() || "0");
+
+    if (idPeriodoBusqueda <= 0) {
+        swal("Aviso", "No hay un periodo activo para cancelar.", "warning");
+        return;
+    }
+
+    swal({
+        title: "Cancelar búsqueda",
+        text: "Escribe el motivo de cancelación:",
+        type: "input",
+        showCancelButton: true,
+        closeOnConfirm: false,
+        animation: "slide-from-top",
+        inputPlaceholder: "Motivo de cancelación"
+    }, function (motivo) {
+
+        if (motivo === false) {
+            return;
+        }
+
+        if (!motivo || motivo.trim() === "") {
+            swal.showInputError("Captura el motivo de cancelación.");
+            return;
+        }
+
+        $("#btnCancelarBusquedaResumen")
+            .prop("disabled", true)
+            .html('<i class="fa fa-spinner fa-spin"></i> Cancelando...');
+
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("CancelarPeriodoBusquedaPersonaInteres", "PersonasInteres")",
+            data: {
+                idPeriodoBusqueda: idPeriodoBusqueda,
+                motivoCancelacion: motivo
+            },
+            success: function (resp) {
+
+                $("#btnCancelarBusquedaResumen")
+                    .prop("disabled", false)
+                    .html('<i class="fa fa-ban"></i> Cancelar búsqueda');
+
+                if (resp.IsSuccess) {
+
+                    swal("", resp.Message, "success");
+
+                    cargarResumenPeriodoBusquedaInicial();
+
+                    if ($("#contenedorPeriodosBusquedaPersonaInteres").data("cargado") === true) {
+                        $("#contenedorPeriodosBusquedaPersonaInteres").data("cargado", false);
+                        cargarTabPeriodosBusquedaPersonaInteres();
+                    }
+
+                } else {
+                    swal("Error", resp.Message, "error");
+                }
+            },
+            error: function (xhr) {
+                console.log(xhr.responseText);
+
+                $("#btnCancelarBusquedaResumen")
+                    .prop("disabled", false)
+                    .html('<i class="fa fa-ban"></i> Cancelar búsqueda');
+
+                swal("Error", "Ocurrió un error al cancelar la búsqueda.", "error");
+            }
+        });
+    });
+}
+
+</script>

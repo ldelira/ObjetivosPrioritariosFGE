@@ -1,0 +1,179 @@
+﻿<div class="pi-section-title">
+    <h3>Fotografías</h3>
+    <p>Agrega imágenes frontales, laterales o adicionales de la persona de interés.</p>
+</div>
+
+<div class="pi-upload-card">
+
+    <div class="row">
+
+        <div class="col-md-4">
+            <div class="form-group">
+                <label>Tipo de fotografía</label>
+                <select id="ddlTipoFotoPersonaInteres" class="form-control">
+                    <option value="1">Frontal</option>
+                    <option value="2">Perfil izquierdo</option>
+                    <option value="3">Perfil derecho</option>
+                    <option value="4">Otra</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="col-md-5">
+            <div class="form-group">
+                <label>Seleccionar imagen</label>
+                <input type="file"
+                       id="fileFotoPersonaInteres"
+                       class="form-control"
+                       accept="image/*" />
+            </div>
+        </div>
+
+        <div class="col-md-3 d-flex align-items-end">
+            <button type="button" class="btn btn-primary btn-block" id="btnSubirFotoPersonaInteres">
+                <i class="fa fa-upload"></i> Subir fotografía
+            </button>
+        </div>
+
+    </div>
+
+</div>
+
+<hr />
+
+<div id="galeriaFotosPersonaInteres" class="pi-photo-grid"></div>
+
+<script>
+    $(document).ready(function () {
+        cargarFotografiasPersonaInteres();
+
+        $("#btnSubirFotoPersonaInteres").off("click").on("click", function () {
+            subirFotografiaPersonaInteres();
+        });
+    });
+
+    function cargarFotografiasPersonaInteres() {
+
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("FillFotografiasPersonaInteres", "PersonasInteres")",
+            data: {
+                idPersona: $("#idPersona").val()
+            },
+            success: function (data) {
+
+                var html = "";
+
+                if (!data || data.length === 0) {
+                    html = `
+                        <div class="pi-empty">
+                            <i class="fa fa-camera"></i>
+                            <strong>Sin fotografías registradas.</strong>
+                            <br />
+                            Sube una fotografía para comenzar.
+                        </div>
+                    `;
+
+                    $("#galeriaFotosPersonaInteres").html(html);
+                    return;
+                }
+
+                $.each(data, function (i, item) {
+
+                    var foto = item.archivoB64 || "";
+
+                    html += `
+                        <div class="pi-photo-item">
+                            <div class="pi-photo-preview">
+                                ${foto
+                                    ? `<img src="${foto}" alt="Fotografía" />`
+                                    : `<div class="pi-photo-preview-empty"><i class="fa fa-image"></i><span>Sin imagen</span></div>`
+                                }
+                            </div>
+
+                            <div class="pi-photo-info">
+                                <strong>${item.tipoFoto || "Fotografía"}</strong>
+                                <span>${item.fechaRegistro || ""}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                $("#galeriaFotosPersonaInteres").html(html);
+            },
+            error: function (xhr) {
+                console.log(xhr.responseText);
+                swal("Error", "Ocurrió un error al cargar las fotografías.", "error");
+            }
+        });
+    }
+
+    function subirFotografiaPersonaInteres() {
+
+        var idPersona = parseInt($("#idPersona").val() || "0");
+
+        if (idPersona <= 0) {
+            swal("Aviso", "Primero guarda la persona de interés.", "warning");
+            return;
+        }
+
+        var archivo = $("#fileFotoPersonaInteres")[0].files[0];
+
+        if (!archivo) {
+            swal("Validación", "Selecciona una imagen.", "warning");
+            return;
+        }
+
+        if (!archivo.type.match("image.*")) {
+            swal("Validación", "El archivo seleccionado debe ser una imagen.", "warning");
+            return;
+        }
+
+        var formData = new FormData();
+        formData.append("idPersona", idPersona);
+        formData.append("idTipoFoto", $("#ddlTipoFotoPersonaInteres").val());
+        formData.append("foto", archivo);
+
+        $("#btnSubirFotoPersonaInteres")
+            .prop("disabled", true)
+            .html('<i class="fa fa-spinner fa-spin"></i> Subiendo...');
+
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("SaveFotografiaPersonaInteres", "PersonasInteres")",
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (resp) {
+
+                $("#btnSubirFotoPersonaInteres")
+                    .prop("disabled", false)
+                    .html('<i class="fa fa-upload"></i> Subir fotografía');
+                if (resp.IsSuccess) {
+                    swal("", resp.Message, "success");
+
+                    $("#fileFotoPersonaInteres").val("");
+                    $("#ddlTipoFotoPersonaInteres").val("1");
+
+                    cargarFotografiasPersonaInteres();
+
+                    if (typeof actualizarFotoPrincipalPersonaInteres === "function") {
+                        actualizarFotoPrincipalPersonaInteres();
+                    }
+                }
+                 else {
+                    swal("Error", resp.Message, "error");
+                }
+            },
+            error: function (xhr) {
+                console.log(xhr.responseText);
+
+                $("#btnSubirFotoPersonaInteres")
+                    .prop("disabled", false)
+                    .html('<i class="fa fa-upload"></i> Subir fotografía');
+
+                swal("Error", "Ocurrió un error al subir la fotografía.", "error");
+            }
+        });
+    }
+</script>

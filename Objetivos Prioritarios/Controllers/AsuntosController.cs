@@ -334,7 +334,8 @@ namespace Objetivos_Prioritarios.Controllers
                     fa.int_id_ficha_asunto,
                     fa.int_id_rol_participacion,
                     fa.nvarchar_descripcion_participacion,
-                    rol_participacion = rp == null ? "Por definir" : rp.nvarchar_rol
+                    rol_participacion = rp == null ? "Por definir" : rp.nvarchar_rol,
+                    fa.nvarchar_observaciones
                 }
             ).ToList()
              .ToDictionary(x => x.int_id_ficha_asunto, x => x);
@@ -360,9 +361,10 @@ namespace Objetivos_Prioritarios.Controllers
                     x.GruposDelictivos,
                     x.FechaNacimiento,
                     x.estatus_objetivo,
-                    int_id_rol_participacion = participacion == null ? null : participacion.int_id_rol_participacion,
+                    int_id_rol_participacion = participacion == null ? 10 : participacion.int_id_rol_participacion,
                     rol_participacion = participacion == null ? "Por definir" : participacion.rol_participacion,
-                    nvarchar_descripcion_participacion = participacion == null ? "" : participacion.nvarchar_descripcion_participacion,
+                    descripcion_participacion = participacion == null ? "" : participacion.nvarchar_descripcion_participacion,
+                    observaciones_relacion = participacion.nvarchar_observaciones,
                     isFoto = x.nvarchar_foto == null ? "SIN FOTO" : "CON FOTO"
                 };
             }).ToList();
@@ -547,7 +549,7 @@ namespace Objetivos_Prioritarios.Controllers
                         : x.tb_AsuntoRelacionado.nvarchar_descripcion),
                 numavp = x.tb_AsuntoRelacionado == null ? "" : x.tb_AsuntoRelacionado.numavp,
                 fecha_asunto = x.tb_AsuntoRelacionado == null ? "" : string.Format("{0:dd-MM-yyyy}", x.tb_AsuntoRelacionado.date_fecha_asunto),
-                int_id_rol_participacion = x.int_id_rol_participacion,
+                int_id_rol_participacion = x.int_id_rol_participacion== null ? 10 : x.cat_RolParticipacionAsunto.int_id_rol_participacion,
                 rol_participacion = x.cat_RolParticipacionAsunto == null ? "Por definir" : x.cat_RolParticipacionAsunto.nvarchar_rol,
                 descripcion_participacion = x.nvarchar_descripcion_participacion,
                 observaciones_relacion = x.nvarchar_observaciones,
@@ -660,6 +662,23 @@ namespace Objetivos_Prioritarios.Controllers
 
         #endregion
 
+
+        [HttpPost]
+        public JsonResult EditarParticipacionObjetivoAsunto(
+    int int_id_ficha_asunto,
+    int? int_id_rol_participacion,
+    string descripcionParticipacion,
+    string observaciones)
+        {
+            var resp = AsuntoService.EditarParticipacionObjetivoAsunto(
+                int_id_ficha_asunto,
+                int_id_rol_participacion,
+                descripcionParticipacion,
+                observaciones
+            );
+
+            return Json(resp, JsonRequestBehavior.AllowGet);
+        }
 
 
     }

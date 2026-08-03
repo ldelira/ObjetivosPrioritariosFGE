@@ -82,7 +82,16 @@ namespace Objetivos_Prioritarios.Controllers
                 return mapaRelacionesService;
             }
         }
-
+        private PersonaInteresService personaInteresService = null;
+        public PersonaInteresService PersonaInteresService
+        {
+            get
+            {
+                if (personaInteresService == null)
+                    personaInteresService = new PersonaInteresService();
+                return personaInteresService;
+            }
+        }
 
     }
 }

@@ -1,0 +1,171 @@
+﻿<div class="pi-section-title">
+    <h3>Huellas</h3>
+    <p>Agrega una o varias imágenes de huellas para la persona de interés.</p>
+</div>
+
+<div class="pi-upload-card">
+
+    <div class="row">
+
+        <div class="col-md-9">
+            <div class="form-group">
+                <label>Seleccionar imágenes de huellas</label>
+                <input type="file"
+                       id="fileHuellasPersonaInteres"
+                       class="form-control"
+                       accept="image/*"
+                       multiple />
+                <small class="text-muted">
+                    Puedes seleccionar varias imágenes al mismo tiempo.
+                </small>
+            </div>
+        </div>
+
+        <div class="col-md-3 d-flex align-items-end">
+            <button type="button" class="btn btn-primary btn-block" id="btnSubirHuellasPersonaInteres">
+                <i class="fa fa-upload"></i> Subir huellas
+            </button>
+        </div>
+
+    </div>
+
+</div>
+
+<hr />
+
+<div id="galeriaHuellasPersonaInteres" class="pi-photo-grid"></div>
+
+<script>
+    $(document).ready(function () {
+        cargarHuellasPersonaInteres();
+
+        $("#btnSubirHuellasPersonaInteres").off("click").on("click", function () {
+            subirHuellasPersonaInteres();
+        });
+    });
+
+    function cargarHuellasPersonaInteres() {
+        debugger;
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("FillHuellasPersonaInteres", "PersonasInteres")",
+            data: {
+                idPersona: $("#idPersona").val()
+            },
+            success: function (data) {
+                debugger;
+                var html = "";
+
+                if (!data || data.length === 0) {
+                    html = `
+                        <div class="pi-empty">
+                            <i class="fa fa-hand-paper-o"></i>
+                            <strong>Sin huellas registradas.</strong>
+                            <br />
+                            Sube una o varias imágenes para comenzar.
+                        </div>
+                    `;
+
+                    $("#galeriaHuellasPersonaInteres").html(html);
+                    return;
+                }
+
+               $.each(data, function (i, item) {
+
+                var urlHuella = '@Url.Action("VerHuellaPersonaInteres", "PersonasInteres")'
+                    + '?idFicha=' + item.idFicha
+                    + '&v=' + new Date().getTime();
+
+                html += `
+                    <div class="pi-photo-item">
+                        <div class="pi-photo-preview">
+                            <img src="${urlHuella}"
+                                 alt="Huella"
+                                 onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=&quot;pi-photo-preview-empty&quot;><i class=&quot;fa fa-image&quot;></i><span>No se pudo cargar</span></div>';" />
+                        </div>
+
+                        <div class="pi-photo-info">
+                            <strong>Huella #${item.idFicha}</strong>
+                            <span>${item.fechaRegistro || ""}</span>
+                        </div>
+                    </div>
+                `;
+            });
+
+                $("#galeriaHuellasPersonaInteres").html(html);
+            },
+            error: function (xhr) {
+                console.log(xhr.responseText);
+                swal("Error", "Ocurrió un error al cargar las huellas.", "error");
+            }
+        });
+    }
+
+    function subirHuellasPersonaInteres() {
+
+        var idPersona = parseInt($("#idPersona").val() || "0");
+
+        if (idPersona <= 0) {
+            swal("Aviso", "Primero guarda la persona de interés.", "warning");
+            return;
+        }
+
+        var input = $("#fileHuellasPersonaInteres")[0];
+
+        if (!input.files || input.files.length === 0) {
+            swal("Validación", "Selecciona al menos una imagen de huella.", "warning");
+            return;
+        }
+
+        var formData = new FormData();
+        formData.append("idPersona", idPersona);
+
+        for (var i = 0; i < input.files.length; i++) {
+            var archivo = input.files[i];
+
+            if (!archivo.type.match("image.*")) {
+                swal("Validación", "Todos los archivos deben ser imágenes.", "warning");
+                return;
+            }
+
+            formData.append("huellas", archivo);
+        }
+
+        $("#btnSubirHuellasPersonaInteres")
+            .prop("disabled", true)
+            .html('<i class="fa fa-spinner fa-spin"></i> Subiendo...');
+
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("SaveHuellasPersonaInteres", "PersonasInteres")",
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (resp) {
+
+                $("#btnSubirHuellasPersonaInteres")
+                    .prop("disabled", false)
+                    .html('<i class="fa fa-upload"></i> Subir huellas');
+
+                if (resp.IsSuccess) {
+                    swal("", resp.Message, "success");
+
+                    $("#fileHuellasPersonaInteres").val("");
+
+                    cargarHuellasPersonaInteres();
+                } else {
+                    swal("Error", resp.Message, "error");
+                }
+            },
+            error: function (xhr) {
+                console.log(xhr.responseText);
+
+                $("#btnSubirHuellasPersonaInteres")
+                    .prop("disabled", false)
+                    .html('<i class="fa fa-upload"></i> Subir huellas');
+
+                swal("Error", "Ocurrió un error al subir las huellas.", "error");
+            }
+        });
+    }
+</script>

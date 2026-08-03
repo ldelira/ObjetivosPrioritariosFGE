@@ -27,7 +27,6 @@ namespace Objetivos_Prioritarios.Models
             throw new UnintentionalCodeFirstException();
         }
     
-        public virtual DbSet<cat_EstatusAlerta> cat_EstatusAlerta { get; set; }
         public virtual DbSet<cat_TbFuente> cat_TbFuente { get; set; }
         public virtual DbSet<cat_TipoAlerta> cat_TipoAlerta { get; set; }
         public virtual DbSet<tb_Alerta> tb_Alerta { get; set; }
@@ -35,12 +34,12 @@ namespace Objetivos_Prioritarios.Models
         public virtual DbSet<tb_DETENIDO_C5> tb_DETENIDO_C5 { get; set; }
         public virtual DbSet<tb_FOTO_C5> tb_FOTO_C5 { get; set; }
         public virtual DbSet<tb_HUELLA_C5> tb_HUELLA_C5 { get; set; }
-        public virtual DbSet<tb_Persona> tb_Persona { get; set; }
-        public virtual DbSet<tb_PersonaPeriodoBusqueda> tb_PersonaPeriodoBusqueda { get; set; }
-        public virtual DbSet<tb_SenasParticulares> tb_SenasParticulares { get; set; }
         public virtual DbSet<tb_PersonaBusqueda> tb_PersonaBusqueda { get; set; }
-        public virtual DbSet<tb_PersonaEmbedding> tb_PersonaEmbedding { get; set; }
-        public virtual DbSet<tb_PersonaSourceAFIS> tb_PersonaSourceAFIS { get; set; }
+        public virtual DbSet<tb_FichaDecadactilar> tb_FichaDecadactilar { get; set; }
+        public virtual DbSet<tb_Fotografia> tb_Fotografia { get; set; }
+        public virtual DbSet<tb_Persona> tb_Persona { get; set; }
+        public virtual DbSet<cat_EstatusPeriodoBusqueda> cat_EstatusPeriodoBusqueda { get; set; }
+        public virtual DbSet<tb_PersonaPeriodoBusqueda> tb_PersonaPeriodoBusqueda { get; set; }
     
         public virtual ObjectResult<sp_Alertas_Result> sp_Alertas()
         {

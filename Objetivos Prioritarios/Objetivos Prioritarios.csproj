@@ -267,6 +267,7 @@
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="ControllersServices\PersonaInteresService.cs" />
     <Compile Include="ControllersServices\FiliacionMunicipalService.cs" />
     <Compile Include="ControllersServices\MapaRelacionesService.cs" />
     <Compile Include="ControllersServices\BaseService.cs" />
@@ -277,6 +278,7 @@
     <Compile Include="ControllersServices\ObjetivoService.cs" />
     <Compile Include="ControllersServices\ReporteService.cs" />
     <Compile Include="Controllers\ABaseController.cs" />
+    <Compile Include="Controllers\PersonasInteresController.cs" />
     <Compile Include="Controllers\AsuntosController.cs" />
     <Compile Include="Controllers\CatalogoController.cs" />
     <Compile Include="Controllers\DashboardController.cs" />
@@ -295,6 +297,7 @@
     <Compile Include="Models\A_Amber_alertas_amber.cs">
       <DependentUpon>FiscaliaWeb.tt</DependentUpon>
     </Compile>
+    <Compile Include="Helpers\UserCredentials.cs" />
     <Compile Include="Models\Calles.cs">
       <DependentUpon>Catalogos.tt</DependentUpon>
     </Compile>
@@ -324,6 +327,9 @@
     </Compile>
     <Compile Include="Models\cat_EstatusAsunto.cs">
       <DependentUpon>ObjetivosPrioritarios.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\cat_EstatusPeriodoBusqueda.cs">
+      <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\cat_EstatusProceso.cs">
       <DependentUpon>ObjetivosPrioritarios.tt</DependentUpon>
@@ -583,8 +589,14 @@
     <Compile Include="Models\tb_FichaAsunto.cs">
       <DependentUpon>ObjetivosPrioritarios.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\tb_FichaDecadactilar.cs">
+      <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\tb_FichaObjetivo.cs">
       <DependentUpon>ObjetivosPrioritarios.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\tb_Fotografia.cs">
+      <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\tb_FOTO_C5.cs">
       <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
@@ -640,6 +652,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utils\BasicOperationResponse.cs" />
     <Compile Include="Utils\Detenido.cs" />
+    <Compile Include="Utils\ImagenArchivoResponse.cs" />
     <Compile Include="Utils\LoginUser.cs" />
     <Compile Include="Utils\PowerPointGeneratorNoImagePartType.cs" />
   </ItemGroup>
@@ -2659,6 +2672,7 @@
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\bootstrap.rtl.css" />
     <Content Include="Content\bootstrap.rtl.min.css" />
+    <Content Include="Content\css\PersonasInteres\personas-interes.css" />
     <Content Include="Content\DataTables\css\autoFill.bootstrap.css" />
     <Content Include="Content\DataTables\css\autoFill.bootstrap.min.css" />
     <Content Include="Content\DataTables\css\autoFill.bootstrap4.css" />
@@ -2853,6 +2867,7 @@
     <Content Include="images\icons8-id-card-48.png" />
     <Content Include="images\icons8-prison-50.png" />
     <Content Include="images\icons8-prisoner-50.png" />
+    <Content Include="images\icons8-target-audience-24.png" />
     <Content Include="images\logoIcono.png" />
     <Content Include="images\logoNe.png" />
     <Content Include="images\Nodisponible.png" />
@@ -3560,6 +3575,11 @@
     <Content Include="Views\SIC\DetalleDetenidoC5.cshtml" />
     <Content Include="Views\SIC\DetenidosObjetivoModal.cshtml" />
     <Content Include="Views\SIC\CoincidenciasAlerta.cshtml" />
+    <Content Include="Views\PersonasInteres\Index.cshtml" />
+    <Content Include="Views\PersonasInteres\AddEditPersonaInteres.cshtml" />
+    <Content Include="Views\PersonasInteres\FotografiasPersonaInteresPartial.cshtml" />
+    <Content Include="Views\PersonasInteres\HuellasPersonaInteresPartial.cshtml" />
+    <Content Include="Views\PersonasInteres\PeriodosBusquedaPersonaInteresPartial.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

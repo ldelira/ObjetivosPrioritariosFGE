@@ -27,6 +27,7 @@ namespace Objetivos_Prioritarios.Models
         public string MotivoCancelacion { get; set; }
         public int idEstatusPeriodoBusqueda { get; set; }
     
+        public virtual cat_EstatusPeriodoBusqueda cat_EstatusPeriodoBusqueda { get; set; }
         public virtual tb_Persona tb_Persona { get; set; }
     }
 }

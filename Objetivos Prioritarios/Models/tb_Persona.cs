@@ -17,7 +17,7 @@ namespace Objetivos_Prioritarios.Models
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public tb_Persona()
         {
-            this.tb_SenasParticulares = new HashSet<tb_SenasParticulares>();
+            this.tb_Fotografia = new HashSet<tb_Fotografia>();
             this.tb_PersonaPeriodoBusqueda = new HashSet<tb_PersonaPeriodoBusqueda>();
         }
     
@@ -33,7 +33,7 @@ namespace Objetivos_Prioritarios.Models
         public string Observaciones { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<tb_SenasParticulares> tb_SenasParticulares { get; set; }
+        public virtual ICollection<tb_Fotografia> tb_Fotografia { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<tb_PersonaPeriodoBusqueda> tb_PersonaPeriodoBusqueda { get; set; }
     }

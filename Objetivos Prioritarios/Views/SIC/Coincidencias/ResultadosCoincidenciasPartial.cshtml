@@ -1,0 +1,485 @@
+﻿@model Objetivos_Prioritarios.Models.Extends.ResultadosCoincidenciasViewModel
+
+@{
+    bool existenCoincidencias =
+        Model != null &&
+        Model.Coincidencias != null &&
+        Model.Coincidencias.Count > 0;
+
+    bool tieneFotografiaConsulta =
+        Model != null &&
+        Model.TieneFotografiaConsulta;
+
+    bool tieneHuellaConsulta =
+        Model != null &&
+        Model.TieneHuellaConsulta;
+
+    string tieneFotografiaTexto =
+        tieneFotografiaConsulta
+            ? "true"
+            : "false";
+
+    string tieneHuellaTexto =
+        tieneHuellaConsulta
+            ? "true"
+            : "false";
+
+    int totalCoincidencias =
+        Model == null
+            ? 0
+            : Model.TotalCoincidencias;
+
+    int totalFotografia =
+        Model == null
+            ? 0
+            : Model.TotalFotografia;
+
+    int totalHuella =
+        Model == null
+            ? 0
+            : Model.TotalHuella;
+
+    int totalCombinadas =
+        Model == null
+            ? 0
+            : Model.TotalCombinadas;
+
+    string imagenNoDisponible =
+        Url.Content(
+            "~/Content/imagenes/Nodisponible.jpg"
+        );
+
+    var modeloDetalleInicial =
+        Model == null
+            ? null
+            : new Objetivos_Prioritarios.Models.Extends.DetalleCoincidenciaViewModel
+            {
+                Coincidencia =
+                    Model.CoincidenciaSeleccionada,
+
+                TieneFotografiaConsulta =
+                    tieneFotografiaConsulta,
+
+                TieneHuellaConsulta =
+                    tieneHuellaConsulta
+            };
+}
+
+
+<!-- ============================================================
+     RESUMEN DE COINCIDENCIAS
+     ============================================================ -->
+
+<div class="sic-resumen-coincidencias">
+
+    <div class="sic-resumen-item sic-resumen-total">
+
+        <span>
+            Coincidencias totales
+        </span>
+
+        <strong>
+            @totalCoincidencias
+        </strong>
+
+        <i class="fa fa-users"></i>
+
+    </div>
+
+
+    <div class="sic-resumen-item sic-resumen-foto">
+
+        <span>
+            Coincidencias foto
+        </span>
+
+        <strong>
+            @totalFotografia
+        </strong>
+
+        <i class="fa fa-camera"></i>
+
+    </div>
+
+
+    <div class="sic-resumen-item sic-resumen-huella">
+
+        <span>
+            Coincidencias huella
+        </span>
+
+        <strong>
+            @totalHuella
+        </strong>
+
+        <i class="fa fa-hand-pointer-o"></i>
+
+    </div>
+
+
+    <div class="sic-resumen-item sic-resumen-combinada">
+
+        <span>
+            Coincidencias combinadas
+        </span>
+
+        <strong>
+            @totalCombinadas
+        </strong>
+
+        <i class="fa fa-link"></i>
+
+    </div>
+
+</div>
+
+
+<!-- ============================================================
+     VALIDAR SI EXISTEN RESULTADOS
+     ============================================================ -->
+
+@if (!existenCoincidencias)
+{
+    <!-- ========================================================
+         SIN RESULTADOS
+         ======================================================== -->
+
+    <div class="sic-sin-resultados">
+
+        <i class="fa fa-search-minus"></i>
+
+        <strong>
+            No se encontraron coincidencias
+        </strong>
+
+        <span>
+            Modifique los filtros o reduzca el porcentaje mínimo
+            para realizar una nueva búsqueda.
+        </span>
+
+    </div>
+}
+else
+{
+    <!-- ========================================================
+         CONTENEDOR DE RESULTADOS Y DETALLE
+         ======================================================== -->
+
+    <div id="sicResultadosContexto"
+         class="sic-resultados-layout"
+         data-tiene-fotografia="@tieneFotografiaTexto"
+         data-tiene-huella="@tieneHuellaTexto">
+
+
+        <!-- ====================================================
+             COLUMNA IZQUIERDA: LISTADO DE COINCIDENCIAS
+             ==================================================== -->
+
+        <section class="sic-listado-coincidencias">
+
+
+            <!-- ================================================
+                 PESTAÑAS DE FILTRADO
+                 ================================================ -->
+
+            <div class="sic-tabs-resultados"
+                 role="tablist"
+                 aria-label="Tipos de coincidencia">
+
+
+                <button type="button"
+                        class="sic-tab-resultado active js-tab-coincidencias"
+                        data-tipo="TODOS"
+                        role="tab"
+                        aria-selected="true">
+
+                    Todos (@totalCoincidencias)
+
+                </button>
+
+
+                @if (tieneFotografiaConsulta)
+                {
+                    <button type="button"
+                            class="sic-tab-resultado js-tab-coincidencias"
+                            data-tipo="FOTO"
+                            role="tab"
+                            aria-selected="false">
+
+                        <i class="fa fa-camera"></i>
+
+                        Por foto (@totalFotografia)
+
+                    </button>
+                }
+
+
+                @if (tieneHuellaConsulta)
+                {
+                    <button type="button"
+                            class="sic-tab-resultado js-tab-coincidencias"
+                            data-tipo="HUELLA"
+                            role="tab"
+                            aria-selected="false">
+
+                        <i class="fa fa-hand-pointer-o"></i>
+
+                        Por huella (@totalHuella)
+
+                    </button>
+                }
+
+            </div>
+
+
+            <!-- ================================================
+                 LISTADO DE PERSONAS
+                 ================================================ -->
+
+            <div class="sic-lista-resultados">
+
+                @foreach (var item in Model.Coincidencias)
+                {
+                    bool seleccionado =
+                        Model.CoincidenciaSeleccionada != null &&
+                        Model.CoincidenciaSeleccionada.IdCoincidencia ==
+                        item.IdCoincidencia;
+
+                    string claseSeleccionado =
+                        seleccionado
+                            ? "active"
+                            : "";
+
+                    string claseNivel;
+
+                    if (item.SimilitudGlobal >= 85)
+                    {
+                        claseNivel =
+                            "sic-nivel-alto";
+                    }
+                    else if (item.SimilitudGlobal >= 75)
+                    {
+                        claseNivel =
+                            "sic-nivel-medio";
+                    }
+                    else
+                    {
+                        claseNivel =
+                            "sic-nivel-bajo";
+                    }
+
+
+                    string fotoUrl =
+                        string.IsNullOrWhiteSpace(
+                            item.FotoUrl
+                        )
+                            ? imagenNoDisponible
+                            : Url.Content(
+                                item.FotoUrl
+                            );
+
+
+                    string tipoCoincidencia =
+                        string.IsNullOrWhiteSpace(
+                            item.TipoCoincidencia
+                        )
+                            ? ""
+                            : item.TipoCoincidencia
+                                .Trim()
+                                .ToUpperInvariant();
+
+
+                    string nombreCompleto =
+                        string.IsNullOrWhiteSpace(
+                            item.NombreCompleto
+                        )
+                            ? "SIN INFORMACIÓN"
+                            : item.NombreCompleto;
+
+
+                    string folio =
+                        string.IsNullOrWhiteSpace(
+                            item.Folio
+                        )
+                            ? "SIN INFORMACIÓN"
+                            : item.Folio;
+
+
+                    string municipio =
+                        string.IsNullOrWhiteSpace(
+                            item.Municipio
+                        )
+                            ? "SIN INFORMACIÓN"
+                            : item.Municipio;
+
+
+                    string sexo =
+                        string.IsNullOrWhiteSpace(
+                            item.Sexo
+                        )
+                            ? "SIN INFORMACIÓN"
+                            : item.Sexo;
+
+
+                    string edadTexto =
+                        item.Edad > 0
+                            ? item.Edad + " años"
+                            : "SIN INFORMACIÓN";
+
+
+                    string porcentajeGlobal =
+                        item.SimilitudGlobal
+                            .ToString("0") +
+                        "%";
+
+
+                    <article class="sic-resultado-persona @claseSeleccionado"
+                             data-tipo="@tipoCoincidencia"
+                             data-id="@item.IdCoincidencia"
+                             tabindex="0"
+                             role="button"
+                             aria-label="Seleccionar coincidencia de @nombreCompleto">
+
+
+                        <!-- ====================================
+                             FOTOGRAFÍA DEL CANDIDATO
+                             ==================================== -->
+
+                        <img src="@fotoUrl"
+                             alt="Fotografía de @nombreCompleto"
+                             class="sic-resultado-foto"
+                             onerror="this.onerror=null;this.src='@imagenNoDisponible';" />
+
+
+                        <!-- ====================================
+                             INFORMACIÓN GENERAL
+                             ==================================== -->
+
+                        <div class="sic-resultado-informacion">
+
+                            <strong class="sic-resultado-nombre">
+                                @nombreCompleto
+                            </strong>
+
+                            @if (item.TieneAvisoMandamientos)
+                            {
+                                <div class="sic-aviso-mandamiento-listado">
+
+                                    <i class="fa fa-exclamation-triangle"></i>
+
+                                    <span>
+                                        Coincidencia nominal en Mandamientos Judiciales
+                                    </span>
+
+                                    <strong>
+                                        @item.TotalMandamientos
+                                    </strong>
+
+                                </div>
+                            }
+
+
+                            <div class="sic-resultado-datos">
+
+                                <span>
+
+                                    <b>
+                                        Folio:
+                                    </b>
+
+                                    @folio
+
+                                </span>
+
+
+                                <span>
+
+                                    <b>
+                                        Municipio:
+                                    </b>
+
+                                    @municipio
+
+                                </span>
+
+
+                                <span>
+
+                                    <b>
+                                        Edad:
+                                    </b>
+
+                                    @edadTexto
+
+                                </span>
+
+
+                                <span>
+
+                                    <b>
+                                        Sexo:
+                                    </b>
+
+                                    @sexo
+
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- ====================================
+                             PORCENTAJE Y BOTÓN DE DETALLE
+                             ==================================== -->
+
+                        <div class="sic-resultado-puntaje">
+
+                            <small>
+                                Similitud global
+                            </small>
+
+                            <strong class="@claseNivel">
+                                @porcentajeGlobal
+                            </strong>
+
+
+                            <button type="button"
+                                    class="btn js-ver-coincidencia"
+                                    data-id="@item.IdCoincidencia"
+                                    aria-label="Ver detalle de @nombreCompleto">
+
+                                <i class="fa fa-eye"></i>
+
+                                Ver detalle
+
+                            </button>
+
+                        </div>
+
+                    </article>
+                }
+
+            </div>
+
+        </section>
+
+
+        <!-- ====================================================
+             COLUMNA DERECHA: DETALLE DE LA COINCIDENCIA
+             ==================================================== -->
+
+        <section id="panelDetalleCoincidencia"
+                 class="sic-panel-detalle"
+                 aria-live="polite"
+                 aria-busy="false">
+
+            @Html.Partial(
+                     "Coincidencias/DetalleCoincidenciaPartial",
+                     modeloDetalleInicial
+                 )
+
+        </section>
+
+    </div>
+}

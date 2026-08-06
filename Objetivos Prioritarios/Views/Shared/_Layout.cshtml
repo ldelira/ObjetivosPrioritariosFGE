@@ -1,43 +1,180 @@
 ﻿@{
-    var controllerName = (ViewContext.RouteData.Values["controller"] ?? "").ToString();
-    var actionName = (ViewContext.RouteData.Values["action"] ?? "").ToString();
+    var controllerName =
+        (ViewContext.RouteData.Values["controller"] ?? "")
+            .ToString();
 
-    var nombreUsuario = (Session["NombreUsuario"] ?? "Perfil Prueba").ToString();
-    var pageTitle = ((ViewBag.Title ?? ViewBag.title) ?? "").ToString();
+    var actionName =
+        (ViewContext.RouteData.Values["action"] ?? "")
+            .ToString();
 
-    var isMapa = controllerName.Equals("MapaRelaciones", StringComparison.OrdinalIgnoreCase);
+    var nombreUsuario =
+        (Session["NombreUsuario"] ?? "FGEA")
+            .ToString();
 
-    var isAsuntos = controllerName.Equals("Asuntos", StringComparison.OrdinalIgnoreCase);
+    var pageTitle =
+        ((ViewBag.Title ?? ViewBag.title) ?? "")
+            .ToString();
 
-    var isSic = controllerName.Equals("SIC", StringComparison.OrdinalIgnoreCase)
-            || controllerName.Equals("Sic", StringComparison.OrdinalIgnoreCase)
-            || controllerName.Equals("SicNotificador", StringComparison.OrdinalIgnoreCase);
 
-    var isPersonasInteres = controllerName.Equals("PersonasInteres", StringComparison.OrdinalIgnoreCase);
+    /* =========================================================
+       IDENTIFICACIÓN DE PANTALLAS
+       ========================================================= */
 
-    var isAlbum = controllerName.Equals("FichaObjetivo", StringComparison.OrdinalIgnoreCase)
-          && actionName.Equals("IndexAlbum", StringComparison.OrdinalIgnoreCase);
+    var isMapa =
+        controllerName.Equals(
+            "MapaRelaciones",
+            StringComparison.OrdinalIgnoreCase
+        );
 
-    var isObjetivos = controllerName.Equals("Objetivo", StringComparison.OrdinalIgnoreCase)
-                      || (controllerName.Equals("FichaObjetivo", StringComparison.OrdinalIgnoreCase) && !isAlbum);
+    var isAsuntos =
+        controllerName.Equals(
+            "Asuntos",
+            StringComparison.OrdinalIgnoreCase
+        );
 
-    var isModuloObjetivos = isMapa || isObjetivos || isAsuntos || isAlbum;
-    var isModuloSic = isSic;
-    var isModuloPersonasInteres = isPersonasInteres;
 
-    var moduloActivo = "Objetivos Prioritarios";
-    var moduloActivoSubtitulo = "Gestión de inteligencia";
+    /*
+     * La búsqueda utiliza el controlador SIC,
+     * pero será una opción principal independiente.
+     */
+    var isBusquedaCoincidencias =
+        controllerName.Equals(
+            "SIC",
+            StringComparison.OrdinalIgnoreCase
+        )
+        &&
+        actionName.Equals(
+            "BusquedaCoincidencias",
+            StringComparison.OrdinalIgnoreCase
+        );
+
+
+    /*
+     * Pantalla principal de consulta SIC.
+     */
+    var isConsultaSic =
+        controllerName.Equals(
+            "SIC",
+            StringComparison.OrdinalIgnoreCase
+        )
+        &&
+        actionName.Equals(
+            "Index",
+            StringComparison.OrdinalIgnoreCase
+        );
+
+
+    /*
+     * Acciones pertenecientes al módulo SIC.
+     * Se excluye la búsqueda de coincidencias porque
+     * aparecerá como una opción independiente.
+     */
+    var isSic =
+        (
+            controllerName.Equals(
+                "SIC",
+                StringComparison.OrdinalIgnoreCase
+            )
+            ||
+            controllerName.Equals(
+                "SicNotificador",
+                StringComparison.OrdinalIgnoreCase
+            )
+        )
+        &&
+        !isBusquedaCoincidencias;
+
+
+    var isPersonasInteres =
+        controllerName.Equals(
+            "PersonasInteres",
+            StringComparison.OrdinalIgnoreCase
+        );
+
+
+    var isAlbum =
+        controllerName.Equals(
+            "FichaObjetivo",
+            StringComparison.OrdinalIgnoreCase
+        )
+        &&
+        actionName.Equals(
+            "IndexAlbum",
+            StringComparison.OrdinalIgnoreCase
+        );
+
+
+    var isObjetivos =
+        controllerName.Equals(
+            "Objetivo",
+            StringComparison.OrdinalIgnoreCase
+        )
+        ||
+        (
+            controllerName.Equals(
+                "FichaObjetivo",
+                StringComparison.OrdinalIgnoreCase
+            )
+            &&
+            !isAlbum
+        );
+
+
+    /* =========================================================
+       MÓDULOS ACTIVOS
+       ========================================================= */
+
+    var isModuloObjetivos =
+        isMapa ||
+        isObjetivos ||
+        isAsuntos ||
+        isAlbum;
+
+    var isModuloSic =
+        isSic;
+
+    var isModuloPersonasInteres =
+        isPersonasInteres;
+
+
+    /* =========================================================
+       TEXTO DEL MÓDULO ACTIVO
+       ========================================================= */
+
+    var moduloActivo =
+        "Objetivos Prioritarios";
+
+    var moduloActivoSubtitulo =
+        "Gestión de inteligencia";
+
 
     if (isModuloSic)
     {
-        moduloActivo = "Sistema de Identificación Criminal";
-        moduloActivoSubtitulo = "Consulta y filiación";
+        moduloActivo =
+            "Sistema de Identificación Criminal";
+
+        moduloActivoSubtitulo =
+            "Consulta y filiación";
     }
+
+
+    if (isBusquedaCoincidencias)
+    {
+        moduloActivo =
+            "Búsqueda de coincidencias";
+
+        moduloActivoSubtitulo =
+            "Consulta biométrica por fotografía y huella";
+    }
+
 
     if (isModuloPersonasInteres)
     {
-        moduloActivo = "Personas de Interés";
-        moduloActivoSubtitulo = "Registros parciales, fotos y huellas";
+        moduloActivo =
+            "Personas de Interés";
+
+        moduloActivoSubtitulo =
+            "Registros parciales, fotos y huellas";
     }
 }
 
@@ -1349,183 +1486,367 @@
 
     <aside id="sidebar" class="sidebar">
 
+        <!-- ======================================================
+         MÓDULO ACTIVO
+         ====================================================== -->
+
         <div class="op-sidebar-title op-sidebar-title-modern">
+
             <div class="op-sidebar-title-top">
+
                 <span>Módulo activo</span>
+
                 <i class="fa fa-cubes"></i>
+
             </div>
-            <strong>@moduloActivo</strong>
-            <small>@moduloActivoSubtitulo</small>
+
+            <strong>
+                @moduloActivo
+            </strong>
+
+            <small>
+                @moduloActivoSubtitulo
+            </small>
+
         </div>
 
-        <ul class="sidebar-nav op-sidebar-nav-modern" id="sidebar-nav">
 
-            <li class="nav-heading">Módulos del sistema</li>
+        <!-- ======================================================
+         MENÚ PRINCIPAL
+         ====================================================== -->
 
-            <!-- OBJETIVOS PRIORITARIOS -->
+        <ul class="sidebar-nav op-sidebar-nav-modern"
+            id="sidebar-nav">
+
+            <li class="nav-heading">
+                Módulos del sistema
+            </li>
+
+
+            <!-- ==================================================
+             OBJETIVOS PRIORITARIOS
+             ================================================== -->
+
             <li class="nav-item op-module-item">
+
                 <a class="nav-link op-module-toggle @(isModuloObjetivos ? "" : "collapsed")"
                    data-bs-target="#menuObjetivosPrioritarios"
                    data-bs-toggle="collapse"
                    href="#"
                    aria-expanded="@(isModuloObjetivos ? "true" : "false")">
+
                     <i class="fa fa-shield"></i>
-                    <span>Objetivos Prioritarios</span>
+
+                    <span>
+                        Objetivos Prioritarios
+                    </span>
+
                     <i class="fa fa-chevron-down op-module-chevron"></i>
+
                 </a>
+
 
                 <ul id="menuObjetivosPrioritarios"
                     class="nav-content collapse @(isModuloObjetivos ? "show" : "")"
                     data-bs-parent="#sidebar-nav">
 
+
                     <li>
-                        <a class="@(isMapa ? "active" : "")" href="@Url.Action("Index", "MapaRelaciones")">
+
+                        <a class="@(isMapa ? "active" : "")"
+                           href="@Url.Action("Index", "MapaRelaciones")">
+
                             <i class="fa fa-sitemap"></i>
-                            <span>Red de inteligencia</span>
+
+                            <span>
+                                Red de inteligencia
+                            </span>
+
                         </a>
+
                     </li>
 
+
                     <li>
-                        <a class="@(isObjetivos ? "active" : "")" href="@Url.Action("Index", "Objetivo")">
+
+                        <a class="@(isObjetivos ? "active" : "")"
+                           href="@Url.Action("Index", "Objetivo")">
+
                             <i class="fa fa-user"></i>
-                            <span>Objetivos</span>
+
+                            <span>
+                                Objetivos
+                            </span>
+
                         </a>
+
                     </li>
 
+
                     <li>
-                        <a class="@(isAsuntos ? "active" : "")" href="@Url.Action("Index", "Asuntos")">
+
+                        <a class="@(isAsuntos ? "active" : "")"
+                           href="@Url.Action("Index", "Asuntos")">
+
                             <i class="fa fa-link"></i>
-                            <span>Asuntos relacionados</span>
+
+                            <span>
+                                Asuntos relacionados
+                            </span>
+
                         </a>
+
                     </li>
 
+
                     <li>
-                        <a class="@(isAlbum ? "active" : "")" href="@Url.Action("IndexAlbum", "FichaObjetivo")">
+
+                        <a class="@(isAlbum ? "active" : "")"
+                           href="@Url.Action("IndexAlbum", "FichaObjetivo")">
+
                             <i class="fa fa-folder-open"></i>
-                            <span>Álbum de fichas</span>
+
+                            <span>
+                                Álbum de fichas
+                            </span>
+
                         </a>
+
                     </li>
 
+
                     <li>
-                        <a class="disabled" href="javascript:void(0);" title="Pendiente de enlazar a la ruta de catálogos">
+
+                        <a class="disabled"
+                           href="javascript:void(0);"
+                           title="Pendiente de enlazar a la ruta de catálogos">
+
                             <i class="fa fa-list"></i>
-                            <span>Catálogos</span>
-                            <em>Próximo</em>
+
+                            <span>
+                                Catálogos
+                            </span>
+
+                            <em>
+                                Próximo
+                            </em>
+
                         </a>
+
                     </li>
 
                 </ul>
+
             </li>
 
-            <!-- SIC -->
+
+            <!-- ==================================================
+             SIC
+             ================================================== -->
+
             <li class="nav-item op-module-item">
+
                 <a class="nav-link op-module-toggle @(isModuloSic ? "" : "collapsed")"
                    data-bs-target="#menuSic"
                    data-bs-toggle="collapse"
                    href="#"
                    aria-expanded="@(isModuloSic ? "true" : "false")">
+
                     <i class="fa fa-user-secret"></i>
-                    <span>SIC</span>
+
+                    <span>
+                        SIC
+                    </span>
+
                     <i class="fa fa-chevron-down op-module-chevron"></i>
+
                 </a>
+
 
                 <ul id="menuSic"
                     class="nav-content collapse @(isModuloSic ? "show" : "")"
                     data-bs-parent="#sidebar-nav">
 
+
                     <li>
-                        <a class="@(isSic ? "active" : "")" href="@Url.Action("Index", "SIC")">
+
+                        <a class="@(isConsultaSic ? "active" : "")"
+                           href="@Url.Action("Index", "SIC")">
+
                             <i class="fa fa-id-card-o"></i>
-                            <span>Consulta SIC</span>
+
+                            <span>
+                                Consulta SIC
+                            </span>
+
                         </a>
+
                     </li>
 
-                    <li>
-                        <a class="disabled" href="javascript:void(0);">
-                            <i class="fa fa-search"></i>
-                            <span>Búsqueda avanzada</span>
-                            <em>Próximo</em>
-                        </a>
-                    </li>
 
                     <li>
-                        <a class="disabled" href="javascript:void(0);">
+
+                        <a class="disabled"
+                           href="javascript:void(0);">
+
                             <i class="fa fa-tags"></i>
-                            <span>Catálogos SIC</span>
-                            <em>Próximo</em>
+
+                            <span>
+                                Catálogos SIC
+                            </span>
+
+                            <em>
+                                Próximo
+                            </em>
+
                         </a>
+
                     </li>
 
                 </ul>
+
             </li>
 
-            <!-- PERSONAS DE INTERÉS -->
+
+            <!-- ==================================================
+             BÚSQUEDA DE COINCIDENCIAS
+             OPCIÓN PRINCIPAL INDEPENDIENTE
+             ================================================== -->
+
             <li class="nav-item op-module-item">
+
+                <a class="nav-link op-module-toggle @(isBusquedaCoincidencias ? "active" : "collapsed")"
+                   href="@Url.Action("BusquedaCoincidencias", "SIC")">
+
+                    <i class="fa fa-search"></i>
+
+                    <span>
+                        Búsqueda Intencionada
+                    </span>
+
+                </a>
+
+            </li>
+
+
+            <!-- ==================================================
+             PERSONAS DE INTERÉS
+             ================================================== -->
+
+            <li class="nav-item op-module-item">
+
                 <a class="nav-link op-module-toggle @(isModuloPersonasInteres ? "" : "collapsed")"
                    data-bs-target="#menuPersonasInteres"
                    data-bs-toggle="collapse"
                    href="#"
                    aria-expanded="@(isModuloPersonasInteres ? "true" : "false")">
 
+
                     <span class="op-module-custom-icon">
+
                         <img src="@Url.Content("~/images/icons8-target-audience-24.png")"
                              alt="Personas de Interés" />
+
                     </span>
 
-                    <span class="op-module-label">Personas de Interés</span>
+
+                    <span class="op-module-label">
+                        Personas de Interés
+                    </span>
+
 
                     <i class="fa fa-chevron-down op-module-chevron"></i>
+
                 </a>
+
 
                 <ul id="menuPersonasInteres"
                     class="nav-content collapse @(isModuloPersonasInteres ? "show" : "")"
                     data-bs-parent="#sidebar-nav">
 
+
                     <li>
+
                         <a class="@(isPersonasInteres && actionName.Equals("Index", StringComparison.OrdinalIgnoreCase) ? "active" : "")"
                            href="@Url.Action("Index", "PersonasInteres")">
+
                             <i class="fa fa-users"></i>
-                            <span>Personas</span>
+
+                            <span>
+                                Personas
+                            </span>
+
                         </a>
+
                     </li>
 
-                    @*<li>
+
+                    @*
+                    <li>
+
                         <a class="@(isPersonasInteres && actionName.Equals("AddEditPersonaInteres", StringComparison.OrdinalIgnoreCase) ? "active" : "")"
                            href="@Url.Action("AddEditPersonaInteres", "PersonasInteres")">
+
                             <i class="fa fa-plus"></i>
-                            <span>Registrar persona</span>
+
+                            <span>
+                                Registrar persona
+                            </span>
+
                         </a>
+
                     </li>
 
+
                     <li>
-                        <a class="disabled" href="javascript:void(0);">
+
+                        <a class="disabled"
+                           href="javascript:void(0);">
+
                             <i class="fa fa-camera"></i>
-                            <span>Fotografías</span>
-                            <em>Próximo</em>
+
+                            <span>
+                                Fotografías
+                            </span>
+
+                            <em>
+                                Próximo
+                            </em>
+
                         </a>
+
                     </li>
 
+
                     <li>
-                        <a class="disabled" href="javascript:void(0);">
+
+                        <a class="disabled"
+                           href="javascript:void(0);">
+
                             <i class="fa fa-hand-paper-o"></i>
-                            <span>Huellas</span>
-                            <em>Próximo</em>
-                        </a>
-                    </li>
 
-                    <li>
-                        <a class="disabled" href="javascript:void(0);">
-                            <i class="fa fa-search"></i>
-                            <span>Búsqueda biométrica</span>
-                            <em>Próximo</em>
+                            <span>
+                                Huellas
+                            </span>
+
+                            <em>
+                                Próximo
+                            </em>
+
                         </a>
-                    </li>*@
+
+                    </li>
+                    *@
 
                 </ul>
+
             </li>
 
         </ul>
+
     </aside>
+
+
     <main id="main" class="main">
         @if (!string.IsNullOrWhiteSpace(pageTitle))
         {

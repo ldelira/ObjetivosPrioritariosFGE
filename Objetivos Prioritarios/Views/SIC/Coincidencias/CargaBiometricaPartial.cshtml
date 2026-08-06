@@ -1,0 +1,219 @@
+﻿@model Objetivos_Prioritarios.Models.Extends.BusquedaCoincidenciasViewModel
+
+<div class="sic-carga-grid">
+
+    <section class="sic-carga-card"
+             data-tipo-biometrico="fotografia">
+
+        <div class="sic-carga-card-header">
+
+            <span class="sic-carga-numero">
+                1
+            </span>
+
+            <div>
+                <h2>
+                    Buscar por fotografía
+                </h2>
+
+                <p>
+                    Cargue una fotografía frontal de la persona.
+                </p>
+            </div>
+
+        </div>
+
+        <div class="sic-carga-contenido">
+
+            <div class="sic-preview-box">
+
+                <div id="estadoVacioFotografia"
+                     class="sic-preview-vacio">
+
+                    <i class="fa fa-user"></i>
+
+                    <span>
+                        Sin fotografía
+                    </span>
+
+                </div>
+
+                <img id="previewFotografia"
+                     class="sic-preview-imagen"
+                     src=""
+                     alt="Vista previa de fotografía" />
+
+            </div>
+
+            <label for="Fotografia"
+                   id="dropzoneFotografia"
+                   class="sic-dropzone"
+                   data-input-id="Fotografia">
+
+                <i class="fa fa-cloud-upload"></i>
+
+                <strong>
+                    Arrastre una fotografía aquí
+                </strong>
+
+                <span>
+                    o haga clic para seleccionar
+                </span>
+
+                <small>
+                    JPG, PNG o WEBP · Máximo 10 MB
+                </small>
+
+                @Html.TextBoxFor(
+                         model => model.Fotografia,
+                         new
+                         {
+                             type = "file",
+                             id = "Fotografia",
+                             @class = "sic-file-input js-biometrico-input",
+                             accept = ".jpg,.jpeg,.png,.webp",
+                             data_tipo = "fotografia",
+                             data_preview = "previewFotografia",
+                             data_vacio = "estadoVacioFotografia",
+                             data_quitar = "btnQuitarFotografia"
+                         }
+                     )
+
+            </label>
+
+        </div>
+
+        <div class="sic-carga-acciones">
+
+            <button type="button"
+                    class="btn btn-outline-primary js-seleccionar-biometrico"
+                    data-input-id="Fotografia">
+
+                <i class="fa fa-refresh"></i>
+
+                Seleccionar
+            </button>
+
+            <button type="button"
+                    id="btnQuitarFotografia"
+                    class="btn btn-outline-danger js-quitar-biometrico"
+                    data-input-id="Fotografia"
+                    disabled>
+
+                <i class="fa fa-trash"></i>
+
+                Quitar
+            </button>
+
+        </div>
+
+    </section>
+
+    <section class="sic-carga-card"
+             data-tipo-biometrico="huella">
+
+        <div class="sic-carga-card-header">
+
+            <span class="sic-carga-numero">
+                2
+            </span>
+
+            <div>
+                <h2>
+                    Buscar por huella
+                </h2>
+
+                <p>
+                    Cargue una imagen clara de la huella digital.
+                </p>
+            </div>
+
+        </div>
+
+        <div class="sic-carga-contenido">
+
+            <div class="sic-preview-box sic-preview-huella">
+
+                <div id="estadoVacioHuella"
+                     class="sic-preview-vacio">
+
+                    <i class="fa fa-hand-pointer-o"></i>
+
+                    <span>
+                        Sin huella
+                    </span>
+
+                </div>
+
+                <img id="previewHuella"
+                     class="sic-preview-imagen sic-preview-imagen-huella"
+                     src=""
+                     alt="Vista previa de huella" />
+
+            </div>
+
+            <label for="Huella"
+                   id="dropzoneHuella"
+                   class="sic-dropzone"
+                   data-input-id="Huella">
+
+                <i class="fa fa-cloud-upload"></i>
+
+                <strong>
+                    Arrastre una huella aquí
+                </strong>
+
+                <span>
+                    o haga clic para seleccionar
+                </span>
+
+                <small>
+                    JPG, PNG o WEBP · Máximo 10 MB
+                </small>
+
+                @Html.TextBoxFor(
+                         model => model.Huella,
+                         new
+                         {
+                             type = "file",
+                             id = "Huella",
+                             @class = "sic-file-input js-biometrico-input",
+                             accept = ".jpg,.jpeg,.png,.webp",
+                             data_tipo = "huella",
+                             data_preview = "previewHuella",
+                             data_vacio = "estadoVacioHuella",
+                             data_quitar = "btnQuitarHuella"
+                         }
+                     )
+
+            </label>
+
+        </div>
+
+        <div class="sic-carga-acciones">
+
+            <button type="button"
+                    class="btn btn-outline-primary js-seleccionar-biometrico"
+                    data-input-id="Huella">
+
+                <i class="fa fa-refresh"></i>
+
+                Seleccionar
+            </button>
+
+            <button type="button"
+                    id="btnQuitarHuella"
+                    class="btn btn-outline-danger js-quitar-biometrico"
+                    data-input-id="Huella"
+                    disabled>
+
+                <i class="fa fa-trash"></i>
+
+                Quitar
+            </button>
+
+        </div>
+
+    </section>
+
+</div>

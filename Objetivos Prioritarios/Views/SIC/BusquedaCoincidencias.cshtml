@@ -1,0 +1,90 @@
+﻿@model Objetivos_Prioritarios.Models.Extends.BusquedaCoincidenciasViewModel
+
+@{
+    ViewBag.Title = "Búsqueda Intencionada";
+}
+
+<link href="@Url.Content("~/Content/SIC/busqueda-coincidencias.css")"
+      rel="stylesheet"
+      type="text/css" />
+
+<div id="sicBusquedaCoincidencias"
+     class="sic-busqueda-page">
+
+    <div class="sic-busqueda-encabezado">
+
+        <div>
+            @*<h1 class="sic-busqueda-titulo">
+                Búsqueda de coincidencias
+            </h1>*@
+
+            <p class="sic-busqueda-subtitulo">
+                Consulta de posibles coincidencias por fotografía y huella.
+            </p>
+        </div>
+
+        <div class="sic-busqueda-estado">
+            <i class="fa fa-shield"></i>
+
+            <span>
+                Sistema de Identificación Criminal
+            </span>
+        </div>
+
+    </div>
+
+    <form id="formBusquedaCoincidencias"
+          enctype="multipart/form-data"
+          autocomplete="off">
+
+        @Html.AntiForgeryToken()
+
+        @Html.Partial(
+                 "Coincidencias/CargaBiometricaPartial",
+                 Model
+             )
+
+        @Html.Partial(
+                 "Coincidencias/FiltrosCoincidenciasPartial",
+                 Model
+             )
+
+    </form>
+
+    <div id="contenedorResultadosCoincidencias"
+         class="sic-resultados-inicial">
+
+        <div class="sic-resultados-inicial-icono">
+            <i class="fa fa-search"></i>
+        </div>
+
+        <strong>
+            Realice una búsqueda de coincidencias
+        </strong>
+
+        <span>
+            Seleccione una fotografía, una huella o ambos archivos para comenzar.
+        </span>
+
+    </div>
+
+</div>
+
+@section scripts {
+
+    <script>
+    window.sicCoincidenciasConfig = {
+        urlBuscar:
+            '@Url.Action("BuscarCoincidencias", "SIC")',
+
+        urlDetalle:
+            '@Url.Action("DetalleCoincidenciaPartial", "SIC")',
+
+        maximoArchivoMb:
+            10
+    };
+    </script>
+
+    <script src="@Url.Content("~/Scripts/SIC/busqueda-coincidencias.js")"></script>
+
+}

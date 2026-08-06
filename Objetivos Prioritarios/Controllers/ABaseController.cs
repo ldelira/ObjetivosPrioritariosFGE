@@ -93,5 +93,17 @@ namespace Objetivos_Prioritarios.Controllers
             }
         }
 
+
+        private CoincidenciasBiometricasService coincidenciasBiometricasService = null;
+        public CoincidenciasBiometricasService CoincidenciasBiometricasService
+        {
+            get
+            {
+                if (coincidenciasBiometricasService == null)
+                    coincidenciasBiometricasService = new CoincidenciasBiometricasService();
+                return coincidenciasBiometricasService;
+            }
+        }
+
     }
 }

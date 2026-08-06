@@ -177,6 +177,7 @@
     <Reference Include="System.Numerics.Vectors, Version=4.1.6.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Numerics.Vectors.4.6.1\lib\net462\System.Numerics.Vectors.dll</HintPath>
     </Reference>
+    <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=6.0.3.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.6.1.2\lib\net462\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
     </Reference>
@@ -276,6 +277,7 @@
     <Compile Include="ControllersServices\CatalogoService.cs" />
     <Compile Include="ControllersServices\FichaObjetivoService.cs" />
     <Compile Include="ControllersServices\ObjetivoService.cs" />
+    <Compile Include="ControllersServices\CoincidenciasBiometricasService.cs" />
     <Compile Include="ControllersServices\ReporteService.cs" />
     <Compile Include="Controllers\ABaseController.cs" />
     <Compile Include="Controllers\PersonasInteresController.cs" />
@@ -382,6 +384,14 @@
     <Compile Include="Models\Estado.cs">
       <DependentUpon>Catalogos.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\Extends\ApiBusquedaBiometricaResponse.cs" />
+    <Compile Include="Models\Extends\ApiErrorBiometrico.cs" />
+    <Compile Include="Models\Extends\BusquedaCoincidenciasViewModel.cs" />
+    <Compile Include="Models\Extends\CoincidenciaDetenidoFuente6Dto.cs" />
+    <Compile Include="Models\Extends\CoincidenciaResultadoViewModel.cs" />
+    <Compile Include="Models\Extends\DetalleCoincidenciaViewModel.cs" />
+    <Compile Include="Models\Extends\MandamientoJudicialViewModel.cs" />
+    <Compile Include="Models\Extends\ResultadosCoincidenciasViewModel.cs" />
     <Compile Include="Models\Extends\tb_NombreObjetivo.cs" />
     <Compile Include="Models\Extends\tb_Victimas.cs" />
     <Compile Include="Models\Extends\tb_Usuarios.cs" />
@@ -2874,6 +2884,8 @@
     <Content Include="Content\Selectize\js\selectize.min.js" />
     <Content Include="Content\Selectize\js\standalone\selectize.js" />
     <Content Include="Content\Selectize\js\standalone\selectize.min.js" />
+    <Content Include="Content\SIC\busqueda-coincidencias.css" />
+    <Content Include="Scripts\SIC\busqueda-coincidencias.js" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
@@ -3595,6 +3607,11 @@
     <Content Include="Views\PersonasInteres\FotografiasPersonaInteresPartial.cshtml" />
     <Content Include="Views\PersonasInteres\HuellasPersonaInteresPartial.cshtml" />
     <Content Include="Views\PersonasInteres\PeriodosBusquedaPersonaInteresPartial.cshtml" />
+    <Content Include="Views\SIC\BusquedaCoincidencias.cshtml" />
+    <Content Include="Views\SIC\Coincidencias\CargaBiometricaPartial.cshtml" />
+    <Content Include="Views\SIC\Coincidencias\FiltrosCoincidenciasPartial.cshtml" />
+    <Content Include="Views\SIC\Coincidencias\ResultadosCoincidenciasPartial.cshtml" />
+    <Content Include="Views\SIC\Coincidencias\DetalleCoincidenciaPartial.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

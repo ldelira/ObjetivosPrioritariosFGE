@@ -1,0 +1,154 @@
+﻿@model Objetivos_Prioritarios.Models.Extends.BusquedaCoincidenciasViewModel
+
+<section class="sic-filtros-card">
+
+    <div class="sic-filtros-grid">
+
+        <div class="sic-campo">
+
+            @Html.LabelFor(
+                     model => model.Municipio,
+                     "Municipio"
+                 )
+
+            @Html.DropDownListFor(
+                     model => model.Municipio,
+                     Model.Municipios,
+                     new
+                     {
+                         @class = "form-control"
+                     }
+                 )
+
+        </div>
+
+        <div class="sic-campo">
+
+            <label>
+                Rango de edad
+            </label>
+
+            <div class="sic-rango-edad">
+
+                @Html.TextBoxFor(
+                         model => model.EdadMinima,
+                         new
+                         {
+                             type = "number",
+                             min = "0",
+                             max = "120",
+                             @class = "form-control",
+                             aria_label = "Edad mínima"
+                         }
+                     )
+
+                <span>
+                    a
+                </span>
+
+                @Html.TextBoxFor(
+                         model => model.EdadMaxima,
+                         new
+                         {
+                             type = "number",
+                             min = "0",
+                             max = "120",
+                             @class = "form-control",
+                             aria_label = "Edad máxima"
+                         }
+                     )
+
+            </div>
+
+        </div>
+
+        <div class="sic-campo">
+
+            @Html.LabelFor(
+                     model => model.Sexo,
+                     "Sexo"
+                 )
+
+            @Html.DropDownListFor(
+                     model => model.Sexo,
+                     Model.Sexos,
+                     new
+                     {
+                         @class = "form-control"
+                     }
+                 )
+
+        </div>
+
+        <div class="sic-campo">
+
+            @Html.LabelFor(
+                     model => model.TipoCoincidencia,
+                     "Tipo de coincidencia"
+                 )
+
+            @Html.DropDownListFor(
+                     model => model.TipoCoincidencia,
+                     Model.TiposCoincidencia,
+                     new
+                     {
+                         @class = "form-control"
+                     }
+                 )
+
+        </div>
+
+        <div class="sic-campo sic-campo-porcentaje">
+
+            <label for="PorcentajeMinimo">
+                Porcentaje mínimo
+            </label>
+
+            <div class="sic-porcentaje-control">
+
+                <output id="valorPorcentajeMinimo">
+                    @Model.PorcentajeMinimo%
+                </output>
+
+                @Html.TextBoxFor(
+                         model => model.PorcentajeMinimo,
+                         new
+                         {
+                             type = "range",
+                             min = "50",
+                             max = "100",
+                             step = "1",
+                             @class = "sic-range"
+                         }
+                     )
+
+            </div>
+
+        </div>
+
+        <div class="sic-filtros-acciones">
+
+            <button type="submit"
+                    id="btnBuscarCoincidencias"
+                    class="btn sic-btn-buscar"
+                    disabled>
+
+                <i class="fa fa-search"></i>
+
+                Buscar coincidencias
+            </button>
+
+            <button type="button"
+                    id="btnLimpiarBusqueda"
+                    class="btn sic-btn-limpiar">
+
+                <i class="fa fa-undo"></i>
+
+                Limpiar filtros
+            </button>
+
+        </div>
+
+    </div>
+
+</section>

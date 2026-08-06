@@ -1,19 +1,23 @@
 ﻿using Objetivos_Prioritarios.ControllersServices;
 using Objetivos_Prioritarios.Helpers;
 using Objetivos_Prioritarios.Models;
+using Objetivos_Prioritarios.Models.Extends;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web.Mvc;
+
 
 namespace Objetivos_Prioritarios.Controllers
 {
-    public class SICController : Controller
+    public class SICController : ABaseController
     {
         private readonly FiliacionMunicipalService _filiacionService;
 
-
+        private const string SessionResultadosCoincidencias =
+       "SIC_RESULTADOS_COINCIDENCIAS";
         private const string RutaBaseFotosC5 = @"\\10.13.1.232\detenidos";
         private const string RutaBaseFotosCapea = @"\\234fgea\temporalfiliacion$\CAPEA\";
 
@@ -2247,6 +2251,171 @@ namespace Objetivos_Prioritarios.Controllers
                     "text/html"
                 );
             }
+        }
+
+
+        [HttpGet]
+        public ActionResult BusquedaCoincidencias()
+        {
+            ViewBag.Title =
+                "Búsqueda Intencionada";
+
+            /*
+             * Al entrar nuevamente a la pantalla eliminamos
+             * los resultados de una búsqueda anterior.
+             */
+            Session.Remove(
+                SessionResultadosCoincidencias
+            );
+
+            BusquedaCoincidenciasViewModel modelo =
+                CoincidenciasBiometricasService
+                    .CrearModeloInicial();
+
+            return View(modelo);
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> BuscarCoincidencias(
+            BusquedaCoincidenciasViewModel modelo)
+        {
+            try
+            {
+                ResultadosCoincidenciasViewModel resultado =
+                    await CoincidenciasBiometricasService
+                        .BuscarCoincidenciasAsync(
+                            modelo
+                        );
+
+                /*
+                 * Conservamos los resultados reales para que
+                 * el botón Ver detalle no vuelva a utilizar
+                 * las coincidencias simuladas.
+                 */
+                Session[
+                    SessionResultadosCoincidencias
+                ] = resultado;
+
+                return PartialView(
+                    "Coincidencias/ResultadosCoincidenciasPartial",
+                    resultado
+                );
+            }
+            catch (ArgumentException ex)
+            {
+                Response.StatusCode = 400;
+
+                return Content(
+                    ex.Message,
+                    "text/plain"
+                );
+            }
+            catch (InvalidOperationException ex)
+            {
+                /*
+                 * Aquí entran errores devueltos por la API:
+                 * token inválido, configuración faltante,
+                 * respuesta biométrica incorrecta, etc.
+                 */
+                Response.StatusCode = 502;
+
+                return Content(
+                    ex.Message,
+                    "text/plain"
+                );
+            }
+            catch (System.Net.Http.HttpRequestException ex)
+            {
+                Response.StatusCode = 503;
+
+                return Content(
+                    "No fue posible comunicarse con la API biométrica. " +
+                    ex.Message,
+                    "text/plain"
+                );
+            }
+            catch (TaskCanceledException)
+            {
+                Response.StatusCode = 504;
+
+                return Content(
+                    "La API biométrica superó el tiempo máximo de espera.",
+                    "text/plain"
+                );
+            }
+            catch (Exception)
+            {
+                Response.StatusCode = 500;
+
+                return Content(
+                    "Ocurrió un error al buscar las coincidencias biométricas.",
+                    "text/plain"
+                );
+            }
+        }
+
+
+        [HttpGet]
+        public ActionResult DetalleCoincidenciaPartial(
+            int idCoincidencia,
+            bool tieneFotografiaConsulta = false,
+            bool tieneHuellaConsulta = false)
+        {
+            ResultadosCoincidenciasViewModel resultados =
+                Session[
+                    SessionResultadosCoincidencias
+                ] as ResultadosCoincidenciasViewModel;
+
+            if (resultados == null)
+            {
+                Response.StatusCode = 409;
+
+                return Content(
+                    "La búsqueda ya no está disponible. Realice nuevamente la consulta biométrica.",
+                    "text/plain"
+                );
+            }
+
+            CoincidenciaResultadoViewModel coincidencia =
+                resultados.Coincidencias == null
+                    ? null
+                    : resultados.Coincidencias
+                        .FirstOrDefault(x =>
+                            x.IdCoincidencia ==
+                            idCoincidencia
+                        );
+
+            if (coincidencia == null)
+            {
+                return HttpNotFound(
+                    "No se encontró la coincidencia solicitada."
+                );
+            }
+
+            /*
+             * Usamos los indicadores guardados con la búsqueda
+             * real. Los parámetros se conservan en la acción
+             * para no romper el JavaScript actual.
+             */
+            DetalleCoincidenciaViewModel modelo =
+                new DetalleCoincidenciaViewModel
+                {
+                    Coincidencia =
+                        coincidencia,
+
+                    TieneFotografiaConsulta =
+                        resultados.TieneFotografiaConsulta,
+
+                    TieneHuellaConsulta =
+                        resultados.TieneHuellaConsulta
+                };
+
+            return PartialView(
+                "Coincidencias/DetalleCoincidenciaPartial",
+                modelo
+            );
         }
 
 

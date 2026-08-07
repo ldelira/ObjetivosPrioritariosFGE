@@ -39,6 +39,8 @@ namespace Objetivos_Prioritarios.Models.Extends
 
         public decimal SimilitudGlobal { get; set; }
 
+        public int CriteriosCumplidos { get; set; }
+
         public DateTime FechaRegistro { get; set; }
 
         public int IdPersona { get; set; }
@@ -54,6 +56,77 @@ namespace Objetivos_Prioritarios.Models.Extends
             get;
             set;
         } = new List<MandamientoJudicialViewModel>();
+        /*
+ * Nombre legible de la fuente.
+ *
+ * Ejemplo:
+ * C5 - Detenidos
+ * Detenidos FGEA
+ * Objetivos prioritarios
+ */
+        public string NombreFuente { get; set; }
 
+        /*
+         * Indica que la fuente no representa evidencia
+         * biométrica principal.
+         *
+         * Actualmente aplica a Mandamientos Judiciales.
+         */
+        public bool EsFuenteInformativa { get; set; }
+
+        /*
+         * Porcentaje de coincidencia contra el alias.
+         */
+        public decimal PorcentajeAlias { get; set; }
+
+        /*
+         * Mejor porcentaje entre nombre y alias.
+         */
+        public decimal PorcentajeTexto { get; set; }
+
+        /*
+         * NOMBRE
+         * ALIAS
+         * NOMBRE_Y_ALIAS
+         */
+        public string OrigenCoincidenciaTexto { get; set; }
+
+        /*
+         * Nombre o alias específico que produjo
+         * la coincidencia.
+         *
+         * Ejemplo:
+         * PEPE
+         * JOSÉ JUAN PÉREZ HUERTA
+         */
+        public string TextoCoincidente { get; set; }
+
+        /*
+         * Indica si el resultado tuvo alguna
+         * coincidencia textual.
+         */
+        public bool TieneCoincidenciaTexto
+        {
+            get
+            {
+                return
+                    PorcentajeNombre > 0 ||
+                    PorcentajeAlias > 0;
+            }
+        }
+
+        /*
+         * Indica si el resultado tuvo alguna
+         * coincidencia biométrica.
+         */
+        public bool TieneCoincidenciaBiometrica
+        {
+            get
+            {
+                return
+                    PorcentajeFoto > 0 ||
+                    PorcentajeHuella > 0;
+            }
+        }
     }
 }

@@ -51,16 +51,54 @@ namespace Objetivos_Prioritarios.ControllersServices
 
         public BusquedaCoincidenciasViewModel CrearModeloInicial()
         {
-            var modelo = new BusquedaCoincidenciasViewModel
-            {
-                Municipios = ObtenerMunicipios(),
-                Sexos = ObtenerSexos(),
-                TiposCoincidencia = ObtenerTiposCoincidencia()
-            };
+            BusquedaCoincidenciasViewModel modelo =
+                new BusquedaCoincidenciasViewModel
+                {
+                    NombreBusqueda =
+                        string.Empty,
+
+                    AliasBusqueda =
+                        string.Empty,
+
+                    TextoBusqueda =
+                        string.Empty,
+
+                    ModoBusquedaTexto =
+                        "NOMBRE",
+
+                    ModoCombinacion =
+                        "PRIORIZAR",
+
+                    Municipio =
+                        string.Empty,
+
+                    Sexo =
+                        string.Empty,
+
+                    EdadMinima =
+                        null,
+
+                    EdadMaxima =
+                        null,
+
+                    TipoCoincidencia =
+                        string.Empty,
+
+                    PorcentajeMinimo =
+                        70,
+
+                    Municipios =
+                        ObtenerMunicipios(),
+
+                    Sexos =
+                        ObtenerSexos(),
+
+                    TiposCoincidencia =
+                        ObtenerTiposCoincidencia()
+                };
 
             return modelo;
         }
-
         private List<SelectListItem> ObtenerMunicipios()
         {
             return new List<SelectListItem>
@@ -153,28 +191,43 @@ namespace Objetivos_Prioritarios.ControllersServices
         private List<SelectListItem> ObtenerTiposCoincidencia()
         {
             return new List<SelectListItem>
-            {
-                new SelectListItem
-                {
-                    Value = "",
-                    Text = "Todas las coincidencias"
-                },
-                new SelectListItem
-                {
-                    Value = "FOTO",
-                    Text = "Coincidencia por fotografía"
-                },
-                new SelectListItem
-                {
-                    Value = "HUELLA",
-                    Text = "Coincidencia por huella"
-                },
-                new SelectListItem
-                {
-                    Value = "COMBINADA",
-                    Text = "Coincidencia combinada"
-                }
-            };
+    {
+        new SelectListItem
+        {
+            Value = "",
+            Text = "Todos los resultados"
+        },
+
+        new SelectListItem
+        {
+            Value = "TEXTO",
+            Text = "Coincidencia por nombre o alias"
+        },
+
+        new SelectListItem
+        {
+            Value = "FOTO",
+            Text = "Coincidencia por fotografía"
+        },
+
+        new SelectListItem
+        {
+            Value = "HUELLA",
+            Text = "Coincidencia por huella"
+        },
+
+        new SelectListItem
+        {
+            Value = "COMBINADA",
+            Text = "Coincidencia por foto y huella"
+        },
+
+        new SelectListItem
+        {
+            Value = "TEXTO_BIOMETRIA",
+            Text = "Coincidencia textual y biométrica"
+        }
+    };
         }
 
         public async Task<ResultadosCoincidenciasViewModel>
@@ -198,6 +251,16 @@ namespace Objetivos_Prioritarios.ControllersServices
                 "huella"
             );
 
+            bool tieneNombre =
+            !string.IsNullOrWhiteSpace(
+                filtros.NombreBusqueda
+            );
+
+            bool tieneAlias =
+                !string.IsNullOrWhiteSpace(
+                    filtros.AliasBusqueda
+                );
+
             bool tieneFotografia =
                 filtros.Fotografia != null &&
                 filtros.Fotografia.ContentLength > 0;
@@ -206,10 +269,15 @@ namespace Objetivos_Prioritarios.ControllersServices
                 filtros.Huella != null &&
                 filtros.Huella.ContentLength > 0;
 
-            if (!tieneFotografia && !tieneHuella)
+            if (
+                !tieneNombre &&
+                !tieneAlias &&
+                !tieneFotografia &&
+                !tieneHuella
+            )
             {
                 throw new ArgumentException(
-                    "Seleccione una fotografía, una huella o ambos archivos."
+                    "Capture un nombre, un alias, una fotografía o una huella."
                 );
             }
 
@@ -705,101 +773,98 @@ namespace Objetivos_Prioritarios.ControllersServices
                     );
 
                 CoincidenciaResultadoViewModel coincidencia =
-                    new CoincidenciaResultadoViewModel
-                    {
-                        /*
-                         * Identificador visual temporal.
-                         * Se reasignará después de ordenar.
-                         */
-                        IdCoincidencia =
-                            consecutivo,
+     new CoincidenciaResultadoViewModel
+     {
+         IdCoincidencia =
+             consecutivo,
 
-                        /*
-                         * Identificadores reales devueltos
-                         * por la API biométrica.
-                         */
-                        IdPersona =
-                            item.IdPersona,
+         IdPersona =
+             item.IdPersona,
 
-                        IdTbFuente =
-                            item.IdTbFuente,
+         IdTbFuente =
+             item.IdTbFuente,
 
-                        /*
-                         * Valores provisionales.
-                         * Se reemplazan durante el enriquecimiento.
-                         */
-                        NombreCompleto =
-                            "PERSONA " +
-                            item.IdPersona,
+         NombreFuente =
+             ObtenerNombreFuente(
+                 item.IdTbFuente
+             ),
 
-                        Alias =
-                            "SIN INFORMACIÓN",
+         EsFuenteInformativa =
+             EsFuenteInformativa(
+                 item.IdTbFuente
+             ),
 
-                        Folio =
-                            "ID " +
-                            item.IdPersona,
+         NombreCompleto =
+             "PERSONA " +
+             item.IdPersona,
 
-                        Expediente =
-                            "FUENTE " +
-                            item.IdTbFuente,
+         Alias =
+             "SIN INFORMACIÓN",
 
-                        MunicipioClave =
-                            "",
+         Folio =
+             "ID " +
+             item.IdPersona,
 
-                        Municipio =
-                            "FUENTE " +
-                            item.IdTbFuente,
+         Expediente =
+             "FUENTE " +
+             item.IdTbFuente,
 
-                        Edad =
-                            0,
+         MunicipioClave =
+             "",
 
-                        Sexo =
-                            "SIN INFORMACIÓN",
+         Municipio =
+             "SIN INFORMACIÓN",
 
-                        FotoUrl =
-                            "~/Content/imagenes/Nodisponible.jpg",
+         Edad =
+             0,
 
-                        TipoCoincidencia =
-                            string.IsNullOrWhiteSpace(
-                                item.TipoCoincidencia
-                            )
-                                ? DeterminarTipoCoincidencia(
-                                    porcentajeFoto,
-                                    porcentajeHuella
-                                )
-                                : item.TipoCoincidencia
-                                    .Trim()
-                                    .ToUpperInvariant(),
+         Sexo =
+             "SIN INFORMACIÓN",
 
-                        PorcentajeNombre =
-                            0,
+         FotoUrl =
+             "~/Content/imagenes/Nodisponible.jpg",
 
-                        PorcentajeFoto =
-                            porcentajeFoto,
+         TipoCoincidencia =
+             item.TipoCoincidencia,
 
-                        PorcentajeHuella =
-                            porcentajeHuella,
+         PorcentajeNombre =
+             0,
 
-                        SimilitudGlobal =
-                            similitudGlobal,
+         PorcentajeAlias =
+             0,
 
-                        FechaRegistro =
-                            DateTime.MinValue,
+         PorcentajeTexto =
+             0,
 
-                        /*
-                         * Mandamientos empieza vacío.
-                         * AgregarAvisosMandamientos lo llenará
-                         * cuando exista coincidencia nominal.
-                         */
-                        TieneAvisoMandamientos =
-                            false,
+         OrigenCoincidenciaTexto =
+             "",
 
-                        TotalMandamientos =
-                            0,
+         TextoCoincidente =
+             "",
 
-                        MandamientosJudiciales =
-                            new List<MandamientoJudicialViewModel>()
-                    };
+         PorcentajeFoto =
+             porcentajeFoto,
+
+         PorcentajeHuella =
+             porcentajeHuella,
+
+         SimilitudGlobal =
+             similitudGlobal,
+
+         FechaRegistro =
+             DateTime.MinValue,
+
+         TieneAvisoMandamientos =
+             false,
+
+         TotalMandamientos =
+             0,
+
+         MandamientosJudiciales =
+             new List<
+                 MandamientoJudicialViewModel
+             >()
+     };
 
                 coincidencias.Add(
                     coincidencia
@@ -1468,20 +1533,49 @@ namespace Objetivos_Prioritarios.ControllersServices
             }
 
             /*
+             * Aseguramos que todas las coincidencias
+             * tengan el nombre de su fuente.
+             */
+            foreach (
+                CoincidenciaResultadoViewModel coincidencia
+                in coincidencias
+            )
+            {
+                coincidencia.NombreFuente =
+                    ObtenerNombreFuente(
+                        coincidencia.IdTbFuente
+                    );
+
+                coincidencia.EsFuenteInformativa =
+                    EsFuenteInformativa(
+                        coincidencia.IdTbFuente
+                    );
+            }
+
+            /*
              * Fuente 6: Detenidos FGEA.
+             * Este enriquecimiento ya funciona.
              */
             EnriquecerCoincidenciasDetenidos(
                 coincidencias
             );
 
             /*
-             * Las demás fuentes biométricas se agregarán aquí.
+             * Próximos enriquecimientos:
+             *
+             * Fuente 1:
+             * EnriquecerCoincidenciasC5(coincidencias);
+             *
+             * Fuente 5:
+             * EnriquecerCoincidenciasObjetivosPrioritarios(coincidencias);
+             *
+             * Fuentes 2, 7 y 8:
+             * EnriquecerCoincidenciasCapea(coincidencias);
              */
 
             /*
-             * Mandamientos Judiciales es únicamente informativo
-             * y debe ejecutarse al final, cuando ya tenemos
-             * el nombre real de cada candidato.
+             * Mandamientos siempre se consulta al final,
+             * después de obtener los nombres oficiales.
              */
             AgregarAvisosMandamientos(
                 coincidencias
@@ -2223,6 +2317,49 @@ namespace Objetivos_Prioritarios.ControllersServices
         }
 
 
+        private static string ObtenerNombreFuente(
+    int idTbFuente)
+        {
+            switch (idTbFuente)
+            {
+                case 1:
+                    return "C5 - Detenidos";
 
+                case 2:
+                    return "FEMDLP / CAPEA";
+
+                case 3:
+                    return "Personas de interés";
+
+                case 4:
+                    return "Mandamientos judiciales";
+
+                case 5:
+                    return "Objetivos prioritarios";
+
+                case 6:
+                    return "Detenidos FGEA";
+
+                case 7:
+                    return "FEMDLP / CAPEA";
+
+                case 8:
+                    return "FEMDLP / CAPEA";
+
+                default:
+                    return "Fuente " + idTbFuente;
+            }
+        }
+
+
+        private static bool EsFuenteInformativa(
+            int idTbFuente)
+        {
+            /*
+             * Mandamientos Judiciales solamente
+             * agrega una alerta nominal.
+             */
+            return idTbFuente == 4;
+        }
     }
 }

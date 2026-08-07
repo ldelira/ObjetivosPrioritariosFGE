@@ -1,10 +1,6 @@
 ﻿(function ($) {
     'use strict';
 
-    /* ============================================================
-       CONFIGURACIÓN GENERAL
-       ============================================================ */
-
     const tiposPermitidos = [
         'image/jpeg',
         'image/jpg',
@@ -12,33 +8,459 @@
         'image/webp'
     ];
 
-    let solicitudBusquedaActual = null;
-    let solicitudDetalleActual = null;
-    let buscandoCoincidencias = false;
+    const modoBusquedaPredeterminado =
+        'NOMBRE';
 
+    const modoCombinacionPredeterminado =
+        'PRIORIZAR';
 
-    /* ============================================================
-       INICIALIZACIÓN
-       ============================================================ */
+    const porcentajePredeterminado =
+        70;
+
+    let solicitudBusquedaActual =
+        null;
+
+    let solicitudDetalleActual =
+        null;
+
+    let buscandoCoincidencias =
+        false;
+
 
     $(document).ready(function () {
-
+        inicializarBusquedaTexto();
+        inicializarModoCombinacion();
         inicializarCargaBiometrica();
         inicializarPorcentaje();
+        inicializarFiltrosAvanzados();
+        inicializarConteoFiltros();
         inicializarFormulario();
         inicializarLimpieza();
         inicializarEventosResultados();
 
+        normalizarModoBusquedaInicial();
+        normalizarModoCombinacionInicial();
+        sincronizarTextoBusquedaAnterior();
+        actualizarConteoFiltrosAvanzados();
+        abrirFiltrosAvanzadosIniciales();
         actualizarEstadoBotonBusqueda();
+        inicializarMandamientosDesplegables();
     });
 
 
     /* ============================================================
-       CARGA DE FOTOGRAFÍA Y HUELLA
+       BÚSQUEDA TEXTUAL
+       ============================================================ */
+
+    function inicializarBusquedaTexto() {
+        $(document)
+            .off(
+                'click.sicBusquedaTexto',
+                '.sic-modo-busqueda'
+            )
+            .on(
+                'click.sicBusquedaTexto',
+                '.sic-modo-busqueda',
+                function () {
+                    const modo =
+                        normalizarModoBusqueda(
+                            $(this).attr('data-modo')
+                        );
+
+                    establecerModoBusqueda(
+                        modo,
+                        true
+                    );
+                }
+            );
+
+        $('#NombreBusqueda, #AliasBusqueda')
+            .off(
+                'input.sicBusquedaTexto ' +
+                'change.sicBusquedaTexto'
+            )
+            .on(
+                'input.sicBusquedaTexto ' +
+                'change.sicBusquedaTexto',
+                function () {
+                    sincronizarTextoBusquedaAnterior();
+                    actualizarEstadoBotonBusqueda();
+                }
+            );
+
+        $('#NombreBusqueda, #AliasBusqueda')
+            .off(
+                'keydown.sicBusquedaTexto'
+            )
+            .on(
+                'keydown.sicBusquedaTexto',
+                function (evento) {
+                    if (
+                        evento.key === 'Enter' &&
+                        !buscandoCoincidencias
+                    ) {
+                        evento.preventDefault();
+
+                        $('#formBusquedaCoincidencias')
+                            .trigger('submit');
+                    }
+                }
+            );
+
+        $(document)
+            .off(
+                'click.sicLimpiarCampoTexto',
+                '.js-limpiar-campo-texto'
+            )
+            .on(
+                'click.sicLimpiarCampoTexto',
+                '.js-limpiar-campo-texto',
+                function () {
+                    const target =
+                        $(this).attr('data-target');
+
+                    if (!target) {
+                        return;
+                    }
+
+                    $('#' + target)
+                        .val('')
+                        .trigger('focus');
+
+                    sincronizarTextoBusquedaAnterior();
+                    actualizarEstadoBotonBusqueda();
+                }
+            );
+    }
+
+
+    function normalizarModoBusquedaInicial() {
+        establecerModoBusqueda(
+            normalizarModoBusqueda(
+                $('#ModoBusquedaTexto').val()
+            ),
+            false
+        );
+    }
+
+
+    function normalizarModoBusqueda(
+        modo
+    ) {
+        const valor =
+            String(
+                modo || ''
+            )
+                .trim()
+                .toUpperCase();
+
+        if (
+            valor === 'NOMBRE' ||
+            valor === 'ALIAS' ||
+            valor === 'AMBOS'
+        ) {
+            return valor;
+        }
+
+        return modoBusquedaPredeterminado;
+    }
+
+
+    function establecerModoBusqueda(
+        modo,
+        enfocarCampo
+    ) {
+        const modoNormalizado =
+            normalizarModoBusqueda(
+                modo
+            );
+
+        $('#ModoBusquedaTexto')
+            .val(
+                modoNormalizado
+            );
+
+        $('.sic-modo-busqueda')
+            .removeClass('active')
+            .attr(
+                'aria-pressed',
+                'false'
+            );
+
+        $('.sic-modo-busqueda[data-modo="' +
+            modoNormalizado +
+            '"]')
+            .addClass('active')
+            .attr(
+                'aria-pressed',
+                'true'
+            );
+
+        const mostrarNombre =
+            modoNormalizado === 'NOMBRE' ||
+            modoNormalizado === 'AMBOS';
+
+        const mostrarAlias =
+            modoNormalizado === 'ALIAS' ||
+            modoNormalizado === 'AMBOS';
+
+        $('#grupoNombreBusqueda')
+            .toggle(
+                mostrarNombre
+            );
+
+        $('#grupoAliasBusqueda')
+            .toggle(
+                mostrarAlias
+            );
+
+        $('#contenedorCamposTextuales')
+            .toggleClass(
+                'sic-campos-dobles',
+                modoNormalizado === 'AMBOS'
+            )
+            .toggleClass(
+                'sic-campos-sencillos',
+                modoNormalizado !== 'AMBOS'
+            );
+
+        actualizarDescripcionModoBusqueda(
+            modoNormalizado
+        );
+
+        sincronizarTextoBusquedaAnterior();
+        actualizarEstadoBotonBusqueda();
+
+        if (enfocarCampo) {
+            window.setTimeout(
+                function () {
+                    if (modoNormalizado === 'ALIAS') {
+                        $('#AliasBusqueda')
+                            .trigger('focus');
+                    }
+                    else {
+                        $('#NombreBusqueda')
+                            .trigger('focus');
+                    }
+                },
+                0
+            );
+        }
+    }
+
+
+    function actualizarDescripcionModoBusqueda(
+        modo
+    ) {
+        let descripcion =
+            'Se buscarán personas que coincidan con el nombre capturado.';
+
+        if (modo === 'ALIAS') {
+            descripcion =
+                'Se buscarán personas que coincidan con el alias capturado.';
+        }
+        else if (modo === 'AMBOS') {
+            descripcion =
+                'El nombre y el alias se evaluarán como criterios independientes.';
+        }
+
+        $('#textoDescripcionModoBusqueda')
+            .text(
+                descripcion
+            );
+    }
+
+
+    function obtenerNombreBusqueda() {
+        return $.trim(
+            $('#NombreBusqueda').val() || ''
+        );
+    }
+
+
+    function obtenerAliasBusqueda() {
+        return $.trim(
+            $('#AliasBusqueda').val() || ''
+        );
+    }
+
+
+    function obtenerNombreBusquedaActivo() {
+        const modo =
+            normalizarModoBusqueda(
+                $('#ModoBusquedaTexto').val()
+            );
+
+        if (
+            modo !== 'NOMBRE' &&
+            modo !== 'AMBOS'
+        ) {
+            return '';
+        }
+
+        return obtenerNombreBusqueda();
+    }
+
+
+    function obtenerAliasBusquedaActivo() {
+        const modo =
+            normalizarModoBusqueda(
+                $('#ModoBusquedaTexto').val()
+            );
+
+        if (
+            modo !== 'ALIAS' &&
+            modo !== 'AMBOS'
+        ) {
+            return '';
+        }
+
+        return obtenerAliasBusqueda();
+    }
+
+
+    function tieneNombreBusquedaValido() {
+        return obtenerNombreBusquedaActivo()
+            .length >= 2;
+    }
+
+
+    function tieneAliasBusquedaValido() {
+        return obtenerAliasBusquedaActivo()
+            .length >= 2;
+    }
+
+
+    function tieneTextoBusquedaValido() {
+        return (
+            tieneNombreBusquedaValido() ||
+            tieneAliasBusquedaValido()
+        );
+    }
+
+
+    function obtenerTextoBusquedaCompatibilidad() {
+        const nombre =
+            obtenerNombreBusquedaActivo();
+
+        const alias =
+            obtenerAliasBusquedaActivo();
+
+        /*
+         * Compatibilidad temporal con el backend anterior.
+         * Cuando existan ambos criterios se conserva primero
+         * el nombre porque antes solamente se recibía un texto.
+         */
+        return nombre || alias;
+    }
+
+
+    function sincronizarTextoBusquedaAnterior() {
+        $('#TextoBusqueda')
+            .val(
+                obtenerTextoBusquedaCompatibilidad()
+            );
+    }
+
+
+    /* ============================================================
+       MODO DE COMBINACIÓN
+       ============================================================ */
+
+    function inicializarModoCombinacion() {
+        $(document)
+            .off(
+                'change.sicModoCombinacion',
+                '.js-modo-combinacion'
+            )
+            .on(
+                'change.sicModoCombinacion',
+                '.js-modo-combinacion',
+                function () {
+                    establecerModoCombinacion(
+                        $(this).val()
+                    );
+                }
+            );
+    }
+
+
+    function normalizarModoCombinacionInicial() {
+        establecerModoCombinacion(
+            obtenerModoCombinacion()
+        );
+    }
+
+
+    function normalizarModoCombinacion(
+        modo
+    ) {
+        const valor =
+            String(
+                modo || ''
+            )
+                .trim()
+                .toUpperCase();
+
+        if (
+            valor === 'PRIORIZAR' ||
+            valor === 'ESTRICTO'
+        ) {
+            return valor;
+        }
+
+        return modoCombinacionPredeterminado;
+    }
+
+
+    function obtenerModoCombinacion() {
+        return normalizarModoCombinacion(
+            $('input[name="ModoCombinacion"]:checked')
+                .val()
+        );
+    }
+
+
+    function establecerModoCombinacion(
+        modo
+    ) {
+        const modoNormalizado =
+            normalizarModoCombinacion(
+                modo
+            );
+
+        $('input[name="ModoCombinacion"]')
+            .prop(
+                'checked',
+                false
+            );
+
+        $('input[name="ModoCombinacion"][value="' +
+            modoNormalizado +
+            '"]')
+            .prop(
+                'checked',
+                true
+            );
+
+        $('.sic-opcion-combinacion')
+            .removeClass('active');
+
+        $('input[name="ModoCombinacion"][value="' +
+            modoNormalizado +
+            '"]')
+            .closest(
+                '.sic-opcion-combinacion'
+            )
+            .addClass('active');
+    }
+
+
+    /* ============================================================
+       ARCHIVOS BIOMÉTRICOS
        ============================================================ */
 
     function inicializarCargaBiometrica() {
-
         $(document)
             .off(
                 'change.sicCoincidencias',
@@ -48,11 +470,11 @@
                 'change.sicCoincidencias',
                 '.js-biometrico-input',
                 function () {
-
-                    procesarArchivoSeleccionado(this);
+                    procesarArchivoSeleccionado(
+                        this
+                    );
                 }
             );
-
 
         $(document)
             .off(
@@ -62,19 +484,21 @@
             .on(
                 'click.sicCoincidencias',
                 '.js-seleccionar-biometrico',
-                function () {
+                function (evento) {
+                    evento.preventDefault();
+                    evento.stopPropagation();
 
                     const inputId =
-                        $(this).attr('data-input-id');
+                        $(this).attr(
+                            'data-input-id'
+                        );
 
-                    if (!inputId) {
-                        return;
+                    if (inputId) {
+                        $('#' + inputId)
+                            .trigger('click');
                     }
-
-                    $('#' + inputId).trigger('click');
                 }
             );
-
 
         $(document)
             .off(
@@ -84,46 +508,51 @@
             .on(
                 'click.sicCoincidencias',
                 '.js-quitar-biometrico',
-                function () {
+                function (evento) {
+                    evento.preventDefault();
+                    evento.stopPropagation();
 
-                    const inputId =
-                        $(this).attr('data-input-id');
-
-                    limpiarArchivoBiometrico(inputId);
+                    limpiarArchivoBiometrico(
+                        $(this).attr(
+                            'data-input-id'
+                        )
+                    );
                 }
             );
 
-
         $('.sic-dropzone')
-            .off('.sicCoincidenciasDrop')
+            .off(
+                '.sicCoincidenciasDrop'
+            )
             .on(
                 'dragenter.sicCoincidenciasDrop ' +
                 'dragover.sicCoincidenciasDrop',
                 function (evento) {
-
                     evento.preventDefault();
                     evento.stopPropagation();
 
                     $(this)
-                        .addClass('sic-dropzone-activa');
+                        .addClass(
+                            'sic-dropzone-activa'
+                        );
                 }
             )
             .on(
                 'dragleave.sicCoincidenciasDrop ' +
                 'drop.sicCoincidenciasDrop',
                 function (evento) {
-
                     evento.preventDefault();
                     evento.stopPropagation();
 
                     $(this)
-                        .removeClass('sic-dropzone-activa');
+                        .removeClass(
+                            'sic-dropzone-activa'
+                        );
                 }
             )
             .on(
                 'drop.sicCoincidenciasDrop',
                 function (evento) {
-
                     const eventoOriginal =
                         evento.originalEvent;
 
@@ -135,7 +564,9 @@
                     }
 
                     const archivos =
-                        eventoOriginal.dataTransfer.files;
+                        eventoOriginal
+                            .dataTransfer
+                            .files;
 
                     if (
                         !archivos ||
@@ -145,13 +576,14 @@
                     }
 
                     const inputId =
-                        $(this).attr('data-input-id');
-
-                    const input =
-                        document.getElementById(inputId);
+                        $(this).attr(
+                            'data-input-id'
+                        );
 
                     asignarArchivoAInput(
-                        input,
+                        document.getElementById(
+                            inputId
+                        ),
                         archivos[0]
                     );
                 }
@@ -163,25 +595,26 @@
         input,
         archivo
     ) {
-
         if (!input || !archivo) {
             return;
         }
 
         try {
-
             const transferencia =
                 new DataTransfer();
 
-            transferencia.items.add(archivo);
+            transferencia.items.add(
+                archivo
+            );
 
             input.files =
                 transferencia.files;
 
-            procesarArchivoSeleccionado(input);
-
-        } catch (error) {
-
+            procesarArchivoSeleccionado(
+                input
+            );
+        }
+        catch (error) {
             mostrarMensaje(
                 'No fue posible cargar el archivo arrastrado. Utilice el botón Seleccionar.',
                 'error'
@@ -193,16 +626,16 @@
     function procesarArchivoSeleccionado(
         input
     ) {
-
         if (
             !input ||
             !input.files ||
             input.files.length === 0
         ) {
+            limpiarVistaPrevia(
+                input
+            );
 
-            limpiarVistaPrevia(input);
             actualizarEstadoBotonBusqueda();
-
             return;
         }
 
@@ -210,85 +643,91 @@
             input.files[0];
 
         if (!archivoEsValido(archivo)) {
-
             input.value = '';
 
-            limpiarVistaPrevia(input);
-            actualizarEstadoBotonBusqueda();
+            limpiarVistaPrevia(
+                input
+            );
 
+            actualizarEstadoBotonBusqueda();
             return;
         }
 
-
         const previewId =
-            $(input).attr('data-preview');
+            $(input).attr(
+                'data-preview'
+            );
 
         const estadoVacioId =
-            $(input).attr('data-vacio');
+            $(input).attr(
+                'data-vacio'
+            );
 
         const quitarId =
-            $(input).attr('data-quitar');
-
+            $(input).attr(
+                'data-quitar'
+            );
 
         const lector =
             new FileReader();
 
+        lector.onload =
+            function (evento) {
+                $('#' + previewId)
+                    .attr(
+                        'src',
+                        evento.target.result
+                    )
+                    .show();
 
-        lector.onload = function (evento) {
+                $('#' + estadoVacioId)
+                    .hide();
 
-            $('#' + previewId)
-                .attr(
-                    'src',
-                    evento.target.result
-                )
-                .show();
+                $('#' + quitarId)
+                    .prop(
+                        'disabled',
+                        false
+                    );
 
-            $('#' + estadoVacioId)
-                .hide();
+                $(input)
+                    .closest(
+                        '.sic-biometrico-tile'
+                    )
+                    .addClass(
+                        'sic-biometrico-con-archivo'
+                    );
 
-            $('#' + quitarId)
-                .prop(
-                    'disabled',
-                    false
+                actualizarEstadoBotonBusqueda();
+            };
+
+        lector.onerror =
+            function () {
+                input.value = '';
+
+                limpiarVistaPrevia(
+                    input
                 );
 
-            $(input)
-                .closest('.sic-carga-card')
-                .addClass(
-                    'sic-carga-card-con-archivo'
+                actualizarEstadoBotonBusqueda();
+
+                mostrarMensaje(
+                    'No fue posible leer el archivo seleccionado.',
+                    'error'
                 );
+            };
 
-            actualizarEstadoBotonBusqueda();
-        };
-
-
-        lector.onerror = function () {
-
-            input.value = '';
-
-            limpiarVistaPrevia(input);
-
-            actualizarEstadoBotonBusqueda();
-
-            mostrarMensaje(
-                'No fue posible leer el archivo seleccionado.',
-                'error'
-            );
-        };
-
-
-        lector.readAsDataURL(archivo);
+        lector.readAsDataURL(
+            archivo
+        );
     }
 
 
     function archivoEsValido(
         archivo
     ) {
-
         if (!archivo) {
             return false;
         }
-
 
         const nombreArchivo =
             archivo.name
@@ -300,10 +739,11 @@
                 ? archivo.type.toLowerCase()
                 : '';
 
-
         const extensionValida =
             /\.(jpg|jpeg|png|webp)$/i
-                .test(nombreArchivo);
+                .test(
+                    nombreArchivo
+                );
 
         const mimeValido =
             tipoArchivo === '' ||
@@ -311,9 +751,10 @@
                 tipoArchivo
             ) !== -1;
 
-
-        if (!extensionValida || !mimeValido) {
-
+        if (
+            !extensionValida ||
+            !mimeValido
+        ) {
             mostrarMensaje(
                 'Seleccione una imagen JPG, PNG o WEBP.',
                 'warning'
@@ -322,19 +763,19 @@
             return false;
         }
 
-
         const configuracion =
             window.sicCoincidenciasConfig || {};
 
         const maximoMb =
-            configuracion.maximoArchivoMb || 10;
+            configuracion.maximoArchivoMb ||
+            10;
 
         const maximoBytes =
-            maximoMb * 1024 * 1024;
-
+            maximoMb *
+            1024 *
+            1024;
 
         if (archivo.size > maximoBytes) {
-
             mostrarMensaje(
                 'El archivo supera el límite de ' +
                 maximoMb +
@@ -345,9 +786,7 @@
             return false;
         }
 
-
         if (archivo.size <= 0) {
-
             mostrarMensaje(
                 'El archivo seleccionado está vacío.',
                 'warning'
@@ -356,7 +795,6 @@
             return false;
         }
 
-
         return true;
     }
 
@@ -364,13 +802,14 @@
     function limpiarArchivoBiometrico(
         inputId
     ) {
-
         if (!inputId) {
             return;
         }
 
         const input =
-            document.getElementById(inputId);
+            document.getElementById(
+                inputId
+            );
 
         if (!input) {
             return;
@@ -378,7 +817,10 @@
 
         input.value = '';
 
-        limpiarVistaPrevia(input);
+        limpiarVistaPrevia(
+            input
+        );
+
         actualizarEstadoBotonBusqueda();
     }
 
@@ -386,77 +828,242 @@
     function limpiarVistaPrevia(
         input
     ) {
-
         if (!input) {
             return;
         }
 
-
         const previewId =
-            $(input).attr('data-preview');
-
-        const estadoVacioId =
-            $(input).attr('data-vacio');
-
-        const quitarId =
-            $(input).attr('data-quitar');
-
-
-        $('#' + previewId)
-            .attr('src', '')
-            .hide();
-
-        $('#' + estadoVacioId)
-            .show();
-
-        $('#' + quitarId)
-            .prop(
-                'disabled',
-                true
+            $(input).attr(
+                'data-preview'
             );
 
+        const estadoVacioId =
+            $(input).attr(
+                'data-vacio'
+            );
+
+        const quitarId =
+            $(input).attr(
+                'data-quitar'
+            );
+
+        if (previewId) {
+            $('#' + previewId)
+                .attr(
+                    'src',
+                    ''
+                )
+                .hide();
+        }
+
+        if (estadoVacioId) {
+            $('#' + estadoVacioId)
+                .show();
+        }
+
+        if (quitarId) {
+            $('#' + quitarId)
+                .prop(
+                    'disabled',
+                    true
+                );
+        }
+
         $(input)
-            .closest('.sic-carga-card')
+            .closest(
+                '.sic-biometrico-tile'
+            )
             .removeClass(
-                'sic-carga-card-con-archivo'
+                'sic-biometrico-con-archivo'
             );
     }
 
 
+    function inputTieneArchivo(
+        inputId
+    ) {
+        const input =
+            document.getElementById(
+                inputId
+            );
+
+        return !!(
+            input &&
+            input.files &&
+            input.files.length > 0
+        );
+    }
+
+
     /* ============================================================
-       CONTROL DEL PORCENTAJE
+       PORCENTAJE Y FILTROS
        ============================================================ */
 
     function inicializarPorcentaje() {
-
         $('#PorcentajeMinimo')
-            .off('input.sicCoincidencias')
+            .off(
+                'input.sicCoincidencias ' +
+                'change.sicCoincidencias'
+            )
             .on(
-                'input.sicCoincidencias',
+                'input.sicCoincidencias ' +
+                'change.sicCoincidencias',
                 function () {
-
-                    const valor =
-                        $(this).val() || 70;
-
                     $('#valorPorcentajeMinimo')
-                        .text(valor + '%');
+                        .text(
+                            ($(this).val() || porcentajePredeterminado) +
+                            '%'
+                        );
                 }
             );
     }
 
 
+    function inicializarFiltrosAvanzados() {
+        $('#btnFiltrosAvanzados')
+            .off(
+                'click.sicFiltrosAvanzados'
+            )
+            .on(
+                'click.sicFiltrosAvanzados',
+                function () {
+                    const panel =
+                        $('#panelFiltrosAvanzados');
+
+                    establecerEstadoFiltrosAvanzados(
+                        !panel.is(':visible'),
+                        true
+                    );
+                }
+            );
+    }
+
+
+    function establecerEstadoFiltrosAvanzados(
+        abrir,
+        animar
+    ) {
+        const panel =
+            $('#panelFiltrosAvanzados');
+
+        const boton =
+            $('#btnFiltrosAvanzados');
+
+        if (
+            panel.length === 0 ||
+            boton.length === 0
+        ) {
+            return;
+        }
+
+        panel.stop(
+            true,
+            true
+        );
+
+        if (abrir) {
+            animar
+                ? panel.slideDown(180)
+                : panel.show();
+
+            boton
+                .addClass('active')
+                .attr(
+                    'aria-expanded',
+                    'true'
+                );
+        }
+        else {
+            animar
+                ? panel.slideUp(180)
+                : panel.hide();
+
+            boton
+                .removeClass('active')
+                .attr(
+                    'aria-expanded',
+                    'false'
+                );
+        }
+    }
+
+
+    function inicializarConteoFiltros() {
+        $('#Municipio, #Sexo, #EdadMinima, #EdadMaxima')
+            .off(
+                'change.sicConteoFiltros ' +
+                'input.sicConteoFiltros'
+            )
+            .on(
+                'change.sicConteoFiltros ' +
+                'input.sicConteoFiltros',
+                function () {
+                    actualizarConteoFiltrosAvanzados();
+                }
+            );
+    }
+
+
+    function obtenerCantidadFiltrosAvanzados() {
+        let total = 0;
+
+        if ($.trim($('#Municipio').val() || '') !== '') {
+            total++;
+        }
+
+        if ($.trim($('#Sexo').val() || '') !== '') {
+            total++;
+        }
+
+        if ($.trim($('#EdadMinima').val() || '') !== '') {
+            total++;
+        }
+
+        if ($.trim($('#EdadMaxima').val() || '') !== '') {
+            total++;
+        }
+
+        return total;
+    }
+
+
+    function actualizarConteoFiltrosAvanzados() {
+        const total =
+            obtenerCantidadFiltrosAvanzados();
+
+        const contador =
+            $('#contadorFiltrosAvanzados');
+
+        contador.text(
+            total
+        );
+
+        total > 0
+            ? contador.show()
+            : contador.hide();
+    }
+
+
+    function abrirFiltrosAvanzadosIniciales() {
+        establecerEstadoFiltrosAvanzados(
+            obtenerCantidadFiltrosAvanzados() > 0,
+            false
+        );
+    }
+
+
     /* ============================================================
-       FORMULARIO DE BÚSQUEDA
+       FORMULARIO Y BÚSQUEDA AJAX
        ============================================================ */
 
     function inicializarFormulario() {
-
         $('#formBusquedaCoincidencias')
-            .off('submit.sicCoincidencias')
+            .off(
+                'submit.sicCoincidencias'
+            )
             .on(
                 'submit.sicCoincidencias',
                 function (evento) {
-
                     evento.preventDefault();
 
                     if (!validarFormularioBusqueda()) {
@@ -470,84 +1077,163 @@
 
 
     function validarFormularioBusqueda() {
+        const modoBusqueda =
+            normalizarModoBusqueda(
+                $('#ModoBusquedaTexto').val()
+            );
+
+        const nombre =
+            obtenerNombreBusquedaActivo();
+
+        const alias =
+            obtenerAliasBusquedaActivo();
 
         const tieneFotografia =
-            inputTieneArchivo('Fotografia');
+            inputTieneArchivo(
+                'Fotografia'
+            );
 
         const tieneHuella =
-            inputTieneArchivo('Huella');
-
-
-        if (!tieneFotografia && !tieneHuella) {
-
-            mostrarMensaje(
-                'Seleccione una fotografía, una huella o ambos archivos.',
-                'warning'
+            inputTieneArchivo(
+                'Huella'
             );
-
-            return false;
-        }
-
-
-        const edadMinima =
-            parseInt(
-                $('#EdadMinima').val(),
-                10
-            );
-
-        const edadMaxima =
-            parseInt(
-                $('#EdadMaxima').val(),
-                10
-            );
-
 
         if (
-            isNaN(edadMinima) ||
-            edadMinima < 0 ||
-            edadMinima > 120
+            nombre.length === 0 &&
+            alias.length === 0 &&
+            !tieneFotografia &&
+            !tieneHuella
         ) {
-
             mostrarMensaje(
-                'La edad mínima debe estar entre 0 y 120 años.',
+                'Capture un nombre, un alias o agregue una fotografía o huella.',
                 'warning'
             );
 
-            $('#EdadMinima').focus();
+            enfocarPrimerCampoActivo(
+                modoBusqueda
+            );
 
             return false;
         }
-
 
         if (
-            isNaN(edadMaxima) ||
-            edadMaxima < 0 ||
-            edadMaxima > 120
+            nombre.length === 1
         ) {
-
             mostrarMensaje(
-                'La edad máxima debe estar entre 0 y 120 años.',
+                'El nombre debe contener al menos dos caracteres.',
                 'warning'
             );
 
-            $('#EdadMaxima').focus();
+            $('#NombreBusqueda')
+                .trigger('focus');
 
             return false;
         }
 
+        if (
+            alias.length === 1
+        ) {
+            mostrarMensaje(
+                'El alias debe contener al menos dos caracteres.',
+                'warning'
+            );
 
-        if (edadMinima > edadMaxima) {
+            $('#AliasBusqueda')
+                .trigger('focus');
 
+            return false;
+        }
+
+        $('#ModoBusquedaTexto')
+            .val(
+                modoBusqueda
+            );
+
+        establecerModoCombinacion(
+            obtenerModoCombinacion()
+        );
+
+        sincronizarTextoBusquedaAnterior();
+
+        const edadMinimaTexto =
+            $.trim(
+                $('#EdadMinima').val() || ''
+            );
+
+        const edadMaximaTexto =
+            $.trim(
+                $('#EdadMaxima').val() || ''
+            );
+
+        let edadMinima = null;
+        let edadMaxima = null;
+
+        if (edadMinimaTexto !== '') {
+            edadMinima =
+                parseInt(
+                    edadMinimaTexto,
+                    10
+                );
+
+            if (
+                isNaN(edadMinima) ||
+                edadMinima < 0 ||
+                edadMinima > 120
+            ) {
+                mostrarMensaje(
+                    'La edad mínima debe estar entre 0 y 120 años.',
+                    'warning'
+                );
+
+                abrirYEnfocarFiltro(
+                    'EdadMinima'
+                );
+
+                return false;
+            }
+        }
+
+        if (edadMaximaTexto !== '') {
+            edadMaxima =
+                parseInt(
+                    edadMaximaTexto,
+                    10
+                );
+
+            if (
+                isNaN(edadMaxima) ||
+                edadMaxima < 0 ||
+                edadMaxima > 120
+            ) {
+                mostrarMensaje(
+                    'La edad máxima debe estar entre 0 y 120 años.',
+                    'warning'
+                );
+
+                abrirYEnfocarFiltro(
+                    'EdadMaxima'
+                );
+
+                return false;
+            }
+        }
+
+        if (
+            edadMinima !== null &&
+            edadMaxima !== null &&
+            edadMinima > edadMaxima
+        ) {
             mostrarMensaje(
                 'La edad mínima no puede ser mayor que la edad máxima.',
                 'warning'
             );
 
-            $('#EdadMinima').focus();
+            abrirYEnfocarFiltro(
+                'EdadMinima'
+            );
 
             return false;
         }
-
 
         const porcentaje =
             parseInt(
@@ -555,13 +1241,11 @@
                 10
             );
 
-
         if (
             isNaN(porcentaje) ||
             porcentaje < 50 ||
             porcentaje > 100
         ) {
-
             mostrarMensaje(
                 'El porcentaje mínimo debe estar entre 50% y 100%.',
                 'warning'
@@ -570,25 +1254,56 @@
             return false;
         }
 
-
         return true;
     }
 
 
-    function buscarCoincidencias() {
+    function enfocarPrimerCampoActivo(
+        modoBusqueda
+    ) {
+        if (modoBusqueda === 'ALIAS') {
+            $('#AliasBusqueda')
+                .trigger('focus');
+        }
+        else {
+            $('#NombreBusqueda')
+                .trigger('focus');
+        }
+    }
 
+
+    function abrirYEnfocarFiltro(
+        inputId
+    ) {
+        establecerEstadoFiltrosAvanzados(
+            true,
+            true
+        );
+
+        window.setTimeout(
+            function () {
+                $('#' + inputId)
+                    .trigger('focus');
+            },
+            220
+        );
+    }
+
+
+    function buscarCoincidencias() {
         if (buscandoCoincidencias) {
             return;
         }
-
 
         const formulario =
             document.getElementById(
                 'formBusquedaCoincidencias'
             );
 
-        if (!formulario) {
+        const configuracion =
+            window.sicCoincidenciasConfig || {};
 
+        if (!formulario) {
             mostrarMensaje(
                 'No se encontró el formulario de búsqueda.',
                 'error'
@@ -597,12 +1312,7 @@
             return;
         }
 
-
-        const configuracion =
-            window.sicCoincidenciasConfig || {};
-
         if (!configuracion.urlBuscar) {
-
             mostrarMensaje(
                 'No se configuró la dirección para buscar coincidencias.',
                 'error'
@@ -611,24 +1321,50 @@
             return;
         }
 
-
-        if (
-            solicitudBusquedaActual &&
-            solicitudBusquedaActual.readyState !== 4
-        ) {
-            solicitudBusquedaActual.abort();
-        }
-
+        cancelarSolicitudBusqueda();
 
         const datos =
-            new FormData(formulario);
+            new FormData(
+                formulario
+            );
 
+        const nombreBusqueda =
+            obtenerNombreBusquedaActivo();
+
+        const aliasBusqueda =
+            obtenerAliasBusquedaActivo();
+
+        datos.set(
+            'NombreBusqueda',
+            nombreBusqueda
+        );
+
+        datos.set(
+            'AliasBusqueda',
+            aliasBusqueda
+        );
+
+        datos.set(
+            'TextoBusqueda',
+            obtenerTextoBusquedaCompatibilidad()
+        );
+
+        datos.set(
+            'ModoBusquedaTexto',
+            normalizarModoBusqueda(
+                $('#ModoBusquedaTexto').val()
+            )
+        );
+
+        datos.set(
+            'ModoCombinacion',
+            obtenerModoCombinacion()
+        );
 
         buscandoCoincidencias = true;
 
         solicitudBusquedaActual =
             $.ajax({
-
                 url:
                     configuracion.urlBuscar,
 
@@ -647,77 +1383,130 @@
                 cache:
                     false,
 
+                beforeSend:
+                    function () {
+                        mostrarCargandoResultados();
 
-                beforeSend: function () {
+                        $('#btnBuscarCoincidencias')
+                            .prop(
+                                'disabled',
+                                true
+                            )
+                            .html(
+                                '<i class="fa fa-spinner fa-spin"></i> ' +
+                                '<span>Buscando...</span>'
+                            );
+                    },
 
-                    mostrarCargandoResultados();
+                success:
+                    function (html) {
+                        $('#contenedorResultadosCoincidencias')
+                            .removeClass(
+                                'sic-resultados-inicial'
+                            )
+                            .html(
+                                html
+                            );
 
-                    $('#btnBuscarCoincidencias')
-                        .prop(
-                            'disabled',
-                            true
-                        )
-                        .html(
-                            '<i class="fa fa-spinner fa-spin"></i> ' +
-                            'Buscando...'
+                        sincronizarImagenesConsulta();
+                    },
+
+                error:
+                    function (
+                        xhr,
+                        estado
+                    ) {
+                        if (estado === 'abort') {
+                            return;
+                        }
+
+                        mostrarErrorResultados(
+                            limpiarMensajeErrorServidor(
+                                xhr.responseText ||
+                                'No fue posible realizar la búsqueda.'
+                            )
                         );
-                },
+                    },
 
+                complete:
+                    function () {
+                        buscandoCoincidencias = false;
+                        solicitudBusquedaActual = null;
 
-                success: function (html) {
+                        $('#btnBuscarCoincidencias')
+                            .html(
+                                '<i class="fa fa-search"></i> ' +
+                                '<span>Buscar coincidencias</span>'
+                            );
 
-                    $('#contenedorResultadosCoincidencias')
-                        .removeClass(
-                            'sic-resultados-inicial'
-                        )
-                        .html(html);
-
-                    sincronizarImagenesConsulta();
-                },
-
-
-                error: function (
-                    xhr,
-                    estado
-                ) {
-
-                    if (estado === 'abort') {
-                        return;
+                        actualizarEstadoBotonBusqueda();
                     }
-
-                    let mensaje =
-                        xhr.responseText ||
-                        'No fue posible realizar la búsqueda.';
-
-                    mensaje =
-                        limpiarMensajeErrorServidor(
-                            mensaje
-                        );
-
-                    mostrarErrorResultados(
-                        mensaje
-                    );
-                },
-
-
-                complete: function () {
-
-                    buscandoCoincidencias = false;
-                    solicitudBusquedaActual = null;
-
-                    $('#btnBuscarCoincidencias')
-                        .html(
-                            '<i class="fa fa-search"></i> ' +
-                            'Buscar coincidencias'
-                        );
-
-                    actualizarEstadoBotonBusqueda();
-                }
             });
     }
 
 
+    function cancelarSolicitudBusqueda() {
+        if (
+            solicitudBusquedaActual &&
+            solicitudBusquedaActual.readyState !== 4
+        ) {
+            solicitudBusquedaActual.abort();
+        }
+
+        solicitudBusquedaActual = null;
+    }
+
+
     function mostrarCargandoResultados() {
+        const tieneNombre =
+            tieneNombreBusquedaValido();
+
+        const tieneAlias =
+            tieneAliasBusquedaValido();
+
+        const tieneTexto =
+            tieneNombre ||
+            tieneAlias;
+
+        const tieneFotografia =
+            inputTieneArchivo(
+                'Fotografia'
+            );
+
+        const tieneHuella =
+            inputTieneArchivo(
+                'Huella'
+            );
+
+        let descripcion =
+            'Se están analizando los criterios proporcionados.';
+
+        if (
+            tieneTexto &&
+            (tieneFotografia || tieneHuella)
+        ) {
+            descripcion =
+                'Se están evaluando los criterios textuales y biométricos proporcionados.';
+        }
+        else if (
+            tieneNombre &&
+            tieneAlias
+        ) {
+            descripcion =
+                'Se están comparando el nombre y el alias como criterios independientes.';
+        }
+        else if (tieneNombre) {
+            descripcion =
+                'Se está buscando el nombre en las fuentes disponibles.';
+        }
+        else if (tieneAlias) {
+            descripcion =
+                'Se está buscando el alias en las fuentes disponibles.';
+        }
+        else {
+            descripcion =
+                'Se están comparando los datos biométricos proporcionados.';
+        }
 
         $('#contenedorResultadosCoincidencias')
             .removeClass(
@@ -726,9 +1515,9 @@
             .html(
                 '<div class="sic-resultados-loader">' +
                 '<i class="fa fa-spinner fa-spin"></i>' +
-                '<strong>Analizando información biométrica</strong>' +
+                '<strong>Analizando posibles coincidencias</strong>' +
                 '<span>' +
-                'Espere mientras se buscan posibles coincidencias.' +
+                escaparHtml(descripcion) +
                 '</span>' +
                 '</div>'
             );
@@ -738,7 +1527,6 @@
     function mostrarErrorResultados(
         mensaje
     ) {
-
         $('#contenedorResultadosCoincidencias')
             .removeClass(
                 'sic-resultados-inicial'
@@ -756,11 +1544,10 @@
 
 
     /* ============================================================
-       EVENTOS DEL LISTADO DE RESULTADOS
+       RESULTADOS Y DETALLE
        ============================================================ */
 
     function inicializarEventosResultados() {
-
         $(document)
             .off(
                 'click.sicCoincidencias',
@@ -770,18 +1557,16 @@
                 'click.sicCoincidencias',
                 '.js-ver-coincidencia',
                 function (evento) {
-
                     evento.preventDefault();
                     evento.stopPropagation();
 
-                    const idCoincidencia =
-                        parseInt(
-                            $(this).attr('data-id'),
-                            10
-                        );
-
                     seleccionarCoincidencia(
-                        idCoincidencia,
+                        parseInt(
+                            $(this).attr(
+                                'data-id'
+                            ),
+                            10
+                        ),
                         $(this)
                             .closest(
                                 '.sic-resultado-persona'
@@ -789,7 +1574,6 @@
                     );
                 }
             );
-
 
         $(document)
             .off(
@@ -800,7 +1584,6 @@
                 'click.sicCoincidencias',
                 '.sic-resultado-persona',
                 function (evento) {
-
                     if (
                         $(evento.target)
                             .closest(
@@ -811,19 +1594,35 @@
                         return;
                     }
 
-                    const idCoincidencia =
-                        parseInt(
-                            $(this).attr('data-id'),
-                            10
-                        );
-
-                    seleccionarCoincidencia(
-                        idCoincidencia,
+                    seleccionarResultadoDesdeElemento(
                         $(this)
                     );
                 }
             );
 
+        $(document)
+            .off(
+                'keydown.sicCoincidencias',
+                '.sic-resultado-persona'
+            )
+            .on(
+                'keydown.sicCoincidencias',
+                '.sic-resultado-persona',
+                function (evento) {
+                    if (
+                        evento.key !== 'Enter' &&
+                        evento.key !== ' '
+                    ) {
+                        return;
+                    }
+
+                    evento.preventDefault();
+
+                    seleccionarResultadoDesdeElemento(
+                        $(this)
+                    );
+                }
+            );
 
         $(document)
             .off(
@@ -834,19 +1633,29 @@
                 'click.sicCoincidencias',
                 '.js-tab-coincidencias',
                 function () {
-
                     const tipo =
-                        (
-                            $(this).attr('data-tipo') ||
+                        String(
+                            $(this).attr(
+                                'data-tipo'
+                            ) ||
                             'TODOS'
                         )
+                            .trim()
                             .toUpperCase();
 
                     $('.js-tab-coincidencias')
-                        .removeClass('active');
+                        .removeClass('active')
+                        .attr(
+                            'aria-selected',
+                            'false'
+                        );
 
                     $(this)
-                        .addClass('active');
+                        .addClass('active')
+                        .attr(
+                            'aria-selected',
+                            'true'
+                        );
 
                     filtrarResultadosPorTipo(
                         tipo
@@ -856,11 +1665,32 @@
     }
 
 
+    function seleccionarResultadoDesdeElemento(
+        elementoResultado
+    ) {
+        if (
+            !elementoResultado ||
+            elementoResultado.length === 0
+        ) {
+            return;
+        }
+
+        seleccionarCoincidencia(
+            parseInt(
+                elementoResultado.attr(
+                    'data-id'
+                ),
+                10
+            ),
+            elementoResultado
+        );
+    }
+
+
     function seleccionarCoincidencia(
         idCoincidencia,
         elementoResultado
     ) {
-
         if (
             isNaN(idCoincidencia) ||
             idCoincidencia <= 0
@@ -868,19 +1698,20 @@
             return;
         }
 
-
         $('.sic-resultado-persona')
-            .removeClass('active');
+            .removeClass(
+                'active'
+            );
 
         if (
             elementoResultado &&
             elementoResultado.length > 0
         ) {
-
             elementoResultado
-                .addClass('active');
+                .addClass(
+                    'active'
+                );
         }
-
 
         cargarDetalleCoincidencia(
             idCoincidencia
@@ -891,88 +1722,114 @@
     function filtrarResultadosPorTipo(
         tipo
     ) {
-
         $('.sic-resultado-persona')
             .each(function () {
+                const registro =
+                    $(this);
 
-                const tipoRegistro =
-                    (
-                        $(this).attr('data-tipo') ||
-                        ''
-                    )
-                        .toUpperCase();
+                const tieneTexto =
+                    registro.attr(
+                        'data-tiene-texto'
+                    ) === 'true';
+
+                const tieneFoto =
+                    registro.attr(
+                        'data-tiene-foto'
+                    ) === 'true';
+
+                const tieneHuella =
+                    registro.attr(
+                        'data-tiene-huella'
+                    ) === 'true';
+
+                const esCombinada =
+                    registro.attr(
+                        'data-es-combinada'
+                    ) === 'true';
 
                 let mostrar = false;
 
+                switch (tipo) {
+                    case 'TODOS':
+                        mostrar = true;
+                        break;
 
-                if (tipo === 'TODOS') {
+                    case 'TEXTO':
+                        mostrar = tieneTexto;
+                        break;
 
-                    mostrar = true;
+                    case 'FOTO':
+                        mostrar = tieneFoto;
+                        break;
 
-                } else if (tipo === 'FOTO') {
+                    case 'HUELLA':
+                        mostrar = tieneHuella;
+                        break;
 
-                    mostrar =
-                        tipoRegistro === 'FOTO' ||
-                        tipoRegistro === 'COMBINADA';
+                    case 'COMBINADA':
+                        mostrar =
+                            esCombinada ||
+                            (tieneFoto && tieneHuella);
+                        break;
 
-                } else if (tipo === 'HUELLA') {
-
-                    mostrar =
-                        tipoRegistro === 'HUELLA' ||
-                        tipoRegistro === 'COMBINADA';
-
-                } else if (tipo === 'COMBINADA') {
-
-                    mostrar =
-                        tipoRegistro === 'COMBINADA';
+                    default:
+                        mostrar =
+                            String(
+                                registro.attr(
+                                    'data-tipo'
+                                ) || ''
+                            )
+                                .toUpperCase() === tipo;
+                        break;
                 }
 
-
-                $(this).toggle(mostrar);
+                registro.toggle(
+                    mostrar
+                );
             });
 
-
-        const seleccionadoVisible =
-            $('.sic-resultado-persona.active:visible');
-
-
-        if (seleccionadoVisible.length === 0) {
-
-            const primerResultadoVisible =
-                $('.sic-resultado-persona:visible')
-                    .first();
-
-            if (primerResultadoVisible.length > 0) {
-
-                const idCoincidencia =
-                    parseInt(
-                        primerResultadoVisible
-                            .attr('data-id'),
-                        10
-                    );
-
-                seleccionarCoincidencia(
-                    idCoincidencia,
-                    primerResultadoVisible
-                );
-            }
-        }
+        seleccionarPrimerResultadoVisible();
     }
 
 
-    /* ============================================================
-       DETALLE DE LA COINCIDENCIA
-       ============================================================ */
+    function seleccionarPrimerResultadoVisible() {
+        if (
+            $('.sic-resultado-persona.active:visible')
+                .length > 0
+        ) {
+            return;
+        }
+
+        const primerResultadoVisible =
+            $('.sic-resultado-persona:visible')
+                .first();
+
+        if (primerResultadoVisible.length > 0) {
+            seleccionarResultadoDesdeElemento(
+                primerResultadoVisible
+            );
+
+            return;
+        }
+
+        $('#panelDetalleCoincidencia')
+            .html(
+                '<div class="sic-detalle-vacio">' +
+                '<i class="fa fa-filter"></i>' +
+                '<strong>No hay resultados en esta categoría</strong>' +
+                '<span>Seleccione otra pestaña para consultar las coincidencias.</span>' +
+                '</div>'
+            );
+    }
+
 
     function cargarDetalleCoincidencia(
         idCoincidencia
     ) {
-
         const configuracion =
             window.sicCoincidenciasConfig || {};
 
         if (!configuracion.urlDetalle) {
-
             mostrarMensaje(
                 'No se configuró la dirección del detalle de coincidencia.',
                 'error'
@@ -981,16 +1838,16 @@
             return;
         }
 
+        cancelarSolicitudDetalle();
 
-        if (
-            solicitudDetalleActual &&
-            solicitudDetalleActual.readyState !== 4
-        ) {
-            solicitudDetalleActual.abort();
-        }
+        const panelDetalle =
+            $('#panelDetalleCoincidencia');
 
-
-        $('#panelDetalleCoincidencia')
+        panelDetalle
+            .attr(
+                'aria-busy',
+                'true'
+            )
             .html(
                 '<div class="sic-detalle-loader">' +
                 '<i class="fa fa-spinner fa-spin"></i>' +
@@ -1001,16 +1858,8 @@
         const contexto =
             $('#sicResultadosContexto');
 
-        const tieneFotografiaConsulta =
-            contexto.attr('data-tiene-fotografia') === 'true';
-
-        const tieneHuellaConsulta =
-            contexto.attr('data-tiene-huella') === 'true';
-
-
         solicitudDetalleActual =
             $.ajax({
-
                 url:
                     configuracion.urlDetalle,
 
@@ -1025,69 +1874,78 @@
                         idCoincidencia,
 
                     tieneFotografiaConsulta:
-                        tieneFotografiaConsulta,
+                        contexto.attr(
+                            'data-tiene-fotografia'
+                        ) === 'true',
 
                     tieneHuellaConsulta:
-                        tieneHuellaConsulta
+                        contexto.attr(
+                            'data-tiene-huella'
+                        ) === 'true'
                 },
 
+                success:
+                    function (html) {
+                        panelDetalle
+                            .html(
+                                html
+                            );
 
-                success: function (html) {
+                        sincronizarImagenesConsulta();
+                    },
 
-                    $('#panelDetalleCoincidencia')
-                        .html(html);
+                error:
+                    function (
+                        xhr,
+                        estado
+                    ) {
+                        if (estado === 'abort') {
+                            return;
+                        }
 
-                    sincronizarImagenesConsulta();
-                },
+                        panelDetalle
+                            .html(
+                                '<div class="sic-detalle-vacio">' +
+                                '<i class="fa fa-exclamation-circle"></i>' +
+                                '<strong>No se pudo cargar el detalle</strong>' +
+                                '<span>' +
+                                escaparHtml(
+                                    limpiarMensajeErrorServidor(
+                                        xhr.responseText ||
+                                        'No se pudo cargar el detalle.'
+                                    )
+                                ) +
+                                '</span>' +
+                                '</div>'
+                            );
+                    },
 
+                complete:
+                    function () {
+                        solicitudDetalleActual = null;
 
-                error: function (
-                    xhr,
-                    estado
-                ) {
-
-                    if (estado === 'abort') {
-                        return;
+                        panelDetalle.attr(
+                            'aria-busy',
+                            'false'
+                        );
                     }
-
-                    let mensaje =
-                        xhr.responseText ||
-                        'No se pudo cargar el detalle.';
-
-                    mensaje =
-                        limpiarMensajeErrorServidor(
-                            mensaje
-                        );
-
-                    $('#panelDetalleCoincidencia')
-                        .html(
-                            '<div class="sic-detalle-vacio">' +
-                            '<i class="fa fa-exclamation-circle"></i>' +
-                            '<strong>' +
-                            'No se pudo cargar el detalle' +
-                            '</strong>' +
-                            '<span>' +
-                            escaparHtml(mensaje) +
-                            '</span>' +
-                            '</div>'
-                        );
-                },
-
-
-                complete: function () {
-
-                    solicitudDetalleActual = null;
-                }
             });
     }
 
 
-    /* ============================================================
-       COMPARACIÓN DE IMÁGENES
-       ============================================================ */
+    function cancelarSolicitudDetalle() {
+        if (
+            solicitudDetalleActual &&
+            solicitudDetalleActual.readyState !== 4
+        ) {
+            solicitudDetalleActual.abort();
+        }
+
+        solicitudDetalleActual = null;
+    }
+
 
     function sincronizarImagenesConsulta() {
-
         const fotoConsulta =
             $('#previewFotografia').is(':visible')
                 ? $('#previewFotografia').attr('src')
@@ -1098,7 +1956,6 @@
                 ? $('#previewHuella').attr('src')
                 : '';
 
-
         $('.js-comparacion-foto')
             .toggle(
                 !!fotoConsulta
@@ -1108,7 +1965,6 @@
             .toggle(
                 !!huellaConsulta
             );
-
 
         $('.js-imagen-consulta-foto')
             .attr(
@@ -1121,21 +1977,32 @@
                 'src',
                 huellaConsulta || ''
             );
+
+        $('.sic-comparaciones-seccion')
+            .each(function () {
+                $(this).toggle(
+                    $(this)
+                        .find(
+                            '.sic-comparacion-card:visible'
+                        )
+                        .length > 0
+                );
+            });
     }
 
 
     /* ============================================================
-       LIMPIAR FORMULARIO
+       LIMPIEZA
        ============================================================ */
 
     function inicializarLimpieza() {
-
         $('#btnLimpiarBusqueda')
-            .off('click.sicCoincidencias')
+            .off(
+                'click.sicCoincidencias'
+            )
             .on(
                 'click.sicCoincidencias',
                 function () {
-
                     limpiarBusquedaCompleta();
                 }
             );
@@ -1143,26 +2010,10 @@
 
 
     function limpiarBusquedaCompleta() {
+        cancelarSolicitudBusqueda();
+        cancelarSolicitudDetalle();
 
-        if (
-            solicitudBusquedaActual &&
-            solicitudBusquedaActual.readyState !== 4
-        ) {
-            solicitudBusquedaActual.abort();
-        }
-
-        if (
-            solicitudDetalleActual &&
-            solicitudDetalleActual.readyState !== 4
-        ) {
-            solicitudDetalleActual.abort();
-        }
-
-
-        solicitudBusquedaActual = null;
-        solicitudDetalleActual = null;
         buscandoCoincidencias = false;
-
 
         limpiarArchivoBiometrico(
             'Fotografia'
@@ -1172,28 +2023,62 @@
             'Huella'
         );
 
+        $('#NombreBusqueda')
+            .val('');
 
-        $('#Municipio').val('');
-        $('#Sexo').val('');
-        $('#TipoCoincidencia').val('');
+        $('#AliasBusqueda')
+            .val('');
 
-        $('#EdadMinima').val(18);
-        $('#EdadMaxima').val(99);
+        $('#TextoBusqueda')
+            .val('');
 
-        $('#PorcentajeMinimo').val(70);
+        establecerModoBusqueda(
+            modoBusquedaPredeterminado,
+            false
+        );
+
+        establecerModoCombinacion(
+            modoCombinacionPredeterminado
+        );
+
+        $('#Municipio')
+            .val('');
+
+        $('#Sexo')
+            .val('');
+
+        $('#TipoCoincidencia')
+            .val('');
+
+        $('#EdadMinima')
+            .val('');
+
+        $('#EdadMaxima')
+            .val('');
+
+        $('#PorcentajeMinimo')
+            .val(
+                porcentajePredeterminado
+            );
 
         $('#valorPorcentajeMinimo')
-            .text('70%');
+            .text(
+                porcentajePredeterminado +
+                '%'
+            );
 
+        establecerEstadoFiltrosAvanzados(
+            false,
+            false
+        );
 
+        actualizarConteoFiltrosAvanzados();
         restaurarEstadoInicialResultados();
-
         actualizarEstadoBotonBusqueda();
     }
 
 
     function restaurarEstadoInicialResultados() {
-
         $('#contenedorResultadosCoincidencias')
             .addClass(
                 'sic-resultados-inicial'
@@ -1202,57 +2087,29 @@
                 '<div class="sic-resultados-inicial-icono">' +
                 '<i class="fa fa-search"></i>' +
                 '</div>' +
-                '<strong>' +
-                'Realice una búsqueda de coincidencias' +
-                '</strong>' +
+                '<strong>Realice una búsqueda de coincidencias</strong>' +
                 '<span>' +
-                'Seleccione una fotografía, una huella o ambos archivos para comenzar.' +
+                'Escriba un nombre o alias, agregue una fotografía, una huella o combine varios elementos.' +
                 '</span>'
             );
     }
 
 
-    /* ============================================================
-       ESTADO DEL BOTÓN DE BÚSQUEDA
-       ============================================================ */
-
     function actualizarEstadoBotonBusqueda() {
-
-        const tieneFotografia =
-            inputTieneArchivo(
-                'Fotografia'
+        const habilitar =
+            !buscandoCoincidencias &&
+            (
+                tieneNombreBusquedaValido() ||
+                tieneAliasBusquedaValido() ||
+                inputTieneArchivo('Fotografia') ||
+                inputTieneArchivo('Huella')
             );
-
-        const tieneHuella =
-            inputTieneArchivo(
-                'Huella'
-            );
-
 
         $('#btnBuscarCoincidencias')
             .prop(
                 'disabled',
-                buscandoCoincidencias ||
-                (
-                    !tieneFotografia &&
-                    !tieneHuella
-                )
+                !habilitar
             );
-    }
-
-
-    function inputTieneArchivo(
-        inputId
-    ) {
-
-        const input =
-            document.getElementById(inputId);
-
-        return !!(
-            input &&
-            input.files &&
-            input.files.length > 0
-        );
     }
 
 
@@ -1264,12 +2121,10 @@
         mensaje,
         tipo
     ) {
-
         if (
             window.Swal &&
             typeof window.Swal.fire === 'function'
         ) {
-
             window.Swal.fire({
                 icon:
                     tipo || 'info',
@@ -1284,12 +2139,10 @@
             return;
         }
 
-
         if (
             window.swal &&
             typeof window.swal === 'function'
         ) {
-
             window.swal({
                 title:
                     mensaje,
@@ -1304,15 +2157,15 @@
             return;
         }
 
-
-        alert(mensaje);
+        alert(
+            mensaje
+        );
     }
 
 
     function escaparHtml(
         valor
     ) {
-
         return $('<div>')
             .text(
                 valor || ''
@@ -1324,30 +2177,118 @@
     function limpiarMensajeErrorServidor(
         mensaje
     ) {
-
         if (!mensaje) {
             return 'Ocurrió un error inesperado.';
         }
 
-
         const texto =
             $('<div>')
-                .html(mensaje)
+                .html(
+                    mensaje
+                )
                 .text()
-                .replace(/\s+/g, ' ')
+                .replace(
+                    /\s+/g,
+                    ' '
+                )
                 .trim();
 
-
-        if (texto.length > 500) {
-
-            return texto.substring(
-                0,
-                500
-            ) + '...';
-        }
-
-
-        return texto;
+        return texto.length > 500
+            ? texto.substring(0, 500) + '...'
+            : texto;
     }
+
+
+    function inicializarMandamientosDesplegables() {
+        $(document)
+            .off(
+                'click.sicMandamientos',
+                '.js-toggle-mandamientos'
+            )
+            .on(
+                'click.sicMandamientos',
+                '.js-toggle-mandamientos',
+                function () {
+                    const $boton =
+                        $(this);
+
+                    const selectorPanel =
+                        $boton.attr(
+                            'data-target'
+                        );
+
+                    if (!selectorPanel) {
+                        return;
+                    }
+
+                    const $panel =
+                        $(selectorPanel);
+
+                    if (!$panel.length) {
+                        return;
+                    }
+
+                    const estaAbierto =
+                        $boton.attr(
+                            'aria-expanded'
+                        ) === 'true';
+
+
+                    if (estaAbierto) {
+                        $panel
+                            .stop(true, true)
+                            .slideUp(220);
+
+                        $panel.attr(
+                            'aria-hidden',
+                            'true'
+                        );
+
+                        $boton.attr(
+                            'aria-expanded',
+                            'false'
+                        );
+
+                        $boton
+                            .closest(
+                                '.sic-mandamientos-alerta'
+                            )
+                            .removeClass(
+                                'sic-mandamientos-abierto'
+                            )
+                            .addClass(
+                                'sic-mandamientos-colapsado'
+                            );
+                    }
+                    else {
+                        $panel
+                            .stop(true, true)
+                            .slideDown(220);
+
+                        $panel.attr(
+                            'aria-hidden',
+                            'false'
+                        );
+
+                        $boton.attr(
+                            'aria-expanded',
+                            'true'
+                        );
+
+                        $boton
+                            .closest(
+                                '.sic-mandamientos-alerta'
+                            )
+                            .removeClass(
+                                'sic-mandamientos-colapsado'
+                            )
+                            .addClass(
+                                'sic-mandamientos-abierto'
+                            );
+                    }
+                }
+            );
+    }
+
 
 })(jQuery);

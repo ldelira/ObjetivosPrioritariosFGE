@@ -12,9 +12,12 @@ namespace Objetivos_Prioritarios.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class CAT_Municipio
+    public partial class COINCIDENCIA
     {
-        public long Muni { get; set; }
-        public string Nombre { get; set; }
+        public int Id { get; set; }
+        public int DetenidoId { get; set; }
+        public int DetenidoCoincidenciaId { get; set; }
+        public string TipoCoincidencia { get; set; }
+        public System.DateTime FechaRegistro { get; set; }
     }
 }

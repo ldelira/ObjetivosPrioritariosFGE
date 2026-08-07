@@ -16,8 +16,11 @@ namespace Objetivos_Prioritarios.Models
         public int CLAVE_PERSO { get; set; }
         public string IdsNomPerso { get; set; }
         public string IdsNomPersoOrigenAlerta { get; set; }
+        public int CantidadIdsRecibidosAgrupados { get; set; }
+        public Nullable<int> CantidadIdsUnificados { get; set; }
         public string NUM_FILIA { get; set; }
         public string NombreCompleto { get; set; }
+        public string NombresConId { get; set; }
         public string ALIAS { get; set; }
         public System.DateTime FEC_NAC { get; set; }
         public string SEXO { get; set; }

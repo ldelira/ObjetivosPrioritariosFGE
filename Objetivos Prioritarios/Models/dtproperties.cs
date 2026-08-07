@@ -12,11 +12,14 @@ namespace Objetivos_Prioritarios.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class Cat_Faltas
+    public partial class dtproperties
     {
-        public int IdFueroComun { get; set; }
-        public string FueroComun { get; set; }
-        public Nullable<int> IdTipoFuero { get; set; }
-        public string Municipio { get; set; }
+        public int id { get; set; }
+        public Nullable<int> objectid { get; set; }
+        public string property { get; set; }
+        public string value { get; set; }
+        public string uvalue { get; set; }
+        public byte[] lvalue { get; set; }
+        public int version { get; set; }
     }
 }

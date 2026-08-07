@@ -12,11 +12,14 @@ namespace Objetivos_Prioritarios.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class Huella
+    public partial class Del_x_in
     {
-        public int IdHuella { get; set; }
-        public Nullable<int> IdDetenido { get; set; }
-        public string Huellas { get; set; }
-        public string VECTOR_EMBEDDING { get; set; }
+        public System.DateTime FE_DELI { get; set; }
+        public string DEL_OBSE { get; set; }
+        public int CLAVE_PERSO { get; set; }
+        public int CLA_DELITO { get; set; }
+        public System.DateTime fec_captu { get; set; }
+        public int id { get; set; }
+        public System.Guid rowguid { get; set; }
     }
 }

@@ -5,6 +5,149 @@
     <!-- SSDL content -->
     <edmx:StorageModels>
     <Schema Namespace="FiliacionModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <!--Errores durante la generación:
+advertencia 6002: La tabla o vista 'Filiacion.dbo.Alias' no tiene definida ninguna clave principal. Se ha inferido la clave y la definición se creado como una vista o tabla de solo lectura.-->
+        <EntityType Name="Alias">
+          <Key>
+            <PropertyRef Name="ALIAS" />
+            <PropertyRef Name="FEC_ALI" />
+            <PropertyRef Name="CLAVE_PERSO" />
+            <PropertyRef Name="miconse" />
+            <PropertyRef Name="fec_captu" />
+            <PropertyRef Name="rowguid" />
+          </Key>
+          <Property Name="ALIAS" Type="nvarchar" MaxLength="30" Nullable="false" />
+          <Property Name="FEC_ALI" Type="datetime" Nullable="false" />
+          <Property Name="CLAVE_PERSO" Type="int" Nullable="false" />
+          <Property Name="miconse" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="fec_captu" Type="smalldatetime" Nullable="false" />
+          <Property Name="rowguid" Type="uniqueidentifier" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Del_x_in">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="FE_DELI" Type="datetime" Nullable="false" />
+          <Property Name="DEL_OBSE" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="CLAVE_PERSO" Type="int" Nullable="false" />
+          <Property Name="CLA_DELITO" Type="int" Nullable="false" />
+          <Property Name="fec_captu" Type="smalldatetime" Nullable="false" />
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="rowguid" Type="uniqueidentifier" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Domicilios">
+          <Key>
+            <PropertyRef Name="Clave_Perso" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Clave_Perso" Type="int" Nullable="false" />
+          <Property Name="Fecha_Aprox_Vivia" Type="datetime" Nullable="false" />
+          <Property Name="Fecha_Alta" Type="datetime" Nullable="false" />
+          <Property Name="Cla_Calle" Type="int" Nullable="false" />
+          <Property Name="Num_Casa" Type="nvarchar" MaxLength="16" Nullable="false" />
+          <Property Name="Actual" Type="int" Nullable="false" />
+          <Property Name="CoordX" Type="nvarchar" MaxLength="30" Nullable="false" />
+          <Property Name="CoordY" Type="nvarchar" MaxLength="30" Nullable="false" />
+          <Property Name="MapaLogin" Type="nvarchar" MaxLength="15" Nullable="false" />
+          <Property Name="MapaCve_Usuario" Type="int" Nullable="false" />
+          <Property Name="MapaFechaAct" Type="datetime" Nullable="false" />
+          <Property Name="MapaHoraAct" Type="nvarchar" MaxLength="5" Nullable="false" />
+          <Property Name="MapaLogin_Red" Type="nvarchar" MaxLength="15" Nullable="false" />
+          <Property Name="rowguid" Type="uniqueidentifier" Nullable="false" />
+        </EntityType>
+        <EntityType Name="dtproperties">
+          <Key>
+            <PropertyRef Name="id" />
+            <PropertyRef Name="property" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="objectid" Type="int" />
+          <Property Name="property" Type="varchar" MaxLength="64" Nullable="false" />
+          <Property Name="value" Type="varchar" MaxLength="255" />
+          <Property Name="uvalue" Type="nvarchar" MaxLength="255" />
+          <Property Name="lvalue" Type="image" />
+          <Property Name="version" Type="int" Nullable="false" />
+        </EntityType>
+        <!--Errores durante la generación:
+advertencia 6002: La tabla o vista 'Filiacion.dbo.Ingresos' no tiene definida ninguna clave principal. Se ha inferido la clave y la definición se creado como una vista o tabla de solo lectura.-->
+        <EntityType Name="Ingresos">
+          <Key>
+            <PropertyRef Name="FE_INGRE" />
+            <PropertyRef Name="HO_INGRE" />
+            <PropertyRef Name="PER_DETE" />
+            <PropertyRef Name="CONSIGNA" />
+            <PropertyRef Name="CONSIOBSE" />
+            <PropertyRef Name="LU_DETEN" />
+            <PropertyRef Name="FEC_DET" />
+            <PropertyRef Name="HORA_DET" />
+            <PropertyRef Name="MP" />
+            <PropertyRef Name="NUM_AVP" />
+            <PropertyRef Name="NUM_ORD" />
+            <PropertyRef Name="CLAVE_PERSO" />
+            <PropertyRef Name="CLA_MOTI" />
+            <PropertyRef Name="FEC_SASEP" />
+            <PropertyRef Name="HORA_SASEP" />
+            <PropertyRef Name="CLA_DISPO" />
+            <PropertyRef Name="CLA_AUTO" />
+            <PropertyRef Name="CLA_EDO" />
+            <PropertyRef Name="NUM_PERSO" />
+            <PropertyRef Name="SAL_LIBRE" />
+            <PropertyRef Name="SalCeldas" />
+            <PropertyRef Name="Id" />
+            <PropertyRef Name="Perso_Encontraba" />
+            <PropertyRef Name="Fec_Captu" />
+            <PropertyRef Name="AutorIntelectual" />
+            <PropertyRef Name="rowguid" />
+            <PropertyRef Name="CoordX" />
+            <PropertyRef Name="CoordY" />
+            <PropertyRef Name="MapaLogin" />
+            <PropertyRef Name="MapaCve_Usuario" />
+            <PropertyRef Name="MapaFechaAct" />
+            <PropertyRef Name="MapaHoraAct" />
+            <PropertyRef Name="MapaLogin_Red" />
+          </Key>
+          <Property Name="FE_INGRE" Type="datetime" Nullable="false" />
+          <Property Name="HO_INGRE" Type="nvarchar" MaxLength="5" Nullable="false" />
+          <Property Name="PER_DETE" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="CONSIGNA" Type="int" Nullable="false" />
+          <Property Name="LUCONSIGNA" Type="nvarchar" MaxLength="30" />
+          <Property Name="CONSIOBSE" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="LU_DETEN" Type="nvarchar" MaxLength="150" Nullable="false" />
+          <Property Name="FEC_DET" Type="datetime" Nullable="false" />
+          <Property Name="HORA_DET" Type="nvarchar" MaxLength="5" Nullable="false" />
+          <Property Name="MOT_DET" Type="nvarchar" MaxLength="50" />
+          <Property Name="MP" Type="nvarchar" MaxLength="62" Nullable="false" />
+          <Property Name="NUM_AVP" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="DETENIDO" Type="int" />
+          <Property Name="DISPOSIDE" Type="nvarchar" MaxLength="30" />
+          <Property Name="NUM_ORD" Type="nvarchar" MaxLength="12" Nullable="false" />
+          <Property Name="DETENPOR" Type="nvarchar" MaxLength="50" />
+          <Property Name="ENTIFED" Type="nvarchar" MaxLength="30" />
+          <Property Name="CLAVE_PERSO" Type="int" Nullable="false" />
+          <Property Name="CLA_MOTI" Type="int" Nullable="false" />
+          <Property Name="FEC_SASEP" Type="datetime" Nullable="false" />
+          <Property Name="HORA_SASEP" Type="nvarchar" MaxLength="5" Nullable="false" />
+          <Property Name="CLA_DISPO" Type="int" Nullable="false" />
+          <Property Name="CLA_AUTO" Type="int" Nullable="false" />
+          <Property Name="CLA_EDO" Type="nvarchar" MaxLength="3" Nullable="false" />
+          <Property Name="NUM_PERSO" Type="int" Nullable="false" />
+          <Property Name="SAL_LIBRE" Type="char" MaxLength="1" Nullable="false" />
+          <Property Name="SalCeldas" Type="int" Nullable="false" />
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Perso_Encontraba" Type="nvarchar" MaxLength="150" Nullable="false" />
+          <Property Name="Fec_Captu" Type="smalldatetime" Nullable="false" />
+          <Property Name="AutorIntelectual" Type="int" Nullable="false" />
+          <Property Name="rowguid" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="Cla_Edo_Anterior" Type="nvarchar" MaxLength="3" />
+          <Property Name="Cla_Edo_Nuevo" Type="nvarchar" MaxLength="3" />
+          <Property Name="CoordX" Type="nvarchar" MaxLength="30" Nullable="false" />
+          <Property Name="CoordY" Type="nvarchar" MaxLength="30" Nullable="false" />
+          <Property Name="MapaLogin" Type="nvarchar" MaxLength="15" Nullable="false" />
+          <Property Name="MapaCve_Usuario" Type="int" Nullable="false" />
+          <Property Name="MapaFechaAct" Type="datetime" Nullable="false" />
+          <Property Name="MapaHoraAct" Type="nvarchar" MaxLength="5" Nullable="false" />
+          <Property Name="MapaLogin_Red" Type="nvarchar" MaxLength="15" Nullable="false" />
+        </EntityType>
         <EntityType Name="Nom_perso">
           <Key>
             <PropertyRef Name="id" />
@@ -130,14 +273,82 @@
           <Parameter Name="ids_nom_perso" Type="nvarchar(max)" Mode="In" />
         </Function>
         <EntityContainer Name="FiliacionModelStoreContainer">
+          <EntitySet Name="Del_x_in" EntityType="Self.Del_x_in" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Domicilios" EntityType="Self.Domicilios" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="dtproperties" EntityType="Self.dtproperties" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Nom_perso" EntityType="Self.Nom_perso" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Persona" EntityType="Self.Persona" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Alias" EntityType="Self.Alias" store:Type="Tables" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [Alias].[ALIAS] AS [ALIAS], 
+    [Alias].[FEC_ALI] AS [FEC_ALI], 
+    [Alias].[CLAVE_PERSO] AS [CLAVE_PERSO], 
+    [Alias].[miconse] AS [miconse], 
+    [Alias].[fec_captu] AS [fec_captu], 
+    [Alias].[rowguid] AS [rowguid]
+    FROM [dbo].[Alias] AS [Alias]</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="Ingresos" EntityType="Self.Ingresos" store:Type="Tables" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [Ingresos].[FE_INGRE] AS [FE_INGRE], 
+    [Ingresos].[HO_INGRE] AS [HO_INGRE], 
+    [Ingresos].[PER_DETE] AS [PER_DETE], 
+    [Ingresos].[CONSIGNA] AS [CONSIGNA], 
+    [Ingresos].[LUCONSIGNA] AS [LUCONSIGNA], 
+    [Ingresos].[CONSIOBSE] AS [CONSIOBSE], 
+    [Ingresos].[LU_DETEN] AS [LU_DETEN], 
+    [Ingresos].[FEC_DET] AS [FEC_DET], 
+    [Ingresos].[HORA_DET] AS [HORA_DET], 
+    [Ingresos].[MOT_DET] AS [MOT_DET], 
+    [Ingresos].[MP] AS [MP], 
+    [Ingresos].[NUM_AVP] AS [NUM_AVP], 
+    [Ingresos].[DETENIDO] AS [DETENIDO], 
+    [Ingresos].[DISPOSIDE] AS [DISPOSIDE], 
+    [Ingresos].[NUM_ORD] AS [NUM_ORD], 
+    [Ingresos].[DETENPOR] AS [DETENPOR], 
+    [Ingresos].[ENTIFED] AS [ENTIFED], 
+    [Ingresos].[CLAVE_PERSO] AS [CLAVE_PERSO], 
+    [Ingresos].[CLA_MOTI] AS [CLA_MOTI], 
+    [Ingresos].[FEC_SASEP] AS [FEC_SASEP], 
+    [Ingresos].[HORA_SASEP] AS [HORA_SASEP], 
+    [Ingresos].[CLA_DISPO] AS [CLA_DISPO], 
+    [Ingresos].[CLA_AUTO] AS [CLA_AUTO], 
+    [Ingresos].[CLA_EDO] AS [CLA_EDO], 
+    [Ingresos].[NUM_PERSO] AS [NUM_PERSO], 
+    [Ingresos].[SAL_LIBRE] AS [SAL_LIBRE], 
+    [Ingresos].[SalCeldas] AS [SalCeldas], 
+    [Ingresos].[Id] AS [Id], 
+    [Ingresos].[Perso_Encontraba] AS [Perso_Encontraba], 
+    [Ingresos].[Fec_Captu] AS [Fec_Captu], 
+    [Ingresos].[AutorIntelectual] AS [AutorIntelectual], 
+    [Ingresos].[rowguid] AS [rowguid], 
+    [Ingresos].[Cla_Edo_Anterior] AS [Cla_Edo_Anterior], 
+    [Ingresos].[Cla_Edo_Nuevo] AS [Cla_Edo_Nuevo], 
+    [Ingresos].[CoordX] AS [CoordX], 
+    [Ingresos].[CoordY] AS [CoordY], 
+    [Ingresos].[MapaLogin] AS [MapaLogin], 
+    [Ingresos].[MapaCve_Usuario] AS [MapaCve_Usuario], 
+    [Ingresos].[MapaFechaAct] AS [MapaFechaAct], 
+    [Ingresos].[MapaHoraAct] AS [MapaHoraAct], 
+    [Ingresos].[MapaLogin_Red] AS [MapaLogin_Red]
+    FROM [dbo].[Ingresos] AS [Ingresos]</DefiningQuery>
+          </EntitySet>
         </EntityContainer>
       </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="FiliacionModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
         <EntityContainer Name="FiliacionEntities" annotation:LazyLoadingEnabled="true" >
+          <EntitySet Name="Nom_perso" EntityType="FiliacionModel.Nom_perso" />
+          <EntitySet Name="Persona" EntityType="FiliacionModel.Persona" />
+          <EntitySet Name="Del_x_in" EntityType="FiliacionModel.Del_x_in" />
+          <EntitySet Name="Domicilios" EntityType="FiliacionModel.Domicilios" />
+          <EntitySet Name="dtproperties" EntityType="FiliacionModel.dtproperties" />
+          <EntitySet Name="Alias" EntityType="FiliacionModel.Alias" />
+          <EntitySet Name="Ingresos" EntityType="FiliacionModel.Ingresos" />
+          <FunctionImport Name="SP_ObjPri_getFiliObjetivoClavePersona" ReturnType="Collection(FiliacionModel.SP_ObjPri_getFiliObjetivoClavePersona_Result)">
+            <Parameter Name="clave_persona" Mode="In" Type="Int32" />
+          </FunctionImport>
           <FunctionImport Name="SP_ObjPri_getFiliObjetivoInfo" ReturnType="Collection(FiliacionModel.SP_ObjPri_getFiliObjetivoInfo_Result)">
             <Parameter Name="movimiento" Mode="In" Type="Int32" />
             <Parameter Name="nombre" Mode="In" Type="String" />
@@ -146,11 +357,6 @@
             <Parameter Name="numavp" Mode="In" Type="String" />
             <Parameter Name="clave_persona" Mode="In" Type="Int32" />
           </FunctionImport>
-          <FunctionImport Name="SP_ObjPri_getFiliObjetivoClavePersona" ReturnType="Collection(FiliacionModel.SP_ObjPri_getFiliObjetivoClavePersona_Result)">
-          <Parameter Name="clave_persona" Mode="In" Type="Int32" />
-          </FunctionImport>
-          <EntitySet Name="Nom_perso" EntityType="FiliacionModel.Nom_perso" />
-          <EntitySet Name="Persona" EntityType="FiliacionModel.Persona" />
           <FunctionImport Name="SP_ObjPri_getListinfogeneral" ReturnType="Collection(FiliacionModel.SP_ObjPri_getListinfogeneral_Result)">
             <Parameter Name="nombre" Mode="In" Type="String" />
             <Parameter Name="paterno" Mode="In" Type="String" />
@@ -160,29 +366,6 @@
             <Parameter Name="ids_nom_perso" Mode="In" Type="String" />
           </FunctionImport>
         </EntityContainer>
-        <ComplexType Name="SP_ObjPri_getFiliObjetivoInfo_Result">
-          <Property Type="Int32" Name="CLAVE_PERSO" Nullable="false" />
-          <Property Type="String" Name="NUM_FILIA" Nullable="false" MaxLength="9" />
-          <Property Type="String" Name="NUM_FICH" Nullable="false" MaxLength="9" />
-          <Property Type="String" Name="NOMBRES_COMPLETOS" Nullable="true" />
-          <Property Type="String" Name="DELITOS" Nullable="true" />
-          <Property Type="String" Name="NUM_AVP" Nullable="true" />
-        </ComplexType>
-        <ComplexType Name="SP_ObjPri_getFiliObjetivoClavePersona_Result">
-          <Property Type="Int32" Name="CLAVE_PERSO" Nullable="false" />
-          <Property Type="DateTime" Name="FE_INGRE" Nullable="false" Precision="23" />
-          <Property Type="DateTime" Name="FEC_DET" Nullable="false" Precision="23" />
-          <Property Type="String" Name="HORA_DET" Nullable="false" MaxLength="5" />
-          <Property Type="String" Name="LU_DETEN" Nullable="false" MaxLength="150" />
-          <Property Type="String" Name="NUM_AVP" Nullable="false" MaxLength="50" />
-          <Property Type="DateTime" Name="Fec_Captu" Nullable="false" Precision="16" />
-          <Property Type="DateTime" Name="Ingreso_FecCaptu" Nullable="false" Precision="16" />
-          <Property Type="Int32" Name="IngresoId" Nullable="false" />
-          <Property Type="Int32" Name="CLA_DELITO" Nullable="true" />
-          <Property Type="String" Name="DELITO_DESCRIP" Nullable="true" MaxLength="100" />
-          <Property Type="DateTime" Name="Delito_FecCaptu" Nullable="true" Precision="23" />
-          <Property Type="Int32" Name="Dias_Diferencia" Nullable="true" />
-        </ComplexType>
         <EntityType Name="Nom_perso">
           <Key>
             <PropertyRef Name="id" />
@@ -288,6 +471,168 @@
           <Property Name="MapaHoraAct" Type="String" Nullable="false" MaxLength="5" FixedLength="false" Unicode="true" />
           <Property Name="MapaLogin_Red" Type="String" Nullable="false" MaxLength="15" FixedLength="false" Unicode="true" />
         </EntityType>
+        <EntityType Name="Del_x_in">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="FE_DELI" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="DEL_OBSE" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="CLAVE_PERSO" Type="Int32" Nullable="false" />
+          <Property Name="CLA_DELITO" Type="Int32" Nullable="false" />
+          <Property Name="fec_captu" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="rowguid" Type="Guid" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Domicilios">
+          <Key>
+            <PropertyRef Name="Clave_Perso" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Clave_Perso" Type="Int32" Nullable="false" />
+          <Property Name="Fecha_Aprox_Vivia" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="Fecha_Alta" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="Cla_Calle" Type="Int32" Nullable="false" />
+          <Property Name="Num_Casa" Type="String" Nullable="false" MaxLength="16" FixedLength="false" Unicode="true" />
+          <Property Name="Actual" Type="Int32" Nullable="false" />
+          <Property Name="CoordX" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="true" />
+          <Property Name="CoordY" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="true" />
+          <Property Name="MapaLogin" Type="String" Nullable="false" MaxLength="15" FixedLength="false" Unicode="true" />
+          <Property Name="MapaCve_Usuario" Type="Int32" Nullable="false" />
+          <Property Name="MapaFechaAct" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="MapaHoraAct" Type="String" Nullable="false" MaxLength="5" FixedLength="false" Unicode="true" />
+          <Property Name="MapaLogin_Red" Type="String" Nullable="false" MaxLength="15" FixedLength="false" Unicode="true" />
+          <Property Name="rowguid" Type="Guid" Nullable="false" />
+        </EntityType>
+        <EntityType Name="dtproperties">
+          <Key>
+            <PropertyRef Name="id" />
+            <PropertyRef Name="property" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="objectid" Type="Int32" />
+          <Property Name="property" Type="String" Nullable="false" MaxLength="64" FixedLength="false" Unicode="false" />
+          <Property Name="value" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="uvalue" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="lvalue" Type="Binary" MaxLength="Max" FixedLength="false" />
+          <Property Name="version" Type="Int32" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Alias">
+          <Key>
+            <PropertyRef Name="ALIAS1" />
+            <PropertyRef Name="FEC_ALI" />
+            <PropertyRef Name="CLAVE_PERSO" />
+            <PropertyRef Name="miconse" />
+            <PropertyRef Name="fec_captu" />
+            <PropertyRef Name="rowguid" />
+          </Key>
+          <Property Name="ALIAS1" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="true" />
+          <Property Name="FEC_ALI" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="CLAVE_PERSO" Type="Int32" Nullable="false" />
+          <Property Name="miconse" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="fec_captu" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="rowguid" Type="Guid" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Ingresos">
+          <Key>
+            <PropertyRef Name="FE_INGRE" />
+            <PropertyRef Name="HO_INGRE" />
+            <PropertyRef Name="PER_DETE" />
+            <PropertyRef Name="CONSIGNA" />
+            <PropertyRef Name="CONSIOBSE" />
+            <PropertyRef Name="LU_DETEN" />
+            <PropertyRef Name="FEC_DET" />
+            <PropertyRef Name="HORA_DET" />
+            <PropertyRef Name="MP" />
+            <PropertyRef Name="NUM_AVP" />
+            <PropertyRef Name="NUM_ORD" />
+            <PropertyRef Name="CLAVE_PERSO" />
+            <PropertyRef Name="CLA_MOTI" />
+            <PropertyRef Name="FEC_SASEP" />
+            <PropertyRef Name="HORA_SASEP" />
+            <PropertyRef Name="CLA_DISPO" />
+            <PropertyRef Name="CLA_AUTO" />
+            <PropertyRef Name="CLA_EDO" />
+            <PropertyRef Name="NUM_PERSO" />
+            <PropertyRef Name="SAL_LIBRE" />
+            <PropertyRef Name="SalCeldas" />
+            <PropertyRef Name="Id" />
+            <PropertyRef Name="Perso_Encontraba" />
+            <PropertyRef Name="Fec_Captu" />
+            <PropertyRef Name="AutorIntelectual" />
+            <PropertyRef Name="rowguid" />
+            <PropertyRef Name="CoordX" />
+            <PropertyRef Name="CoordY" />
+            <PropertyRef Name="MapaLogin" />
+            <PropertyRef Name="MapaCve_Usuario" />
+            <PropertyRef Name="MapaFechaAct" />
+            <PropertyRef Name="MapaHoraAct" />
+            <PropertyRef Name="MapaLogin_Red" />
+          </Key>
+          <Property Name="FE_INGRE" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="HO_INGRE" Type="String" Nullable="false" MaxLength="5" FixedLength="false" Unicode="true" />
+          <Property Name="PER_DETE" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="CONSIGNA" Type="Int32" Nullable="false" />
+          <Property Name="LUCONSIGNA" Type="String" MaxLength="30" FixedLength="false" Unicode="true" />
+          <Property Name="CONSIOBSE" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="LU_DETEN" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="true" />
+          <Property Name="FEC_DET" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="HORA_DET" Type="String" Nullable="false" MaxLength="5" FixedLength="false" Unicode="true" />
+          <Property Name="MOT_DET" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="MP" Type="String" Nullable="false" MaxLength="62" FixedLength="false" Unicode="true" />
+          <Property Name="NUM_AVP" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="DETENIDO" Type="Int32" />
+          <Property Name="DISPOSIDE" Type="String" MaxLength="30" FixedLength="false" Unicode="true" />
+          <Property Name="NUM_ORD" Type="String" Nullable="false" MaxLength="12" FixedLength="false" Unicode="true" />
+          <Property Name="DETENPOR" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="ENTIFED" Type="String" MaxLength="30" FixedLength="false" Unicode="true" />
+          <Property Name="CLAVE_PERSO" Type="Int32" Nullable="false" />
+          <Property Name="CLA_MOTI" Type="Int32" Nullable="false" />
+          <Property Name="FEC_SASEP" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="HORA_SASEP" Type="String" Nullable="false" MaxLength="5" FixedLength="false" Unicode="true" />
+          <Property Name="CLA_DISPO" Type="Int32" Nullable="false" />
+          <Property Name="CLA_AUTO" Type="Int32" Nullable="false" />
+          <Property Name="CLA_EDO" Type="String" Nullable="false" MaxLength="3" FixedLength="false" Unicode="true" />
+          <Property Name="NUM_PERSO" Type="Int32" Nullable="false" />
+          <Property Name="SAL_LIBRE" Type="String" Nullable="false" MaxLength="1" FixedLength="true" Unicode="false" />
+          <Property Name="SalCeldas" Type="Int32" Nullable="false" />
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Perso_Encontraba" Type="String" Nullable="false" MaxLength="150" FixedLength="false" Unicode="true" />
+          <Property Name="Fec_Captu" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="AutorIntelectual" Type="Int32" Nullable="false" />
+          <Property Name="rowguid" Type="Guid" Nullable="false" />
+          <Property Name="Cla_Edo_Anterior" Type="String" MaxLength="3" FixedLength="false" Unicode="true" />
+          <Property Name="Cla_Edo_Nuevo" Type="String" MaxLength="3" FixedLength="false" Unicode="true" />
+          <Property Name="CoordX" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="true" />
+          <Property Name="CoordY" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="true" />
+          <Property Name="MapaLogin" Type="String" Nullable="false" MaxLength="15" FixedLength="false" Unicode="true" />
+          <Property Name="MapaCve_Usuario" Type="Int32" Nullable="false" />
+          <Property Name="MapaFechaAct" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="MapaHoraAct" Type="String" Nullable="false" MaxLength="5" FixedLength="false" Unicode="true" />
+          <Property Name="MapaLogin_Red" Type="String" Nullable="false" MaxLength="15" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <ComplexType Name="SP_ObjPri_getFiliObjetivoClavePersona_Result">
+          <Property Type="Int32" Name="CLAVE_PERSO" Nullable="false" />
+          <Property Type="DateTime" Name="FE_INGRE" Nullable="false" Precision="23" />
+          <Property Type="DateTime" Name="FEC_DET" Nullable="false" Precision="23" />
+          <Property Type="String" Name="HORA_DET" Nullable="false" MaxLength="5" />
+          <Property Type="String" Name="LU_DETEN" Nullable="false" MaxLength="150" />
+          <Property Type="String" Name="NUM_AVP" Nullable="false" MaxLength="50" />
+          <Property Type="DateTime" Name="Fec_Captu" Nullable="false" Precision="16" />
+          <Property Type="DateTime" Name="Ingreso_FecCaptu" Nullable="false" Precision="16" />
+          <Property Type="Int32" Name="IngresoId" Nullable="false" />
+          <Property Type="Int32" Name="CLA_DELITO" Nullable="true" />
+          <Property Type="String" Name="DELITO_DESCRIP" Nullable="true" MaxLength="100" />
+          <Property Type="DateTime" Name="Delito_FecCaptu" Nullable="true" Precision="23" />
+          <Property Type="Int32" Name="Dias_Diferencia" Nullable="true" />
+        </ComplexType>
+        <ComplexType Name="SP_ObjPri_getFiliObjetivoInfo_Result">
+          <Property Type="Int32" Name="CLAVE_PERSO" Nullable="false" />
+          <Property Type="String" Name="NUM_FILIA" Nullable="false" MaxLength="9" />
+          <Property Type="String" Name="NUM_FICH" Nullable="false" MaxLength="9" />
+          <Property Type="String" Name="NOMBRES_COMPLETOS" Nullable="true" />
+          <Property Type="String" Name="DELITOS" Nullable="true" />
+          <Property Type="String" Name="NUM_AVP" Nullable="true" />
+        </ComplexType>
         <ComplexType Name="SP_ObjPri_getListinfogeneral_Result">
           <Property Type="Int32" Name="CLAVE_PERSO" Nullable="false" />
           <Property Type="Int32" Name="id" Nullable="true" />
@@ -317,8 +662,11 @@
           <Property Type="Int32" Name="CLAVE_PERSO" Nullable="false" />
           <Property Type="String" Name="IdsNomPerso" Nullable="false" />
           <Property Type="String" Name="IdsNomPersoOrigenAlerta" Nullable="false" />
+          <Property Type="Int32" Name="CantidadIdsRecibidosAgrupados" Nullable="false" />
+          <Property Type="Int32" Name="CantidadIdsUnificados" Nullable="true" />
           <Property Type="String" Name="NUM_FILIA" Nullable="false" MaxLength="9" />
           <Property Type="String" Name="NombreCompleto" Nullable="false" />
+          <Property Type="String" Name="NombresConId" Nullable="false" />
           <Property Type="String" Name="ALIAS" Nullable="false" />
           <Property Type="DateTime" Name="FEC_NAC" Nullable="false" Precision="23" />
           <Property Type="String" Name="SEXO" Nullable="false" MaxLength="15" />
@@ -331,37 +679,6 @@
     <edmx:Mappings>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
         <EntityContainerMapping StorageEntityContainer="FiliacionModelStoreContainer" CdmEntityContainer="FiliacionEntities" >
-          <FunctionImportMapping FunctionImportName="SP_ObjPri_getFiliObjetivoInfo" FunctionName="FiliacionModel.Store.SP_ObjPri_getFiliObjetivoInfo">
-            <ResultMapping>
-              <ComplexTypeMapping TypeName="FiliacionModel.SP_ObjPri_getFiliObjetivoInfo_Result">
-                <ScalarProperty Name="CLAVE_PERSO" ColumnName="CLAVE_PERSO" />
-                <ScalarProperty Name="NUM_FILIA" ColumnName="NUM_FILIA" />
-                <ScalarProperty Name="NUM_FICH" ColumnName="NUM_FICH" />
-                <ScalarProperty Name="NOMBRES_COMPLETOS" ColumnName="NOMBRES_COMPLETOS" />
-                <ScalarProperty Name="DELITOS" ColumnName="DELITOS" />
-                <ScalarProperty Name="NUM_AVP" ColumnName="NUM_AVP" />
-              </ComplexTypeMapping>
-            </ResultMapping>
-          </FunctionImportMapping>
-          <FunctionImportMapping FunctionImportName="SP_ObjPri_getFiliObjetivoClavePersona" FunctionName="FiliacionModel.Store.SP_ObjPri_getFiliObjetivoClavePersona">
-            <ResultMapping>
-              <ComplexTypeMapping TypeName="FiliacionModel.SP_ObjPri_getFiliObjetivoClavePersona_Result">
-                <ScalarProperty Name="CLAVE_PERSO" ColumnName="CLAVE_PERSO" />
-                <ScalarProperty Name="FE_INGRE" ColumnName="FE_INGRE" />
-                <ScalarProperty Name="FEC_DET" ColumnName="FEC_DET" />
-                <ScalarProperty Name="HORA_DET" ColumnName="HORA_DET" />
-                <ScalarProperty Name="LU_DETEN" ColumnName="LU_DETEN" />
-                <ScalarProperty Name="NUM_AVP" ColumnName="NUM_AVP" />
-                <ScalarProperty Name="Fec_Captu" ColumnName="Fec_Captu" />
-                <ScalarProperty Name="Ingreso_FecCaptu" ColumnName="Ingreso_FecCaptu" />
-                <ScalarProperty Name="IngresoId" ColumnName="IngresoId" />
-                <ScalarProperty Name="CLA_DELITO" ColumnName="CLA_DELITO" />
-                <ScalarProperty Name="DELITO_DESCRIP" ColumnName="DELITO_DESCRIP" />
-                <ScalarProperty Name="Delito_FecCaptu" ColumnName="Delito_FecCaptu" />
-                <ScalarProperty Name="Dias_Diferencia" ColumnName="Dias_Diferencia" />
-              </ComplexTypeMapping>
-            </ResultMapping>
-          </FunctionImportMapping>
           <EntitySetMapping Name="Nom_perso">
             <EntityTypeMapping TypeName="FiliacionModel.Nom_perso">
               <MappingFragment StoreEntitySet="Nom_perso">
@@ -469,6 +786,143 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <EntitySetMapping Name="Del_x_in">
+            <EntityTypeMapping TypeName="FiliacionModel.Del_x_in">
+              <MappingFragment StoreEntitySet="Del_x_in">
+                <ScalarProperty Name="rowguid" ColumnName="rowguid" />
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="fec_captu" ColumnName="fec_captu" />
+                <ScalarProperty Name="CLA_DELITO" ColumnName="CLA_DELITO" />
+                <ScalarProperty Name="CLAVE_PERSO" ColumnName="CLAVE_PERSO" />
+                <ScalarProperty Name="DEL_OBSE" ColumnName="DEL_OBSE" />
+                <ScalarProperty Name="FE_DELI" ColumnName="FE_DELI" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Domicilios">
+            <EntityTypeMapping TypeName="FiliacionModel.Domicilios">
+              <MappingFragment StoreEntitySet="Domicilios">
+                <ScalarProperty Name="rowguid" ColumnName="rowguid" />
+                <ScalarProperty Name="MapaLogin_Red" ColumnName="MapaLogin_Red" />
+                <ScalarProperty Name="MapaHoraAct" ColumnName="MapaHoraAct" />
+                <ScalarProperty Name="MapaFechaAct" ColumnName="MapaFechaAct" />
+                <ScalarProperty Name="MapaCve_Usuario" ColumnName="MapaCve_Usuario" />
+                <ScalarProperty Name="MapaLogin" ColumnName="MapaLogin" />
+                <ScalarProperty Name="CoordY" ColumnName="CoordY" />
+                <ScalarProperty Name="CoordX" ColumnName="CoordX" />
+                <ScalarProperty Name="Actual" ColumnName="Actual" />
+                <ScalarProperty Name="Num_Casa" ColumnName="Num_Casa" />
+                <ScalarProperty Name="Cla_Calle" ColumnName="Cla_Calle" />
+                <ScalarProperty Name="Fecha_Alta" ColumnName="Fecha_Alta" />
+                <ScalarProperty Name="Fecha_Aprox_Vivia" ColumnName="Fecha_Aprox_Vivia" />
+                <ScalarProperty Name="Clave_Perso" ColumnName="Clave_Perso" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="dtproperties">
+            <EntityTypeMapping TypeName="FiliacionModel.dtproperties">
+              <MappingFragment StoreEntitySet="dtproperties">
+                <ScalarProperty Name="version" ColumnName="version" />
+                <ScalarProperty Name="lvalue" ColumnName="lvalue" />
+                <ScalarProperty Name="uvalue" ColumnName="uvalue" />
+                <ScalarProperty Name="value" ColumnName="value" />
+                <ScalarProperty Name="property" ColumnName="property" />
+                <ScalarProperty Name="objectid" ColumnName="objectid" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Alias">
+            <EntityTypeMapping TypeName="FiliacionModel.Alias">
+              <MappingFragment StoreEntitySet="Alias">
+                <ScalarProperty Name="rowguid" ColumnName="rowguid" />
+                <ScalarProperty Name="fec_captu" ColumnName="fec_captu" />
+                <ScalarProperty Name="miconse" ColumnName="miconse" />
+                <ScalarProperty Name="CLAVE_PERSO" ColumnName="CLAVE_PERSO" />
+                <ScalarProperty Name="FEC_ALI" ColumnName="FEC_ALI" />
+                <ScalarProperty Name="ALIAS1" ColumnName="ALIAS" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Ingresos">
+            <EntityTypeMapping TypeName="FiliacionModel.Ingresos">
+              <MappingFragment StoreEntitySet="Ingresos">
+                <ScalarProperty Name="MapaLogin_Red" ColumnName="MapaLogin_Red" />
+                <ScalarProperty Name="MapaHoraAct" ColumnName="MapaHoraAct" />
+                <ScalarProperty Name="MapaFechaAct" ColumnName="MapaFechaAct" />
+                <ScalarProperty Name="MapaCve_Usuario" ColumnName="MapaCve_Usuario" />
+                <ScalarProperty Name="MapaLogin" ColumnName="MapaLogin" />
+                <ScalarProperty Name="CoordY" ColumnName="CoordY" />
+                <ScalarProperty Name="CoordX" ColumnName="CoordX" />
+                <ScalarProperty Name="Cla_Edo_Nuevo" ColumnName="Cla_Edo_Nuevo" />
+                <ScalarProperty Name="Cla_Edo_Anterior" ColumnName="Cla_Edo_Anterior" />
+                <ScalarProperty Name="rowguid" ColumnName="rowguid" />
+                <ScalarProperty Name="AutorIntelectual" ColumnName="AutorIntelectual" />
+                <ScalarProperty Name="Fec_Captu" ColumnName="Fec_Captu" />
+                <ScalarProperty Name="Perso_Encontraba" ColumnName="Perso_Encontraba" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="SalCeldas" ColumnName="SalCeldas" />
+                <ScalarProperty Name="SAL_LIBRE" ColumnName="SAL_LIBRE" />
+                <ScalarProperty Name="NUM_PERSO" ColumnName="NUM_PERSO" />
+                <ScalarProperty Name="CLA_EDO" ColumnName="CLA_EDO" />
+                <ScalarProperty Name="CLA_AUTO" ColumnName="CLA_AUTO" />
+                <ScalarProperty Name="CLA_DISPO" ColumnName="CLA_DISPO" />
+                <ScalarProperty Name="HORA_SASEP" ColumnName="HORA_SASEP" />
+                <ScalarProperty Name="FEC_SASEP" ColumnName="FEC_SASEP" />
+                <ScalarProperty Name="CLA_MOTI" ColumnName="CLA_MOTI" />
+                <ScalarProperty Name="CLAVE_PERSO" ColumnName="CLAVE_PERSO" />
+                <ScalarProperty Name="ENTIFED" ColumnName="ENTIFED" />
+                <ScalarProperty Name="DETENPOR" ColumnName="DETENPOR" />
+                <ScalarProperty Name="NUM_ORD" ColumnName="NUM_ORD" />
+                <ScalarProperty Name="DISPOSIDE" ColumnName="DISPOSIDE" />
+                <ScalarProperty Name="DETENIDO" ColumnName="DETENIDO" />
+                <ScalarProperty Name="NUM_AVP" ColumnName="NUM_AVP" />
+                <ScalarProperty Name="MP" ColumnName="MP" />
+                <ScalarProperty Name="MOT_DET" ColumnName="MOT_DET" />
+                <ScalarProperty Name="HORA_DET" ColumnName="HORA_DET" />
+                <ScalarProperty Name="FEC_DET" ColumnName="FEC_DET" />
+                <ScalarProperty Name="LU_DETEN" ColumnName="LU_DETEN" />
+                <ScalarProperty Name="CONSIOBSE" ColumnName="CONSIOBSE" />
+                <ScalarProperty Name="LUCONSIGNA" ColumnName="LUCONSIGNA" />
+                <ScalarProperty Name="CONSIGNA" ColumnName="CONSIGNA" />
+                <ScalarProperty Name="PER_DETE" ColumnName="PER_DETE" />
+                <ScalarProperty Name="HO_INGRE" ColumnName="HO_INGRE" />
+                <ScalarProperty Name="FE_INGRE" ColumnName="FE_INGRE" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="SP_ObjPri_getFiliObjetivoClavePersona" FunctionName="FiliacionModel.Store.SP_ObjPri_getFiliObjetivoClavePersona">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="FiliacionModel.SP_ObjPri_getFiliObjetivoClavePersona_Result">
+                <ScalarProperty Name="CLAVE_PERSO" ColumnName="CLAVE_PERSO" />
+                <ScalarProperty Name="FE_INGRE" ColumnName="FE_INGRE" />
+                <ScalarProperty Name="FEC_DET" ColumnName="FEC_DET" />
+                <ScalarProperty Name="HORA_DET" ColumnName="HORA_DET" />
+                <ScalarProperty Name="LU_DETEN" ColumnName="LU_DETEN" />
+                <ScalarProperty Name="NUM_AVP" ColumnName="NUM_AVP" />
+                <ScalarProperty Name="Fec_Captu" ColumnName="Fec_Captu" />
+                <ScalarProperty Name="Ingreso_FecCaptu" ColumnName="Ingreso_FecCaptu" />
+                <ScalarProperty Name="IngresoId" ColumnName="IngresoId" />
+                <ScalarProperty Name="CLA_DELITO" ColumnName="CLA_DELITO" />
+                <ScalarProperty Name="DELITO_DESCRIP" ColumnName="DELITO_DESCRIP" />
+                <ScalarProperty Name="Delito_FecCaptu" ColumnName="Delito_FecCaptu" />
+                <ScalarProperty Name="Dias_Diferencia" ColumnName="Dias_Diferencia" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="SP_ObjPri_getFiliObjetivoInfo" FunctionName="FiliacionModel.Store.SP_ObjPri_getFiliObjetivoInfo">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="FiliacionModel.SP_ObjPri_getFiliObjetivoInfo_Result">
+                <ScalarProperty Name="CLAVE_PERSO" ColumnName="CLAVE_PERSO" />
+                <ScalarProperty Name="NUM_FILIA" ColumnName="NUM_FILIA" />
+                <ScalarProperty Name="NUM_FICH" ColumnName="NUM_FICH" />
+                <ScalarProperty Name="NOMBRES_COMPLETOS" ColumnName="NOMBRES_COMPLETOS" />
+                <ScalarProperty Name="DELITOS" ColumnName="DELITOS" />
+                <ScalarProperty Name="NUM_AVP" ColumnName="NUM_AVP" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
           <FunctionImportMapping FunctionImportName="SP_ObjPri_getListinfogeneral" FunctionName="FiliacionModel.Store.SP_ObjPri_getListinfogeneral">
             <ResultMapping>
               <ComplexTypeMapping TypeName="FiliacionModel.SP_ObjPri_getListinfogeneral_Result">
@@ -504,8 +958,11 @@
                 <ScalarProperty Name="CLAVE_PERSO" ColumnName="CLAVE_PERSO" />
                 <ScalarProperty Name="IdsNomPerso" ColumnName="IdsNomPerso" />
                 <ScalarProperty Name="IdsNomPersoOrigenAlerta" ColumnName="IdsNomPersoOrigenAlerta" />
+                <ScalarProperty Name="CantidadIdsRecibidosAgrupados" ColumnName="CantidadIdsRecibidosAgrupados" />
+                <ScalarProperty Name="CantidadIdsUnificados" ColumnName="CantidadIdsUnificados" />
                 <ScalarProperty Name="NUM_FILIA" ColumnName="NUM_FILIA" />
                 <ScalarProperty Name="NombreCompleto" ColumnName="NombreCompleto" />
+                <ScalarProperty Name="NombresConId" ColumnName="NombresConId" />
                 <ScalarProperty Name="ALIAS" ColumnName="ALIAS" />
                 <ScalarProperty Name="FEC_NAC" ColumnName="FEC_NAC" />
                 <ScalarProperty Name="SEXO" ColumnName="SEXO" />

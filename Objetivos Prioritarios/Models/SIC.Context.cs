@@ -13,10 +13,10 @@ namespace Objetivos_Prioritarios.Models
     using System.Data.Entity;
     using System.Data.Entity.Infrastructure;
     
-    public partial class PortalDetenidosEntities : DbContext
+    public partial class SICEntities : DbContext
     {
-        public PortalDetenidosEntities()
-            : base("name=PortalDetenidosEntities")
+        public SICEntities()
+            : base("name=SICEntities")
         {
         }
     
@@ -25,11 +25,12 @@ namespace Objetivos_Prioritarios.Models
             throw new UnintentionalCodeFirstException();
         }
     
-        public virtual DbSet<Cat_Faltas> Cat_Faltas { get; set; }
+        public virtual DbSet<COINCIDENCIA> COINCIDENCIA { get; set; }
         public virtual DbSet<DETENCION> DETENCION { get; set; }
         public virtual DbSet<DETENIDO> DETENIDO { get; set; }
         public virtual DbSet<FOTO> FOTO { get; set; }
-        public virtual DbSet<Huella> Huella { get; set; }
-        public virtual DbSet<CAT_Municipio> CAT_Municipio { get; set; }
+        public virtual DbSet<Modulos> Modulos { get; set; }
+        public virtual DbSet<Usuario> Usuario { get; set; }
+        public virtual DbSet<Usuario_Modulos> Usuario_Modulos { get; set; }
     }
 }

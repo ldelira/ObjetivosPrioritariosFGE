@@ -1,4 +1,7 @@
-﻿using Objetivos_Prioritarios.Models;
+﻿using DocumentFormat.OpenXml.Wordprocessing;
+using Microsoft.Ajax.Utilities;
+using Objetivos_Prioritarios.Models;
+using Objetivos_Prioritarios.Utils;
 using Objetivos_Prioritarios.Models.Extends;
 using System;
 using System.Collections.Generic;
@@ -8,6 +11,7 @@ using System.Data.SqlClient;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Reflection;
 using System.Web.UI.WebControls;
 
 namespace Objetivos_Prioritarios.ControllersServices
@@ -774,11 +778,93 @@ namespace Objetivos_Prioritarios.ControllersServices
                     alerta.Estatus = 0;
                 }
 
+
+
+
                 db.SaveChanges();
+                bool bandera = !db.tb_Alerta .Any(x =>
+                                 x.idDetenidoC5 == idDetenido &&
+                                 x.IdTbFuente == idFuente &&
+                                 (x.Estatus == 1 || x.Estatus == 2));
+
+                if (bandera)
+                {
+                    ActualizarEstatusDetenido(2, idDetenido);
+                }
+
+
 
                 return alertas.Count;
             }
         }
+
+        public bool ActualizarEstatusDetenido( int origen, int idDetenido)
+        {
+
+            if (origen == 2)
+            {
+                using (var db = new SICEntities())
+                {
+                    var registro = db.DETENIDO
+                        .FirstOrDefault(x =>
+                            x.IDDETENIDO == idDetenido);
+
+                    if (registro == null)
+                    {
+                        return false;
+                    }
+
+                    registro.Situacion = "R";
+
+                    db.SaveChanges();
+
+                    return true;
+                }
+            }
+            else if (origen == 1)
+            {
+                using (var db = new SICEntities())
+                {
+                    var registro = db.DETENIDO
+                        .FirstOrDefault(x =>
+                            x.IDDETENIDO == idDetenido);
+
+                    if (registro == null)
+                    {
+                        return false;
+                    }
+
+                    registro.Situacion = "C";
+
+                    db.SaveChanges();
+
+                    return true;
+                }
+            }
+            else if (origen == 3)
+            {
+                using (var db = new SICEntities())
+                {
+                    var registro = db.DETENIDO
+                       .FirstOrDefault(x =>
+                           x.IDDETENIDO == idDetenido);
+
+                    if (registro == null)
+                    {
+                        return false;
+                    }
+
+                    registro.Situacion = "I";
+
+                    db.SaveChanges();
+
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         public int ApagarNotificacionDetenidos(int idDetenido, List<int> idsNomPerso)
         {
             if (idsNomPerso == null || idsNomPerso.Count == 0)
@@ -969,6 +1055,14 @@ namespace Objetivos_Prioritarios.ControllersServices
 
                 db.SaveChanges();
 
+                if (db.tb_Alerta.Any(x =>
+                                      x.idDetenidoC5 == idDetenido &&
+                                      x.IdTbFuente != 6 &&
+                                       (x.Estatus != 1 || x.Estatus != 2)))
+                {
+                    ActualizarEstatusDetenido(2, idDetenido);
+                }
+
                 return alertas.Count;
             }
         }
@@ -1025,12 +1119,7 @@ namespace Objetivos_Prioritarios.ControllersServices
             }
         }
 
-        public int ActualizarEstatusNotificacion(
-    int idDetenido,
-    int idOrigen,
-    int idFuente,
-    int nuevoEstatus)
-        {
+        public int ActualizarEstatusNotificacion( int idDetenido, int idOrigen, int idFuente, int nuevoEstatus) {
             if (nuevoEstatus != 0 &&
                 nuevoEstatus != 1 &&
                 nuevoEstatus != 2)
@@ -1054,7 +1143,39 @@ namespace Objetivos_Prioritarios.ControllersServices
 
                 db.SaveChanges();
 
-                return alertas.Count;
+                if(nuevoEstatus == 2)
+                {
+                    if (db.tb_Alerta.Any(x =>
+                                     x.idDetenidoC5 == idDetenido &&
+                                     x.IdTbFuente != 6 &&
+                                     x.Estatus == 2))
+                    {
+                        ActualizarEstatusDetenido(1, idDetenido);
+                    }
+                }
+                else if(nuevoEstatus == 1)
+                {
+                    if (db.tb_Alerta.Any(x =>
+                                     x.idDetenidoC5 == idDetenido &&
+                                     x.IdTbFuente != 6 &&
+                                     x.Estatus == 1 &&
+                                     x.Estatus != 2))
+                    {
+                        ActualizarEstatusDetenido(3, idDetenido);
+                    }
+                }else if(nuevoEstatus == 0)
+                {
+                    if (db.tb_Alerta.Any(x =>
+                                     x.idDetenidoC5 == idDetenido &&
+                                     x.IdTbFuente != 6 &&
+                                      (x.Estatus != 1 || x.Estatus != 2)))
+                    {
+                        ActualizarEstatusDetenido(2, idDetenido);
+                    }
+                }
+
+
+                    return alertas.Count;
             }
         }
 
@@ -1081,6 +1202,21 @@ namespace Objetivos_Prioritarios.ControllersServices
 
             using (var db = new Filiacion_MunicipiosEntities())
             {
+
+                if (nuevoEstatus == 2)
+                {
+                    var desactivar = db.tb_Alerta
+                        .Where(x =>
+                            x.idDetenidoC5 == idDetenido &&
+                            x.IdTbFuente == 6);
+
+                    foreach (var alerta in desactivar)
+                    {
+                        alerta.Estatus = 0;
+                    }
+
+                }
+
                 var alertas = db.tb_Alerta
                     .Where(x =>
                         x.idDetenidoC5 == idDetenido &&

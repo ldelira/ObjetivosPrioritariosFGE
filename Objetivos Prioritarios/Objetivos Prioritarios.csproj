@@ -293,6 +293,9 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Helpers\NetworkConnection.cs" />
+    <Compile Include="Models\Alias.cs">
+      <DependentUpon>Filiacion.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\A_Alba_alertas_alba.cs">
       <DependentUpon>FiscaliaWeb.tt</DependentUpon>
     </Compile>
@@ -336,12 +339,6 @@
     <Compile Include="Models\cat_EstatusProceso.cs">
       <DependentUpon>ObjetivosPrioritarios.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\Cat_Faltas.cs">
-      <DependentUpon>SIC.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Models\CAT_Municipio.cs">
-      <DependentUpon>SIC.tt</DependentUpon>
-    </Compile>
     <Compile Include="Models\cat_Nivel_Organizacion.cs">
       <DependentUpon>ObjetivosPrioritarios.tt</DependentUpon>
     </Compile>
@@ -369,17 +366,29 @@
     <Compile Include="Models\cat_ZonaCuerpo.cs">
       <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\COINCIDENCIA.cs">
+      <DependentUpon>SIC.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\Colonia.cs">
       <DependentUpon>Catalogos.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\delitos_mandamiento.cs">
       <DependentUpon>Mandamientos.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\Del_x_in.cs">
+      <DependentUpon>Filiacion.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\DETENCION.cs">
       <DependentUpon>SIC.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\DETENIDO.cs">
       <DependentUpon>SIC.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Domicilios.cs">
+      <DependentUpon>Filiacion.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\dtproperties.cs">
+      <DependentUpon>Filiacion.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Estado.cs">
       <DependentUpon>Catalogos.tt</DependentUpon>
@@ -470,8 +479,8 @@
     <Compile Include="Models\getNamePhotoList_Result.cs">
       <DependentUpon>ObjetivosPrioritarios.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\Huella.cs">
-      <DependentUpon>SIC.tt</DependentUpon>
+    <Compile Include="Models\Ingresos.cs">
+      <DependentUpon>Filiacion.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Mandamientos.Context.cs">
       <AutoGen>True</AutoGen>
@@ -490,6 +499,9 @@
     </Compile>
     <Compile Include="Models\mandamiento_judicial.cs">
       <DependentUpon>Mandamientos.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Modulos.cs">
+      <DependentUpon>SIC.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Municipio.cs">
       <DependentUpon>Catalogos.tt</DependentUpon>
@@ -518,20 +530,20 @@
     <Compile Include="Models\Persona.cs">
       <DependentUpon>Filiacion.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\SIC.Context1.cs">
+    <Compile Include="Models\SIC.Context.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>SIC.Context.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\SIC.Designer.cs">
-      <DependentUpon>SIC.edmx</DependentUpon>
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-    </Compile>
-    <Compile Include="Models\SIC1.cs">
+    <Compile Include="Models\SIC.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>SIC.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\SIC.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SIC.edmx</DependentUpon>
     </Compile>
     <Compile Include="Models\SIPJ.Context.cs">
       <AutoGen>True</AutoGen>
@@ -673,6 +685,12 @@
     </Compile>
     <Compile Include="Models\tb_Victimas.cs">
       <DependentUpon>ObjetivosPrioritarios.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Usuario.cs">
+      <DependentUpon>SIC.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Usuario_Modulos.cs">
+      <DependentUpon>SIC.tt</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utils\BasicOperationResponse.cs" />
@@ -2960,11 +2978,13 @@
     </Content>
     <Content Include="Models\SIC.Context.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>SIC.Context1.cs</LastGenOutput>
+      <DependentUpon>SIC.edmx</DependentUpon>
+      <LastGenOutput>SIC.Context.cs</LastGenOutput>
     </Content>
     <Content Include="Models\SIC.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>SIC1.cs</LastGenOutput>
+      <DependentUpon>SIC.edmx</DependentUpon>
+      <LastGenOutput>SIC.cs</LastGenOutput>
     </Content>
     <Content Include="Models\SIPJ.Context.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
@@ -3332,13 +3352,6 @@
     <Content Include="Plantillas\plantilla_base.pptx" />
     <Content Include="Salidas\informe_detenidos.pptx" />
     <Content Include="Plantillas\plantilla_base_vicefiscalia.pptx" />
-    <EntityDeploy Include="Models\SIC.edmx">
-      <Generator>EntityModelCodeGenerator</Generator>
-      <LastGenOutput>SIC.Designer.cs</LastGenOutput>
-    </EntityDeploy>
-    <Content Include="Models\SIC.edmx.diagram">
-      <DependentUpon>SIC.edmx</DependentUpon>
-    </Content>
     <EntityDeploy Include="Models\FiliacionMunicipal.edmx">
       <Generator>EntityModelCodeGenerator</Generator>
       <LastGenOutput>FiliacionMunicipal.Designer.cs</LastGenOutput>
@@ -3352,6 +3365,13 @@
     </EntityDeploy>
     <Content Include="Models\FiscaliaWeb.edmx.diagram">
       <DependentUpon>FiscaliaWeb.edmx</DependentUpon>
+    </Content>
+    <EntityDeploy Include="Models\SIC.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>SIC.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <Content Include="Models\SIC.edmx.diagram">
+      <DependentUpon>SIC.edmx</DependentUpon>
     </Content>
     <None Include="Scripts\jquery-3.4.1.intellisense.js" />
     <Content Include="Scripts\DataTables\autoFill.bootstrap.js" />

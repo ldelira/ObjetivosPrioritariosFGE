@@ -14,12 +14,6 @@ namespace Objetivos_Prioritarios.Models
     
     public partial class DETENIDO
     {
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public DETENIDO()
-        {
-            this.FOTO = new HashSet<FOTO>();
-        }
-    
         public int IDDETENIDO { get; set; }
         public Nullable<int> IDDETENCION { get; set; }
         public string NOMBRE { get; set; }
@@ -42,8 +36,10 @@ namespace Objetivos_Prioritarios.Models
         public string Folio { get; set; }
         public string Situacion { get; set; }
         public string Telefono { get; set; }
-    
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<FOTO> FOTO { get; set; }
+        public string Estatus { get; set; }
+        public Nullable<System.DateTime> FechaRegistro { get; set; }
+        public string UsuarioRegistro { get; set; }
+        public string RFC { get; set; }
+        public string CURP { get; set; }
     }
 }

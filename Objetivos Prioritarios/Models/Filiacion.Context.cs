@@ -29,6 +29,20 @@ namespace Objetivos_Prioritarios.Models
     
         public virtual DbSet<Nom_perso> Nom_perso { get; set; }
         public virtual DbSet<Persona> Persona { get; set; }
+        public virtual DbSet<Del_x_in> Del_x_in { get; set; }
+        public virtual DbSet<Domicilios> Domicilios { get; set; }
+        public virtual DbSet<dtproperties> dtproperties { get; set; }
+        public virtual DbSet<Alias> Alias { get; set; }
+        public virtual DbSet<Ingresos> Ingresos { get; set; }
+    
+        public virtual ObjectResult<SP_ObjPri_getFiliObjetivoClavePersona_Result> SP_ObjPri_getFiliObjetivoClavePersona(Nullable<int> clave_persona)
+        {
+            var clave_personaParameter = clave_persona.HasValue ?
+                new ObjectParameter("clave_persona", clave_persona) :
+                new ObjectParameter("clave_persona", typeof(int));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<SP_ObjPri_getFiliObjetivoClavePersona_Result>("SP_ObjPri_getFiliObjetivoClavePersona", clave_personaParameter);
+        }
     
         public virtual ObjectResult<SP_ObjPri_getFiliObjetivoInfo_Result> SP_ObjPri_getFiliObjetivoInfo(Nullable<int> movimiento, string nombre, string paterno, string materno, string numavp, Nullable<int> clave_persona)
         {
@@ -57,15 +71,6 @@ namespace Objetivos_Prioritarios.Models
                 new ObjectParameter("clave_persona", typeof(int));
     
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<SP_ObjPri_getFiliObjetivoInfo_Result>("SP_ObjPri_getFiliObjetivoInfo", movimientoParameter, nombreParameter, paternoParameter, maternoParameter, numavpParameter, clave_personaParameter);
-        }
-    
-        public virtual ObjectResult<SP_ObjPri_getFiliObjetivoClavePersona_Result> SP_ObjPri_getFiliObjetivoClavePersona(Nullable<int> clave_persona)
-        {
-            var clave_personaParameter = clave_persona.HasValue ?
-                new ObjectParameter("clave_persona", clave_persona) :
-                new ObjectParameter("clave_persona", typeof(int));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<SP_ObjPri_getFiliObjetivoClavePersona_Result>("SP_ObjPri_getFiliObjetivoClavePersona", clave_personaParameter);
         }
     
         public virtual ObjectResult<SP_ObjPri_getListinfogeneral_Result> SP_ObjPri_getListinfogeneral(string nombre, string paterno, string materno)

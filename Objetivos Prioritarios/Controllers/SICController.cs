@@ -3,6 +3,7 @@ using Objetivos_Prioritarios.Helpers;
 using Objetivos_Prioritarios.Models;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Linq;
 using System.Web.Mvc;
@@ -348,6 +349,27 @@ namespace Objetivos_Prioritarios.Controllers
         idsAlba
     );
 
+            capeas = capeas
+                .OrderByDescending(x =>
+                {
+                    var datosAlerta =
+                        ObtenerDatosAlerta(
+                            alertasTipo,
+                            new int[]
+                            {
+                    x.id_boletin_busqueda
+                            },
+                            new int[]
+                            {
+                    2, 7, 8
+                            }
+                        );
+
+                    // Item3 = porcentaje
+                    return datosAlerta.Item3;
+                })
+                .ToList();
+
             ViewBag.Capeas =
                 capeas;
 
@@ -362,20 +384,21 @@ namespace Objetivos_Prioritarios.Controllers
                ============================================================ */
 
             var alertasPersonaInteres = alertasTipo
-                .Where(x => x.Item2 == 3)
-                .GroupBy(x => x.Item1)
-                .Select(grupo => grupo
-                    .OrderByDescending(x => x.Item4)
-                    .ThenByDescending(x =>
-                        x.Item3 == 1
-                            ? 3
-                            : x.Item3 == 2
-                                ? 2
-                                : 1
-                    )
-                    .First()
-                )
-                .ToList();
+    .Where(x => x.Item2 == 3)
+    .GroupBy(x => x.Item1)
+    .Select(grupo => grupo
+        .OrderByDescending(x => x.Item4)
+        .ThenByDescending(x =>
+            x.Item3 == 1
+                ? 3
+                : x.Item3 == 2
+                    ? 2
+                    : 1
+        )
+        .First()
+    )
+    .OrderByDescending(x => x.Item4)
+    .ToList();
 
             ViewBag.AlertasPersonaInteres =
                 alertasPersonaInteres;
@@ -387,9 +410,9 @@ namespace Objetivos_Prioritarios.Controllers
                ============================================================ */
 
             var mandamientos =
-                _filiacionService.GetInfoMandamientos(
-                    idsMandamientos
-                );
+     _filiacionService.GetInfoMandamientos(
+         idsMandamientos
+     );
 
             AgregarDatosAlertaADataTable(
                 mandamientos,
@@ -397,6 +420,11 @@ namespace Objetivos_Prioritarios.Controllers
                 new int[] { 4 },
                 "IdOrigenAlerta"
             );
+
+            mandamientos =
+                OrdenarPorPorcentaje(
+                    mandamientos
+                );
 
             ViewBag.Mandamientos =
                 mandamientos;
@@ -408,9 +436,9 @@ namespace Objetivos_Prioritarios.Controllers
                ============================================================ */
 
             var detenidos =
-                _filiacionService.GetInfoDetenidos(
-                    idsDetenidos
-                );
+     _filiacionService.GetInfoDetenidos(
+         idsDetenidos
+     );
 
             AgregarFotoUrlADetenidos(
                 detenidos
@@ -423,6 +451,11 @@ namespace Objetivos_Prioritarios.Controllers
                 "IdsNomPersoOrigenAlerta"
             );
 
+            detenidos =
+                OrdenarPorPorcentaje(
+                    detenidos
+                );
+
             ViewBag.Detenidos =
                 detenidos;
 
@@ -433,9 +466,9 @@ namespace Objetivos_Prioritarios.Controllers
                ============================================================ */
 
             var objetivosPrioritarios =
-                _filiacionService.GetInfoObjetivosPrioritarios(
-                    idsNombreObjetivo
-                );
+     _filiacionService.GetInfoObjetivosPrioritarios(
+         idsNombreObjetivo
+     );
 
             AgregarDatosAlertaADataTable(
                 objetivosPrioritarios,
@@ -443,6 +476,11 @@ namespace Objetivos_Prioritarios.Controllers
                 new int[] { 5 },
                 "IdsNombreObjetivoOrigenAlerta"
             );
+
+            objetivosPrioritarios =
+                OrdenarPorPorcentaje(
+                    objetivosPrioritarios
+                );
 
             ViewBag.ObjetivosPrioritarios =
                 objetivosPrioritarios;
@@ -2249,6 +2287,48 @@ namespace Objetivos_Prioritarios.Controllers
             }
         }
 
+
+        private System.Data.DataTable OrdenarPorPorcentaje(
+    System.Data.DataTable tabla)
+        {
+            if (tabla == null ||
+                !tabla.Columns.Contains("PorcentajeCoincidencia") ||
+                tabla.Rows.Count == 0)
+            {
+                return tabla;
+            }
+
+            var filasOrdenadas = tabla
+                .AsEnumerable()
+                .OrderByDescending(row =>
+                {
+                    if (row["PorcentajeCoincidencia"] == DBNull.Value)
+                    {
+                        return 0;
+                    }
+
+                    int porcentaje = 0;
+
+                    int.TryParse(
+                        Convert.ToString(
+                            row["PorcentajeCoincidencia"]
+                        ),
+                        out porcentaje
+                    );
+
+                    return porcentaje;
+                })
+                .ToList();
+
+            var tablaOrdenada = tabla.Clone();
+
+            foreach (var fila in filasOrdenadas)
+            {
+                tablaOrdenada.ImportRow(fila);
+            }
+
+            return tablaOrdenada;
+        }
 
     }
 

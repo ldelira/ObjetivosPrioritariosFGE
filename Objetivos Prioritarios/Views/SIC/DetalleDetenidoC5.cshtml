@@ -161,15 +161,16 @@
                 filter: brightness(.98);
             }
 
-        .sic-hero {
-            background: linear-gradient(135deg, #102f55 0%, #1d63d3 100%);
-            border-radius: 18px;
-            padding: 22px;
-            color: #ffffff;
-            box-shadow: 0 12px 28px rgba(15, 35, 75, .16);
-            margin-bottom: 18px;
-            overflow: hidden;
-        }
+    .sic-hero {
+        background: linear-gradient(135deg, #102f55 0%, #1d63d3 100%);
+        border-radius: 18px;
+        padding: 22px;
+        padding-bottom: 10px;
+        color: #ffffff;
+        box-shadow: 0 12px 28px rgba(15, 35, 75, .16);
+        margin-bottom: 18px;
+        overflow: hidden;
+    }
 
         .sic-hero-content {
             display: grid;
@@ -327,7 +328,8 @@
 
         .sic-main-info-grid {
             display: grid;
-            grid-template-columns: repeat(2, minmax(130px, 1fr));
+            margin-top: 5px;
+            grid-template-columns: repeat(1, minmax(130px, 1fr));
             gap: 6px 12px;
             max-width: 520px;
         }
@@ -372,14 +374,20 @@
             word-break: break-word;
         }
 
-        .sic-hero-counters {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 30px;
-            width: 100%;
-            margin-left: auto;
-            align-self: start;
-        }
+    .sic-hero-counters {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        column-gap: 14px;
+        row-gap: 22px;
+        width: 500px;
+        max-width: none;
+        margin-left: 0;
+        margin-right: auto;
+        justify-self: start;
+        align-self: start;
+        box-sizing: border-box;
+        transform: translateX(-20px);
+    }
 
         .sic-hero-counter {
             min-height: 62px;
@@ -988,9 +996,12 @@
                 color: #334155;
                 font-size: 11px;
                 font-weight: 800;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
+                white-space: normal;
+                overflow: visible;
+                text-overflow: clip;
+                overflow-wrap: anywhere;
+                word-break: break-word;
+                line-height: 1.25;
             }
 
         .sic-gallery-grid::-webkit-scrollbar {
@@ -2021,17 +2032,33 @@
             }
         }
 
-        .sic-modal-det-sidebar-data {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
+    .sic-modal-det-sidebar-data {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+    }
+
+    .sic-modal-det-sidebar-item {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+        padding: 0 2px;
+    }
+
+        .sic-modal-det-sidebar-item .sic-info-label {
+            margin: 0;
+            padding: 0;
+            line-height: 1;
         }
 
-        .sic-modal-det-sidebar-item {
-            display: flex;
-            flex-direction: column;
-            gap: 3px;
-            padding: 0 2px;
+        .sic-modal-det-sidebar-item .sic-info-value {
+            margin: 1px 0 0;
+            padding: 0;
+            line-height: 1;
+        }
+
+        .sic-modal-det-sidebar-item + .sic-modal-det-sidebar-item {
+            margin-top: 10px;
         }
 
         /* ============================================================
@@ -2051,7 +2078,7 @@
         }
 
             .sic-modal-det-header h4 {
-                margin: 0 0 7px;
+                margin: 0 0 2px;
                 color: #16345f;
                 font-size: 19px;
                 font-weight: 800;
@@ -2163,7 +2190,7 @@
 
         .sic-modal-det-listas {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 3fr 2fr;
             gap: 13px;
         }
 
@@ -2470,16 +2497,26 @@
             line-height: 18px;
         }
 
+    .sic-photo-main-wrap {
+        width: 200px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
     .sic-estado-identidad-pildoras {
         display: inline-flex;
         align-items: center;
+        justify-content: center;
         flex: 0 0 auto;
         gap: 8px;
         width: auto;
         min-width: max-content;
-        margin: 0;
+        /* Antes tenías margin: 10px */
+        margin: -14px 0 0 0;
         padding: 0;
-        vertical-align: middle;
+        position: relative;
+        z-index: 5;
     }
     /* Píldora principal de identidad */
 
@@ -2712,7 +2749,7 @@
         display: block;
         width: 100%;
         max-width: none;
-        margin-top: 18px;
+        /*margin-top: 8px;*/
         padding: 0;
         /* Quitar barra y corte */
         overflow: visible;
@@ -2741,6 +2778,930 @@
             margin: 0 !important;
             white-space: nowrap !important;
             flex: 0 0 auto !important;
+        }
+
+    .sic-hero-counter {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        min-width: 0;
+        min-height: 64px;
+        padding: 10px 12px;
+        background: rgba(255, 255, 255, .12);
+        border: 1px solid rgba(255, 255, 255, .20);
+        border-radius: 13px;
+        box-sizing: border-box;
+        overflow: hidden;
+    }
+
+    .sic-hero-counter-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 38px;
+        width: 38px;
+        height: 38px;
+        border-radius: 11px;
+        background: rgba(255, 255, 255, .14);
+        border: 1px solid rgba(255, 255, 255, .20);
+        color: #ffffff;
+        font-size: 15px;
+    }
+
+    .sic-hero-counter-texto,
+    .sic-hero-counter > div:last-child {
+        min-width: 0;
+    }
+
+    .sic-hero-counter label {
+        display: block;
+        margin: 0 0 2px 0;
+        color: #ffffff;
+        font-size: 10px;
+        font-weight: 800;
+        line-height: 1.05;
+        text-transform: uppercase;
+        letter-spacing: .2px;
+    }
+
+    .sic-hero-counter strong {
+        display: block;
+        color: #ffffff;
+        font-size: 17px;
+        font-weight: 900;
+        line-height: 1;
+    }
+
+    .sic-hero-counter.alerta {
+        background: #fff1f2;
+        border-color: #fecdd3;
+    }
+
+        .sic-hero-counter.alerta label,
+        .sic-hero-counter.alerta strong {
+            color: #be123c;
+        }
+
+        .sic-hero-counter.alerta .sic-hero-counter-icon {
+            background: #ffe4e6;
+            border-color: #fecdd3;
+            color: #ef4444;
+        }
+
+    .sic-hero-counter.revisada {
+        background: #ecfdf5;
+        border-color: #a7f3d0;
+    }
+
+        .sic-hero-counter.revisada label,
+        .sic-hero-counter.revisada strong {
+            color: #047857;
+        }
+
+        .sic-hero-counter.revisada .sic-hero-counter-icon {
+            background: #d1fae5;
+            border-color: #a7f3d0;
+            color: #10b981;
+        }
+
+    .sic-hero-counter.confirmada {
+        background: #eff6ff;
+        border-color: #bfdbfe;
+    }
+
+        .sic-hero-counter.confirmada label,
+        .sic-hero-counter.confirmada strong {
+            color: #1e40af;
+        }
+
+        .sic-hero-counter.confirmada .sic-hero-counter-icon {
+            background: #dbeafe;
+            border-color: #93c5fd;
+            color: #2563eb;
+        }
+
+    .sic-counter-total {
+        background: #fff1f2;
+        border: 1px solid #fecdd3;
+    }
+
+        .sic-counter-total label,
+        .sic-counter-total strong {
+            color: #be123c;
+        }
+
+        .sic-counter-total .sic-hero-counter-icon {
+            background: #ffe4e6;
+            border: 1px solid #fda4af;
+            color: #e11d48;
+        }
+
+    .sic-counter-activas {
+        background: #fee2e2;
+        border: 1px solid #f87171;
+        box-shadow: 0 8px 18px rgba(185, 28, 28, .18);
+    }
+
+        .sic-counter-activas label,
+        .sic-counter-activas strong {
+            color: #b91c1c;
+        }
+
+        .sic-counter-activas .sic-hero-counter-icon {
+            background: #fecaca;
+            border: 1px solid #f87171;
+            color: #dc2626;
+        }
+
+    .sic-counter-activas {
+        background: #fee2e2;
+        border: 1px solid #f87171;
+        box-shadow: 0 8px 18px rgba(185, 28, 28, .18);
+    }
+
+        .sic-counter-activas label,
+        .sic-counter-activas strong {
+            color: #b91c1c;
+        }
+
+        .sic-counter-activas .sic-hero-counter-icon {
+            background: #fecaca;
+            border: 1px solid #f87171;
+            color: #dc2626;
+        }
+
+    .sic-counter-confirmadas {
+        background: #ecfdf5;
+        border: 1px solid #6ee7b7;
+    }
+
+        .sic-counter-confirmadas label,
+        .sic-counter-confirmadas strong {
+            color: #047857;
+        }
+
+        .sic-counter-confirmadas .sic-hero-counter-icon {
+            background: #d1fae5;
+            border: 1px solid #6ee7b7;
+            color: #059669;
+        }
+
+    .sic-counter-nombre {
+        background: #eff6ff;
+        border: 1px solid #93c5fd;
+    }
+
+        .sic-counter-nombre label,
+        .sic-counter-nombre strong {
+            color: #1d4ed8;
+        }
+
+        .sic-counter-nombre .sic-hero-counter-icon {
+            background: #dbeafe;
+            border: 1px solid #93c5fd;
+            color: #2563eb;
+        }
+
+    .sic-counter-foto {
+        background: #faf5ff;
+        border: 1px solid #d8b4fe;
+    }
+
+        .sic-counter-foto label,
+        .sic-counter-foto strong {
+            color: #7e22ce;
+        }
+
+        .sic-counter-foto .sic-hero-counter-icon {
+            background: #f3e8ff;
+            border: 1px solid #d8b4fe;
+            color: #9333ea;
+        }
+
+    .sic-counter-huella {
+        background: #eef2ff;
+        border: 1px solid #a5b4fc;
+    }
+
+        .sic-counter-huella label,
+        .sic-counter-huella strong {
+            color: #4338ca;
+        }
+
+        .sic-counter-huella .sic-hero-counter-icon {
+            background: #e0e7ff;
+            border: 1px solid #a5b4fc;
+            color: #4f46e5;
+        }
+
+    .sic-icono-huella svg {
+        width: 19px;
+        height: 19px;
+        fill: currentColor;
+    }
+
+    .sic-counter-fotos-municipio {
+        background: #ecfeff;
+        border: 1px solid #67e8f9;
+    }
+
+        .sic-counter-fotos-municipio label,
+        .sic-counter-fotos-municipio strong {
+            color: #0e7490;
+        }
+
+        .sic-counter-fotos-municipio .sic-hero-counter-icon {
+            background: #cffafe;
+            border: 1px solid #67e8f9;
+            color: #0891b2;
+        }
+
+    .sic-counter-huellas-municipio {
+        background: #fffbeb;
+        border: 1px solid #fcd34d;
+    }
+
+        .sic-counter-huellas-municipio label,
+        .sic-counter-huellas-municipio strong {
+            color: #b45309;
+        }
+
+        .sic-counter-huellas-municipio .sic-hero-counter-icon {
+            background: #fef3c7;
+            border: 1px solid #fcd34d;
+            color: #d97706;
+        }
+
+    /* ============================================================
+   FOTO PRINCIPAL EXPANDIBLE
+   ============================================================ */
+
+    .sic-foto-expandible {
+        cursor: zoom-in;
+        transition: transform .2s ease, filter .2s ease;
+    }
+
+        .sic-foto-expandible:hover {
+            transform: scale(1.025);
+            filter: brightness(1.04);
+        }
+
+        .sic-foto-expandible:focus {
+            outline: 3px solid rgba(255, 255, 255, .65);
+            outline-offset: -4px;
+        }
+
+
+    /* ============================================================
+   VISOR DE FOTO
+   ============================================================ */
+
+    .sic-visor-foto {
+        position: fixed;
+        inset: 0;
+        z-index: 99999;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 28px;
+        background: rgba(7, 18, 38, .88);
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+        box-sizing: border-box;
+    }
+
+        .sic-visor-foto.activo {
+            display: flex;
+        }
+
+    .sic-visor-foto-contenido {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        max-width: 95vw;
+        max-height: 94vh;
+    }
+
+    .sic-vista-foto-unica > img {
+        display: block;
+        max-width: 92vw;
+        max-height: 84vh;
+        width: auto;
+        height: auto;
+        object-fit: contain;
+        background: #ffffff;
+        border: 4px solid rgba(255, 255, 255, .88);
+        border-radius: 16px;
+        box-shadow: 0 24px 70px rgba(0, 0, 0, .55);
+    }
+
+    .sic-visor-foto-cerrar {
+        position: absolute;
+        top: -17px;
+        right: -17px;
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 42px;
+        height: 42px;
+        padding: 0;
+        background: #ffffff;
+        color: #102f55;
+        border: 1px solid #dbe3ef;
+        border-radius: 50%;
+        font-size: 18px;
+        cursor: pointer;
+        box-shadow: 0 8px 22px rgba(0, 0, 0, .32);
+    }
+
+        .sic-visor-foto-cerrar:hover {
+            background: #f1f5f9;
+            transform: scale(1.05);
+        }
+
+    .sic-visor-foto-texto {
+        margin-top: 12px;
+        padding: 7px 14px;
+        background: rgba(15, 23, 42, .75);
+        color: #ffffff;
+        border: 1px solid rgba(255, 255, 255, .18);
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+        text-align: center;
+    }
+
+    .sic-delito-principal {
+        display: flex;
+        align-items: flex-start;
+        gap: 7px;
+        font-weight: 900;
+        color: #111827;
+    }
+
+        .sic-delito-principal > i {
+            margin-top: 3px;
+            color: #c46308;
+            font-size: 11px;
+        }
+
+    .sic-delitos-collapse {
+        margin-top: 7px;
+    }
+
+        .sic-delitos-collapse summary {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 10px;
+            color: #0753ad;
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 800;
+            cursor: pointer;
+            list-style: none;
+            user-select: none;
+        }
+
+            .sic-delitos-collapse summary::-webkit-details-marker {
+                display: none;
+            }
+
+            .sic-delitos-collapse summary i {
+                font-size: 9px;
+                transition: transform .18s ease;
+            }
+
+        .sic-delitos-collapse[open] summary i {
+            transform: rotate(180deg);
+        }
+
+    .sic-delitos-collapse-list {
+        max-height: 145px;
+        overflow-y: auto;
+        margin-top: 8px;
+        padding: 7px 9px;
+        background: rgba(255, 255, 255, .65);
+        border: 1px solid #f2d19c;
+        border-radius: 9px;
+    }
+
+    .sic-delitos-collapse-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 7px;
+        padding: 6px 3px;
+        color: #374151;
+        font-size: 12px;
+        font-weight: 700;
+        border-bottom: 1px solid rgba(203, 139, 49, .16);
+    }
+
+        .sic-delitos-collapse-item:last-child {
+            border-bottom: 0;
+        }
+
+        .sic-delitos-collapse-item > i {
+            margin-top: 5px;
+            color: #d97706;
+            font-size: 5px;
+            flex-shrink: 0;
+        }
+
+        .sic-vista-foto-unica {
+    display: block;
+    text-align: center;
+}
+
+.sic-vista-comparacion {
+    display: none;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+    width: min(1180px, 94vw);
+    max-height: 88vh;
+}
+
+.sic-comparacion-panel {
+    min-width: 0;
+    padding: 12px;
+    background: rgba(255, 255, 255, .08);
+    border: 1px solid rgba(255, 255, 255, .18);
+    border-radius: 16px;
+    box-sizing: border-box;
+}
+
+.sic-comparacion-titulo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    min-height: 34px;
+    margin-bottom: 9px;
+    padding: 6px 10px;
+    background: rgba(15, 23, 42, .88);
+    color: #ffffff;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 900;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+.sic-comparacion-imagen-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 70vh;
+    max-height: 680px;
+    overflow: hidden;
+    background: #0f172a;
+    border-radius: 12px;
+}
+
+.sic-comparacion-imagen-wrap img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    border: 0;
+    border-radius: 12px;
+    background: transparent;
+    box-shadow: none;
+}
+
+@@media (max-width: 800px) {
+    .sic-vista-comparacion {
+        grid-template-columns: 1fr;
+        overflow-y: auto;
+        max-height: 88vh;
+    }
+
+    .sic-comparacion-imagen-wrap {
+        height: 55vh;
+    }
+}
+
+.sic-gallery-item-expandible {
+    cursor: zoom-in;
+    transition: transform .18s ease, box-shadow .18s ease;
+}
+
+.sic-gallery-item-expandible:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 9px 20px rgba(15, 35, 75, .15);
+}
+
+.sic-gallery-item-expandible:focus {
+    outline: 3px solid rgba(37, 99, 235, .35);
+    outline-offset: 2px;
+}
+
+.sic-gallery-image-wrap {
+    position: relative;
+    width: 100%;
+    height: 115px;
+    overflow: hidden;
+    background: #f1f5f9;
+}
+
+.sic-gallery-image-wrap .sic-gallery-foto {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.sic-gallery-image-error {
+    display: none;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    background: #f1f5f9;
+    color: #94a3b8;
+    font-size: 38px;
+}
+
+.sic-gallery-zoom {
+    position: absolute;
+    right: 7px;
+    bottom: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 29px;
+    height: 29px;
+    background: rgba(15, 47, 85, .86);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, .35);
+    border-radius: 50%;
+    font-size: 12px;
+    opacity: 0;
+    transform: scale(.85);
+    transition: opacity .18s ease, transform .18s ease;
+    pointer-events: none;
+}
+
+.sic-gallery-item-expandible:hover .sic-gallery-zoom {
+    opacity: 1;
+    transform: scale(1);
+}
+
+
+/* ============================================================
+   VISOR CARRUSEL DE GALERÍA
+   ============================================================ */
+
+.sic-galeria-visor {
+    position: fixed;
+    inset: 0;
+    z-index: 100001;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: rgba(7, 18, 38, .92);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    box-sizing: border-box;
+}
+
+.sic-galeria-visor.activo {
+    display: flex;
+}
+
+.sic-galeria-visor-contenido {
+    position: relative;
+    width: min(1050px, 94vw);
+    max-height: 94vh;
+    padding: 14px;
+    background: rgba(15, 23, 42, .96);
+    border: 1px solid rgba(255, 255, 255, .18);
+    border-radius: 18px;
+    box-shadow: 0 28px 80px rgba(0, 0, 0, .55);
+    box-sizing: border-box;
+}
+
+.sic-galeria-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-height: 38px;
+    margin-bottom: 10px;
+    padding: 0 45px 0 6px;
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+.sic-galeria-header > div {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.sic-galeria-header span {
+    padding: 5px 10px;
+    background: rgba(255, 255, 255, .12);
+    border: 1px solid rgba(255, 255, 255, .18);
+    border-radius: 999px;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.sic-galeria-cerrar {
+    position: absolute;
+    top: 8px;
+    right: 9px;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    background: #ffffff;
+    color: #102f55;
+    border: 0;
+    border-radius: 50%;
+    font-size: 17px;
+    cursor: pointer;
+    box-shadow: 0 7px 18px rgba(0, 0, 0, .32);
+}
+
+.sic-galeria-imagen-area {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: min(72vh, 680px);
+    overflow: hidden;
+    background: #020617;
+    border-radius: 14px;
+}
+
+.sic-galeria-imagen-area > img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.sic-galeria-error {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    color: #cbd5e1;
+    text-align: center;
+}
+
+.sic-galeria-error i {
+    font-size: 60px;
+    color: #64748b;
+}
+
+.sic-galeria-error span {
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.sic-galeria-navegacion {
+    position: absolute;
+    top: 50%;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 46px;
+    height: 58px;
+    padding: 0;
+    background: rgba(15, 47, 85, .86);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, .28);
+    border-radius: 12px;
+    font-size: 19px;
+    cursor: pointer;
+    transform: translateY(-50%);
+    transition: background .18s ease, transform .18s ease;
+}
+
+.sic-galeria-navegacion:hover {
+    background: rgba(29, 99, 211, .96);
+}
+
+.sic-galeria-anterior {
+    left: 14px;
+}
+
+.sic-galeria-siguiente {
+    right: 14px;
+}
+
+.sic-galeria-descripcion {
+    margin-top: 10px;
+    padding: 8px 14px;
+    background: rgba(255, 255, 255, .08);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, .14);
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 800;
+    text-align: center;
+}
+
+.sic-galeria-ayuda {
+    margin-top: 7px;
+    color: #94a3b8;
+    font-size: 10px;
+    font-weight: 700;
+    text-align: center;
+}
+
+@@media (max-width: 700px) {
+    .sic-galeria-visor {
+        padding: 10px;
+    }
+
+    .sic-galeria-visor-contenido {
+        width: 100%;
+        padding: 10px;
+    }
+
+    .sic-galeria-imagen-area {
+        height: 68vh;
+    }
+
+    .sic-galeria-navegacion {
+        width: 40px;
+        height: 50px;
+    }
+
+    .sic-galeria-anterior {
+        left: 7px;
+    }
+
+    .sic-galeria-siguiente {
+        right: 7px;
+    }
+
+    .sic-galeria-ayuda {
+        display: none;
+    }
+}
+
+    .sic-nombre-principal {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 9px;
+    }
+
+    .sic-nombre-texto {
+        min-width: 0;
+        flex: 1;
+        overflow-wrap: anywhere;
+    }
+
+    .sic-nombre-porcentaje {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        padding: 4px 8px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 900;
+        line-height: 1;
+        white-space: nowrap;
+    }
+
+        .sic-nombre-porcentaje.pendiente {
+            background: #fff7ed;
+            color: #c2410c;
+            border: 1px solid #fdba74;
+        }
+
+        .sic-nombre-porcentaje.confirmada {
+            background: #ecfdf5;
+            color: #047857;
+            border: 1px solid #6ee7b7;
+        }
+
+        .sic-nombre-porcentaje.descartada {
+            background: #f1f5f9;
+            color: #64748b;
+            border: 1px solid #cbd5e1;
+        }
+
+    .sic-nombre-principal-bloque {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .sic-nombre-principal {
+        margin: 0;
+        display: block;
+        width: 100%;
+    }
+
+    .sic-principal-coincidencia-wrap {
+        display: flex;
+        justify-content: flex-start;
+        width: 100%;
+    }
+
+    .sic-principal-coincidencia {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 7px 12px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 800;
+        line-height: 1.2;
+        white-space: nowrap;
+    }
+
+        .sic-principal-coincidencia.pendiente {
+            background: #eff6ff;
+            color: #1d4ed8;
+            border: 1px solid #93c5fd;
+        }
+
+        .sic-principal-coincidencia.confirmada {
+            background: #ecfdf5;
+            color: #047857;
+            border: 1px solid #6ee7b7;
+        }
+
+        .sic-principal-coincidencia.descartada {
+            background: #f8fafc;
+            color: #64748b;
+            border: 1px solid #cbd5e1;
+        }
+
+    .sic-modal-det-lista-item-vertical {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .sic-modal-det-lista-item-head {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        width: 100%;
+    }
+
+    .sic-modal-det-lista-item-pill {
+        width: 100%;
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .sic-nombre-porcentaje {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 5px 10px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 800;
+        line-height: 1.2;
+        white-space: nowrap;
+    }
+
+        .sic-nombre-porcentaje.pendiente {
+            background: #fff7ed;
+            color: #c2410c;
+            border: 1px solid #fdba74;
+        }
+
+        .sic-nombre-porcentaje.confirmada {
+            background: #ecfdf5;
+            color: #047857;
+            border: 1px solid #6ee7b7;
+        }
+
+        .sic-nombre-porcentaje.descartada {
+            background: #f8fafc;
+            color: #64748b;
+            border: 1px solid #cbd5e1;
         }
 
 </style>
@@ -2773,14 +3734,24 @@
 <div class="sic-ficha-page">
 
     <div class="sic-hero">
+
         <div class="sic-hero-content">
 
+            <!-- COLUMNA 1: FOTO -->
             <div class="sic-photo-main-wrap">
+
                 <div class="sic-photo-main sic-photo-placeholder-wrap">
+
                     @if (!string.IsNullOrWhiteSpace(fotoPrincipalUrl))
                     {
-                        <img src="@fotoPrincipalUrl"
-                             alt="Foto de frente detenido en Municipio"
+                        <img id="sicFotoPrincipalC5"
+                             src="@fotoPrincipalUrl"
+                             alt="Foto principal del detenido en municipio"
+                             class="sic-foto-expandible"
+                             role="button"
+                             tabindex="0"
+                             title="Presione para ampliar"
+                             onclick="abrirFotoExpandida(this.currentSrc || this.src, this.alt);"
                              onerror="mostrarFotoNoExiste(this);" />
                     }
                     else
@@ -2790,11 +3761,8 @@
                             <span>NO EXISTE FOTO EN ARCHIVO</span>
                         </div>
                     }
-                </div>
-            </div>
 
-            <div class="sic-hero-info">
-                <h2>@nombreCompleto</h2>
+                </div>
 
                 @{
                     int estadoIdentidadCodigo =
@@ -2832,11 +3800,34 @@
                             : "Sin confirmar";
                 }
 
+                <span id="contenedorPildorasIdentidad" class="sic-estado-identidad-pildoras">
+
+                    <span id="pillEstadoIdentidad"
+                          class="sic-pill sic-pill-estado-identidad @claseIdentidad"
+                          data-estado="@estadoIdentidadCodigo"
+                          title="@estadoIdentidadDetalle">
+
+                        <i id="iconoEstadoIdentidad" class="@iconoIdentidad"></i>
+
+                        <span id="textoEstadoIdentidad">
+                            @textoIdentidad
+                        </span>
+                    </span>
+
+                </span>
+
+            </div>
+
+            <div class="sic-hero-info">
+                <h2>@nombreCompleto</h2>
+
+
+
                 <div class="sic-hero-meta">
-                    <span class="sic-pill sic-pill-alerta">
+                    @*<span class="sic-pill sic-pill-alerta">
                         <i class="fa fa-exclamation-triangle"></i>
                         @totalAlertas Alerta(s) Totales
-                    </span>
+                    </span>*@
 
                     <span class="sic-pill">
                         <i class="fa fa-id-card"></i>
@@ -2848,21 +3839,7 @@
                         Folio: @folio
                     </span>
 
-                    <span id="contenedorPildorasIdentidad" class="sic-estado-identidad-pildoras">
 
-                        <span id="pillEstadoIdentidad"
-                              class="sic-pill sic-pill-estado-identidad @claseIdentidad"
-                              data-estado="@estadoIdentidadCodigo"
-                              title="@estadoIdentidadDetalle">
-
-                            <i id="iconoEstadoIdentidad" class="@iconoIdentidad"></i>
-
-                            <span id="textoEstadoIdentidad">
-                                @textoIdentidad
-                            </span>
-                        </span>
-
-                    </span>
                 </div>
 
                 <div class="sic-main-info-grid">
@@ -2878,121 +3855,189 @@
 
                     <div class="sic-main-info-item">
                         <div class="sic-main-info-icon">
-                            <i class="fa fa-user-secret"></i>
+                            <i class="fa fa-gavel"></i>
                         </div>
                         <div>
-                            <label>Alias</label>
-                            <strong>@alias</strong>
+                            <label>Falta administrativa</label>
+                            <strong>
+                                @(detencionC5 == null || string.IsNullOrWhiteSpace(Convert.ToString(detencionC5.CAUSA)) ? "SIN INFORMACIÓN"  : Convert.ToString(detencionC5.CAUSA).Trim())
+                            </strong>
                         </div>
                     </div>
 
                     <div class="sic-main-info-item">
                         <div class="sic-main-info-icon">
-                            <i class="fa fa-venus-mars"></i>
+                            <i class="fa fa-calendar"></i>
                         </div>
                         <div>
-                            <label>Sexo</label>
-                            <strong>@sexo</strong>
+                            <label>Fecha detención</label>
+                            <strong>
+                                @(detencionC5 == null || string.IsNullOrWhiteSpace(Convert.ToString(detencionC5.FECHA_DETENCION))  ? "SIN INFORMACIÓN"  : Convert.ToDateTime(detencionC5.FECHA_DETENCION)  .ToString("dd/MM/yyyy hh:mm:ss tt"))
+                            </strong>
                         </div>
                     </div>
 
-                    <div class="sic-main-info-item">
-                        <div class="sic-main-info-icon">
-                            <i class="fa fa-birthday-cake"></i>
-                        </div>
-                        <div>
-                            <label>Edad</label>
-                            <strong>@edad</strong>
-                        </div>
-                    </div>
+                    @*<div class="sic-main-info-item">
+            <div class="sic-main-info-icon">
+                <i class="fa fa-user-secret"></i>
+            </div>
+            <div>
+                <label>Alias</label>
+                <strong>@alias</strong>
+            </div>
+        </div>
 
-                    <div class="sic-main-info-item">
-                        <div class="sic-main-info-icon">
-                            <i class="fa fa-picture-o"></i>
-                        </div>
-                        <div>
-                            <label>Fotos en Municipio</label>
-                            <strong>@totalFotos</strong>
-                        </div>
-                    </div>
+        <div class="sic-main-info-item">
+            <div class="sic-main-info-icon">
+                <i class="fa fa-venus-mars"></i>
+            </div>
+            <div>
+                <label>Sexo</label>
+                <strong>@sexo</strong>
+            </div>
+        </div>
 
-                    <div class="sic-main-info-item">
-                        <div class="sic-main-info-icon">
-                            <i class="fa fa-hand-paper-o"></i>
-                        </div>
-                        <div>
-                            <label>Huellas</label>
-                            <strong>@totalHuellas</strong>
-                        </div>
-                    </div>
+        <div class="sic-main-info-item">
+            <div class="sic-main-info-icon">
+                <i class="fa fa-birthday-cake"></i>
+            </div>
+            <div>
+                <label>Edad</label>
+                <strong>@edad</strong>
+            </div>
+        </div>*@
+
+                    @*<div class="sic-main-info-item">
+            <div class="sic-main-info-icon">
+                <i class="fa fa-picture-o"></i>
+            </div>
+            <div>
+                <label>Fotos en Municipio</label>
+                <strong>@totalFotos</strong>
+            </div>
+        </div>
+
+        <div class="sic-main-info-item">
+            <div class="sic-main-info-icon">
+                <i class="fa fa-hand-paper-o"></i>
+            </div>
+            <div>
+                <label>Huellas</label>
+                <strong>@totalHuellas</strong>
+            </div>
+        </div>*@
                 </div>
             </div>
 
             <div class="sic-hero-counters">
-                <div class="sic-hero-counter alerta">
+
+                <div class="sic-hero-counter sic-counter-total">
+                    <div class="sic-hero-counter-icon">
+                        <i class="fa fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="sic-hero-counter-texto">
+                        <label>Coincidencia(s) totale(s)</label>
+                        <strong>@totalAlertas</strong>
+                    </div>
+                </div>
+
+                <div class="sic-hero-counter sic-counter-activas">
                     <div class="sic-hero-counter-icon">
                         <i class="fa fa-bell"></i>
                     </div>
-                    <div>
-                        <label>Alertas activas</label>
-                        <strong id="contadorAlertasActivas">@totalAlertasActivas</strong>
+                    <div class="sic-hero-counter-texto">
+                        <label>Coincidencia(s) activa(s)</label>
+                        <strong id="contadorAlertasActivas">
+                            @totalAlertasActivas
+                        </strong>
                     </div>
                 </div>
 
-                <div class="sic-hero-counter revisada">
+                <div class="sic-hero-counter sic-counter-descartadas">
+                    <div class="sic-hero-counter-icon">
+                        <i class="fa fa-ban"></i>
+                    </div>
+                    <div class="sic-hero-counter-texto">
+                        <label>Coincidencia(s) descartada(s)</label>
+                        <strong id="contadorAlertasDescartadas">
+                            @totalAlertasRevisadas
+                        </strong>
+                    </div>
+                </div>
+
+                <div class="sic-hero-counter sic-counter-confirmadas">
                     <div class="sic-hero-counter-icon">
                         <i class="fa fa-check-circle"></i>
                     </div>
-                    <div>
-                        <label>Alertas revisadas</label>
-                        <strong id="contadorAlertasRevisadas">@totalAlertasRevisadas</strong>
-                    </div>
-                </div>
-
-                <div class="sic-confirmadas-counter">
-
-                    <div class="sic-confirmadas-counter-icon">
-                        <i class="fa fa-check-circle"></i>
-                    </div>
-
-                    <div>
+                    <div class="sic-hero-counter-texto">
                         <label>Coincidencias confirmadas</label>
                         <strong id="contadorCoincidenciasConfirmadas">
                             @totalCoincidenciasConfirmadas
                         </strong>
                     </div>
-
                 </div>
 
-                <div class="sic-hero-counter">
+                <div class="sic-hero-counter sic-counter-nombre">
                     <div class="sic-hero-counter-icon">
                         <i class="fa fa-user"></i>
                     </div>
-                    <div>
+                    <div class="sic-hero-counter-texto">
                         <label>Coincidencia nombre</label>
                         <strong>@ViewBag.TotalCoincidenciaNombre</strong>
                     </div>
                 </div>
 
-                <div class="sic-hero-counter">
+                <div class="sic-hero-counter sic-counter-foto">
                     <div class="sic-hero-counter-icon">
                         <i class="fa fa-picture-o"></i>
                     </div>
-                    <div>
+                    <div class="sic-hero-counter-texto">
                         <label>Coincidencia foto</label>
                         <strong>@ViewBag.TotalCoincidenciaFoto</strong>
                     </div>
                 </div>
 
-                <div class="sic-hero-counter">
-                    <div class="sic-hero-counter-icon">
-                        <i class="fa fa-hand-paper-o"></i>
+                <div class="sic-hero-counter sic-counter-huella">
+                    <div class="sic-hero-counter-icon sic-icono-huella">
+                        <svg viewBox="0 0 24 24"
+                             aria-hidden="true"
+                             focusable="false">
+
+                            <path d="M12 2a8 8 0 0 0-8 8c0 1.46.3 2.7.68 3.82.2.58.83.89 1.41.69.58-.2.89-.83.69-1.41A9.65 9.65 0 0 1 6 10a6 6 0 0 1 12 0c0 3.56-1.05 6.54-2.7 9.22a1 1 0 0 0 1.7 1.06C18.84 17.3 20 13.93 20 10a8 8 0 0 0-8-8Z"></path>
+
+                            <path d="M12 6a4 4 0 0 0-4 4c0 2.92-.69 5.32-1.86 7.48a1 1 0 1 0 1.76.96C9.22 16 10 13.24 10 10a2 2 0 0 1 4 0c0 4.5-1.22 8.15-3.36 11.32a1 1 0 1 0 1.66 1.12C14.66 18.95 16 14.9 16 10a4 4 0 0 0-4-4Z"></path>
+
+                            <path d="M12 9a1 1 0 0 0-1 1c0 3.47-.84 6.28-2.34 8.7a1 1 0 1 0 1.7 1.06C12.06 17.03 13 13.83 13 10a1 1 0 0 0-1-1Z"></path>
+
+                        </svg>
                     </div>
-                    <div>
+
+                    <div class="sic-hero-counter-texto">
                         <label>Coincidencia huella</label>
                         <strong>@ViewBag.TotalCoincidenciaHuella</strong>
                     </div>
                 </div>
+
+                <div class="sic-hero-counter sic-counter-fotos-municipio">
+                    <div class="sic-hero-counter-icon">
+                        <i class="fa fa-picture-o"></i>
+                    </div>
+                    <div class="sic-hero-counter-texto">
+                        <label>Fotos en municipio</label>
+                        <strong>@totalFotos</strong>
+                    </div>
+                </div>
+
+                <div class="sic-hero-counter sic-counter-huellas-municipio">
+                    <div class="sic-hero-counter-icon">
+                        <i class="fa fa-hand-paper-o"></i>
+                    </div>
+                    <div class="sic-hero-counter-texto">
+                        <label>Huellas en municipio</label>
+                        <strong>@totalHuellas</strong>
+                    </div>
+                </div>
+
             </div>
 
         </div>
@@ -3147,7 +4192,7 @@
                                                     <div>
                                                         <h5>@nombreCapea</h5>
 
-                                                        @Html.Partial( "CoincidenciasAlerta", coincidenciasAlertaCapea )
+                                                        @Html.Partial("CoincidenciasAlerta", coincidenciasAlertaCapea)
                                                     </div>
                                                     @if (idOrigenCapea > 0 && idFuenteAlertaCapea > 0)
                                                     {
@@ -3366,7 +4411,7 @@
                                             <div>
                                                 <h5>@ViewBag.Texto(row["Nombre"])</h5>
 
-                                                @Html.Partial( "CoincidenciasAlerta", coincidenciasAlertaMandamiento )
+                                                @Html.Partial("CoincidenciasAlerta", coincidenciasAlertaMandamiento)
 
                                             </div>
 
@@ -3526,7 +4571,7 @@
                                 }
 
                                 var idsOrigenObjetivoCoincidencias =
-            new System.Collections.Generic.List<int>();
+new System.Collections.Generic.List<int>();
 
                                 if (row.Table.Columns.Contains("IdsNombreObjetivoOrigenAlerta") &&
                                     row["IdsNombreObjetivoOrigenAlerta"] != DBNull.Value)
@@ -3855,7 +4900,7 @@ StringComparer.OrdinalIgnoreCase
                                                     <strong>@ViewBag.Texto(idObjetivo)</strong>
                                                 </div>
 
-                                                @Html.Partial( "CoincidenciasAlerta", coincidenciasAlertaObjetivo )
+                                                @Html.Partial("CoincidenciasAlerta", coincidenciasAlertaObjetivo)
                                             </div>
 
                                             @if (idOrigenObjetivo > 0)
@@ -4079,7 +5124,7 @@ StringComparer.OrdinalIgnoreCase
                                         detenidos.Rows[i];
 
                                     var idsOrigenDetenidoCoincidencias =
-                new System.Collections.Generic.List<int>();
+new System.Collections.Generic.List<int>();
 
                                     if (row.Table.Columns.Contains("IdsNomPersoOrigenAlerta") &&
                                         row["IdsNomPersoOrigenAlerta"] != DBNull.Value)
@@ -4128,6 +5173,39 @@ StringComparer.OrdinalIgnoreCase
                                             new System.Collections.ArrayList();
                                     }
 
+                                    var coincidenciasNombrePorId =
+                new System.Collections.Generic.Dictionary<
+                int,
+                object[]
+                >();
+
+                                    foreach (int idNombre in idsOrigenDetenidoCoincidencias)
+                                    {
+                                        System.Collections.ArrayList coincidenciaIndividual =
+                                            ViewBag.ObtenerCoincidenciasAlerta(
+                                                new int[] { idNombre },
+                                                new int[] { 6 }
+                                            ) as System.Collections.ArrayList;
+
+                                        if (coincidenciaIndividual == null ||
+                                            coincidenciaIndividual.Count == 0)
+                                        {
+                                            continue;
+                                        }
+
+                                        object[] datosCoincidencia =
+                                            coincidenciaIndividual[0] as object[];
+
+                                        if (datosCoincidencia == null ||
+                                            datosCoincidencia.Length < 5)
+                                        {
+                                            continue;
+                                        }
+
+                                        coincidenciasNombrePorId[idNombre] =
+                                            datosCoincidencia;
+                                    }
+
 
                                     <div class="sic-rel-slide sic-detenido-slide @(i == 0 ? "active" : "")"
                                          data-index="@i">
@@ -4152,6 +5230,10 @@ StringComparer.OrdinalIgnoreCase
                                                                 {
                                                                     "CoincidenciasAlerta",
                                                                     coincidenciasAlertaDetenido
+                                                                },
+                                                                {
+                                                                     "CoincidenciasNombrePorId",
+                                                                     coincidenciasNombrePorId
                                                                 }
                                                         }
                                         )
@@ -4299,6 +5381,94 @@ StringComparer.OrdinalIgnoreCase
 
                     <div class="sic-globo-interes-label">
                         DE INTERÉS
+                    </div>
+
+                </div>
+
+
+                <div id="sicVisorFoto"
+                     class="sic-visor-foto"
+                     aria-hidden="true"
+                     onclick="cerrarFotoExpandidaAlFondo(event);">
+
+                    <div id="sicVisorFotoContenido"
+                         class="sic-visor-foto-contenido"
+                         onclick="event.stopPropagation();">
+
+                        <button type="button"
+                                class="sic-visor-foto-cerrar"
+                                onclick="cerrarFotoExpandida();"
+                                title="Cerrar imagen"
+                                aria-label="Cerrar imagen">
+
+                            <i class="fa fa-times"></i>
+
+                        </button>
+
+                        <!-- UNA                onclick="cerrarFotoExpandida();"
+                title="Cerrar imagen"
+                aria-label="Cerrar imagen">
+
+            <i class="fa fa-times"></i>
+
+        </button>
+
+        <!-- UNA SOLA FOTOGRAFÍA -->
+                        <div id="sicVistaFotoUnica"
+                             class="sic-vista-foto-unica">
+
+                            <img id="sicFotoExpandida"
+                                 src=""
+                                 alt="Fotografía ampliada" />
+
+                            <div id="sicFotoExpandidaTexto"
+                                 class="sic-visor-foto-texto">
+                            </div>
+
+                        </div>
+
+                        <!-- COMPARACIÓN DE FOTOGRAFÍAS -->
+                        <div id="sicVistaComparacion"
+                             class="sic-vista-comparacion">
+
+                            <div class="sic-comparacion-panel">
+
+                                <div class="sic-comparacion-titulo">
+                                    <i class="fa fa-camera"></i>
+                                    Fotografía del detenido en municipio
+                                </div>
+
+                                <div class="sic-comparacion-imagen-wrap">
+
+                                    <img id="sicFotoComparacionPrincipal"
+                                         src=""
+                                         alt="Fotografía del detenido en municipio"
+                                         onerror="this.style.display='none';" />
+
+                                </div>
+
+                            </div>
+
+                            <div class="sic-comparacion-panel">
+
+                                <div class="sic-comparacion-titulo">
+                                    <i class="fa fa-id-card"></i>
+                                    Registro de detenidos FGEA
+                                </div>
+
+                                <div class="sic-comparacion-imagen-wrap">
+
+                                    <img id="sicFotoComparacionDetenido"
+                                         src=""
+                                         alt="Fotografía del registro de detenidos FGEA"
+                                         onerror="this.style.display='none';" />
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
                     </div>
 
                 </div>
@@ -4521,7 +5691,14 @@ StringComparer.OrdinalIgnoreCase
             return;
         }
 
-        if (!confirm('¿Seguro que deseas descartar esta coincidencia?')) {
+        var continuar = await confirmarAccionSIC(
+            'Descartar coincidencia',
+            'La coincidencia será marcada como descartada. ¿Deseas continuar?',
+            'Sí, descartar',
+            'warning'
+        );
+
+        if (!continuar) {
             return;
         }
 
@@ -4555,10 +5732,12 @@ StringComparer.OrdinalIgnoreCase
                     idDetenido
                 );
 
-                alert(
-                    response.message ||
-                    'Coincidencia descartada correctamente.'
-                );
+                //mostrarMensajeSIC(
+                //    'Coincidencia descartada',
+                //    response.message ||
+                //    'Coincidencia descartada correctamente.',
+                //    'success'
+                //);
             },
             error: function (xhr) {
                 console.log(xhr.responseText);
@@ -4566,7 +5745,11 @@ StringComparer.OrdinalIgnoreCase
                 boton.prop('disabled', false)
                      .html('<i class="fa fa-times"></i> Descartar');
 
-                alert('Error del servidor al descartar la coincidencia.');
+                mostrarMensajeSIC(
+                    'Error',
+                    'Error del servidor al descartar la coincidencia.',
+                    'error'
+                );
             }
         });
     });
@@ -4582,18 +5765,40 @@ StringComparer.OrdinalIgnoreCase
         var idFuente = boton.data('id-fuente');
 
         if (isNaN(estatusAnterior)) {
-            alert('No se pudo determinar el estado anterior de la coincidencia.');
+
+            mostrarMensajeSIC(
+                'Estado no disponible',
+                'No se pudo determinar el estado anterior de la coincidencia.',
+                'warning'
+            );
+
             return;
         }
 
         if (!idDetenido || !idOrigen || !idFuente) {
-            alert('Faltan datos para Cancelar Confirmación de la coincidencia.');
+
+            mostrarMensajeSIC(
+                'Datos incompletos',
+                'Faltan datos para cancelar la confirmación de la coincidencia.',
+                'warning'
+            );
+
             return;
         }
 
-        if (!confirm('¿Seguro que deseas Cancelar Confirmación de esta coincidencia?')) {
-            return;
-        }
+        mostrarConfirmacionSIC({
+            titulo: 'Cancelar confirmación',
+            texto: 'La coincidencia volverá a quedar pendiente de revisión. ¿Deseas continuar?',
+            icono: 'warning',
+            textoConfirmar: 'Sí, cancelar confirmación'
+        }).then(function (resultado) {
+
+            if (!resultado.isConfirmed) {
+                return;
+            }
+
+            // AQUÍ VA TU bloquearBoton + AJAX ACTUAL
+        });
 
         boton.prop('disabled', true)
              .html('<i class="fa fa-spinner fa-spin"></i> Reabriendo...');
@@ -4608,10 +5813,18 @@ StringComparer.OrdinalIgnoreCase
             },
             success: function (response) {
                 if (!response.success) {
-                    boton.prop('disabled', false)
-                        .html('<i class="fa fa-undo"></i> Cancelar Confirmación');
 
-                    alert(response.message || 'No se pudo Cancelar Confirmación de la coincidencia.');
+                    restaurarBotonReabrir(
+                        boton
+                    );
+
+                    mostrarMensajeSIC(
+                        'No se pudo cancelar',
+                        response.message ||
+                        'No se pudo cancelar la confirmación de la coincidencia.',
+                        'error'
+                    );
+
                     return;
                 }
 
@@ -4625,15 +5838,28 @@ StringComparer.OrdinalIgnoreCase
                     actualizarContadoresAlertas(1, -1, 0);
                 }
 
-                alert(response.message || 'Coincidencia reabierta correctamente.');
+                //mostrarMensajeSIC(
+                //    'Confirmación cancelada',
+                //    response.message ||
+                //    'La coincidencia volvió a quedar pendiente de revisión.',
+                //    'success'
+                //);
             },
             error: function (xhr) {
-                console.log(xhr.responseText);
 
-                boton.prop('disabled', false)
-                    .html('<i class="fa fa-undo"></i> Cancelar Confirmación');
+                console.log(
+                    xhr.responseText
+                );
 
-                alert('Error del servidor al Cancelar Confirmación de la coincidencia.');
+                restaurarBotonReabrir(
+                    boton
+                );
+
+                mostrarMensajeSIC(
+                    'Error',
+                    'Error del servidor al cancelar la confirmación de la coincidencia.',
+                    'error'
+                );
             }
         });
     });
@@ -4649,9 +5875,19 @@ StringComparer.OrdinalIgnoreCase
             return;
         }
 
-        if (!confirm('¿Seguro que deseas descartar esta coincidencia?')) {
-            return;
-        }
+        mostrarConfirmacionSIC({
+            titulo: 'Cancelar confirmación',
+            texto: 'La coincidencia volverá a quedar pendiente de revisión. ¿Deseas continuar?',
+            icono: 'warning',
+            textoConfirmar: 'Sí, cancelar confirmación'
+        }).then(function (resultado) {
+
+            if (!resultado.isConfirmed) {
+                return;
+            }
+
+            // AQUÍ VA TU bloquearBoton + AJAX ACTUAL
+        });
 
         boton.prop('disabled', true)
              .html('<i class="fa fa-spinner fa-spin"></i> Descartando...');
@@ -4682,10 +5918,12 @@ StringComparer.OrdinalIgnoreCase
                     idDetenido
                 );
 
-                alert(
-                    response.message ||
-                    'Coincidencia descartada correctamente.'
-                );
+                //mostrarMensajeSIC(
+                //    'Coincidencia descartada',
+                //    response.message ||
+                //    'Coincidencia descartada correctamente.',
+                //    'success'
+                //);
             },
             error: function (xhr) {
                 console.log(xhr.responseText);
@@ -4693,7 +5931,11 @@ StringComparer.OrdinalIgnoreCase
                 boton.prop('disabled', false)
                      .html('<i class="fa fa-times"></i> Descartar');
 
-                alert('Error del servidor al descartar la coincidencia.');
+                mostrarMensajeSIC(
+                    'Error',
+                    'Error del servidor al descartar la coincidencia.',
+                    'error'
+                );
             }
         });
     });
@@ -4708,18 +5950,40 @@ StringComparer.OrdinalIgnoreCase
         var idsNomPerso = boton.data('ids-nom-perso');
 
         if (isNaN(estatusAnterior)) {
-            alert('No se pudo determinar el estado anterior de la coincidencia.');
+
+            mostrarMensajeSIC(
+                'Estado no disponible',
+                'No se pudo determinar el estado anterior de la coincidencia.',
+                'warning'
+            );
+
             return;
         }
 
-        if (!idDetenido || !idsNomPerso) {
-            alert('Faltan datos para Cancelar Confirmación de la coincidencia.');
+        if (!idDetenido || !idOrigen || !idFuente) {
+
+            mostrarMensajeSIC(
+                'Datos incompletos',
+                'Faltan datos para cancelar la confirmación de la coincidencia.',
+                'warning'
+            );
+
             return;
         }
 
-        if (!confirm('¿Seguro que deseas Cancelar Confirmación de esta coincidencia?')) {
-            return;
-        }
+        mostrarConfirmacionSIC({
+            titulo: 'Cancelar confirmación',
+            texto: 'La coincidencia volverá a quedar pendiente de revisión. ¿Deseas continuar?',
+            icono: 'warning',
+            textoConfirmar: 'Sí, cancelar confirmación'
+        }).then(function (resultado) {
+
+            if (!resultado.isConfirmed) {
+                return;
+            }
+
+            // AQUÍ VA TU bloquearBoton + AJAX ACTUAL
+        });
 
         boton.prop('disabled', true)
              .html('<i class="fa fa-spinner fa-spin"></i> Reabriendo...');
@@ -4733,10 +5997,18 @@ StringComparer.OrdinalIgnoreCase
             },
             success: function (response) {
                 if (!response.success) {
-                    boton.prop('disabled', false)
-                        .html('<i class="fa fa-undo"></i> Cancelar Confirmación');
 
-                    alert(response.message || 'No se pudo Cancelar Confirmación de la coincidencia.');
+                    restaurarBotonReabrir(
+                        boton
+                    );
+
+                    mostrarMensajeSIC(
+                        'No se pudo cancelar',
+                        response.message ||
+                        'No se pudo cancelar la confirmación de la coincidencia.',
+                        'error'
+                    );
+
                     return;
                 }
 
@@ -4750,15 +6022,28 @@ StringComparer.OrdinalIgnoreCase
                     actualizarContadoresAlertas(1, -1, 0);
                 }
 
-                alert(response.message || 'Coincidencia reabierta correctamente.');
+                //mostrarMensajeSIC(
+                //    'Confirmación cancelada',
+                //    response.message ||
+                //    'La coincidencia volvió a quedar pendiente de revisión.',
+                //    'success'
+                //);
             },
             error: function (xhr) {
-                console.log(xhr.responseText);
 
-                boton.prop('disabled', false)
-                    .html('<i class="fa fa-undo"></i> Cancelar Confirmación');
+                console.log(
+                    xhr.responseText
+                );
 
-                alert('Error del servidor al Cancelar Confirmación de la coincidencia.');
+                restaurarBotonReabrir(
+                    boton
+                );
+
+                mostrarMensajeSIC(
+                    'Error',
+                    'Error del servidor al cancelar la confirmación de la coincidencia.',
+                    'error'
+                );
             }
         });
     });
@@ -4887,35 +6172,9 @@ StringComparer.OrdinalIgnoreCase
                         <div class="sic-detenido-c5-grid">
 
                             <div class="sic-detenido-line">
-                                <label>Nombre:</label>
-                                <strong>@detNombre</strong>
-                            </div>
-
-                            <div class="sic-detenido-line">
-                                <label>Ap. paterno:</label>
-                                <strong>@detPaterno</strong>
-                            </div>
-
-                            <div class="sic-detenido-line">
-                                <label>Ap. materno:</label>
-                                <strong>@detMaterno</strong>
-                            </div>
-
-                            <div class="sic-detenido-line">
                                 <label>Alias:</label>
                                 <strong>@detAlias</strong>
                             </div>
-
-                            <div class="sic-detenido-line">
-                                <label>Edad:</label>
-                                <strong>@detEdad</strong>
-                            </div>
-
-                            <div class="sic-detenido-line">
-                                <label>Sexo:</label>
-                                <strong>@detSexo</strong>
-                            </div>
-
                             <div class="sic-detenido-line">
                                 <label>Fecha nac.:</label>
                                 <strong>@detFechaNacimiento</strong>
@@ -5046,6 +6305,7 @@ StringComparer.OrdinalIgnoreCase
                     string detNumInt = ViewBag.TextoDetencion(detencionC5.NUMINT);
                     string detLatitud = ViewBag.TextoDetencion(detencionC5.Latitud);
                     string detLongitud = ViewBag.TextoDetencion(detencionC5.Longitud);
+
 
                     <div class="sic-detencion-compact">
 
@@ -5232,18 +6492,48 @@ StringComparer.OrdinalIgnoreCase
                 @if (fotosC5.Count > 0)
                 {
                     <div class="sic-gallery-grid">
-                        @foreach (var foto in fotosC5)
+
+                        @for (int i = 0; i < fotosC5.Count; i++)
                         {
-                            <div class="sic-gallery-item">
-                                <img src="@Url.Action("FotoGaleriaC5", "SIC", new { idFoto = foto.IDFOTO })"
-                                     alt="@ViewBag.Texto(foto.TIPO)"
-                                     onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=&quot;fa fa-picture-o&quot;></i>';" />
+                            var foto = fotosC5[i];
+
+                            <div class="sic-gallery-item sic-gallery-item-expandible"
+                                 data-galeria="fotos"
+                                 role="button"
+                                 tabindex="0"
+                                 title="Presione para ampliar"
+                                 onclick="abrirGaleriaC5('fotos', @i);"
+                                 onkeydown="if(event.key === 'Enter' || event.key === ' '){ event.preventDefault(); abrirGaleriaC5('fotos', @i); }">
+
+                                <div class="sic-gallery-image-wrap">
+
+                                    <img class="sic-gallery-foto"
+                                         src="@Url.Action("FotoGaleriaC5", "SIC", new { idFoto = foto.IDFOTO })"
+                                         alt="@ViewBag.Texto(foto.TIPO)"
+                                         onerror="mostrarErrorFotoGaleria(this);" />
+
+                                    <div class="sic-gallery-image-error">
+                                        <i class="fa fa-picture-o"></i>
+                                    </div>
+
+                                </div>
+
+                                @{
+                                    string tipoFoto = ViewBag.Texto(foto.TIPO);
+
+                                    if (tipoFoto.StartsWith("FOTO:", StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        tipoFoto = tipoFoto.Substring(5).Trim();
+                                    }
+                                }
 
                                 <div class="sic-gallery-caption">
-                                    <span>@ViewBag.Texto(foto.TIPO)</span>
+                                    <span>@tipoFoto</span>
                                 </div>
+
                             </div>
                         }
+
                     </div>
                 }
                 else
@@ -5271,13 +6561,14 @@ StringComparer.OrdinalIgnoreCase
                     <div class="sic-gallery-grid">
                         @foreach (var huella in huellasC5)
                         {
-                            <div class="sic-gallery-item">
+                            <div class="sic-gallery-item"
+                                 data-galeria="fotos">
                                 <img src="@Url.Action("HuellaGaleriaC5", "SIC", new { idHuella = huella.IdHuella })"
                                      alt="Huella en Municipio"
                                      onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=&quot;fa fa-hand-paper-o&quot;></i>';" />
 
                                 <div class="sic-gallery-caption">
-                                    <span>Huella @huella.IdHuella</span>
+                                    <span>@huella.IdHuella</span>
                                 </div>
                             </div>
                         }
@@ -5306,18 +6597,49 @@ StringComparer.OrdinalIgnoreCase
                 @if (rasgosC5.Count > 0)
                 {
                     <div class="sic-gallery-grid">
-                        @foreach (var rasgo in rasgosC5)
+
+                        @for (int i = 0; i < rasgosC5.Count; i++)
                         {
-                            <div class="sic-gallery-item">
-                                <img src="@Url.Action("FotoGaleriaC5", "SIC", new { idFoto = rasgo.IDFOTO })"
-                                     alt="@ViewBag.Texto(rasgo.TIPO)"
-                                     onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=&quot;fa fa-picture-o&quot;></i>';" />
+                            var rasgo = rasgosC5[i];
+
+                            <div class="sic-gallery-item sic-gallery-item-expandible"
+                                 data-galeria="rasgos"
+                                 role="button"
+                                 tabindex="0"
+                                 title="Presione para ampliar"
+                                 onclick="abrirGaleriaC5('rasgos', @i);"
+                                 onkeydown="if(event.key === 'Enter' || event.key === ' '){ event.preventDefault(); abrirGaleriaC5('rasgos', @i); }">
+
+                                <div class="sic-gallery-image-wrap">
+
+                                    <img class="sic-gallery-foto"
+                                         src="@Url.Action("FotoGaleriaC5", "SIC", new { idFoto = rasgo.IDFOTO })"
+                                         alt="@ViewBag.Texto(rasgo.TIPO)"
+                                         onerror="mostrarErrorFotoGaleria(this);" />
+
+                                    <div class="sic-gallery-image-error">
+                                        <i class="fa fa-picture-o"></i>
+                                    </div>
+
+                                </div>
+
+                                @{
+                                    string tipoRasgo = ViewBag.Texto(rasgo.TIPO);
+
+                                    if (tipoRasgo.StartsWith("RASGO: Punto Seleccionado:", StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        tipoRasgo = tipoRasgo.Substring(26).Trim();
+                                    }
+
+                                }
 
                                 <div class="sic-gallery-caption">
-                                    <span>@ViewBag.Texto(rasgo.TIPO)</span>
+                                    <span>@tipoRasgo</span>
                                 </div>
+
                             </div>
                         }
+
                     </div>
                 }
                 else
@@ -5335,6 +6657,91 @@ StringComparer.OrdinalIgnoreCase
     </div>
 </div>
 
+
+<div id="sicGaleriaVisor"
+     class="sic-galeria-visor"
+     aria-hidden="true"
+     onclick="cerrarGaleriaC5AlFondo(event);">
+
+    <div class="sic-galeria-visor-contenido"
+         onclick="event.stopPropagation();">
+
+        <button type="button"
+                class="sic-galeria-cerrar"
+                onclick="cerrarGaleriaC5();"
+                title="Cerrar galería"
+                aria-label="Cerrar galería">
+
+            <i class="fa fa-times"></i>
+
+        </button>
+
+        <div class="sic-galeria-header">
+
+            <div>
+                <i class="fa fa-picture-o"></i>
+
+                <span id="sicGaleriaTitulo">
+                    Galería de fotografías
+                </span>
+            </div>
+
+            <span id="sicGaleriaContador">
+                1 / 1
+            </span>
+
+        </div>
+
+        <div class="sic-galeria-imagen-area">
+
+            <button type="button"
+                    id="sicGaleriaAnterior"
+                    class="sic-galeria-navegacion sic-galeria-anterior"
+                    onclick="fotoGaleriaC5Anterior();"
+                    title="Fotografía anterior">
+
+                <i class="fa fa-chevron-left"></i>
+
+            </button>
+
+            <img id="sicGaleriaImagen"
+                 src=""
+                 alt="Fotografía ampliada" />
+
+            <div id="sicGaleriaError"
+                 class="sic-galeria-error">
+
+                <i class="fa fa-picture-o"></i>
+                <span>No se pudo cargar la fotografía</span>
+
+            </div>
+
+            <button type="button"
+                    id="sicGaleriaSiguiente"
+                    class="sic-galeria-navegacion sic-galeria-siguiente"
+                    onclick="fotoGaleriaC5Siguiente();"
+                    title="Fotografía siguiente">
+
+                <i class="fa fa-chevron-right"></i>
+
+            </button>
+
+        </div>
+
+        <div id="sicGaleriaDescripcion"
+             class="sic-galeria-descripcion">
+        </div>
+
+        <div class="sic-galeria-ayuda">
+            <i class="fa fa-keyboard-o"></i>
+            Use las flechas del teclado para cambiar de fotografía
+        </div>
+
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
     $(document).ready(function () {
@@ -5598,7 +7005,46 @@ StringComparer.OrdinalIgnoreCase
             + '</button>';
     }
 
-    function confirmarIdentidadNormal(e) {
+    async function confirmarAccionSIC(
+        titulo,
+        mensaje,
+        textoConfirmar,
+        icono
+    ) {
+        var resultado = await Swal.fire({
+            title: titulo,
+            text: mensaje,
+            icon: icono || 'question',
+
+            showCancelButton: true,
+
+            confirmButtonText: textoConfirmar,
+            cancelButtonText: 'Cancelar',
+
+            reverseButtons: true,
+            allowOutsideClick: false,
+            allowEscapeKey: true
+        });
+
+        return resultado.isConfirmed;
+    }
+
+
+    function mostrarMensajeSIC(
+        titulo,
+        mensaje,
+        icono
+    ) {
+        return Swal.fire({
+            title: titulo,
+            text: mensaje,
+            icon: icono || 'info',
+            confirmButtonText: 'Aceptar',
+            allowOutsideClick: false
+        });
+    }
+
+    async function confirmarIdentidadNormal(e) {
         e.preventDefault();
         e.stopImmediatePropagation();
 
@@ -5608,15 +7054,31 @@ StringComparer.OrdinalIgnoreCase
         var idFuente = boton.data('id-fuente');
 
         if (!idDetenido || !idOrigen || !idFuente) {
-            alert('Faltan datos para confirmar la identidad.');
+
+            mostrarMensajeSIC(
+                'Datos incompletos',
+                'Faltan datos para confirmar la identidad.',
+                'warning'
+            );
+
             return;
         }
 
-        if (!confirm('¿Seguro que deseas confirmar la identidad de este registro?')) {
+        var continuar = await confirmarAccionSIC(
+            'Confirmar identidad',
+            '¿Seguro que deseas confirmar la identidad de este registro?',
+            'Sí, confirmar',
+            'question'
+        );
+
+        if (!continuar) {
             return;
         }
 
-        bloquearBoton(boton, 'Confirmando...');
+        bloquearBoton(
+            boton,
+            'Confirmando...'
+        );
 
         $.ajax({
             url: '@Url.Action("ConfirmarIdentidad", "SIC")',
@@ -5628,8 +7090,18 @@ StringComparer.OrdinalIgnoreCase
             },
             success: function (response) {
                 if (!response.success) {
-                    restaurarBotonConfirmar(boton);
-                    alert(response.message || 'No se pudo confirmar la identidad.');
+
+                    restaurarBotonConfirmar(
+                        boton
+                    );
+
+                    mostrarMensajeSIC(
+                        'No se pudo confirmar',
+                        response.message ||
+                        'No se pudo confirmar la identidad.',
+                        'error'
+                    );
+
                     return;
                 }
 
@@ -5643,17 +7115,26 @@ StringComparer.OrdinalIgnoreCase
                     idDetenido
                 );
 
-                alert(response.message || 'Identidad confirmada correctamente.');
+                //mostrarMensajeSIC(
+                //    'Identidad confirmada',
+                //    response.message ||
+                //    'Identidad confirmada correctamente.',
+                //    'success'
+                //);
             },
             error: function (xhr) {
                 console.log(xhr.responseText);
                 restaurarBotonConfirmar(boton);
-                alert('Error del servidor al confirmar la identidad.');
+                mostrarMensajeSIC(
+                    'Error',
+                    'Error del servidor al confirmar la identidad.',
+                    'error'
+                );
             }
         });
     }
 
-    function confirmarIdentidadDetenido(e) {
+    async function confirmarIdentidadDetenido(e) {
         e.preventDefault();
         e.stopImmediatePropagation();
 
@@ -5662,11 +7143,24 @@ StringComparer.OrdinalIgnoreCase
         var idsNomPerso = boton.attr('data-ids-nom-perso');
 
         if (!idDetenido || !idsNomPerso) {
-            alert('Faltan datos para confirmar la identidad del detenido.');
+
+            mostrarMensajeSIC(
+                'Datos incompletos',
+                'Faltan datos para confirmar la identidad del detenido.',
+                'warning'
+            );
+
             return;
         }
 
-        if (!confirm('¿Seguro que deseas confirmar la identidad de este detenido?')) {
+        var continuar = await confirmarAccionSIC(
+            'Confirmar identidad',
+            '¿Seguro que deseas confirmar la identidad de este detenido?',
+            'Sí, confirmar',
+            'question'
+        );
+
+        if (!continuar) {
             return;
         }
 
@@ -5682,7 +7176,12 @@ StringComparer.OrdinalIgnoreCase
             success: function (response) {
                 if (!response.success) {
                     restaurarBotonConfirmar(boton);
-                    alert(response.message || 'No se pudo confirmar la identidad.');
+                    mostrarMensajeSIC(
+                        'No se pudo confirmar',
+                        response.message ||
+                        'No se pudo confirmar la identidad.',
+                        'error'
+                    );
                     return;
                 }
 
@@ -5696,17 +7195,26 @@ StringComparer.OrdinalIgnoreCase
                     idDetenido
                 );
 
-                alert(response.message || 'Identidad confirmada correctamente.');
+                //mostrarMensajeSIC(
+                //    'Identidad confirmada',
+                //    response.message ||
+                //    'Identidad confirmada correctamente.',
+                //    'success'
+                //);
             },
             error: function (xhr) {
                 console.log(xhr.responseText);
                 restaurarBotonConfirmar(boton);
-                alert('Error del servidor al confirmar la identidad.');
+                mostrarMensajeSIC(
+                    'Error',
+                    'Error del servidor al confirmar la identidad.',
+                    'error'
+                );
             }
         });
     }
 
-    function descartarCoincidenciaNormal(e) {
+    async function descartarCoincidenciaNormal(e) {
         e.preventDefault();
         e.stopImmediatePropagation();
 
@@ -5716,11 +7224,22 @@ StringComparer.OrdinalIgnoreCase
         var idFuente = boton.data('id-fuente');
 
         if (!idDetenido || !idOrigen || !idFuente) {
-            alert('Faltan datos para descartar la coincidencia.');
+            mostrarMensajeSIC(
+                'Datos incompletos',
+                'Faltan datos para descartar la coincidencia.',
+                'warning'
+            );
             return;
         }
 
-        if (!confirm('¿Seguro que deseas descartar esta coincidencia?')) {
+        var continuar = await confirmarAccionSIC(
+            'Descartar coincidencia',
+            'La coincidencia será marcada como descartada. ¿Deseas continuar?',
+            'Sí, descartar',
+            'warning'
+        );
+
+        if (!continuar) {
             return;
         }
 
@@ -5737,7 +7256,12 @@ StringComparer.OrdinalIgnoreCase
             success: function (response) {
                 if (!response.success) {
                     restaurarBotonDescartar(boton);
-                    alert(response.message || 'No se pudo descartar la coincidencia.');
+                    mostrarMensajeSIC(
+                        'No se pudo descartar',
+                        response.message ||
+                        'No se pudo descartar la coincidencia.',
+                        'error'
+                    );
                     return;
                 }
 
@@ -5751,17 +7275,26 @@ StringComparer.OrdinalIgnoreCase
                     idDetenido
                 );
 
-                alert(response.message || 'Coincidencia descartada correctamente.');
+                //mostrarMensajeSIC(
+                //    'Coincidencia descartada',
+                //    response.message ||
+                //    'Coincidencia descartada correctamente.',
+                //    'success'
+                //);
             },
             error: function (xhr) {
                 console.log(xhr.responseText);
                 restaurarBotonDescartar(boton);
-                alert('Error del servidor al descartar la coincidencia.');
+                mostrarMensajeSIC(
+                    'Error',
+                    'Error del servidor al descartar la coincidencia.',
+                    'error'
+                );
             }
         });
     }
 
-    function descartarCoincidenciaDetenido(e) {
+    async function descartarCoincidenciaDetenido(e) {
         e.preventDefault();
         e.stopImmediatePropagation();
 
@@ -5774,7 +7307,14 @@ StringComparer.OrdinalIgnoreCase
             return;
         }
 
-        if (!confirm('¿Seguro que deseas descartar esta coincidencia?')) {
+        var continuar = await confirmarAccionSIC(
+            'Descartar coincidencia',
+            'La coincidencia será marcada como descartada. ¿Deseas continuar?',
+            'Sí, descartar',
+            'warning'
+        );
+
+        if (!continuar) {
             return;
         }
 
@@ -5804,17 +7344,26 @@ StringComparer.OrdinalIgnoreCase
                     idDetenido
                 );
 
-                alert(response.message || 'Coincidencia descartada correctamente.');
+                //mostrarMensajeSIC(
+                //    'Coincidencia descartada',
+                //    response.message ||
+                //    'Coincidencia descartada correctamente.',
+                //    'success'
+                //);
             },
             error: function (xhr) {
                 console.log(xhr.responseText);
                 restaurarBotonDescartar(boton);
-                alert('Error del servidor al descartar la coincidencia.');
+                mostrarMensajeSIC(
+                    'Error',
+                    'Error del servidor al descartar la coincidencia.',
+                    'error'
+                );
             }
         });
     }
 
-    function reabrirCoincidenciaNormal(e) {
+    async function reabrirCoincidenciaNormal(e) {
         e.preventDefault();
         e.stopImmediatePropagation();
 
@@ -5827,16 +7376,35 @@ StringComparer.OrdinalIgnoreCase
         var idFuente = boton.data('id-fuente');
 
         if (isNaN(estatusAnterior)) {
-            alert('No se pudo determinar el estado anterior de la coincidencia.');
+
+            mostrarMensajeSIC(
+                'Estado no disponible',
+                'No se pudo determinar el estado anterior de la coincidencia.',
+                'warning'
+            );
+
             return;
         }
 
         if (!idDetenido || !idOrigen || !idFuente) {
-            alert('Faltan datos para Cancelar Confirmación de la coincidencia.');
+
+            mostrarMensajeSIC(
+                'Datos incompletos',
+                'Faltan datos para cancelar la confirmación de la coincidencia.',
+                'warning'
+            );
+
             return;
         }
 
-        if (!confirm('¿Seguro que deseas Cancelar Confirmación de  esta coincidencia?')) {
+        var continuar = await confirmarAccionSIC(
+            'Cancelar confirmación',
+            'La coincidencia volverá a quedar pendiente de revisión. ¿Deseas continuar?',
+            'Sí, cancelar confirmación',
+            'warning'
+        );
+
+        if (!continuar) {
             return;
         }
 
@@ -5852,8 +7420,18 @@ StringComparer.OrdinalIgnoreCase
             },
             success: function (response) {
                 if (!response.success) {
-                    restaurarBotonReabrir(boton);
-                    alert(response.message || 'No se pudo Cancelar Confirmación de la coincidencia.');
+
+                    restaurarBotonReabrir(
+                        boton
+                    );
+
+                    mostrarMensajeSIC(
+                        'No se pudo cancelar',
+                        response.message ||
+                        'No se pudo cancelar la confirmación de la coincidencia.',
+                        'error'
+                    );
+
                     return;
                 }
 
@@ -5869,20 +7447,33 @@ StringComparer.OrdinalIgnoreCase
                     idDetenido
                 );
 
-                alert(
-                    response.message ||
-                    'Coincidencia reabierta correctamente.'
-                );
+                //mostrarMensajeSIC(
+                //    'Confirmación cancelada',
+                //    response.message ||
+                //    'La coincidencia volvió a quedar pendiente de revisión.',
+                //    'success'
+                //);
             },
             error: function (xhr) {
-                console.log(xhr.responseText);
-                restaurarBotonReabrir(boton);
-                alert('Error del servidor al Cancelar Confirmación de la coincidencia.');
+
+                console.log(
+                    xhr.responseText
+                );
+
+                restaurarBotonReabrir(
+                    boton
+                );
+
+                mostrarMensajeSIC(
+                    'Error',
+                    'Error del servidor al cancelar la confirmación de la coincidencia.',
+                    'error'
+                );
             }
         });
     }
 
-    function reabrirCoincidenciaDetenido(e) {
+    async function reabrirCoincidenciaDetenido(e) {
         e.preventDefault();
         e.stopImmediatePropagation();
 
@@ -5894,16 +7485,35 @@ StringComparer.OrdinalIgnoreCase
         var idsNomPerso = boton.attr('data-ids-nom-perso');
 
         if (isNaN(estatusAnterior)) {
-            alert('No se pudo determinar el estado anterior de la coincidencia.');
+
+            mostrarMensajeSIC(
+                'Estado no disponible',
+                'No se pudo determinar el estado anterior de la coincidencia.',
+                'warning'
+            );
+
             return;
         }
 
         if (!idDetenido || !idsNomPerso) {
-            alert('Faltan datos para Cancelar Confirmación de la coincidencia.');
+
+            mostrarMensajeSIC(
+                'Datos incompletos',
+                'Faltan datos para cancelar la confirmación de la coincidencia.',
+                'warning'
+            );
+
             return;
         }
 
-        if (!confirm('¿Seguro que deseas Cancelar Confirmación de esta coincidencia?')) {
+        var continuar = await confirmarAccionSIC(
+            'Cancelar confirmación',
+            'La coincidencia volverá a quedar pendiente de revisión. ¿Deseas continuar?',
+            'Sí, cancelar confirmación',
+            'warning'
+        );
+
+        if (!continuar) {
             return;
         }
 
@@ -5918,8 +7528,18 @@ StringComparer.OrdinalIgnoreCase
             },
             success: function (response) {
                 if (!response.success) {
-                    restaurarBotonReabrir(boton);
-                    alert(response.message || 'No se pudo Cancelar Confirmación de la coincidencia.');
+
+                    restaurarBotonReabrir(
+                        boton
+                    );
+
+                    mostrarMensajeSIC(
+                        'No se pudo cancelar',
+                        response.message ||
+                        'No se pudo cancelar la confirmación de la coincidencia.',
+                        'error'
+                    );
+
                     return;
                 }
 
@@ -5935,15 +7555,28 @@ StringComparer.OrdinalIgnoreCase
                     idDetenido
                 );
 
-                alert(
-                    response.message ||
-                    'Coincidencia reabierta correctamente.'
-                );
+                //mostrarMensajeSIC(
+                //    'Confirmación cancelada',
+                //    response.message ||
+                //    'La coincidencia volvió a quedar pendiente de revisión.',
+                //    'success'
+                //);
             },
             error: function (xhr) {
-                console.log(xhr.responseText);
-                restaurarBotonReabrir(boton);
-                alert('Error del servidor al Cancelar Confirmación de la coincidencia.');
+
+                console.log(
+                    xhr.responseText
+                );
+
+                restaurarBotonReabrir(
+                    boton
+                );
+
+                mostrarMensajeSIC(
+                    'Error',
+                    'Error del servidor al cancelar la confirmación de la coincidencia.',
+                    'error'
+                );
             }
         });
     }
@@ -6456,6 +8089,558 @@ $(document).on(
         }
     );
 
+    function abrirFotoExpandida(src, descripcion) {
+
+        if (!src) {
+            return;
+        }
+
+        $('#sicVisorFotoContenido')
+            .removeClass('comparando');
+
+        $('#sicVistaComparacion')
+            .hide();
+
+        $('#sicVistaFotoUnica')
+            .show();
+
+        $('#sicFotoExpandida')
+            .css('display', 'block')
+            .attr('src', src)
+            .attr(
+                'alt',
+                descripcion || 'Fotografía ampliada'
+            );
+
+        $('#sicFotoExpandidaTexto')
+            .text(
+                descripcion || 'Fotografía del detenido'
+            );
+
+        $('#sicVisorFoto')
+            .addClass('activo')
+            .attr('aria-hidden', 'false');
+
+        $('body').css('overflow', 'hidden');
+    }
+
+
+    function abrirComparacionFotos(
+        srcFotoDetenido,
+        descripcionDetenido
+    ) {
+
+        if (!srcFotoDetenido) {
+            return;
+        }
+
+        var fotoPrincipal =
+            document.getElementById(
+                'sicFotoPrincipalC5'
+            );
+
+        var srcFotoPrincipal =
+            fotoPrincipal
+                ? fotoPrincipal.currentSrc ||
+                fotoPrincipal.src
+                : '';
+
+        if (!srcFotoPrincipal) {
+
+            abrirFotoExpandida(
+                srcFotoDetenido,
+                descripcionDetenido
+            );
+
+            return;
+        }
+
+        $('#sicVisorFotoContenido')
+            .addClass('comparando');
+
+        $('#sicVistaFotoUnica')
+            .hide();
+
+        $('#sicVistaComparacion')
+            .css('display', 'grid');
+
+        $('#sicFotoComparacionPrincipal')
+            .css('display', 'block')
+            .attr('src', srcFotoPrincipal)
+            .attr(
+                'alt',
+                fotoPrincipal.alt ||
+                'Fotografía del detenido en municipio'
+            );
+
+        $('#sicFotoComparacionDetenido')
+            .css('display', 'block')
+            .attr('src', srcFotoDetenido)
+            .attr(
+                'alt',
+                descripcionDetenido ||
+                'Fotografía del registro de detenidos FGEA'
+            );
+
+        $('#sicVisorFoto')
+            .addClass('activo')
+            .attr('aria-hidden', 'false');
+
+        $('body').css('overflow', 'hidden');
+    }
+
+
+    function cerrarFotoExpandida() {
+
+        var visor =
+            document.getElementById('sicVisorFoto');
+
+        var contenido =
+            document.getElementById('sicVisorFotoContenido');
+
+        var vistaComparacion =
+            document.getElementById('sicVistaComparacion');
+
+        var vistaFotoUnica =
+            document.getElementById('sicVistaFotoUnica');
+
+        var fotoExpandida =
+            document.getElementById('sicFotoExpandida');
+
+        var fotoPrincipal =
+            document.getElementById('sicFotoComparacionPrincipal');
+
+        var fotoDetenido =
+            document.getElementById('sicFotoComparacionDetenido');
+
+
+        if (visor) {
+            visor.classList.remove('activo');
+            visor.setAttribute('aria-hidden', 'true');
+        }
+
+        if (contenido) {
+            contenido.classList.remove('comparando');
+        }
+
+        if (vistaComparacion) {
+            vistaComparacion.style.display = 'none';
+        }
+
+        if (vistaFotoUnica) {
+            vistaFotoUnica.style.display = 'block';
+        }
+
+        if (fotoExpandida) {
+            fotoExpandida.removeAttribute('src');
+        }
+
+        if (fotoPrincipal) {
+            fotoPrincipal.removeAttribute('src');
+        }
+
+        if (fotoDetenido) {
+            fotoDetenido.removeAttribute('src');
+        }
+
+        document.body.style.overflow = '';
+    }
+
+
+
+    function cerrarFotoExpandidaAlFondo(event) {
+
+        if (
+            event &&
+            event.target &&
+            event.target.id === 'sicVisorFoto'
+        ) {
+            cerrarFotoExpandida();
+        }
+    }
+
+
+    $(document).on('keydown', function (event) {
+        if (
+            event.key === 'Escape' &&
+            $('#sicVisorFoto').hasClass('activo')
+        ) {
+            cerrarFotoExpandida();
+        }
+    });
+
+    document.addEventListener('keydown', function (event) {
+
+        var visor =
+            document.getElementById('sicVisorFoto');
+
+        if (
+            event.key === 'Escape' &&
+            visor &&
+            visor.classList.contains('activo')
+        ) {
+            cerrarFotoExpandida();
+        }
+    });
+
+    var sicGaleriaFotosC5 = [];
+    var sicGaleriaIndiceC5 = 0;
+    var sicGaleriaGrupoC5 = '';
+
+
+    function obtenerFotosGaleriaC5(grupo) {
+
+        var elementos =
+            document.querySelectorAll(
+                '.sic-gallery-item-expandible[data-galeria="' +
+                grupo +
+                '"]'
+            );
+
+        var fotos = [];
+
+        elementos.forEach(function (elemento) {
+
+            var imagen =
+                elemento.querySelector(
+                    '.sic-gallery-foto'
+                );
+
+            var descripcion =
+                elemento.querySelector(
+                    '.sic-gallery-caption span'
+                );
+
+            if (!imagen) {
+                return;
+            }
+
+            var src =
+                imagen.currentSrc ||
+                imagen.src ||
+                '';
+
+            if (!src) {
+                return;
+            }
+
+            fotos.push({
+                src: src,
+                descripcion: descripcion
+                    ? descripcion.textContent.trim()
+                    : 'Fotografía'
+            });
+        });
+
+        return fotos;
+    }
+
+
+    function abrirGaleriaC5(grupo, indice) {
+
+        sicGaleriaGrupoC5 =
+            grupo || 'fotos';
+
+        sicGaleriaFotosC5 =
+            obtenerFotosGaleriaC5(
+                sicGaleriaGrupoC5
+            );
+
+        if (sicGaleriaFotosC5.length === 0) {
+            return;
+        }
+
+        sicGaleriaIndiceC5 =
+            parseInt(indice, 10);
+
+        if (
+            isNaN(sicGaleriaIndiceC5) ||
+            sicGaleriaIndiceC5 < 0
+        ) {
+            sicGaleriaIndiceC5 = 0;
+        }
+
+        if (
+            sicGaleriaIndiceC5 >=
+            sicGaleriaFotosC5.length
+        ) {
+            sicGaleriaIndiceC5 =
+                sicGaleriaFotosC5.length - 1;
+        }
+
+        var titulo =
+            document.getElementById(
+                'sicGaleriaTitulo'
+            );
+
+        if (titulo) {
+            titulo.textContent =
+                sicGaleriaGrupoC5 === 'rasgos'
+                    ? 'Rasgos en Municipio'
+                    : 'Galería de fotos en Municipio';
+        }
+
+        mostrarFotoGaleriaC5();
+
+        var visor =
+            document.getElementById(
+                'sicGaleriaVisor'
+            );
+
+        if (visor) {
+            visor.classList.add('activo');
+            visor.setAttribute(
+                'aria-hidden',
+                'false'
+            );
+        }
+
+        document.body.style.overflow =
+            'hidden';
+    }
+
+    function mostrarFotoGaleriaC5() {
+
+        if (
+            sicGaleriaFotosC5.length === 0
+        ) {
+            return;
+        }
+
+        var foto =
+            sicGaleriaFotosC5[
+            sicGaleriaIndiceC5
+            ];
+
+        var imagen =
+            document.getElementById(
+                'sicGaleriaImagen'
+            );
+
+        var error =
+            document.getElementById(
+                'sicGaleriaError'
+            );
+
+        var descripcion =
+            document.getElementById(
+                'sicGaleriaDescripcion'
+            );
+
+        var contador =
+            document.getElementById(
+                'sicGaleriaContador'
+            );
+
+        var anterior =
+            document.getElementById(
+                'sicGaleriaAnterior'
+            );
+
+        var siguiente =
+            document.getElementById(
+                'sicGaleriaSiguiente'
+            );
+
+        if (error) {
+            error.style.display = 'none';
+        }
+
+        if (imagen) {
+
+            imagen.style.display = 'block';
+
+            imagen.onerror = function () {
+
+                imagen.style.display = 'none';
+
+                if (error) {
+                    error.style.display = 'flex';
+                }
+            };
+
+            imagen.src = foto.src;
+            imagen.alt =
+                foto.descripcion ||
+                'Fotografía ampliada';
+        }
+
+        if (descripcion) {
+            descripcion.textContent =
+                foto.descripcion ||
+                'Fotografía';
+        }
+
+        if (contador) {
+            contador.textContent =
+                (sicGaleriaIndiceC5 + 1) +
+                ' / ' +
+                sicGaleriaFotosC5.length;
+        }
+
+        var hayVarias =
+            sicGaleriaFotosC5.length > 1;
+
+        if (anterior) {
+            anterior.style.display =
+                hayVarias ? 'flex' : 'none';
+        }
+
+        if (siguiente) {
+            siguiente.style.display =
+                hayVarias ? 'flex' : 'none';
+        }
+    }
+
+
+    function fotoGaleriaC5Anterior() {
+
+        if (
+            sicGaleriaFotosC5.length <= 1
+        ) {
+            return;
+        }
+
+        sicGaleriaIndiceC5--;
+
+        if (sicGaleriaIndiceC5 < 0) {
+            sicGaleriaIndiceC5 =
+                sicGaleriaFotosC5.length - 1;
+        }
+
+        mostrarFotoGaleriaC5();
+    }
+
+
+    function fotoGaleriaC5Siguiente() {
+
+        if (
+            sicGaleriaFotosC5.length <= 1
+        ) {
+            return;
+        }
+
+        sicGaleriaIndiceC5++;
+
+        if (
+            sicGaleriaIndiceC5 >=
+            sicGaleriaFotosC5.length
+        ) {
+            sicGaleriaIndiceC5 = 0;
+        }
+
+        mostrarFotoGaleriaC5();
+    }
+
+
+    function cerrarGaleriaC5() {
+
+        var visor =
+            document.getElementById(
+                'sicGaleriaVisor'
+            );
+
+        var imagen =
+            document.getElementById(
+                'sicGaleriaImagen'
+            );
+
+        if (visor) {
+            visor.classList.remove('activo');
+            visor.setAttribute(
+                'aria-hidden',
+                'true'
+            );
+        }
+
+        if (imagen) {
+            imagen.removeAttribute('src');
+        }
+
+        document.body.style.overflow = '';
+    }
+
+
+    function cerrarGaleriaC5AlFondo(event) {
+
+        if (
+            event &&
+            event.target &&
+            event.target.id ===
+            'sicGaleriaVisor'
+        ) {
+            cerrarGaleriaC5();
+        }
+    }
+
+
+    function mostrarErrorFotoGaleria(imagen) {
+
+        if (!imagen) {
+            return;
+        }
+
+        imagen.onerror = null;
+        imagen.style.display = 'none';
+
+        var contenedor =
+            imagen.parentElement;
+
+        if (!contenedor) {
+            return;
+        }
+
+        var error =
+            contenedor.querySelector(
+                '.sic-gallery-image-error'
+            );
+
+        var zoom =
+            contenedor.querySelector(
+                '.sic-gallery-zoom'
+            );
+
+        if (error) {
+            error.style.display = 'flex';
+        }
+
+        if (zoom) {
+            zoom.style.display = 'none';
+        }
+    }
+
+
+    document.addEventListener(
+        'keydown',
+        function (event) {
+
+            var visor =
+                document.getElementById(
+                    'sicGaleriaVisor'
+                );
+
+            if (
+                !visor ||
+                !visor.classList.contains(
+                    'activo'
+                )
+            ) {
+                return;
+            }
+
+            if (event.key === 'Escape') {
+                cerrarGaleriaC5();
+            }
+
+            if (event.key === 'ArrowLeft') {
+                fotoGaleriaC5Anterior();
+            }
+
+            if (event.key === 'ArrowRight') {
+                fotoGaleriaC5Siguiente();
+            }
+        }
+    );
 
 
 

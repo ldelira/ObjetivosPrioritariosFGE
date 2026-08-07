@@ -12,13 +12,13 @@ namespace Objetivos_Prioritarios.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class FOTO
+    public partial class Alias
     {
-        public int IDFOTO { get; set; }
-        public Nullable<int> IDDETENIDO { get; set; }
-        public string FOTO1 { get; set; }
-        public Nullable<System.DateTime> FEHCA { get; set; }
-        public string TIPO { get; set; }
-        public string VECTOR_EMBEDDING { get; set; }
+        public string ALIAS1 { get; set; }
+        public System.DateTime FEC_ALI { get; set; }
+        public int CLAVE_PERSO { get; set; }
+        public int miconse { get; set; }
+        public System.DateTime fec_captu { get; set; }
+        public System.Guid rowguid { get; set; }
     }
 }

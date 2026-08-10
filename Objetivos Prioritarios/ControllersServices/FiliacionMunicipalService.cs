@@ -2,12 +2,15 @@
 using Microsoft.Ajax.Utilities;
 using Objetivos_Prioritarios.Models;
 using Objetivos_Prioritarios.Utils;
+using Objetivos_Prioritarios.Models.Extends;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity.Core.EntityClient;
 using System.Data.SqlClient;
+using System.Globalization;
 using System.Linq;
+using System.Text;
 using System.Reflection;
 using System.Web.UI.WebControls;
 
@@ -720,6 +723,45 @@ namespace Objetivos_Prioritarios.ControllersServices
         }
 
 
+        public List<SP_SIC_getCoincidenciasDetenidos_Result>
+    getCoincidenciasDetenidos_Results(
+        List<int> idsNomPerso)
+        {
+            if (
+                idsNomPerso == null ||
+                idsNomPerso.Count == 0
+            )
+            {
+                return new List<
+                    SP_SIC_getCoincidenciasDetenidos_Result
+                >();
+            }
+
+            idsNomPerso =
+                idsNomPerso
+                    .Where(x => x > 0)
+                    .Distinct()
+                    .ToList();
+
+            string clavesTexto =
+                ConvertirIdsATexto(
+                    idsNomPerso
+                );
+
+            using (
+                var db =
+                    new FiliacionEntities()
+            )
+            {
+                return db
+                    .SP_SIC_getCoincidenciasDetenidos(
+                        clavesTexto
+                    )
+                    .ToList();
+            }
+        }
+
+
         public int ApagarNotificacion(int idDetenido, int idOrigen, int idFuente)
         {
             using (var db = new Filiacion_MunicipiosEntities())
@@ -1193,6 +1235,300 @@ namespace Objetivos_Prioritarios.ControllersServices
                 return alertas.Count;
             }
         }
+
+
+        public DataTable BuscarMandamientosCandidatosPorNombre(
+    string nombreCompleto)
+        {
+            DataTable tabla =
+                new DataTable();
+
+            if (string.IsNullOrWhiteSpace(nombreCompleto))
+            {
+                return tabla;
+            }
+
+            List<string> tokens =
+                ObtenerTokensMandamientos(
+                    nombreCompleto
+                )
+                .Where(x => x.Length >= 3)
+                .OrderByDescending(x => x.Length)
+                .Take(4)
+                .ToList();
+
+            if (tokens.Count == 0)
+            {
+                return tabla;
+            }
+
+            using (
+                var db =
+                    new Mandamientos_JudicialesEntities()
+            )
+            {
+                string conexion =
+                    db.Database.Connection.ConnectionString;
+
+                if (
+                    conexion
+                        .TrimStart()
+                        .StartsWith(
+                            "metadata=",
+                            StringComparison.OrdinalIgnoreCase
+                        )
+                )
+                {
+                    EntityConnectionStringBuilder builder =
+                        new EntityConnectionStringBuilder(
+                            conexion
+                        );
+
+                    conexion =
+                        builder.ProviderConnectionString;
+                }
+
+                using (
+                    SqlConnection cn =
+                        new SqlConnection(conexion)
+                )
+                {
+                    cn.Open();
+
+                    StringBuilder sql =
+                        new StringBuilder();
+
+                    sql.AppendLine(@"
+SELECT
+    NM.id AS IdOrigenAlerta,
+    MJ.id AS IdMandamiento,
+    MJ.numero_control,
+    MJ.numero_expediente,
+
+    LTRIM(
+        RTRIM(
+            CONCAT(
+                ISNULL(NM.nombre, ''),
+                ' ',
+                ISNULL(NM.paterno, ''),
+                ' ',
+                ISNULL(NM.materno, '')
+            )
+        )
+    ) AS Nombre,
+
+    TM.mandamiento,
+    MJ.fecha_expedicion,
+    MJ.fecha_alta,
+    EP.tipo AS EstadoProceso
+
+FROM Mandamientos_Judiciales.dbo.mandamiento_judicial MJ
+
+INNER JOIN Mandamientos_Judiciales.dbo.nombres_mandamiento NM
+    ON MJ.id = NM.id_mandamiento_judicial
+
+INNER JOIN Mandamientos_Judiciales.dbo.tipo_mandamiento_judicial TM
+    ON MJ.id_tipo_mandato = TM.id_tipo_mandato
+
+INNER JOIN Mandamientos_Judiciales.dbo.catalogo_estado_proceso EP
+    ON MJ.id_estado_proceso = EP.id_estado_proceso
+
+CROSS APPLY
+(
+    SELECT
+        UPPER(
+            LTRIM(
+                RTRIM(
+                    CONCAT(
+                        ISNULL(NM.nombre, ''),
+                        ' ',
+                        ISNULL(NM.paterno, ''),
+                        ' ',
+                        ISNULL(NM.materno, '')
+                    )
+                )
+            )
+        ) COLLATE Modern_Spanish_CI_AI AS NombreBusqueda
+) NB
+
+WHERE
+(
+");
+
+                    for (int i = 0; i < tokens.Count; i++)
+                    {
+                        if (i > 0)
+                        {
+                            sql.AppendLine(" + ");
+                        }
+
+                        sql.Append(
+                            "CASE WHEN NB.NombreBusqueda LIKE @token" +
+                            i +
+                            " THEN 1 ELSE 0 END"
+                        );
+                    }
+
+                    sql.AppendLine();
+                    sql.AppendLine(") >= @minimoTokens");
+                    sql.AppendLine("ORDER BY MJ.fecha_alta DESC;");
+
+                    using (
+                        SqlCommand cmd =
+                            new SqlCommand(
+                                sql.ToString(),
+                                cn
+                            )
+                    )
+                    {
+                        cmd.CommandType =
+                            CommandType.Text;
+
+                        cmd.CommandTimeout =
+                            120;
+
+                        for (int i = 0; i < tokens.Count; i++)
+                        {
+                            cmd.Parameters.Add(
+                                "@token" + i,
+                                SqlDbType.NVarChar,
+                                100
+                            ).Value =
+                                "%" + tokens[i] + "%";
+                        }
+
+                        /*
+                         * Con dos o más tokens pedimos que coincidan
+                         * al menos dos. Esto evita consultar únicamente
+                         * por un apellido demasiado común.
+                         */
+                        int minimoTokens =
+                            tokens.Count >= 2
+                                ? 2
+                                : 1;
+
+                        cmd.Parameters.Add(
+                            "@minimoTokens",
+                            SqlDbType.Int
+                        ).Value =
+                            minimoTokens;
+
+                        using (
+                            SqlDataAdapter da =
+                                new SqlDataAdapter(cmd)
+                        )
+                        {
+                            da.Fill(tabla);
+                        }
+                    }
+                }
+            }
+
+            return tabla;
+        }
+
+
+        private static List<string> ObtenerTokensMandamientos(
+    string nombreCompleto)
+        {
+            string nombreNormalizado =
+                NormalizarNombreMandamientos(
+                    nombreCompleto
+                );
+
+            if (string.IsNullOrWhiteSpace(nombreNormalizado))
+            {
+                return new List<string>();
+            }
+
+            HashSet<string> palabrasIgnoradas =
+                new HashSet<string>(
+                    StringComparer.OrdinalIgnoreCase
+                )
+                {
+            "DE",
+            "DEL",
+            "LA",
+            "LAS",
+            "LOS",
+            "Y"
+                };
+
+            return nombreNormalizado
+                .Split(
+                    new[] { ' ' },
+                    StringSplitOptions.RemoveEmptyEntries
+                )
+                .Select(x => x.Trim())
+                .Where(x =>
+                    !string.IsNullOrWhiteSpace(x) &&
+                    !palabrasIgnoradas.Contains(x)
+                )
+                .Distinct(
+                    StringComparer.OrdinalIgnoreCase
+                )
+                .ToList();
+        }
+
+
+        private static string NormalizarNombreMandamientos(
+            string texto)
+        {
+            if (string.IsNullOrWhiteSpace(texto))
+            {
+                return "";
+            }
+
+            string textoDescompuesto =
+                texto
+                    .Trim()
+                    .ToUpperInvariant()
+                    .Normalize(
+                        NormalizationForm.FormD
+                    );
+
+            StringBuilder resultado =
+                new StringBuilder();
+
+            foreach (char caracter in textoDescompuesto)
+            {
+                UnicodeCategory categoria =
+                    CharUnicodeInfo.GetUnicodeCategory(
+                        caracter
+                    );
+
+                if (
+                    categoria ==
+                    UnicodeCategory.NonSpacingMark
+                )
+                {
+                    continue;
+                }
+
+                if (
+                    char.IsLetterOrDigit(caracter) ||
+                    char.IsWhiteSpace(caracter)
+                )
+                {
+                    resultado.Append(caracter);
+                }
+                else
+                {
+                    resultado.Append(' ');
+                }
+            }
+
+            return string.Join(
+                " ",
+                resultado
+                    .ToString()
+                    .Split(
+                        new[] { ' ' },
+                        StringSplitOptions.RemoveEmptyEntries
+                    )
+            );
+        }
+
 
     }
 }

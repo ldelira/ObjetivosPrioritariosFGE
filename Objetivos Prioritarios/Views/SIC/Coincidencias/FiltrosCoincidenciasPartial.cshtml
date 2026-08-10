@@ -1,0 +1,208 @@
+﻿@model Objetivos_Prioritarios.Models.Extends.BusquedaCoincidenciasViewModel
+
+<section class="sic-filtros-card">
+
+    <div class="sic-filtros-principales">
+
+        <div class="sic-campo sic-campo-tipo">
+            @Html.LabelFor(
+                model => model.TipoCoincidencia,
+                "Tipo de resultado",
+                new
+                {
+                    @for = "TipoCoincidencia"
+                }
+            )
+
+            @Html.DropDownListFor(
+                model => model.TipoCoincidencia,
+                Model.TiposCoincidencia,
+                new
+                {
+                    id = "TipoCoincidencia",
+                    @class = "form-control",
+                    aria_label = "Tipo de resultado que desea consultar"
+                }
+            )
+        </div>
+
+        <div class="sic-campo sic-campo-porcentaje">
+            <label for="PorcentajeMinimo">Porcentaje mínimo</label>
+
+            <div class="sic-porcentaje-control">
+                <output id="valorPorcentajeMinimo"
+                        for="PorcentajeMinimo">
+                    @(Model.PorcentajeMinimo)%
+                </output>
+
+                @Html.TextBoxFor(
+                    model => model.PorcentajeMinimo,
+                    new
+                    {
+                        id = "PorcentajeMinimo",
+                        type = "range",
+                        min = "50",
+                        max = "100",
+                        step = "1",
+                        @class = "sic-range",
+                        aria_label = "Porcentaje mínimo de coincidencia"
+                    }
+                )
+            </div>
+        </div>
+
+        <div class="sic-filtros-acciones">
+            <button type="button"
+                    id="btnFiltrosAvanzados"
+                    class="btn sic-btn-filtros-avanzados"
+                    aria-expanded="false"
+                    aria-controls="panelFiltrosAvanzados">
+                <i class="fa fa-sliders"></i>
+                <span>Filtros avanzados</span>
+
+                <span id="contadorFiltrosAvanzados"
+                      class="sic-contador-filtros"
+                      style="display:none;">
+                    0
+                </span>
+
+                <i class="fa fa-chevron-down sic-filtros-flecha"></i>
+            </button>
+
+            <button type="submit"
+                    id="btnBuscarCoincidencias"
+                    class="btn sic-btn-buscar"
+                    disabled>
+                <i class="fa fa-search"></i>
+                <span>Buscar coincidencias</span>
+            </button>
+
+            <button type="button"
+                    id="btnLimpiarBusqueda"
+                    class="btn sic-btn-limpiar">
+                <i class="fa fa-undo"></i>
+                <span>Limpiar</span>
+            </button>
+        </div>
+    </div>
+
+    <div id="panelFiltrosAvanzados"
+         class="sic-filtros-avanzados-panel"
+         style="display:none;">
+
+        <div class="sic-filtros-avanzados-header">
+            <div>
+                <strong>Filtros avanzados</strong>
+                <span>
+                    Úselos únicamente cuando necesite reducir los resultados.
+                </span>
+            </div>
+
+            <div class="sic-filtros-avanzados-advertencia">
+                <i class="fa fa-info-circle"></i>
+                <span>
+                    Algunas fuentes podrían no contar con edad, municipio o sexo.
+                </span>
+            </div>
+        </div>
+
+        <div class="sic-filtros-avanzados-grid">
+
+            <div class="sic-campo">
+                @Html.LabelFor(
+                    model => model.Municipio,
+                    "Municipio",
+                    new
+                    {
+                        @for = "Municipio"
+                    }
+                )
+
+                @Html.DropDownListFor(
+                    model => model.Municipio,
+                    Model.Municipios,
+                    new
+                    {
+                        id = "Municipio",
+                        @class = "form-control",
+                        aria_label = "Filtrar los resultados por municipio"
+                    }
+                )
+            </div>
+
+            <div class="sic-campo">
+                @Html.LabelFor(
+                    model => model.EdadMinima,
+                    "Edad mínima",
+                    new
+                    {
+                        @for = "EdadMinima"
+                    }
+                )
+
+                @Html.TextBoxFor(
+                    model => model.EdadMinima,
+                    new
+                    {
+                        id = "EdadMinima",
+                        type = "number",
+                        min = "0",
+                        max = "120",
+                        step = "1",
+                        placeholder = "Sin mínimo",
+                        @class = "form-control",
+                        aria_label = "Edad mínima de los resultados"
+                    }
+                )
+            </div>
+
+            <div class="sic-campo">
+                @Html.LabelFor(
+                    model => model.EdadMaxima,
+                    "Edad máxima",
+                    new
+                    {
+                        @for = "EdadMaxima"
+                    }
+                )
+
+                @Html.TextBoxFor(
+                    model => model.EdadMaxima,
+                    new
+                    {
+                        id = "EdadMaxima",
+                        type = "number",
+                        min = "0",
+                        max = "120",
+                        step = "1",
+                        placeholder = "Sin máximo",
+                        @class = "form-control",
+                        aria_label = "Edad máxima de los resultados"
+                    }
+                )
+            </div>
+
+            <div class="sic-campo">
+                @Html.LabelFor(
+                    model => model.Sexo,
+                    "Sexo",
+                    new
+                    {
+                        @for = "Sexo"
+                    }
+                )
+
+                @Html.DropDownListFor(
+                    model => model.Sexo,
+                    Model.Sexos,
+                    new
+                    {
+                        id = "Sexo",
+                        @class = "form-control",
+                        aria_label = "Filtrar los resultados por sexo"
+                    }
+                )
+            </div>
+        </div>
+    </div>
+</section>

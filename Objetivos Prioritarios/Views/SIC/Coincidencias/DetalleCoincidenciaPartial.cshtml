@@ -1,0 +1,781 @@
+﻿@model Objetivos_Prioritarios.Models.Extends.DetalleCoincidenciaViewModel
+
+@{
+    var coincidencia =
+        Model == null
+            ? null
+            : Model.Coincidencia;
+
+    bool tieneFotografiaConsulta =
+        Model != null &&
+        Model.TieneFotografiaConsulta;
+
+    bool tieneHuellaConsulta =
+        Model != null &&
+        Model.TieneHuellaConsulta;
+
+    string imagenNoDisponible =
+        Url.Content(
+            "~/Content/imagenes/Nodisponible.jpg"
+        );
+
+    string fotoCandidatoUrl =
+        coincidencia == null ||
+        string.IsNullOrWhiteSpace(coincidencia.FotoUrl)
+            ? imagenNoDisponible
+            : Url.Content(coincidencia.FotoUrl);
+}
+
+@if (coincidencia == null)
+{
+    <div class="sic-detalle-vacio">
+        <div class="sic-estado-icono">
+            <i class="fa fa-user-o"></i>
+        </div>
+
+        <strong>Seleccione una coincidencia</strong>
+
+        <span>
+            Elija uno de los candidatos para consultar su información, fuente y evidencias.
+        </span>
+    </div>
+}
+else
+{
+    decimal porcentajeTexto =
+        coincidencia.PorcentajeTexto;
+
+    if (porcentajeTexto <= 0)
+    {
+        porcentajeTexto =
+            Math.Max(
+                coincidencia.PorcentajeNombre,
+                coincidencia.PorcentajeAlias
+            );
+    }
+
+    decimal similitudMostrada =
+        coincidencia.SimilitudGlobal;
+
+    if (similitudMostrada <= 0)
+    {
+        similitudMostrada =
+            Math.Max(
+                porcentajeTexto,
+                Math.Max(
+                    coincidencia.PorcentajeFoto,
+                    coincidencia.PorcentajeHuella
+                )
+            );
+    }
+
+    bool tieneCoincidenciaNombre =
+        coincidencia.PorcentajeNombre > 0;
+
+    bool tieneCoincidenciaAlias =
+        coincidencia.PorcentajeAlias > 0;
+
+    bool tieneCoincidenciaTexto =
+        porcentajeTexto > 0;
+
+    bool tieneCoincidenciaFoto =
+        coincidencia.PorcentajeFoto > 0;
+
+    bool tieneCoincidenciaHuella =
+        coincidencia.PorcentajeHuella > 0;
+
+    bool tieneCoincidenciaBiometrica =
+        tieneCoincidenciaFoto ||
+        tieneCoincidenciaHuella;
+
+    bool tieneCoincidenciaCombinada =
+        tieneCoincidenciaFoto &&
+        tieneCoincidenciaHuella;
+
+    bool tieneTextoYBiometria =
+        tieneCoincidenciaTexto &&
+        tieneCoincidenciaBiometrica;
+
+    string claseNivel;
+    string textoNivel;
+
+    if (similitudMostrada >= 85)
+    {
+        claseNivel = "sic-probabilidad-alta";
+        textoNivel = "Alta probabilidad";
+    }
+    else if (similitudMostrada >= 75)
+    {
+        claseNivel = "sic-probabilidad-media";
+        textoNivel = "Probabilidad media";
+    }
+    else
+    {
+        claseNivel = "sic-probabilidad-baja";
+        textoNivel = "Probabilidad baja";
+    }
+
+    string tipoResultadoTexto;
+
+    if (tieneTextoYBiometria)
+    {
+        tipoResultadoTexto = "Coincidencia textual y biométrica";
+    }
+    else if (tieneCoincidenciaCombinada)
+    {
+        tipoResultadoTexto = "Coincidencia por fotografía y huella";
+    }
+    else if (tieneCoincidenciaFoto)
+    {
+        tipoResultadoTexto = "Coincidencia por fotografía";
+    }
+    else if (tieneCoincidenciaHuella)
+    {
+        tipoResultadoTexto = "Coincidencia por huella";
+    }
+    else if (tieneCoincidenciaTexto)
+    {
+        tipoResultadoTexto = "Coincidencia por nombre o alias";
+    }
+    else
+    {
+        tipoResultadoTexto =
+            string.IsNullOrWhiteSpace(coincidencia.TipoCoincidencia)
+                ? "Coincidencia encontrada"
+                : coincidencia.TipoCoincidencia;
+    }
+
+    string nombreCompleto =
+        string.IsNullOrWhiteSpace(coincidencia.NombreCompleto)
+            ? "SIN INFORMACIÓN"
+            : coincidencia.NombreCompleto.Trim();
+
+    string alias =
+        string.IsNullOrWhiteSpace(coincidencia.Alias)
+            ? "SIN INFORMACIÓN"
+            : coincidencia.Alias.Trim();
+
+    string sexo =
+        string.IsNullOrWhiteSpace(coincidencia.Sexo)
+            ? "SIN INFORMACIÓN"
+            : coincidencia.Sexo.Trim();
+
+    string municipio =
+        string.IsNullOrWhiteSpace(coincidencia.Municipio)
+            ? "SIN INFORMACIÓN"
+            : coincidencia.Municipio.Trim();
+
+    string folio =
+        string.IsNullOrWhiteSpace(coincidencia.Folio)
+            ? "SIN INFORMACIÓN"
+            : coincidencia.Folio.Trim();
+
+    string expediente =
+        string.IsNullOrWhiteSpace(coincidencia.Expediente)
+            ? "SIN INFORMACIÓN"
+            : coincidencia.Expediente.Trim();
+
+    string nombreFuente =
+        string.IsNullOrWhiteSpace(coincidencia.NombreFuente)
+            ? "Fuente " + coincidencia.IdTbFuente
+            : coincidencia.NombreFuente.Trim();
+
+    string textoCoincidente =
+        string.IsNullOrWhiteSpace(coincidencia.TextoCoincidente)
+            ? ""
+            : coincidencia.TextoCoincidente.Trim();
+
+    string origenCoincidenciaTexto =
+        string.IsNullOrWhiteSpace(coincidencia.OrigenCoincidenciaTexto)
+            ? ""
+            : coincidencia.OrigenCoincidenciaTexto.Trim().ToUpperInvariant();
+
+    string descripcionCoincidenciaTexto =
+        "Coincidencia textual";
+
+    if (origenCoincidenciaTexto == "NOMBRE")
+    {
+        descripcionCoincidenciaTexto = "Coincidencia por nombre";
+    }
+    else if (origenCoincidenciaTexto == "ALIAS")
+    {
+        descripcionCoincidenciaTexto = "Coincidencia por alias";
+    }
+    else if (
+        origenCoincidenciaTexto == "AMBOS" ||
+        origenCoincidenciaTexto == "NOMBRE_Y_ALIAS"
+    )
+    {
+        descripcionCoincidenciaTexto = "Coincidencia por nombre y alias";
+    }
+
+    string claseFuente;
+
+    switch (coincidencia.IdTbFuente)
+    {
+        case 1:
+            claseFuente = "sic-fuente-c5";
+            break;
+
+        case 2:
+        case 7:
+        case 8:
+            claseFuente = "sic-fuente-alerta";
+            break;
+
+        case 3:
+            claseFuente = "sic-fuente-interes";
+            break;
+
+        case 4:
+            claseFuente = "sic-fuente-informativa";
+            break;
+
+        case 5:
+            claseFuente = "sic-fuente-objetivos";
+            break;
+
+        case 6:
+            claseFuente = "sic-fuente-detenidos";
+            break;
+
+        default:
+            claseFuente = "sic-fuente-generica";
+            break;
+    }
+
+    <div class="sic-detalle-header">
+        <div class="sic-detalle-header-titulo">
+            <div class="sic-detalle-header-icono">
+                <i class="fa fa-id-card-o"></i>
+            </div>
+
+            <div>
+                <h3>Detalle de la coincidencia</h3>
+                <span>@tipoResultadoTexto</span>
+            </div>
+        </div>
+
+        <span class="sic-probabilidad @claseNivel">
+            <i class="fa fa-check-circle"></i>
+            @textoNivel
+        </span>
+    </div>
+
+    <div class="sic-detalle-fuente">
+        <div class="sic-detalle-fuente-identificador @claseFuente">
+            <i class="fa fa-database"></i>
+
+            <div>
+                <small>Fuente del registro</small>
+                <strong>@nombreFuente</strong>
+            </div>
+        </div>
+
+        <div class="sic-detalle-fuente-id">
+            <span>ID persona</span>
+            <strong>@coincidencia.IdPersona</strong>
+        </div>
+
+        <div class="sic-detalle-fuente-id">
+            <span>ID fuente</span>
+            <strong>@coincidencia.IdTbFuente</strong>
+        </div>
+    </div>
+
+    <div class="sic-detalle-principal">
+        <div class="sic-detalle-foto-contenedor">
+            <img src="@fotoCandidatoUrl"
+                 alt="Fotografía de @nombreCompleto"
+                 class="sic-detalle-foto"
+                 loading="lazy"
+                 onerror="this.onerror=null;this.src='@imagenNoDisponible';" />
+
+            <span class="sic-detalle-foto-fuente @claseFuente">
+                <i class="fa fa-database"></i>
+                @nombreFuente
+            </span>
+        </div>
+
+        <div class="sic-detalle-datos">
+            <div class="sic-detalle-dato-principal">
+                <small>Nombre completo</small>
+                <strong>@nombreCompleto</strong>
+            </div>
+
+            <div class="sic-detalle-dato-principal">
+                <small>Alias</small>
+                <strong>@alias</strong>
+            </div>
+
+            <div>
+                <small>Sexo</small>
+                <strong>@sexo</strong>
+            </div>
+
+            <div>
+                <small>Edad</small>
+                <strong>
+                    @if (coincidencia.Edad > 0)
+                    {
+                        <text>@coincidencia.Edad años</text>
+                    }
+                    else
+                    {
+                        <text>SIN INFORMACIÓN</text>
+                    }
+                </strong>
+            </div>
+
+            <div>
+                <small>Municipio</small>
+                <strong>@municipio</strong>
+            </div>
+
+            <div>
+                <small>Folio</small>
+                <strong>@folio</strong>
+            </div>
+
+            <div>
+                <small>Expediente</small>
+                <strong>@expediente</strong>
+            </div>
+
+            <div>
+                <small>Fecha de registro</small>
+                <strong>
+                    @if (coincidencia.FechaRegistro != DateTime.MinValue)
+                    {
+                        <text>@coincidencia.FechaRegistro.ToString("dd/MM/yyyy")</text>
+                    }
+                    else
+                    {
+                        <text>SIN INFORMACIÓN</text>
+                    }
+                </strong>
+            </div>
+        </div>
+
+        <div class="sic-detalle-puntajes">
+            <h4>Evidencias encontradas</h4>
+
+            <div class="sic-puntaje-item">
+                <span><i class="fa fa-user"></i> Nombre</span>
+                <strong class="@(tieneCoincidenciaNombre ? "sic-puntaje-disponible" : "")">
+                    @(tieneCoincidenciaNombre
+                        ? coincidencia.PorcentajeNombre.ToString("0") + "%"
+                        : "N/A")
+                </strong>
+            </div>
+
+            <div class="sic-puntaje-item">
+                <span><i class="fa fa-user-secret"></i> Alias</span>
+                <strong class="@(tieneCoincidenciaAlias ? "sic-puntaje-disponible" : "")">
+                    @(tieneCoincidenciaAlias
+                        ? coincidencia.PorcentajeAlias.ToString("0") + "%"
+                        : "N/A")
+                </strong>
+            </div>
+
+            <div class="sic-puntaje-item">
+                <span><i class="fa fa-camera"></i> Fotografía</span>
+                <strong class="@(tieneCoincidenciaFoto ? "sic-puntaje-disponible" : "")">
+                    @(tieneCoincidenciaFoto
+                        ? coincidencia.PorcentajeFoto.ToString("0") + "%"
+                        : "N/A")
+                </strong>
+            </div>
+
+            <div class="sic-puntaje-item">
+                <span><i class="fa fa-hand-pointer-o"></i> Huella</span>
+                <strong class="@(tieneCoincidenciaHuella ? "sic-puntaje-disponible" : "")">
+                    @(tieneCoincidenciaHuella
+                        ? coincidencia.PorcentajeHuella.ToString("0") + "%"
+                        : "N/A")
+                </strong>
+            </div>
+
+            <div class="sic-puntaje-global">
+                <span>Mejor coincidencia</span>
+                <strong>@similitudMostrada.ToString("0")%</strong>
+            </div>
+        </div>
+    </div>
+
+    if (tieneCoincidenciaTexto)
+    {
+        <section class="sic-detalle-texto-coincidencia">
+            <div class="sic-detalle-texto-icono">
+                @if (origenCoincidenciaTexto == "ALIAS")
+                {
+                    <i class="fa fa-user-secret"></i>
+                }
+                else
+                {
+                    <i class="fa fa-font"></i>
+                }
+            </div>
+
+            <div class="sic-detalle-texto-contenido">
+                <small>Evidencia textual</small>
+                <strong>@descripcionCoincidenciaTexto</strong>
+
+                @if (!string.IsNullOrWhiteSpace(textoCoincidente))
+                {
+                    <p>
+                        El texto consultado coincidió con:
+                        <b>@textoCoincidente</b>
+                    </p>
+                }
+            </div>
+
+            <span class="sic-detalle-texto-porcentaje">
+                @porcentajeTexto.ToString("0")%
+            </span>
+        </section>
+    }
+
+    if (
+    coincidencia.TieneAvisoMandamientos &&
+    coincidencia.MandamientosJudiciales != null &&
+    coincidencia.MandamientosJudiciales.Count > 0
+)
+    {
+        string idPanelMandamientos =
+            "panelMandamientos_" +
+            coincidencia.IdPersona +
+            "_" +
+            coincidencia.IdTbFuente;
+
+        <section class="sic-mandamientos-alerta sic-mandamientos-colapsado">
+
+            <!-- =====================================================
+                 ENCABEZADO CLICKEABLE
+                 ===================================================== -->
+
+            <button type="button"
+                    class="sic-mandamientos-alerta-header sic-mandamientos-toggle js-toggle-mandamientos"
+                    data-target="#@idPanelMandamientos"
+                    aria-expanded="false"
+                    aria-controls="@idPanelMandamientos">
+
+                <div class="sic-mandamientos-alerta-icono">
+                    <i class="fa fa-exclamation-triangle"></i>
+                </div>
+
+                <div class="sic-mandamientos-alerta-texto">
+
+                    <h4>
+                        Coincidencia nominal en Mandamientos Judiciales
+                    </h4>
+
+                    <p>
+                        Existe uno o más registros con nombre coincidente.
+                        La coincidencia es únicamente nominal y requiere validación.
+                    </p>
+
+                    <span class="sic-mandamientos-indicacion">
+                        Haga clic para consultar los registros encontrados
+                    </span>
+
+                </div>
+
+                <div class="sic-mandamientos-toggle-derecha">
+
+                    <span class="sic-mandamientos-total">
+                        @coincidencia.TotalMandamientos
+                    </span>
+
+                    <span class="sic-mandamientos-flecha">
+                        <i class="fa fa-chevron-down"></i>
+                    </span>
+
+                </div>
+
+            </button>
+
+
+            <!-- =====================================================
+                 CONTENIDO DESPLEGABLE
+                 ===================================================== -->
+
+            <div id="@idPanelMandamientos"
+                 class="sic-mandamientos-contenido"
+                 style="display:none;"
+                 aria-hidden="true">
+
+                <div class="sic-mandamientos-aviso-legal">
+
+                    <i class="fa fa-info-circle"></i>
+
+                    <span>
+                        Este aviso no representa una coincidencia biométrica
+                        y no modifica el porcentaje principal.
+                    </span>
+
+                </div>
+
+
+                <div class="sic-mandamientos-lista">
+
+                    @foreach (
+                        var mandamiento
+                        in coincidencia.MandamientosJudiciales
+                    )
+                    {
+                        string nombreMandamiento =
+                            string.IsNullOrWhiteSpace(
+                                mandamiento.NombreCompleto
+                            )
+                                ? "SIN INFORMACIÓN"
+                                : mandamiento.NombreCompleto.Trim();
+
+
+                        string numeroControl =
+                            string.IsNullOrWhiteSpace(
+                                mandamiento.NumeroControl
+                            )
+                                ? "SIN INFORMACIÓN"
+                                : mandamiento.NumeroControl.Trim();
+
+
+                        string numeroExpediente =
+                            string.IsNullOrWhiteSpace(
+                                mandamiento.NumeroExpediente
+                            )
+                                ? "SIN INFORMACIÓN"
+                                : mandamiento.NumeroExpediente.Trim();
+
+
+                        string tipoMandamiento =
+                            string.IsNullOrWhiteSpace(
+                                mandamiento.TipoMandamiento
+                            )
+                                ? "MANDAMIENTO JUDICIAL"
+                                : mandamiento.TipoMandamiento.Trim();
+
+
+                        string estadoProceso =
+                            string.IsNullOrWhiteSpace(
+                                mandamiento.EstadoProceso
+                            )
+                                ? "SIN INFORMACIÓN"
+                                : mandamiento.EstadoProceso.Trim();
+
+
+                        <article class="sic-mandamiento-item">
+
+                            <div class="sic-mandamiento-item-header">
+
+                                <div>
+
+                                    <small>
+                                        Tipo de mandamiento
+                                    </small>
+
+                                    <strong>
+                                        @tipoMandamiento
+                                    </strong>
+
+                                </div>
+
+
+                                <span>
+
+                                    <i class="fa fa-font"></i>
+
+                                    @mandamiento.PorcentajeNombre% por nombre
+
+                                </span>
+
+                            </div>
+
+
+                            <div class="sic-mandamiento-datos">
+
+                                <div>
+
+                                    <small>
+                                        Nombre registrado
+                                    </small>
+
+                                    <strong>
+                                        @nombreMandamiento
+                                    </strong>
+
+                                </div>
+
+
+                                <div>
+
+                                    <small>
+                                        Número de control
+                                    </small>
+
+                                    <strong>
+                                        @numeroControl
+                                    </strong>
+
+                                </div>
+
+
+                                <div>
+
+                                    <small>
+                                        Expediente
+                                    </small>
+
+                                    <strong>
+                                        @numeroExpediente
+                                    </strong>
+
+                                </div>
+
+
+                                <div>
+
+                                    <small>
+                                        Estado del proceso
+                                    </small>
+
+                                    <strong>
+                                        @estadoProceso
+                                    </strong>
+
+                                </div>
+
+
+                                <div>
+
+                                    <small>
+                                        Fecha de expedición
+                                    </small>
+
+                                    <strong>
+
+                                        @(mandamiento.FechaExpedicion.HasValue
+                                        ? mandamiento.FechaExpedicion
+                                            .Value
+                                            .ToString("dd/MM/yyyy")
+                                        : "SIN INFORMACIÓN")
+
+                                    </strong>
+
+                                </div>
+
+
+                                <div>
+
+                                    <small>
+                                        Fecha de alta
+                                    </small>
+
+                                    <strong>
+
+                                        @(mandamiento.FechaAlta.HasValue
+                                        ? mandamiento.FechaAlta
+                                            .Value
+                                            .ToString("dd/MM/yyyy")
+                                        : "SIN INFORMACIÓN")
+
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+                        </article>
+                    }
+
+                </div>
+
+            </div>
+
+        </section>
+    }
+
+    if (tieneFotografiaConsulta || tieneHuellaConsulta)
+    {
+        <section class="sic-comparaciones-seccion">
+            <div class="sic-comparaciones-header">
+                <div>
+                    <h4>Comparación biométrica</h4>
+                    <span>Información enviada contra el registro candidato.</span>
+                </div>
+
+                <span class="sic-comparaciones-badge">
+                    <i class="fa fa-shield"></i>
+                    Análisis biométrico
+                </span>
+            </div>
+
+            <div class="sic-comparaciones">
+                @if (tieneFotografiaConsulta)
+                {
+                    <div class="sic-comparacion-card js-comparacion-foto">
+                        <h4>
+                            <i class="fa fa-camera"></i>
+                            Comparación de fotografía
+                        </h4>
+
+                        <div class="sic-comparacion-contenido">
+                            <div>
+                                <small>Consulta</small>
+                                <img src=""
+                                     class="sic-comparacion-imagen js-imagen-consulta-foto"
+                                     alt="Fotografía consultada" />
+                            </div>
+
+                            <span class="sic-comparacion-porcentaje">
+                                @(tieneCoincidenciaFoto
+                                    ? coincidencia.PorcentajeFoto.ToString("0") + "%"
+                                    : "N/A")
+                            </span>
+
+                            <div>
+                                <small>Candidato</small>
+                                <img src="@fotoCandidatoUrl"
+                                     class="sic-comparacion-imagen"
+                                     alt="Fotografía candidata"
+                                     onerror="this.onerror=null;this.src='@imagenNoDisponible';" />
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                @if (tieneHuellaConsulta)
+                {
+                    <div class="sic-comparacion-card js-comparacion-huella">
+                        <h4>
+                            <i class="fa fa-hand-pointer-o"></i>
+                            Comparación de huella
+                        </h4>
+
+                        <div class="sic-comparacion-contenido">
+                            <div>
+                                <small>Consulta</small>
+                                <img src=""
+                                     class="sic-comparacion-imagen sic-comparacion-huella js-imagen-consulta-huella"
+                                     alt="Huella consultada" />
+                            </div>
+
+                            <span class="sic-comparacion-porcentaje">
+                                @(tieneCoincidenciaHuella
+                                    ? coincidencia.PorcentajeHuella.ToString("0") + "%"
+                                    : "N/A")
+                            </span>
+
+                            <div>
+                                <small>Candidato</small>
+                                <div class="sic-huella-candidata">
+                                    <i class="fa fa-hand-pointer-o"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </section>
+    }
+}

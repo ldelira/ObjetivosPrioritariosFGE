@@ -379,14 +379,14 @@
         grid-template-columns: repeat(3, minmax(0, 1fr));
         column-gap: 14px;
         row-gap: 22px;
-        width: 500px;
+        width: 525px;
         max-width: none;
         margin-left: 0;
         margin-right: auto;
         justify-self: start;
         align-self: start;
         box-sizing: border-box;
-        transform: translateX(-20px);
+        transform: translateX(-45px);
     }
 
         .sic-hero-counter {
@@ -6567,8 +6567,22 @@ new System.Collections.Generic.List<int>();
                                      alt="Huella en Municipio"
                                      onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=&quot;fa fa-hand-paper-o&quot;></i>';" />
 
+                                @{string nombreHuella =
+                                    System.IO.Path.GetFileNameWithoutExtension(
+                                    Convert.ToString(huella.Huellas)
+                                    );
+
+                                    int ultimoGuion = nombreHuella.LastIndexOf('_');
+
+                                    if (ultimoGuion >= 0 &&
+                                    ultimoGuion < nombreHuella.Length - 1)
+                                    {
+                                        nombreHuella =
+                                        nombreHuella.Substring(ultimoGuion + 1);
+                                    }
+                                }
                                 <div class="sic-gallery-caption">
-                                    <span>@huella.IdHuella</span>
+                                    <span>@nombreHuella</span>
                                 </div>
                             </div>
                         }
@@ -6628,7 +6642,11 @@ new System.Collections.Generic.List<int>();
 
                                     if (tipoRasgo.StartsWith("RASGO: Punto Seleccionado:", StringComparison.OrdinalIgnoreCase))
                                     {
-                                        tipoRasgo = tipoRasgo.Substring(26).Trim();
+                                        tipoRasgo = tipoRasgo.Substring(27).Trim();
+                                    }
+                                    else if (tipoRasgo.StartsWith("RASGO:", StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        tipoRasgo = tipoRasgo.Substring(7).Trim();
                                     }
 
                                 }

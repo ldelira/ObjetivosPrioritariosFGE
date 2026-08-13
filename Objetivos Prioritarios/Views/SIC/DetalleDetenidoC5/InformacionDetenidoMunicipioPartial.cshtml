@@ -1,0 +1,396 @@
+﻿@model Objetivos_Prioritarios.Models.sp_BuscarDetenido_Result
+
+@using System
+
+@{
+    var datosDetenidoC5 =
+        ViewBag.DatosDetenidoC5
+        as Objetivos_Prioritarios.Models.tb_DETENIDO_C5;
+}
+
+
+<!-- ================================================================
+     INFORMACIÓN DEL DETENIDO EN MUNICIPIO
+     SEGUNDA COLUMNA DEL GRID SUPERIOR
+     ================================================================ -->
+<div class="sic-card">
+
+    <!-- ============================================================
+         ENCABEZADO
+         ============================================================ -->
+    <div class="sic-card-header sic-card-header-confirmadas">
+
+        <h5>
+            <i class="fa fa-user"></i>
+            Datos del detenido en Municipio
+        </h5>
+
+    </div>
+
+
+    <!-- ============================================================
+         CONTENIDO
+         ============================================================ -->
+    <div class="sic-card-body">
+
+        @if (datosDetenidoC5 != null)
+        {
+            /* ======================================================
+               PREPARACIÓN DE DATOS
+               ====================================================== */
+
+            string detNombre =
+                ViewBag.Texto(
+                    datosDetenidoC5.NOMBRE
+                );
+
+            string detPaterno =
+                ViewBag.Texto(
+                    datosDetenidoC5.Ap_Paterno
+                );
+
+            string detMaterno =
+                ViewBag.Texto(
+                    datosDetenidoC5.Ap_Materno
+                );
+
+
+            string detNombreCompleto =
+                (
+                    (
+                        detNombre == "SIN INFORMACIÓN"
+                            ? ""
+                            : detNombre
+                    )
+                    + " "
+                    +
+                    (
+                        detPaterno == "SIN INFORMACIÓN"
+                            ? ""
+                            : detPaterno
+                    )
+                    + " "
+                    +
+                    (
+                        detMaterno == "SIN INFORMACIÓN"
+                            ? ""
+                            : detMaterno
+                    )
+                ).Trim();
+
+
+            if (
+                string.IsNullOrWhiteSpace(
+                    detNombreCompleto
+                )
+            )
+            {
+                detNombreCompleto =
+                    "SIN INFORMACIÓN";
+            }
+
+
+            string detAlias =
+                ViewBag.Texto(
+                    datosDetenidoC5.ALIAS
+                );
+
+            string detEdad =
+                ViewBag.Texto(
+                    datosDetenidoC5.EDAD
+                );
+
+            string detOriginario =
+                ViewBag.Texto(
+                    datosDetenidoC5.ORIGINARIO
+                );
+
+            string detSexo =
+                ViewBag.Texto(
+                    datosDetenidoC5.SEXO
+                );
+
+            string detFechaNacimiento =
+                ViewBag.Fecha(
+                    datosDetenidoC5.FECHA_NACIMIENTO
+                );
+
+            string detCalle =
+                ViewBag.Texto(
+                    datosDetenidoC5.CALLE
+                );
+
+            string detColonia =
+                ViewBag.Texto(
+                    datosDetenidoC5.COLONIA
+                );
+
+            string detCp =
+                ViewBag.Texto(
+                    datosDetenidoC5.CP
+                );
+
+            string detMunicipio =
+                ViewBag.Texto(
+                    datosDetenidoC5.MUNICIPIO
+                );
+
+            string detNumExt =
+                ViewBag.Texto(
+                    datosDetenidoC5.NUMEXT
+                );
+
+            string detNumInt =
+                ViewBag.Texto(
+                    datosDetenidoC5.NUMINT
+                );
+
+            string detOcupacion =
+                ViewBag.Texto(
+                    datosDetenidoC5.Ocupacion
+                );
+
+            string detCaracteristicas =
+                ViewBag.Texto(
+                    datosDetenidoC5.CaracteristicasDetenido
+                );
+
+            string detEstado =
+                ViewBag.Texto(
+                    datosDetenidoC5.Estado
+                );
+
+
+            <!-- =====================================================
+                 DATOS PRINCIPALES DEL DETENIDO
+                 ===================================================== -->
+            <div class="sic-detenido-c5">
+
+                <!-- =================================================
+                     CABECERA: NOMBRE / SEXO / EDAD
+                     ================================================= -->
+                <div class="sic-detenido-c5-head">
+
+                    <div class="sic-detenido-c5-icon">
+
+                        <i class="fa fa-user"></i>
+
+                    </div>
+
+                    <div>
+
+                        <strong>
+                            @detNombreCompleto
+                        </strong>
+
+                        <span>
+
+                            @detSexo
+
+                            @if (
+                                detEdad !=
+                                "SIN INFORMACIÓN"
+                            )
+                            {
+                                <text>
+                                    · @detEdad años
+                                </text>
+                            }
+
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================================
+                     GRID DE INFORMACIÓN
+                     ================================================= -->
+                <div class="sic-detenido-c5-grid">
+
+                    <div class="sic-detenido-line">
+
+                        <label>
+                            Alias:
+                        </label>
+
+                        <strong>
+                            @detAlias
+                        </strong>
+
+                    </div>
+
+
+                    <div class="sic-detenido-line">
+
+                        <label>
+                            Fecha nac.:
+                        </label>
+
+                        <strong>
+                            @detFechaNacimiento
+                        </strong>
+
+                    </div>
+
+
+                    <div class="sic-detenido-line">
+
+                        <label>
+                            Originario:
+                        </label>
+
+                        <strong>
+                            @detOriginario
+                        </strong>
+
+                    </div>
+
+
+                    <div class="sic-detenido-line">
+
+                        <label>
+                            Ocupación:
+                        </label>
+
+                        <strong>
+                            @detOcupacion
+                        </strong>
+
+                    </div>
+
+
+                    <div class="sic-detenido-line">
+
+                        <label>
+                            Estado:
+                        </label>
+
+                        <strong>
+                            @detEstado
+                        </strong>
+
+                    </div>
+
+
+                    <div class="sic-detenido-line">
+
+                        <label>
+                            Calle:
+                        </label>
+
+                        <strong>
+                            @detCalle
+                        </strong>
+
+                    </div>
+
+
+                    <div class="sic-detenido-line">
+
+                        <label>
+                            Colonia:
+                        </label>
+
+                        <strong>
+                            @detColonia
+                        </strong>
+
+                    </div>
+
+
+                    <div class="sic-detenido-line">
+
+                        <label>
+                            Núm. ext.:
+                        </label>
+
+                        <strong>
+                            @detNumExt
+                        </strong>
+
+                    </div>
+
+
+                    <div class="sic-detenido-line">
+
+                        <label>
+                            Núm. int.:
+                        </label>
+
+                        <strong>
+                            @detNumInt
+                        </strong>
+
+                    </div>
+
+
+                    <div class="sic-detenido-line">
+
+                        <label>
+                            C.P.:
+                        </label>
+
+                        <strong>
+                            @detCp
+                        </strong>
+
+                    </div>
+
+
+                    <div class="sic-detenido-line">
+
+                        <label>
+                            Municipio:
+                        </label>
+
+                        <strong>
+                            @detMunicipio
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================================
+                     CARACTERÍSTICAS FÍSICAS
+                     ================================================= -->
+                <div class="sic-detenido-c5-extra">
+
+                    <label>
+                        Características:
+                    </label>
+
+                    <strong>
+                        @detCaracteristicas
+                    </strong>
+
+                </div>
+
+            </div>
+        }
+        else
+        {
+            <!-- =====================================================
+                 SIN INFORMACIÓN MUNICIPAL
+                 ===================================================== -->
+            <div class="sic-empty-source">
+
+                <i class="fa fa-user"></i>
+
+                <strong>
+                    Datos del detenido en Municipio
+                </strong>
+
+                <span>
+                    Sin información cargada por el momento.
+                </span>
+
+            </div>
+        }
+
+    </div>
+
+</div>

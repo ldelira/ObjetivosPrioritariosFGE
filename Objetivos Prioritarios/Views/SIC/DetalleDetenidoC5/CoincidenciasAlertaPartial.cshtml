@@ -1,0 +1,53 @@
+﻿@model System.Collections.ArrayList
+
+@using System
+
+@if (Model != null && Model.Count > 0)
+{
+    <div class="sic-coincidencias-alerta">
+
+        @foreach (object elemento in Model)
+        {
+            object[] datos = elemento as object[];
+
+            if (datos == null || datos.Length < 5)
+            {
+                continue;
+            }
+
+            int estatus = 0;
+            int porcentaje = 0;
+
+            int.TryParse(
+                Convert.ToString(datos[1]),
+                out estatus
+            );
+
+            int.TryParse(
+                Convert.ToString(datos[2]),
+                out porcentaje
+            );
+
+            string nombreTipo =
+                Convert.ToString(datos[4]);
+
+            if (string.IsNullOrWhiteSpace(nombreTipo))
+            {
+                nombreTipo = "SIN TIPO DE ALERTA";
+            }
+
+            string claseEstatus =
+                estatus == 2
+                    ? "sic-coincidencia-confirmada"
+                    : estatus == 0
+                        ? "sic-coincidencia-descartada"
+                        : "sic-coincidencia-pendiente";
+
+            <span class="sic-porcentaje-coincidencia @claseEstatus">
+                <strong>@porcentaje%</strong>
+                de coincidencia en @nombreTipo
+            </span>
+        }
+
+    </div>
+}

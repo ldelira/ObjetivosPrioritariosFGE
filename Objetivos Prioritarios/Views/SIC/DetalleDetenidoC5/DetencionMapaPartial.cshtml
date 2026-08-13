@@ -1,0 +1,235 @@
+﻿@model Objetivos_Prioritarios.Models.sp_BuscarDetenido_Result
+
+@using System
+
+@{
+    var detencionC5 =
+        ViewBag.DetencionC5 as Objetivos_Prioritarios.Models.tb_DETENCION_C5;
+
+    string totalRegistrosDetenido = Convert.ToString(Model.TotalRegistrosDetenido);
+    totalRegistrosDetenido = string.IsNullOrWhiteSpace(totalRegistrosDetenido)
+        ? "0"
+        : totalRegistrosDetenido;
+}
+
+<div class="sic-section-grid">
+
+    <div class="sic-card">
+        <div class="sic-card-header"
+             style="display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:16px;
+            width:100%;
+            flex-wrap:nowrap;">
+
+            <h5 style="display:flex;
+               align-items:center;
+               gap:8px;
+               margin:0;
+               min-width:0;
+               white-space:nowrap;">
+
+                <i class="fa fa-car"></i>
+
+                Información de detención en Municipio
+            </h5>
+
+            <div class="sic-confirmadas-counter" style="display:flex; align-items:center; gap:10px; margin-left:auto; flex-shrink:0;">
+
+                <div class="sic-confirmadas-counter-icon" style="display:flex; align-items:center; justify-content:center;">
+                    <i class="fa fa-check-circle"></i>
+                </div>
+
+                <div style="display:flex; flex-direction:column; justify-content:center;">
+
+                    <label style="display:block; margin:0; white-space:nowrap;">
+                        Total detenciones
+                    </label>
+
+                    <strong style="display:block;  margin:0;">
+                        @totalRegistrosDetenido
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="sic-card-body">
+
+            @if (detencionC5 != null)
+            {
+                string detConsecutivo = ViewBag.TextoDetencion(detencionC5.CONSECUTIVO);
+                string detFecha = ViewBag.FechaHoraDetencion(detencionC5.FECHA_DETENCION);
+                string detCalle = ViewBag.TextoDetencion(detencionC5.CALLE);
+                string detColonia = ViewBag.TextoDetencion(detencionC5.COLONIA);
+                string detCp = ViewBag.TextoDetencion(detencionC5.CP);
+                string detMunicipio = ViewBag.TextoDetencion(detencionC5.MUNICIPIO);
+                string detNumExt = ViewBag.TextoDetencion(detencionC5.NUMEXT);
+                string detNumInt = ViewBag.TextoDetencion(detencionC5.NUMINT);
+                string detLatitud = ViewBag.TextoDetencion(detencionC5.Latitud);
+                string detLongitud = ViewBag.TextoDetencion(detencionC5.Longitud);
+
+
+                <div class="sic-detencion-compact">
+
+                    <div class="sic-detencion-compact-head">
+                        <div class="sic-detencion-compact-icon">
+                            <i class="fa fa-map-marker"></i>
+                        </div>
+
+                        <div class="sic-detencion-compact-title">
+                            <strong>@detMunicipio</strong>
+                            <span>
+                                @detCalle
+                                @if (detNumExt != "SIN INFORMACIÓN")
+                                {
+                                    <text> #@detNumExt</text>
+                                }
+                                @if (detNumInt != "SIN INFORMACIÓN")
+                                {
+                                    <text> Int. @detNumInt</text>
+                                }
+                                , Col. @detColonia, C.P. @detCp
+                            </span>
+                        </div>
+
+                        @if (detLatitud != "SIN INFORMACIÓN" && detLongitud != "SIN INFORMACIÓN")
+                        {
+                            <a class="sic-small-btn sic-detencion-map-btn"
+                               href="https://www.google.com/maps?q=@detLatitud,@detLongitud"
+                               target="_blank">
+                                <i class="fa fa-map"></i>
+                                Ubicación
+                            </a>
+                        }
+                    </div>
+
+                    <div class="sic-detencion-compact-grid">
+
+                        <div class="sic-detencion-line">
+                            <label>Consecutivo:</label>
+                            <strong>@detConsecutivo</strong>
+                        </div>
+
+                        <div class="sic-detencion-line">
+                            <label>Fecha detención:</label>
+                            <strong>@detFecha</strong>
+                        </div>
+
+                        <div class="sic-detencion-line">
+                            <label>Calle:</label>
+                            <strong>@detCalle</strong>
+                        </div>
+
+                        <div class="sic-detencion-line">
+                            <label>Colonia:</label>
+                            <strong>@detColonia</strong>
+                        </div>
+
+                        <div class="sic-detencion-line">
+                            <label>Núm. exterior:</label>
+                            <strong>@detNumExt</strong>
+                        </div>
+
+                        <div class="sic-detencion-line">
+                            <label>Núm. interior:</label>
+                            <strong>@detNumInt</strong>
+                        </div>
+
+                        <div class="sic-detencion-line">
+                            <label>Código postal:</label>
+                            <strong>@detCp</strong>
+                        </div>
+
+                        <div class="sic-detencion-line">
+                            <label>Municipio:</label>
+                            <strong>@detMunicipio</strong>
+                        </div>
+
+                        <div class="sic-detencion-line">
+                            <label>Latitud:</label>
+                            <strong>@detLatitud</strong>
+                        </div>
+
+                        <div class="sic-detencion-line">
+                            <label>Longitud:</label>
+                            <strong>@detLongitud</strong>
+                        </div>
+
+                    </div>
+
+                </div>
+            }
+            else
+            {
+                <div class="sic-empty-source">
+                    <i class="fa fa-car"></i>
+                    <strong>Información de detención C5</strong>
+                    <span>Sin información cargada por el momento.</span>
+                </div>
+            }
+
+        </div>
+    </div>
+
+    <div class="sic-card">
+        <div class="sic-card-header">
+            <h5>
+                <i class="fa fa-map-marker"></i>
+                Ubicación de detención
+            </h5>
+        </div>
+
+        <div class="sic-card-body">
+
+            @if (ViewBag.TieneCoordenadasMapa)
+            {
+                <div class="sic-map-card">
+
+                    <div class="sic-map-info">
+                        <div>
+                            <label>Latitud:</label>
+                            <strong>@ViewBag.MapaLatitud</strong>
+                        </div>
+
+                        <div>
+                            <label>Longitud:</label>
+                            <strong>@ViewBag.MapaLongitud</strong>
+                        </div>
+
+                        <a class="sic-small-btn"
+                           href="https://www.google.com/maps?q=@ViewBag.MapaLatitud,@ViewBag.MapaLongitud"
+                           target="_blank">
+                            <i class="fa fa-map"></i>
+                            Abrir en Google Maps
+                        </a>
+                    </div>
+
+                    <div class="sic-map-frame">
+                        <iframe src="https://maps.google.com/maps?q=@ViewBag.MapaLatitud,@ViewBag.MapaLongitud&z=16&output=embed"
+                                width="100%"
+                                height="100%"
+                                style="border:0;"
+                                allowfullscreen=""
+                                loading="lazy">
+                        </iframe>
+                    </div>
+
+                </div>
+            }
+            else
+            {
+                <div class="sic-empty-source">
+                    <i class="fa fa-map-marker"></i>
+                    <strong>Ubicación de detención</strong>
+                    <span>Sin coordenadas registradas por el momento.</span>
+                </div>
+            }
+
+        </div>
+    </div>
+
+</div>

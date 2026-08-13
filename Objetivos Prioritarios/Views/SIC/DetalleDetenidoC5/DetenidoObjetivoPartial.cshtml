@@ -1,0 +1,1039 @@
+﻿@model System.Data.DataRow
+
+@using System
+@using System.Data
+@using System.Linq
+@using System.Collections.Generic
+
+@{
+    Layout = null;
+
+    DataRow row = Model;
+
+    bool esModal =
+        ViewData["EsModal"] != null &&
+        Convert.ToBoolean(ViewData["EsModal"]);
+
+    bool mostrarAcciones =
+        ViewData["MostrarAcciones"] != null &&
+        Convert.ToBoolean(ViewData["MostrarAcciones"]);
+
+    int idDetenidoC5 = 0;
+
+    if (ViewData["IdDetenidoC5"] != null)
+    {
+        int.TryParse(
+            Convert.ToString(ViewData["IdDetenidoC5"]),
+            out idDetenidoC5
+        );
+    }
+
+    Func<object, string> texto =
+        ViewBag.Texto as Func<object, string>;
+
+    if (texto == null)
+    {
+        texto = delegate (object valor)
+        {
+            if (valor == null || valor == DBNull.Value)
+            {
+                return "SIN INFORMACIÓN";
+            }
+
+            string resultado =
+                Convert.ToString(valor);
+
+            return string.IsNullOrWhiteSpace(resultado)
+                ? "SIN INFORMACIÓN"
+                : resultado.Trim();
+        };
+    }
+
+    Func<object, string> fecha =
+        ViewBag.Fecha as Func<object, string>;
+
+    if (fecha == null)
+    {
+        fecha = delegate (object valor)
+        {
+            if (valor == null || valor == DBNull.Value)
+            {
+                return "SIN INFORMACIÓN";
+            }
+
+            DateTime fechaConvertida;
+
+            if (DateTime.TryParse(
+                Convert.ToString(valor),
+                out fechaConvertida
+            ))
+            {
+                return fechaConvertida.ToString("dd/MM/yyyy");
+            }
+
+            return texto(valor);
+        };
+    }
+
+
+    System.Collections.ArrayList coincidenciasAlerta =
+    ViewData["CoincidenciasAlerta"]
+        as System.Collections.ArrayList;
+
+    if (coincidenciasAlerta == null)
+    {
+        coincidenciasAlerta =
+            new System.Collections.ArrayList();
+    }
+
+    Dictionary<int, object[]> coincidenciasNombrePorId =
+    ViewData["CoincidenciasNombrePorId"]
+        as Dictionary<int, object[]>;
+
+    if (coincidenciasNombrePorId == null)
+    {
+        coincidenciasNombrePorId =
+            new Dictionary<int, object[]>();
+    }
+
+
+}
+
+@if (row == null)
+{
+    <div class="sic-modal-sin-detenido">
+
+        <i class="fa fa-exclamation-circle"></i>
+
+        <strong>Sin información disponible</strong>
+
+        <span>
+            No se encontró la información de la persona.
+        </span>
+
+    </div>
+}
+else
+{
+    string fotoDetenidoUrl =
+        Url.Content("~/Content/imagenes/Nodisponible.jpg");
+
+    string nombreCompletoTexto = "";
+    string aliasTexto = "";
+    string idsNomPersoTexto = "";
+    string clavePersonaTexto = "";
+    string numeroFiliacionTexto = "";
+    string fechaNacimientoTexto = "";
+    string sexoTexto = "";
+    int? edad = null;
+    string fechaUltimoDelitoTexto = "";
+    string ultimoDelitoTexto = "";
+
+    int estatusAlerta = 0;
+    int cantidadIdsRecibidosAgrupados = 0;
+    string nombresConIdTexto = "";
+
+    if (row.Table.Columns.Contains("FotoDetenidoUrl") &&
+row["FotoDetenidoUrl"] != DBNull.Value)
+    {
+        string valorFoto =
+            Convert.ToString(row["FotoDetenidoUrl"]);
+
+        if (!string.IsNullOrWhiteSpace(valorFoto))
+        {
+            fotoDetenidoUrl =
+                valorFoto.Trim();
+        }
+    }
+
+    if (row.Table.Columns.Contains("NombreCompleto") &&
+        row["NombreCompleto"] != DBNull.Value)
+    {
+        nombreCompletoTexto =
+            Convert.ToString(row["NombreCompleto"]);
+    }
+
+    if (row.Table.Columns.Contains("ALIAS") &&
+        row["ALIAS"] != DBNull.Value)
+    {
+        aliasTexto =
+            Convert.ToString(row["ALIAS"]);
+    }
+
+    if (row.Table.Columns.Contains("IdsNomPerso") &&
+        row["IdsNomPerso"] != DBNull.Value)
+    {
+        idsNomPersoTexto =
+            Convert.ToString(row["IdsNomPerso"]);
+    }
+
+    if (row.Table.Columns.Contains("CLAVE_PERSO") &&
+        row["CLAVE_PERSO"] != DBNull.Value)
+    {
+        clavePersonaTexto =
+            Convert.ToString(row["CLAVE_PERSO"]);
+    }
+
+    if (row.Table.Columns.Contains("NUM_FILIA") &&
+        row["NUM_FILIA"] != DBNull.Value)
+    {
+        numeroFiliacionTexto =
+            Convert.ToString(row["NUM_FILIA"]);
+    }
+
+    if (row.Table.Columns.Contains("FEC_NAC") &&
+        row["FEC_NAC"] != DBNull.Value &&
+        DateTime.TryParse(row["FEC_NAC"].ToString(), out DateTime fechaNacimiento))
+    {
+        fechaNacimientoTexto = fecha(fechaNacimiento);
+
+        DateTime hoy = DateTime.Today;
+
+        edad = hoy.Year - fechaNacimiento.Year;
+
+        // Si todavía no cumple años este año, se resta uno.
+        if (fechaNacimiento.Date > hoy.AddYears(-edad.Value))
+        {
+            edad--;
+        }
+    }
+
+    if (row.Table.Columns.Contains("SEXO") &&
+row["SEXO"] != DBNull.Value)
+    {
+        sexoTexto =
+            Convert.ToString(row["SEXO"]);
+    }
+
+
+    if (row.Table.Columns.Contains("FechaUltimoDelito") &&
+row["FechaUltimoDelito"] != DBNull.Value)
+    {
+        fechaUltimoDelitoTexto =
+            fecha(row["FechaUltimoDelito"]);
+    }
+
+    if (row.Table.Columns.Contains("UltimoDelito") &&
+        row["UltimoDelito"] != DBNull.Value)
+    {
+        ultimoDelitoTexto =
+            Convert.ToString(row["UltimoDelito"]);
+    }
+
+    if (row.Table.Columns.Contains("CantidadIdsRecibidosAgrupados") &&
+    row["CantidadIdsRecibidosAgrupados"] != DBNull.Value)
+    {
+        int.TryParse(
+            Convert.ToString(row["CantidadIdsRecibidosAgrupados"]),
+            out cantidadIdsRecibidosAgrupados
+        );
+    }
+
+    if (row.Table.Columns.Contains("NombresConId") &&
+    row["NombresConId"] != DBNull.Value)
+    {
+        nombresConIdTexto =
+            Convert.ToString(
+                row["NombresConId"]
+            );
+    }
+
+
+    if (row.Table.Columns.Contains("EstatusAlerta") &&
+row["EstatusAlerta"] != DBNull.Value)
+    {
+        int.TryParse(
+            Convert.ToString(row["EstatusAlerta"]),
+            out estatusAlerta
+        );
+    }
+
+    List<string> nombres =
+        nombreCompletoTexto
+            .Split(
+                new[] { ',' },
+                StringSplitOptions.RemoveEmptyEntries
+            )
+            .Select(x => x.Trim())
+            .Where(x => !string.IsNullOrWhiteSpace(x))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+    List<string> alias =
+        aliasTexto
+            .Split(
+                new[] { ',' },
+                StringSplitOptions.RemoveEmptyEntries
+            )
+            .Select(x => x.Trim())
+            .Where(x => !string.IsNullOrWhiteSpace(x))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+    string nombrePrincipal =
+        nombres.Count > 0
+            ? nombres.First()
+            : "SIN INFORMACIÓN";
+
+    List<string> otrosNombres =
+        nombres
+            .Skip(1)
+            .ToList();
+
+    var coincidenciasPorNombre =
+    new Dictionary<
+        string,
+        object[]
+    >(
+        StringComparer.OrdinalIgnoreCase
+    );
+
+
+
+    if (!string.IsNullOrWhiteSpace(nombresConIdTexto))
+    {
+        string[] registros =
+            nombresConIdTexto.Split(
+                new[] { "|~|" },
+                StringSplitOptions.RemoveEmptyEntries
+            );
+
+        foreach (string registro in registros)
+        {
+            string[] partes =
+                registro.Split(
+                    new[] { "||" },
+                    StringSplitOptions.None
+                );
+
+            if (partes.Length < 2)
+            {
+                continue;
+            }
+
+            int idNomPerso = 0;
+
+            if (!int.TryParse(
+                    partes[0].Trim(),
+                    out idNomPerso
+                ) ||
+                idNomPerso <= 0)
+            {
+                continue;
+            }
+
+            string nombreRelacionado =
+                partes[1].Trim();
+
+            if (string.IsNullOrWhiteSpace(
+                    nombreRelacionado
+                ))
+            {
+                continue;
+            }
+
+            object[] datosCoincidencia = null;
+
+            if (!coincidenciasNombrePorId.TryGetValue(
+                    idNomPerso,
+                    out datosCoincidencia
+                ))
+            {
+                continue;
+            }
+
+            object[] coincidenciaActual = null;
+
+            if (!coincidenciasPorNombre.TryGetValue(
+                    nombreRelacionado,
+                    out coincidenciaActual
+                ))
+            {
+                coincidenciasPorNombre[
+                    nombreRelacionado
+                ] = datosCoincidencia;
+
+                continue;
+            }
+
+            int porcentajeActual = 0;
+            int porcentajeNuevo = 0;
+
+            int.TryParse(
+                Convert.ToString(
+                    coincidenciaActual[2]
+                ),
+                out porcentajeActual
+            );
+
+            int.TryParse(
+                Convert.ToString(
+                    datosCoincidencia[2]
+                ),
+                out porcentajeNuevo
+            );
+
+            /*
+             * Si el mismo nombre está relacionado
+             * con varios IDs, conserva el porcentaje mayor.
+             */
+            if (porcentajeNuevo > porcentajeActual)
+            {
+                coincidenciasPorNombre[
+                    nombreRelacionado
+                ] = datosCoincidencia;
+            }
+        }
+    }
+
+    object[] coincidenciaNombrePrincipal = null;
+
+    coincidenciasPorNombre.TryGetValue(
+        nombrePrincipal,
+        out coincidenciaNombrePrincipal
+    );
+
+    /*
+     * La coincidencia del nombre principal
+     * únicamente debe ser de tipo NOMBRE.
+     *
+     * Posición 3 = IdTipoAlerta
+     * 1 = Nombre
+     */
+    if (coincidenciaNombrePrincipal != null)
+    {
+        int idTipoCoincidenciaPrincipal = 0;
+
+        int.TryParse(
+            Convert.ToString(
+                coincidenciaNombrePrincipal[3]
+            ),
+            out idTipoCoincidenciaPrincipal
+        );
+
+        if (idTipoCoincidenciaPrincipal != 1)
+        {
+            coincidenciaNombrePrincipal = null;
+        }
+    }
+
+    System.Collections.ArrayList coincidenciasParaMostrar =
+new System.Collections.ArrayList();
+
+    /*
+     * Primero agregamos solamente la coincidencia
+     * correspondiente al nombre principal.
+     */
+    if (coincidenciaNombrePrincipal != null)
+    {
+        coincidenciasParaMostrar.Add(
+            coincidenciaNombrePrincipal
+        );
+    }
+
+    /*
+     * Aquí guardaremos FOTO, HUELLA y cualquier otro tipo.
+     * Se conserva el porcentaje más alto de cada tipo.
+     */
+    Dictionary<string, object[]> otrasCoincidenciasPorTipo =
+        new Dictionary<string, object[]>(
+            StringComparer.OrdinalIgnoreCase
+        );
+
+    foreach (object elementoCoincidencia in coincidenciasAlerta)
+    {
+        object[] datosCoincidencia =
+            elementoCoincidencia as object[];
+
+        if (datosCoincidencia == null ||
+            datosCoincidencia.Length < 5)
+        {
+            continue;
+        }
+
+        int idTipoAlerta = 0;
+        int porcentajeNuevo = 0;
+
+        int.TryParse(
+            Convert.ToString(datosCoincidencia[3]),
+            out idTipoAlerta
+        );
+
+        int.TryParse(
+            Convert.ToString(datosCoincidencia[2]),
+            out porcentajeNuevo
+        );
+
+        string nombreTipo =
+            Convert.ToString(datosCoincidencia[4]);
+
+        if (string.IsNullOrWhiteSpace(nombreTipo))
+        {
+            nombreTipo = "SIN TIPO DE ALERTA";
+        }
+
+        /*
+         * Las coincidencias de nombre se omiten aquí,
+         * porque ya se maneja arriba el nombre principal
+         * y los otros nombres se muestran en su propia lista.
+         *
+         * Lo ideal es usar el ID real del tipo NOMBRE.
+         */
+        bool esCoincidenciaNombre =
+            nombreTipo.IndexOf(
+                "NOMBRE",
+                StringComparison.OrdinalIgnoreCase
+            ) >= 0;
+
+        if (esCoincidenciaNombre)
+        {
+            continue;
+        }
+
+        string llaveTipo =
+            idTipoAlerta > 0
+                ? "ID_" + idTipoAlerta
+                : "TIPO_" + nombreTipo.Trim();
+
+        object[] coincidenciaExistente = null;
+
+        if (!otrasCoincidenciasPorTipo.TryGetValue(
+                llaveTipo,
+                out coincidenciaExistente
+            ))
+        {
+            otrasCoincidenciasPorTipo[llaveTipo] =
+                datosCoincidencia;
+
+            continue;
+        }
+
+        int porcentajeExistente = 0;
+
+        int.TryParse(
+            Convert.ToString(coincidenciaExistente[2]),
+            out porcentajeExistente
+        );
+
+        /*
+         * Si existen varias coincidencias del mismo tipo,
+         * conserva la que tenga mayor porcentaje.
+         */
+        if (porcentajeNuevo > porcentajeExistente)
+        {
+            otrasCoincidenciasPorTipo[llaveTipo] =
+                datosCoincidencia;
+        }
+    }
+
+    /*
+     * Agregamos FOTO, HUELLA y los demás tipos
+     * después de la coincidencia del nombre principal.
+     */
+    foreach (object[] otraCoincidencia
+             in otrasCoincidenciasPorTipo.Values)
+    {
+        coincidenciasParaMostrar.Add(
+            otraCoincidencia
+        );
+    }
+
+    string primerIdNomPerso = "";
+
+    if (!string.IsNullOrWhiteSpace(idsNomPersoTexto))
+    {
+        primerIdNomPerso =
+            idsNomPersoTexto
+                .Split(',')[0]
+                .Trim();
+    }
+
+    int idOrigenDetenido = 0;
+
+    int.TryParse(
+        primerIdNomPerso,
+        out idOrigenDetenido
+    );
+
+    bool tieneUltimoDelito =
+        !string.IsNullOrWhiteSpace(ultimoDelitoTexto) &&
+        !ultimoDelitoTexto.Equals(
+            "SIN INFORMACIÓN",
+            StringComparison.OrdinalIgnoreCase
+        );
+
+    List<string> delitosRegistrados =
+    new List<string>();
+
+    if (tieneUltimoDelito)
+    {
+        delitosRegistrados =
+            ultimoDelitoTexto
+                .Split(
+                    new[] { "\r\n", "\n", "\r" },
+                    StringSplitOptions.RemoveEmptyEntries
+                )
+                .Select(x => x.Trim())
+                .Where(x => !string.IsNullOrWhiteSpace(x))
+                .ToList();
+    }
+
+    <div class="sic-modal-det-card @(esModal ? "sic-ficha-detenido-modal" : "sic-ficha-detenido-tab")">
+
+        <div class="sic-modal-det-layout">
+
+            <!-- ================================================
+                 COLUMNA IZQUIERDA
+                 ================================================ -->
+
+            <aside class="sic-modal-det-sidebar">
+
+                <div class="sic-modal-det-photo">
+
+                    <div class="sic-photo-loader"></div>
+
+                    <img src="@fotoDetenidoUrl"
+                         alt="Foto del registro de detenidos FGEA"
+                         loading="lazy"
+                         class="sic-foto-expandible"
+                         role="button"
+                         tabindex="0"
+                         title="Presione para comparar fotografías"
+                         onload="this.parentElement.classList.add('sic-photo-loaded');"
+                         onclick="event.stopPropagation(); abrirComparacionFotos(this.currentSrc || this.src, this.alt);"
+                         onkeydown="if(event.key === 'Enter' || event.key === ' '){ event.preventDefault(); event.stopPropagation(); abrirComparacionFotos(this.currentSrc || this.src, this.alt); }"
+                         onerror="this.onerror=null; this.parentElement.classList.add('sic-photo-loaded'); this.parentElement.innerHTML='<i class=&quot;fa fa-id-badge&quot;></i>';" />
+
+                </div>
+
+                <div class="sic-modal-det-sidebar-data">
+
+                    <div class="sic-modal-det-sidebar-item">
+
+                        <div class="sic-info-label">
+                            Número filiación
+                        </div>
+
+                        <div class="sic-info-value">
+                            @texto(numeroFiliacionTexto)
+                        </div>
+
+                    </div>
+
+                    <div class="sic-modal-det-sidebar-item">
+
+                        <div class="sic-info-label">
+                            Fecha nacimiento
+                        </div>
+
+                        <div class="sic-info-value">
+                            @texto(fechaNacimientoTexto)
+                        </div>
+
+                    </div>
+
+
+                    <div class="sic-modal-det-sidebar-item">
+
+                        <div class="sic-info-label">
+                            Sexo
+                        </div>
+
+                        <div class="sic-info-value">
+                            @texto(sexoTexto)
+                        </div>
+
+                    </div>
+
+                    <div class="sic-modal-det-sidebar-item">
+
+                        <div class="sic-info-label">
+                            Edad
+                        </div>
+
+                        <div class="sic-info-value">
+                            @texto(edad)
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </aside>
+
+            <!-- ================================================
+                 CONTENIDO PRINCIPAL
+                 ================================================ -->
+
+            <section class="sic-modal-det-content">
+
+                <header class="sic-modal-det-header">
+
+                    <div class="sic-modal-det-title-row">
+
+                        <div class="sic-modal-det-title-content">
+
+                            <h4>
+                                @texto(nombrePrincipal)
+                            </h4>
+
+                        </div>
+
+                        @if (mostrarAcciones)
+                        {
+                            <div class="sic-rel-actions">
+
+                                @if (idOrigenDetenido <= 0)
+                                {
+                                    <button type="button"
+                                            class="sic-btn-alerta-desactivada"
+                                            disabled>
+
+                                        <i class="fa fa-exclamation-circle"></i>
+                                        Sin ID de alerta
+
+                                    </button>
+                                }
+                                else if (estatusAlerta == 1)
+                                {
+                                    <button type="button"
+                                            class="sic-btn-confirmar-identidad js-confirmar-identidad-detenido"
+                                            data-id-detenido="@idDetenidoC5"
+                                            data-ids-nom-perso="@idsNomPersoTexto">
+
+                                        <i class="fa fa-check"></i>
+                                        Confirmar identidad
+
+                                    </button>
+
+                                    <button type="button"
+                                            class="sic-btn-warning-soft sic-btn-descartar-alerta-detenidos"
+                                            data-id-detenido="@idDetenidoC5"
+                                            data-ids-nom-perso="@idsNomPersoTexto">
+
+                                        <i class="fa fa-times"></i>
+                                        Descartar
+
+                                    </button>
+                                }
+                                else if (estatusAlerta == 2)
+                                {
+                                    <button type="button"
+                                            class="sic-btn-identidad-confirmada"
+                                            disabled>
+
+                                        <i class="fa fa-check-circle"></i>
+                                        Identidad confirmada
+
+                                    </button>
+
+                                    <button type="button"
+                                            class="sic-btn-reactivar-alerta-detenidos"
+                                            data-estatus-anterior="2"
+                                            data-id-detenido="@idDetenidoC5"
+                                            data-ids-nom-perso="@idsNomPersoTexto">
+
+                                        <i class="fa fa-undo"></i>
+                                        Cancelar Confirmación
+
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button type="button"
+                                            class="sic-btn-descartada"
+                                            disabled>
+
+                                        <i class="fa fa-times-circle"></i>
+                                        Descartada
+
+                                    </button>
+
+                                    <button type="button"
+                                            class="sic-btn-reactivar-alerta-detenidos"
+                                            data-estatus-anterior="0"
+                                            data-id-detenido="@idDetenidoC5"
+                                            data-ids-nom-perso="@idsNomPersoTexto">
+
+                                        <i class="fa fa-undo"></i>
+                                        Cancelar Confirmación
+
+                                    </button>
+                                }
+
+                            </div>
+                        }
+
+                    </div>
+
+                    @* FUERA DE sic-modal-det-title-row *@
+
+                    @if (coincidenciasParaMostrar != null &&
+     coincidenciasParaMostrar.Count > 0)
+                    {
+                        <div class="sic-modal-det-coincidencias">
+
+                            @Html.Partial(
+                                     "~/Views/SIC/DetalleDetenidoC5/CoincidenciasAlertaPartial.cshtml",
+                                     coincidenciasParaMostrar
+                                 )
+
+                        </div>
+                    }
+                    else
+                    {
+                        <span class="sic-modal-det-source">
+
+                            <i class="fa fa-database"></i>
+
+                            Información proveniente de FGEA - Detenidos
+
+                        </span>
+                    }
+
+                </header>
+
+
+                <!-- ============================================
+                ÚLTIMO DELITO
+                ============================================ -->
+                <!-- ============================================
+                OTROS NOMBRES Y ALIAS
+                ============================================ -->
+
+                <div class="sic-modal-det-listas">
+
+                    <div class="sic-modal-det-lista-box">
+
+                        <div class="sic-modal-det-lista-title">
+
+                            <i class="fa fa-user"></i>
+
+                            Otros nombres conocidos
+
+                            <span class="sic-modal-det-lista-total">
+                                @otrosNombres.Count
+                            </span>
+
+                        </div>
+
+                        <div class="sic-modal-det-lista-scroll">
+
+                            @if (otrosNombres.Count > 0)
+                            {
+                                foreach (string nombreConocido in otrosNombres)
+                                {
+                                    object[] coincidenciaNombre = null;
+
+                                    coincidenciasPorNombre.TryGetValue(
+                                        nombreConocido,
+                                        out coincidenciaNombre
+                                    );
+
+                                    int porcentajeNombre = 0;
+                                    int estatusNombre = 0;
+
+                                    string claseNombre = "";
+
+                                    if (coincidenciaNombre != null)
+                                    {
+                                        int.TryParse(
+                                            Convert.ToString(
+                                                coincidenciaNombre[2]
+                                            ),
+                                            out porcentajeNombre
+                                        );
+
+                                        int.TryParse(
+                                            Convert.ToString(
+                                                coincidenciaNombre[1]
+                                            ),
+                                            out estatusNombre
+                                        );
+
+                                        claseNombre =
+                                            estatusNombre == 2
+                                                ? "confirmada"
+                                                : estatusNombre == 0
+                                                    ? "descartada"
+                                                    : "pendiente";
+                                    }
+
+                                    <div class="sic-modal-det-lista-item">
+
+                                        <i class="fa fa-user-circle-o"></i>
+
+                                        <span class="sic-nombre-texto">
+                                            @texto(nombreConocido)
+                                        </span>
+
+                                        @if (coincidenciaNombre != null)
+                                        {
+                                            <span class="sic-nombre-porcentaje @claseNombre">
+                                                @porcentajeNombre%
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="sic-nombre-porcentaje @claseNombre">
+                                                0%
+                                            </span>
+                                        }
+
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <div class="sic-modal-det-lista-empty">
+                                    Sin otros nombres registrados.
+                                </div>
+                            }
+
+                        </div>
+
+                    </div>
+
+                    <div class="sic-modal-det-lista-box">
+
+                        <div class="sic-modal-det-lista-title">
+
+                            <i class="fa fa-tag"></i>
+
+                            Alias conocidos
+
+                            <span class="sic-modal-det-lista-total">
+                                @alias.Count
+                            </span>
+
+                        </div>
+
+                        <div class="sic-modal-det-lista-scroll">
+
+                            @if (alias.Count > 0)
+                            {
+                                foreach (string aliasConocido in alias)
+                                {
+                                    <div class="sic-modal-det-lista-item">
+
+                                        <i class="fa fa-tag"></i>
+
+                                        <span>
+                                            @texto(aliasConocido)
+                                        </span>
+
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <div class="sic-modal-det-lista-empty">
+                                    Sin alias registrados.
+                                </div>
+                            }
+
+                        </div>
+
+                    </div>
+
+                </div>
+                <div class="sic-modal-det-delito @(tieneUltimoDelito ? "" : "sic-modal-det-delito-vacio")">
+
+                    <div class="sic-modal-det-delito-icon">
+                        <i class="fa fa-gavel"></i>
+                    </div>
+
+                    <div class="sic-modal-det-delito-content">
+
+                        <div class="sic-modal-det-delito-header">
+
+                            <span class="sic-modal-det-delito-label">
+                                Último delito registrado
+                            </span>
+
+                            <span class="sic-modal-det-ids-unificados"
+                                  title="IDs recibidos que pertenecen a la misma persona">
+
+                                <i class="fa fa-link"></i>
+
+                                Coincidencias: @cantidadIdsRecibidosAgrupados
+
+                            </span>
+
+                            <span class="sic-modal-det-delito-fecha">
+
+                                <i class="fa fa-calendar"></i>
+
+                                @texto(fechaUltimoDelitoTexto)
+
+                            </span>
+
+                        </div>
+
+                        <div class="sic-modal-det-delito-value">
+
+                            @if (delitosRegistrados.Count == 0)
+                            {
+                                <span>
+                                    SIN INFORMACIÓN
+                                </span>
+                            }
+                            else
+                            {
+                                <div class="sic-delito-principal">
+
+                                    <i class="fa fa-balance-scale"></i>
+
+                                    <span>
+                                        @delitosRegistrados.First()
+                                    </span>
+
+                                </div>
+
+                                if (delitosRegistrados.Count > 1)
+                                {
+                                    <details class="sic-delitos-collapse">
+
+                                        <summary>
+
+                                            <i class="fa fa-chevron-down"></i>
+
+                                            Ver otros @(delitosRegistrados.Count - 1)
+                                            @(delitosRegistrados.Count - 1 == 1
+                        ? "delito registrado"
+                        : "delitos registrados")
+
+                                        </summary>
+
+                                        <div class="sic-delitos-collapse-list">
+
+                                            @foreach (string delito in delitosRegistrados.Skip(1))
+                                            {
+                                                <div class="sic-delitos-collapse-item">
+
+                                                    <i class="fa fa-circle"></i>
+
+                                                    <span>
+                                                        @delito
+                                                    </span>
+
+                                                </div>
+                                            }
+
+                                        </div>
+
+                                    </details>
+                                }
+                            }
+
+                        </div>
+
+                    </div>
+
+                </div>
+            </section>
+
+        </div>
+
+    </div>
+}

@@ -25,5 +25,6 @@ namespace Objetivos_Prioritarios.Models
     
         public virtual cat_TbFuente cat_TbFuente { get; set; }
         public virtual cat_TipoAlerta cat_TipoAlerta { get; set; }
+        public virtual cat_EstatusAlerta cat_EstatusAlerta { get; set; }
     }
 }

@@ -1,0 +1,152 @@
+﻿@model System.Collections.Generic.List<Objetivos_Prioritarios.Models.tb_FOTO_C5>
+
+@using System
+
+@{
+    var rasgosC5 = Model ?? new System.Collections.Generic.List<Objetivos_Prioritarios.Models.tb_FOTO_C5>();
+}
+
+<div class="sic-media-box sic-gallery-box">
+
+    <div class="sic-gallery-header">
+        <div>
+            <strong>Rasgos en Municipio</strong>
+            <span>@rasgosC5.Count rasgo(s) registrado(s)</span>
+        </div>
+    </div>
+
+    @if (rasgosC5.Count > 0)
+    {
+        <div class="sic-gallery-grid">
+
+            @for (int i = 0; i < rasgosC5.Count; i++)
+            {
+                var rasgo = rasgosC5[i];
+
+                <div class="sic-gallery-item sic-gallery-item-expandible"
+                     data-galeria="rasgosMunicipio"
+                     role="button"
+                     tabindex="0"
+                     title="Presione para ampliar"
+                     onclick="abrirRasgosMunicipio(@i);"
+                     onkeydown="if(event.key === 'Enter' || event.key === ' '){ event.preventDefault(); abrirRasgosMunicipio(@i); }">
+
+                    <div class="sic-gallery-image-wrap">
+
+                        <img class="sic-gallery-foto"
+                             src="@Url.Action("FotoGaleriaC5", "SIC", new { idFoto = rasgo.IDFOTO })"
+                             alt="@ViewBag.Texto(rasgo.TIPO)"
+                             onerror="mostrarErrorFotoGaleria(this);" />
+
+                        <div class="sic-gallery-image-error">
+                            <i class="fa fa-picture-o"></i>
+                        </div>
+
+                    </div>
+
+                    @{
+                        string tipoRasgo = ViewBag.Texto(rasgo.TIPO);
+
+                        if (tipoRasgo.StartsWith("RASGO: Punto Seleccionado:", StringComparison.OrdinalIgnoreCase))
+                        {
+                            tipoRasgo = tipoRasgo.Substring(27).Trim();
+                        }
+                        else if (tipoRasgo.StartsWith("RASGO:", StringComparison.OrdinalIgnoreCase))
+                        {
+                            tipoRasgo = tipoRasgo.Substring(7).Trim();
+                        }
+
+                    }
+
+                    <div class="sic-gallery-caption">
+                        <span>@tipoRasgo</span>
+                    </div>
+
+                </div>
+            }
+
+        </div>
+    }
+    else
+    {
+        <div class="sic-empty-source">
+            <i class="fa fa-picture-o"></i>
+            <strong>Rasgos en Municipio</strong>
+            <span>Sin rasgos registrados por el momento.</span>
+        </div>
+    }
+
+</div>
+
+<div id="sicVisorRasgosMunicipio"
+     class="sic-galeria-visor"
+     aria-hidden="true"
+     onclick="cerrarGaleriaSicAlFondo(event, 'sicVisorRasgosMunicipio');">
+
+    <div class="sic-galeria-visor-contenido"
+         onclick="event.stopPropagation();">
+
+        <button type="button"
+                class="sic-galeria-cerrar"
+                onclick="cerrarGaleriaSic('sicVisorRasgosMunicipio');"
+                title="Cerrar visor"
+                aria-label="Cerrar visor">
+            <i class="fa fa-times"></i>
+        </button>
+
+        <div class="sic-galeria-header">
+            <div>
+                <i class="fa fa-picture-o"></i>
+                <span data-sic-galeria-titulo>Rasgos en Municipio</span>
+            </div>
+            <span data-sic-galeria-contador>1 / 1</span>
+        </div>
+
+        <div class="sic-galeria-imagen-area">
+            <button type="button"
+                    class="sic-galeria-navegacion sic-galeria-anterior"
+                    data-sic-galeria-anterior
+                    onclick="navegarGaleriaSic('sicVisorRasgosMunicipio', -1);"
+                    title="Anterior">
+                <i class="fa fa-chevron-left"></i>
+            </button>
+
+            <img data-sic-galeria-imagen
+                 src=""
+                 alt="Imagen ampliada" />
+
+            <div class="sic-galeria-error"
+                 data-sic-galeria-error>
+                <i class="fa fa-picture-o"></i>
+                <span>No se pudo cargar el rasgo</span>
+            </div>
+
+            <button type="button"
+                    class="sic-galeria-navegacion sic-galeria-siguiente"
+                    data-sic-galeria-siguiente
+                    onclick="navegarGaleriaSic('sicVisorRasgosMunicipio', 1);"
+                    title="Siguiente">
+                <i class="fa fa-chevron-right"></i>
+            </button>
+        </div>
+
+        <div class="sic-galeria-descripcion"
+             data-sic-galeria-descripcion></div>
+
+        <div class="sic-galeria-ayuda">
+            <i class="fa fa-keyboard-o"></i>
+            Use las flechas del teclado para cambiar de rasgo
+        </div>
+    </div>
+</div>
+
+<script>
+    function abrirRasgosMunicipio(indice) {
+        abrirGaleriaSic(
+            'rasgosMunicipio',
+            'sicVisorRasgosMunicipio',
+            indice,
+            'Rasgos en Municipio'
+        );
+    }
+</script>

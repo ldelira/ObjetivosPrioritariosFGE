@@ -1,0 +1,150 @@
+﻿@model System.Collections.Generic.List<Objetivos_Prioritarios.Models.tb_HUELLA_C5>
+
+@using System
+@using System.Linq
+
+@{
+    var huellasC5 = Model ?? new System.Collections.Generic.List<Objetivos_Prioritarios.Models.tb_HUELLA_C5>();
+}
+
+<div class="sic-media-box sic-gallery-box">
+
+    <div class="sic-gallery-header">
+        <div>
+            <strong>Huellas en Municipio</strong>
+            <span>@huellasC5.Count huella(s) registrada(s)</span>
+        </div>
+    </div>
+
+    @if (huellasC5.Count > 0)
+    {
+        <div class="sic-gallery-grid">
+
+            @for (int i = 0; i < huellasC5.Count; i++)
+            {
+                var huella = huellasC5[i];
+
+                string nombreHuella =
+                    System.IO.Path.GetFileNameWithoutExtension(
+                        Convert.ToString(huella.Huellas)
+                    );
+
+                int ultimoGuion = nombreHuella.LastIndexOf('_');
+
+                if (ultimoGuion >= 0 &&
+                    ultimoGuion < nombreHuella.Length - 1)
+                {
+                    nombreHuella =
+                        nombreHuella.Substring(ultimoGuion + 1);
+                }
+
+                <div class="sic-gallery-item sic-gallery-item-expandible"
+                     data-galeria="huellasMunicipio"
+                     role="button"
+                     tabindex="0"
+                     title="Presione para ampliar"
+                     onclick="abrirHuellasMunicipio(@i);"
+                     onkeydown="if(event.key === 'Enter' || event.key === ' '){ event.preventDefault(); abrirHuellasMunicipio(@i); }">
+
+                    <div class="sic-gallery-image-wrap">
+                        <img class="sic-gallery-foto"
+                             src="@Url.Action("HuellaGaleriaC5", "SIC", new { idHuella = huella.IdHuella })"
+                             alt="@nombreHuella"
+                             onerror="mostrarErrorFotoGaleria(this);" />
+
+                        <div class="sic-gallery-image-error">
+                            <i class="fa fa-hand-paper-o"></i>
+                        </div>
+                    </div>
+
+                    <div class="sic-gallery-caption">
+                        <span>@nombreHuella</span>
+                    </div>
+                </div>
+            }
+
+        </div>
+    }
+    else
+    {
+        <div class="sic-empty-source">
+            <i class="fa fa-hand-paper-o"></i>
+            <strong>Huellas en Municipio</strong>
+            <span>Sin huellas registradas por el momento.</span>
+        </div>
+    }
+
+</div>
+
+<div id="sicVisorHuellasMunicipio"
+     class="sic-galeria-visor"
+     aria-hidden="true"
+     onclick="cerrarGaleriaSicAlFondo(event, 'sicVisorHuellasMunicipio');">
+
+    <div class="sic-galeria-visor-contenido"
+         onclick="event.stopPropagation();">
+
+        <button type="button"
+                class="sic-galeria-cerrar"
+                onclick="cerrarGaleriaSic('sicVisorHuellasMunicipio');"
+                title="Cerrar visor"
+                aria-label="Cerrar visor">
+            <i class="fa fa-times"></i>
+        </button>
+
+        <div class="sic-galeria-header">
+            <div>
+                <i class="fa fa-hand-paper-o"></i>
+                <span data-sic-galeria-titulo>Huellas en Municipio</span>
+            </div>
+            <span data-sic-galeria-contador>1 / 1</span>
+        </div>
+
+        <div class="sic-galeria-imagen-area">
+            <button type="button"
+                    class="sic-galeria-navegacion sic-galeria-anterior"
+                    data-sic-galeria-anterior
+                    onclick="navegarGaleriaSic('sicVisorHuellasMunicipio', -1);"
+                    title="Anterior">
+                <i class="fa fa-chevron-left"></i>
+            </button>
+
+            <img data-sic-galeria-imagen
+                 src=""
+                 alt="Imagen ampliada" />
+
+            <div class="sic-galeria-error"
+                 data-sic-galeria-error>
+                <i class="fa fa-hand-paper-o"></i>
+                <span>No se pudo cargar la huella</span>
+            </div>
+
+            <button type="button"
+                    class="sic-galeria-navegacion sic-galeria-siguiente"
+                    data-sic-galeria-siguiente
+                    onclick="navegarGaleriaSic('sicVisorHuellasMunicipio', 1);"
+                    title="Siguiente">
+                <i class="fa fa-chevron-right"></i>
+            </button>
+        </div>
+
+        <div class="sic-galeria-descripcion"
+             data-sic-galeria-descripcion></div>
+
+        <div class="sic-galeria-ayuda">
+            <i class="fa fa-keyboard-o"></i>
+            Use las flechas del teclado para cambiar de huella
+        </div>
+    </div>
+</div>
+
+<script>
+    function abrirHuellasMunicipio(indice) {
+        abrirGaleriaSic(
+            'huellasMunicipio',
+            'sicVisorHuellasMunicipio',
+            indice,
+            'Huellas en Municipio'
+        );
+    }
+</script>

@@ -1,0 +1,294 @@
+﻿@model System.Data.DataTable
+
+@using System
+@using System.Collections.Generic
+
+@{
+    var detenidos =
+        Model ?? new System.Data.DataTable();
+
+    int idDetenidoC5 =
+        ViewBag.IdDetenidoC5 == null
+            ? 0
+            : Convert.ToInt32(ViewBag.IdDetenidoC5);
+}
+
+
+@if (detenidos.Rows.Count > 0)
+{
+    <!-- ============================================================
+         CARRUSEL GENERAL DE DETENIDOS FGEA
+         IMPORTANTE:
+         Este DIV contiene todos los slides y la navegación.
+         ============================================================ -->
+    <div class="sic-rel-carousel sic-detenidos-carousel">
+
+
+        <!-- ========================================================
+             CONTENEDOR DE SLIDES
+             ======================================================== -->
+        <div class="sic-detenidos-slides">
+
+            @for (int i = 0; i < detenidos.Rows.Count; i++)
+            {
+                System.Data.DataRow row =
+                    detenidos.Rows[i];
+
+
+                /* ==================================================
+                   IDS NOM_PERSO QUE ORIGINARON LA ALERTA
+                   ================================================== */
+
+                var idsOrigenDetenidoCoincidencias =
+                    new List<int>();
+
+                if (
+                    row.Table.Columns.Contains("IdsNomPersoOrigenAlerta") &&
+                    row["IdsNomPersoOrigenAlerta"] != DBNull.Value
+                )
+                {
+                    string idsTexto =
+                        Convert.ToString(
+                            row["IdsNomPersoOrigenAlerta"]
+                        );
+
+                    if (!string.IsNullOrWhiteSpace(idsTexto))
+                    {
+                        string[] partes =
+                            idsTexto.Split(
+                                new[] { ',' },
+                                StringSplitOptions.RemoveEmptyEntries
+                            );
+
+                        foreach (string parte in partes)
+                        {
+                            int idConvertido = 0;
+
+                            if (
+                                int.TryParse(
+                                    parte.Trim(),
+                                    out idConvertido
+                                ) &&
+                                idConvertido > 0 &&
+                                !idsOrigenDetenidoCoincidencias.Contains(
+                                    idConvertido
+                                )
+                            )
+                            {
+                                idsOrigenDetenidoCoincidencias.Add(
+                                    idConvertido
+                                );
+                            }
+                        }
+                    }
+                }
+
+
+                /* ==================================================
+                   COINCIDENCIAS GENERALES DEL DETENIDO
+                   ================================================== */
+
+                System.Collections.ArrayList coincidenciasAlertaDetenido =
+                    ViewBag.ObtenerCoincidenciasAlerta(
+                        idsOrigenDetenidoCoincidencias.ToArray(),
+                        new int[] { 6 }
+                    ) as System.Collections.ArrayList;
+
+                if (coincidenciasAlertaDetenido == null)
+                {
+                    coincidenciasAlertaDetenido =
+                        new System.Collections.ArrayList();
+                }
+
+
+                /* ==================================================
+                   COINCIDENCIAS POR NOMBRE / NOM_PERSO
+                   ================================================== */
+
+                var coincidenciasNombrePorId =
+                    new Dictionary<int, object[]>();
+
+                foreach (
+                    int idNombre
+                    in idsOrigenDetenidoCoincidencias
+                )
+                {
+                    System.Collections.ArrayList coincidenciaIndividual =
+                        ViewBag.ObtenerCoincidenciasAlerta(
+                            new int[] { idNombre },
+                            new int[] { 6 }
+                        ) as System.Collections.ArrayList;
+
+                    if (
+                        coincidenciaIndividual == null ||
+                        coincidenciaIndividual.Count == 0
+                    )
+                    {
+                        continue;
+                    }
+
+                    object[] datosCoincidencia =
+                        coincidenciaIndividual[0] as object[];
+
+                    if (
+                        datosCoincidencia == null ||
+                        datosCoincidencia.Length < 5
+                    )
+                    {
+                        continue;
+                    }
+
+                    coincidenciasNombrePorId[idNombre] =
+                        datosCoincidencia;
+                }
+
+
+                <!-- =================================================
+                     SLIDE INDIVIDUAL DEL DETENIDO
+
+                     AQUÍ VA LA FICHA FGEA.
+                     Debe permanecer DENTRO del tab Detenidos.
+                     ================================================= -->
+                <div class="sic-rel-slide sic-detenido-slide @(i == 0 ? "active" : "")"
+                     data-index="@i">
+
+                    @{
+                        var viewDataDetenido =
+                            new System.Web.Mvc.ViewDataDictionary(
+                                ViewData
+                            );
+
+                        viewDataDetenido["EsModal"] =
+                            false;
+
+                        viewDataDetenido["MostrarAcciones"] =
+                            true;
+
+                        viewDataDetenido["IdDetenidoC5"] =
+                            idDetenidoC5;
+
+                        viewDataDetenido["CoincidenciasAlerta"] =
+                            coincidenciasAlertaDetenido;
+
+                        viewDataDetenido["CoincidenciasNombrePorId"] =
+                            coincidenciasNombrePorId;
+                    }
+
+
+                    <!-- =============================================
+                         FICHA REUTILIZABLE DEL DETENIDO
+                         ============================================= -->
+                    @Html.Partial(
+                        "~/Views/SIC/DetalleDetenidoC5/DetenidoObjetivoPartial.cshtml",
+                        row,
+                        viewDataDetenido
+                    )
+
+                </div>
+            }
+
+        </div>
+
+
+        @if (detenidos.Rows.Count > 1)
+        {
+            <!-- =====================================================
+                 NAVEGACIÓN DEL CARRUSEL
+                 ===================================================== -->
+            <div class="sic-rel-carousel-footer sic-detenidos-carousel-footer">
+
+                <button type="button"
+                        class="sic-rel-nav sic-detenidos-prev"
+                        title="Detenido anterior">
+
+                    <i class="fa fa-chevron-left"></i>
+
+                </button>
+
+
+                <span class="sic-rel-counter">
+
+                    <span class="sic-detenidos-current">
+                        1
+                    </span>
+
+                    /
+
+                    <span>
+                        @detenidos.Rows.Count
+                    </span>
+
+                </span>
+
+
+                <button type="button"
+                        class="sic-rel-nav sic-detenidos-next"
+                        title="Siguiente detenido">
+
+                    <i class="fa fa-chevron-right"></i>
+
+                </button>
+
+            </div>
+        }
+
+
+    </div>
+    <!-- FIN .sic-rel-carousel.sic-detenidos-carousel -->
+}
+else
+{
+    <!-- ============================================================
+         SIN DETENIDOS FGEA
+         ============================================================ -->
+    <div class="sic-empty-source">
+
+        <i class="fa fa-id-badge"></i>
+
+        <strong>
+            FGEA - Detenidos
+        </strong>
+
+        <span>
+            Sin información cargada por el momento.
+        </span>
+
+    </div>
+}
+
+
+<!-- ================================================================
+     JAVASCRIPT EXCLUSIVO DEL TAB DETENIDOS
+     ================================================================ -->
+<script>
+
+    $(document)
+        .off(
+            'click.tabDetenidos',
+            '#tab-fgea-detenidos .sic-detenidos-prev, #tab-fgea-detenidos .sic-detenidos-next'
+        )
+        .on(
+            'click.tabDetenidos',
+            '#tab-fgea-detenidos .sic-detenidos-prev, #tab-fgea-detenidos .sic-detenidos-next',
+            function (e) {
+
+                e.preventDefault();
+
+                var boton =
+                    $(this);
+
+                var direccion =
+                    boton.hasClass('sic-detenidos-next')
+                        ? 1
+                        : -1;
+
+                moverCarruselSic(
+                    boton,
+                    '.sic-detenido-slide',
+                    '.sic-detenidos-current',
+                    direccion
+                );
+            }
+        );
+
+</script>

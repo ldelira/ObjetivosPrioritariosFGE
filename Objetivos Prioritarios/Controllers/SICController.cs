@@ -1451,32 +1451,32 @@ namespace Objetivos_Prioritarios.Controllers
 
             string rutaCompleta = Path.Combine(RutaBaseFotosCapea, rutaFotoBD);
 
-            if (!System.IO.File.Exists(rutaCompleta))
-            {
-                return HttpNotFound();
-            }
+            //if (!System.IO.File.Exists(rutaCompleta))
+            //{
+            //    return HttpNotFound();
+            //}
 
-            string extension = Path.GetExtension(rutaCompleta).ToLower();
-            string contentType = "image/jpeg";
+            //string extension = Path.GetExtension(rutaCompleta).ToLower();
+            //string contentType = "image/jpeg";
 
-            if (extension == ".png")
-            {
-                contentType = "image/png";
-            }
-            else if (extension == ".gif")
-            {
-                contentType = "image/gif";
-            }
-            else if (extension == ".bmp")
-            {
-                contentType = "image/bmp";
-            }
-            else if (extension == ".webp")
-            {
-                contentType = "image/webp";
-            }
+            //if (extension == ".png")
+            //{
+            //    contentType = "image/png";
+            //}
+            //else if (extension == ".gif")
+            //{
+            //    contentType = "image/gif";
+            //}
+            //else if (extension == ".bmp")
+            //{
+            //    contentType = "image/bmp";
+            //}
+            //else if (extension == ".webp")
+            //{
+            //    contentType = "image/webp";
+            //}
 
-            return File(rutaCompleta, contentType);
+            return Redirect(rutaCompleta);
         }
 
 

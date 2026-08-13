@@ -2394,12 +2394,11 @@ namespace Objetivos_Prioritarios.Controllers
             }
         }
 
-
         [HttpGet]
-        public ActionResult DetalleCoincidenciaPartial(
-            int idCoincidencia,
-            bool tieneFotografiaConsulta = false,
-            bool tieneHuellaConsulta = false)
+        public async Task<ActionResult> DetalleCoincidenciaPartial(
+    int idCoincidencia,
+    bool tieneFotografiaConsulta = false,
+    bool tieneHuellaConsulta = false)
         {
             ResultadosCoincidenciasViewModel resultados =
                 Session[
@@ -2432,10 +2431,134 @@ namespace Objetivos_Prioritarios.Controllers
                 );
             }
 
+
             /*
-             * Usamos los indicadores guardados con la búsqueda
-             * real. Los parámetros se conservan en la acción
-             * para no romper el JavaScript actual.
+             * ============================================================
+             * FUENTE 5 - OBJETIVOS PRIORITARIOS
+             * ============================================================
+             *
+             * Para Objetivos utilizamos el nuevo detalle enriquecido
+             * proveniente de la API.
+             */
+            if (coincidencia.IdTbFuente == 5)
+            {
+                DetalleObjetivoApiDto detalleObjetivo =
+                    await CoincidenciasBiometricasService
+                        .ObtenerDetalleObjetivoAsync(
+                            coincidencia.IdPersona
+                        );
+
+                if (detalleObjetivo == null)
+                {
+                    Response.StatusCode = 404;
+
+                    return Content(
+                        "No fue posible obtener el detalle del objetivo prioritario.",
+                        "text/plain"
+                    );
+                }
+
+
+                /*
+ * ============================================================
+ * FUENTES 2, 7 Y 8 - FISCALIA WEB
+ * ============================================================
+ *
+ * 2 = CAPEA / FEMDLP
+ * 7 = Alerta Amber
+ * 8 = Protocolo Alba
+ */
+                if (
+                    coincidencia.IdTbFuente == 2 ||
+                    coincidencia.IdTbFuente == 7 ||
+                    coincidencia.IdTbFuente == 8
+                )
+                {
+                    DetalleFiscaliaWebApiDto detalleFiscaliaWeb =
+                        await CoincidenciasBiometricasService
+                            .ObtenerDetalleFiscaliaWebAsync(
+                                coincidencia.IdTbFuente,
+                                coincidencia.IdPersona
+                            );
+
+                    if (detalleFiscaliaWeb == null)
+                    {
+                        Response.StatusCode = 404;
+
+                        return Content(
+                            "No fue posible obtener el detalle del registro.",
+                            "text/plain"
+                        );
+                    }
+
+                    /*
+                     * Conservamos la coincidencia original para:
+                     *
+                     * - porcentaje nombre
+                     * - porcentaje alias
+                     * - fotografía
+                     * - huella
+                     * - evidencia textual
+                     * - mandamientos nominales
+                     */
+                    ViewBag.Coincidencia =
+                        coincidencia;
+
+                    ViewBag.TieneFotografiaConsulta =
+                        resultados.TieneFotografiaConsulta;
+
+                    ViewBag.TieneHuellaConsulta =
+                        resultados.TieneHuellaConsulta;
+
+                    return PartialView(
+                        "Coincidencias/DetalleFiscaliaWebCoincidenciaPartial",
+                        detalleFiscaliaWeb
+                    );
+                }
+
+                /*
+                 * Conservamos la coincidencia original para utilizar:
+                 *
+                 * - porcentajes
+                 * - evidencia textual
+                 * - evidencia biométrica
+                 * - mandamientos nominales
+                 * - tipo de coincidencia
+                 */
+                ViewBag.Coincidencia =
+                    coincidencia;
+
+                ViewBag.TieneFotografiaConsulta =
+                    resultados.TieneFotografiaConsulta;
+
+                ViewBag.TieneHuellaConsulta =
+                    resultados.TieneHuellaConsulta;
+
+                return PartialView(
+                    "Coincidencias/DetalleObjetivoCoincidenciaPartial",
+                    detalleObjetivo
+                );
+            }
+
+
+            /*
+             * ============================================================
+             * DEMÁS FUENTES
+             * ============================================================
+             *
+             * Fuente 6 - Detenidos
+             * Fuente 1 - C5
+             * Fuente 2 - CAPEA
+             * Fuente 3 - Personas de interés
+             * Fuente 7 - Amber
+             * Fuente 8 - Alba
+             *
+             * Estas fuentes siguen utilizando el partial original.
+             *
+             * IMPORTANTE:
+             * DetalleCoincidenciaPartial.cshtml espera
+             * DetalleCoincidenciaViewModel, NO
+             * CoincidenciaResultadoViewModel directamente.
              */
             DetalleCoincidenciaViewModel modelo =
                 new DetalleCoincidenciaViewModel
@@ -2455,8 +2578,106 @@ namespace Objetivos_Prioritarios.Controllers
                 modelo
             );
         }
+
+
+        [HttpGet]
+        public async Task<ActionResult> FotoObjetivoBiometria(int idObjetivo)
+        {
+            try
+            {
+                byte[] foto =
+                    await CoincidenciasBiometricasService
+                        .ObtenerFotoObjetivoAsync(
+                            idObjetivo
+                        );
+
+                if (foto == null ||
+                    foto.Length == 0)
+                {
+                    return Redirect(
+                        Url.Content(
+                            "~/Content/imagenes/Nodisponible.jpg"
+                        )
+                    );
+                }
+
+                return File(
+                    foto,
+                    "image/jpeg"
+                );
+            }
+            catch
+            {
+                return Redirect(
+                    Url.Content(
+                        "~/Content/imagenes/Nodisponible.jpg"
+                    )
+                );
             }
         }
+
+
+        //[HttpGet]
+        //public ActionResult DetalleCoincidenciaPartial(
+        //    int idCoincidencia,
+        //    bool tieneFotografiaConsulta = false,
+        //    bool tieneHuellaConsulta = false)
+        //{
+        //    ResultadosCoincidenciasViewModel resultados =
+        //        Session[
+        //            SessionResultadosCoincidencias
+        //        ] as ResultadosCoincidenciasViewModel;
+
+        //    if (resultados == null)
+        //    {
+        //        Response.StatusCode = 409;
+
+        //        return Content(
+        //            "La búsqueda ya no está disponible. Realice nuevamente la consulta biométrica.",
+        //            "text/plain"
+        //        );
+        //    }
+
+        //    CoincidenciaResultadoViewModel coincidencia =
+        //        resultados.Coincidencias == null
+        //            ? null
+        //            : resultados.Coincidencias
+        //                .FirstOrDefault(x =>
+        //                    x.IdCoincidencia ==
+        //                    idCoincidencia
+        //                );
+
+        //    if (coincidencia == null)
+        //    {
+        //        return HttpNotFound(
+        //            "No se encontró la coincidencia solicitada."
+        //        );
+        //    }
+
+        //    /*
+        //     * Usamos los indicadores guardados con la búsqueda
+        //     * real. Los parámetros se conservan en la acción
+        //     * para no romper el JavaScript actual.
+        //     */
+        //    DetalleCoincidenciaViewModel modelo =
+        //        new DetalleCoincidenciaViewModel
+        //        {
+        //            Coincidencia =
+        //                coincidencia,
+
+        //            TieneFotografiaConsulta =
+        //                resultados.TieneFotografiaConsulta,
+
+        //            TieneHuellaConsulta =
+        //                resultados.TieneHuellaConsulta
+        //        };
+
+        //    return PartialView(
+        //        "Coincidencias/DetalleCoincidenciaPartial",
+        //        modelo
+        //    );
+        //}
+
 
 
         private System.Data.DataTable OrdenarPorPorcentaje(

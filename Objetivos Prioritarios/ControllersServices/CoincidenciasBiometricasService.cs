@@ -230,15 +230,13 @@ namespace Objetivos_Prioritarios.ControllersServices
     };
         }
 
-        public async Task<ResultadosCoincidenciasViewModel>
-    BuscarCoincidenciasAsync(
-        BusquedaCoincidenciasViewModel filtros)
+
+
+        public async Task<ResultadosCoincidenciasViewModel> BuscarCoincidenciasAsync(BusquedaCoincidenciasViewModel filtros)
         {
             if (filtros == null)
             {
-                throw new ArgumentNullException(
-                    nameof(filtros)
-                );
+                throw new ArgumentNullException(nameof(filtros));
             }
 
             ValidarArchivo(
@@ -251,14 +249,79 @@ namespace Objetivos_Prioritarios.ControllersServices
                 "huella"
             );
 
+            /* =========================================================
+               NORMALIZAR MODO DE BÚSQUEDA
+               ========================================================= */
+
+            string modoBusquedaTexto =
+                string.IsNullOrWhiteSpace(filtros.ModoBusquedaTexto)
+                    ? "NOMBRE"
+                    : filtros.ModoBusquedaTexto.Trim().ToUpperInvariant();
+
+            if (
+                modoBusquedaTexto != "NOMBRE" &&
+                modoBusquedaTexto != "ALIAS" &&
+                modoBusquedaTexto != "AMBOS"
+            )
+            {
+                modoBusquedaTexto = "NOMBRE";
+            }
+
+            string nombreBusqueda =
+                string.IsNullOrWhiteSpace(filtros.NombreBusqueda)
+                    ? ""
+                    : filtros.NombreBusqueda.Trim();
+
+            string aliasBusqueda =
+                string.IsNullOrWhiteSpace(filtros.AliasBusqueda)
+                    ? ""
+                    : filtros.AliasBusqueda.Trim();
+
+            /*
+             * Aunque por alguna razón el formulario conserve
+             * información de otro campo, respetamos el modo seleccionado.
+             */
+            if (modoBusquedaTexto == "NOMBRE")
+            {
+                aliasBusqueda = "";
+            }
+            else if (modoBusquedaTexto == "ALIAS")
+            {
+                nombreBusqueda = "";
+            }
+
+            string modoCombinacion =
+                string.Equals(
+                    filtros.ModoCombinacion,
+                    "ESTRICTO",
+                    StringComparison.OrdinalIgnoreCase
+                )
+                    ? "ESTRICTO"
+                    : "PRIORIZAR";
+
+            int porcentajeMinimo =
+                filtros.PorcentajeMinimo;
+
+            if (
+                porcentajeMinimo < 1 ||
+                porcentajeMinimo > 100
+            )
+            {
+                porcentajeMinimo = 70;
+            }
+
+            /* =========================================================
+               DETERMINAR CRITERIOS CAPTURADOS
+               ========================================================= */
+
             bool tieneNombre =
-            !string.IsNullOrWhiteSpace(
-                filtros.NombreBusqueda
-            );
+                !string.IsNullOrWhiteSpace(
+                    nombreBusqueda
+                );
 
             bool tieneAlias =
                 !string.IsNullOrWhiteSpace(
-                    filtros.AliasBusqueda
+                    aliasBusqueda
                 );
 
             bool tieneFotografia =
@@ -269,6 +332,21 @@ namespace Objetivos_Prioritarios.ControllersServices
                 filtros.Huella != null &&
                 filtros.Huella.ContentLength > 0;
 
+            /*
+             * Ahora ya NO obligamos a tener biometría.
+             *
+             * Son válidas, por ejemplo:
+             *
+             * Nombre
+             * Alias
+             * Nombre + Alias
+             * Foto
+             * Huella
+             * Nombre + Foto
+             * Alias + Huella
+             * Nombre + Alias + Foto
+             * etc.
+             */
             if (
                 !tieneNombre &&
                 !tieneAlias &&
@@ -283,9 +361,64 @@ namespace Objetivos_Prioritarios.ControllersServices
 
             ValidarConfiguracionApi();
 
-            using (var formulario =
-                new MultipartFormDataContent())
+            /* =========================================================
+               CONSTRUIR PETICIÓN A LA API
+               ========================================================= */
+
+            using (var formulario = new MultipartFormDataContent())
             {
+                /*
+                 * Datos textuales.
+                 *
+                 * Antes el MVC no los estaba mandando a la API.
+                 */
+
+                formulario.Add(
+                    new StringContent(
+                        nombreBusqueda,
+                        Encoding.UTF8
+                    ),
+                    "NombreBusqueda"
+                );
+
+                formulario.Add(
+                    new StringContent(
+                        aliasBusqueda,
+                        Encoding.UTF8
+                    ),
+                    "AliasBusqueda"
+                );
+
+                formulario.Add(
+                    new StringContent(
+                        modoBusquedaTexto,
+                        Encoding.UTF8
+                    ),
+                    "ModoBusquedaTexto"
+                );
+
+                formulario.Add(
+                    new StringContent(
+                        modoCombinacion,
+                        Encoding.UTF8
+                    ),
+                    "ModoCombinacion"
+                );
+
+                formulario.Add(
+                    new StringContent(
+                        porcentajeMinimo.ToString(
+                            CultureInfo.InvariantCulture
+                        ),
+                        Encoding.UTF8
+                    ),
+                    "PorcentajeMinimo"
+                );
+
+                /* =====================================================
+                   FOTOGRAFÍA
+                   ===================================================== */
+
                 if (tieneFotografia)
                 {
                     ByteArrayContent contenidoFoto =
@@ -302,6 +435,10 @@ namespace Objetivos_Prioritarios.ControllersServices
                         )
                     );
                 }
+
+                /* =====================================================
+                   HUELLA
+                   ===================================================== */
 
                 if (tieneHuella)
                 {
@@ -320,11 +457,11 @@ namespace Objetivos_Prioritarios.ControllersServices
                     );
                 }
 
-                using (var solicitud =
-                    new HttpRequestMessage(
-                        HttpMethod.Post,
-                        _urlApi
-                    ))
+                /* =====================================================
+                   EJECUTAR PETICIÓN
+                   ===================================================== */
+
+                using (var solicitud = new HttpRequestMessage(HttpMethod.Post, _urlApi))
                 {
                     solicitud.Headers.Add(
                         "X-API-TOKEN",
@@ -340,8 +477,7 @@ namespace Objetivos_Prioritarios.ControllersServices
                         );
 
                     string contenidoRespuesta =
-                        await respuesta.Content
-                            .ReadAsStringAsync();
+                        await respuesta.Content.ReadAsStringAsync();
 
                     if (!respuesta.IsSuccessStatusCode)
                     {
@@ -354,10 +490,9 @@ namespace Objetivos_Prioritarios.ControllersServices
                     }
 
                     ApiBusquedaBiometricaResponse resultadoApi =
-                        JsonConvert.DeserializeObject
-                            <ApiBusquedaBiometricaResponse>(
-                                contenidoRespuesta
-                            );
+                        JsonConvert.DeserializeObject<ApiBusquedaBiometricaResponse>(
+                            contenidoRespuesta
+                        );
 
                     if (resultadoApi == null)
                     {
@@ -366,7 +501,7 @@ namespace Objetivos_Prioritarios.ControllersServices
                         );
                     }
 
-                    return ConvertirResultadoApi(
+                    return await ConvertirResultadoApiAsync(
                         resultadoApi,
                         tieneFotografia,
                         tieneHuella
@@ -374,6 +509,7 @@ namespace Objetivos_Prioritarios.ControllersServices
                 }
             }
         }
+
 
         public CoincidenciaResultadoViewModel ObtenerDetalleCoincidencia(
     int idCoincidencia)
@@ -698,7 +834,7 @@ namespace Objetivos_Prioritarios.ControllersServices
                 ".";
         }
 
-        private ResultadosCoincidenciasViewModel ConvertirResultadoApi(
+        private async Task<ResultadosCoincidenciasViewModel> ConvertirResultadoApiAsync(
     ApiBusquedaBiometricaResponse resultadoApi,
     bool tieneFotografia,
     bool tieneHuella)
@@ -706,59 +842,62 @@ namespace Objetivos_Prioritarios.ControllersServices
             List<CoincidenciaResultadoViewModel> coincidencias =
                 new List<CoincidenciaResultadoViewModel>();
 
-            /*
-             * Evitamos errores cuando la API no devuelve
-             * una respuesta o la colección viene nula.
-             */
-            if (
-                resultadoApi == null ||
-                resultadoApi.Resultados == null
-            )
+            if (resultadoApi == null || resultadoApi.Resultados == null)
             {
-                GuardarCoincidenciasEnSesion(
-                    coincidencias
-                );
+                GuardarCoincidenciasEnSesion(coincidencias);
 
                 return new ResultadosCoincidenciasViewModel
                 {
-                    TieneFotografiaConsulta =
-                        tieneFotografia,
+                    TieneNombreConsulta = false,
+                    TieneAliasConsulta = false,
+                    TieneFotografiaConsulta = tieneFotografia,
+                    TieneHuellaConsulta = tieneHuella,
 
-                    TieneHuellaConsulta =
-                        tieneHuella,
+                    Coincidencias = coincidencias,
 
-                    Coincidencias =
-                        coincidencias,
+                    TotalCoincidencias = 0,
+                    TotalTexto = 0,
+                    TotalFotografia = 0,
+                    TotalHuella = 0,
+                    TotalCombinadas = 0,
+                    TotalFotoHuella = 0,
 
-                    TotalCoincidencias =
-                        0,
-
-                    TotalFotografia =
-                        0,
-
-                    TotalHuella =
-                        0,
-
-                    TotalCombinadas =
-                        0,
-
-                    CoincidenciaSeleccionada =
-                        null
+                    CoincidenciaSeleccionada = null
                 };
             }
+            /*
+             * Por ahora habilitamos en la presentación:
+             *
+             * Fuente 5 = Objetivos Prioritarios
+             * Fuente 6 = Detenidos FGEA
+             *
+             * Las demás fuentes se habilitarán conforme
+             * agreguemos su enriquecimiento visual.
+             */
 
-            int consecutivo =
-                1;
+            List<ApiCoincidenciaBiometricaDto> resultadosApi = resultadoApi.Resultados
+             .Where(x =>
+                 x != null &&
+                 (
+                    x.IdTbFuente == 1 ||
+                    x.IdTbFuente == 2 ||
+                     x.IdTbFuente == 5 ||
+                     x.IdTbFuente == 6 ||
+                     x.IdTbFuente == 7 ||
+                     x.IdTbFuente == 8 
+                 )
+             )
+             .ToList();
 
-            foreach (
-                ApiCoincidenciaBiometricaDto item
-                in resultadoApi.Resultados
-            )
+            int consecutivo = 1;
+
+            foreach (ApiCoincidenciaBiometricaDto item in resultadosApi)
             {
-                if (item == null)
-                {
-                    continue;
-                }
+                decimal porcentajeNombre =
+                    item.SimilitudNombre ?? 0;
+
+                decimal porcentajeAlias =
+                    item.SimilitudAlias ?? 0;
 
                 decimal porcentajeFoto =
                     item.SimilitudFoto ?? 0;
@@ -766,105 +905,164 @@ namespace Objetivos_Prioritarios.ControllersServices
                 decimal porcentajeHuella =
                     item.SimilitudHuella ?? 0;
 
-                decimal similitudGlobal =
+                decimal porcentajeTexto =
                     Math.Max(
-                        porcentajeFoto,
-                        porcentajeHuella
+                        porcentajeNombre,
+                        porcentajeAlias
                     );
 
+                /*
+                 * No hacemos promedio.
+                 *
+                 * Mostramos como mejor coincidencia
+                 * la evidencia más fuerte encontrada.
+                 */
+                decimal similitudGlobal =
+                    Math.Max(
+                        porcentajeTexto,
+                        Math.Max(
+                            porcentajeFoto,
+                            porcentajeHuella
+                        )
+                    );
+
+                string origenCoincidenciaTexto = "";
+
+                if (
+                    porcentajeNombre > 0 &&
+                    porcentajeAlias > 0
+                )
+                {
+                    origenCoincidenciaTexto =
+                        "NOMBRE_Y_ALIAS";
+                }
+                else if (porcentajeNombre > 0)
+                {
+                    origenCoincidenciaTexto =
+                        "NOMBRE";
+                }
+                else if (porcentajeAlias > 0)
+                {
+                    origenCoincidenciaTexto =
+                        "ALIAS";
+                }
+
                 CoincidenciaResultadoViewModel coincidencia =
-     new CoincidenciaResultadoViewModel
-     {
-         IdCoincidencia =
-             consecutivo,
+                    new CoincidenciaResultadoViewModel
+                    {
+                        IdCoincidencia =
+                            consecutivo,
 
-         IdPersona =
-             item.IdPersona,
+                        IdPersona =
+                            item.IdPersona,
 
-         IdTbFuente =
-             item.IdTbFuente,
+                        IdTbFuente =
+                            item.IdTbFuente,
 
-         NombreFuente =
-             ObtenerNombreFuente(
-                 item.IdTbFuente
-             ),
+                        NombreFuente =
+                            ObtenerNombreFuente(
+                                item.IdTbFuente
+                            ),
 
-         EsFuenteInformativa =
-             EsFuenteInformativa(
-                 item.IdTbFuente
-             ),
+                        EsFuenteInformativa =
+                            EsFuenteInformativa(
+                                item.IdTbFuente
+                            ),
 
-         NombreCompleto =
-             "PERSONA " +
-             item.IdPersona,
+                        /*
+                         * Estos datos son temporales.
+                         *
+                         * Después EnriquecerCoincidenciasPorFuente()
+                         * los sustituye con los datos reales del detenido.
+                         */
+                        NombreCompleto =
+                            "PERSONA " +
+                            item.IdPersona,
 
-         Alias =
-             "SIN INFORMACIÓN",
+                        Alias =
+                            string.IsNullOrWhiteSpace(
+                                item.AliasCoincidente
+                            )
+                                ? "SIN INFORMACIÓN"
+                                : item.AliasCoincidente,
 
-         Folio =
-             "ID " +
-             item.IdPersona,
+                        Folio =
+                            "ID " +
+                            item.IdPersona,
 
-         Expediente =
-             "FUENTE " +
-             item.IdTbFuente,
+                        Expediente =
+                            "FUENTE " +
+                            item.IdTbFuente,
 
-         MunicipioClave =
-             "",
+                        MunicipioClave =
+                            "",
 
-         Municipio =
-             "SIN INFORMACIÓN",
+                        Municipio =
+                            "SIN INFORMACIÓN",
 
-         Edad =
-             0,
+                        Edad =
+                            0,
 
-         Sexo =
-             "SIN INFORMACIÓN",
+                        Sexo =
+                            "SIN INFORMACIÓN",
 
-         FotoUrl =
-             "~/Content/imagenes/Nodisponible.jpg",
+                        FotoUrl =
+                            "~/Content/imagenes/Nodisponible.jpg",
 
-         TipoCoincidencia =
-             item.TipoCoincidencia,
+                        TipoCoincidencia =
+                            item.TipoCoincidencia,
 
-         PorcentajeNombre =
-             0,
+                        /* =============================================
+                           EVIDENCIA TEXTUAL
+                           ============================================= */
 
-         PorcentajeAlias =
-             0,
+                        PorcentajeNombre =
+                            porcentajeNombre,
 
-         PorcentajeTexto =
-             0,
+                        PorcentajeAlias =
+                            porcentajeAlias,
 
-         OrigenCoincidenciaTexto =
-             "",
+                        PorcentajeTexto =
+                            porcentajeTexto,
 
-         TextoCoincidente =
-             "",
+                        OrigenCoincidenciaTexto =
+                            origenCoincidenciaTexto,
 
-         PorcentajeFoto =
-             porcentajeFoto,
+                        TextoCoincidente =
+                            item.TextoCoincidente ?? "",
 
-         PorcentajeHuella =
-             porcentajeHuella,
+                        /* =============================================
+                           EVIDENCIA BIOMÉTRICA
+                           ============================================= */
 
-         SimilitudGlobal =
-             similitudGlobal,
+                        PorcentajeFoto =
+                            porcentajeFoto,
 
-         FechaRegistro =
-             DateTime.MinValue,
+                        PorcentajeHuella =
+                            porcentajeHuella,
 
-         TieneAvisoMandamientos =
-             false,
+                        /* =============================================
+                           DATOS DE RESULTADO
+                           ============================================= */
 
-         TotalMandamientos =
-             0,
+                        CriteriosCumplidos =
+                            item.CriteriosCumplidos,
 
-         MandamientosJudiciales =
-             new List<
-                 MandamientoJudicialViewModel
-             >()
-     };
+                        SimilitudGlobal =
+                            similitudGlobal,
+
+                        FechaRegistro =
+                            DateTime.MinValue,
+
+                        TieneAvisoMandamientos =
+                            false,
+
+                        TotalMandamientos =
+                            0,
+
+                        MandamientosJudiciales =
+                            new List<MandamientoJudicialViewModel>()
+                    };
 
                 coincidencias.Add(
                     coincidencia
@@ -874,61 +1072,106 @@ namespace Objetivos_Prioritarios.ControllersServices
             }
 
             /*
-             * Primero ordenamos por la similitud biométrica.
-             */
-            coincidencias =
-                coincidencias
-                    .OrderByDescending(x =>
-                        x.SimilitudGlobal
-                    )
-                    .ThenByDescending(x =>
-                        x.PorcentajeFoto
-                    )
-                    .ThenByDescending(x =>
-                        x.PorcentajeHuella
-                    )
-                    .ToList();
-
-            /*
-             * Reasignamos el identificador visual después
-             * de ordenar los resultados.
-             */
-            for (
-                int indice = 0;
-                indice < coincidencias.Count;
-                indice++
-            )
-            {
-                coincidencias[indice].IdCoincidencia =
-                    indice + 1;
-            }
-
-            /*
-             * Aquí se completan los datos reales según
-             * la fuente de cada coincidencia.
+             * IMPORTANTE:
              *
-             * El coordinador debe enriquecer primero la
-             * información biométrica y consultar
-             * Mandamientos Judiciales al final.
+             * NO volvemos a ordenar.
+             *
+             * La API ya ordenó correctamente considerando:
+             *
+             * - Nombre
+             * - Alias
+             * - Foto
+             * - Huella
+             * - CriteriosCumplidos
+             * - PRIORIZAR / ESTRICTO
+             *
+             * El MVC solamente conserva ese orden.
+             */
+
+
+
+            /*
+             * Fuentes 2, 7 y 8:
+             *
+             * 2 = CAPEA / FEMDLP
+             * 7 = Alerta Amber
+             * 8 = Protocolo Alba
+             *
+             * Se enriquecen mediante la API.
+             */
+            await EnriquecerCoincidenciasFiscaliaWebAsync(
+                coincidencias
+            );
+
+
+
+
+            /*
+             * Completamos los datos reales.
+             *
+             * Actualmente Fuente 6:
+             * Detenidos FGEA.
              */
             EnriquecerCoincidenciasPorFuente(
                 coincidencias
             );
 
+
             /*
-             * Guardamos la lista ya enriquecida.
+             * Después del enriquecimiento guardamos
+             * los candidatos completos en sesión.
              *
-             * Esto permite que al presionar "Ver detalle"
-             * se recupere el mismo candidato con su foto,
-             * nombre y avisos de Mandamientos.
+             * Así "Ver detalle" utiliza exactamente
+             * los mismos resultados.
              */
             GuardarCoincidenciasEnSesion(
                 coincidencias
             );
 
+
+            /*
+             * Como temporalmente mostramos únicamente
+             * Fuente 6, calculamos los contadores sobre
+             * la lista ya filtrada y no usamos directamente
+             * los totales globales de la API.
+             */
+            int totalTexto =
+                coincidencias.Count(x =>
+                    x.PorcentajeNombre > 0 ||
+                    x.PorcentajeAlias > 0
+                );
+
+            int totalFotografia =
+                coincidencias.Count(x =>
+                    x.PorcentajeFoto > 0
+                );
+
+            int totalHuella =
+                coincidencias.Count(x =>
+                    x.PorcentajeHuella > 0
+                );
+
+            int totalCombinadas =
+                coincidencias.Count(x =>
+                    x.CriteriosCumplidos >= 2
+                );
+
+            int totalFotoHuella =
+                coincidencias.Count(x =>
+                    x.PorcentajeFoto > 0 &&
+                    x.PorcentajeHuella > 0
+                );
+
+
             ResultadosCoincidenciasViewModel resultado =
                 new ResultadosCoincidenciasViewModel
                 {
+                    TieneNombreConsulta =
+                        resultadoApi.TieneNombreConsulta,
+
+                    TieneAliasConsulta =
+                        resultadoApi.TieneAliasConsulta,
+
                     TieneFotografiaConsulta =
                         tieneFotografia,
 
@@ -941,28 +1184,20 @@ namespace Objetivos_Prioritarios.ControllersServices
                     TotalCoincidencias =
                         coincidencias.Count,
 
+                    TotalTexto =
+                        totalTexto,
+
                     TotalFotografia =
-                        tieneFotografia
-                            ? coincidencias.Count(x =>
-                                x.PorcentajeFoto > 0
-                            )
-                            : 0,
+                        totalFotografia,
 
                     TotalHuella =
-                        tieneHuella
-                            ? coincidencias.Count(x =>
-                                x.PorcentajeHuella > 0
-                            )
-                            : 0,
+                        totalHuella,
 
                     TotalCombinadas =
-                        tieneFotografia &&
-                        tieneHuella
-                            ? coincidencias.Count(x =>
-                                x.PorcentajeFoto > 0 &&
-                                x.PorcentajeHuella > 0
-                            )
-                            : 0,
+                        totalCombinadas,
+
+                    TotalFotoHuella =
+                        totalFotoHuella,
 
                     CoincidenciaSeleccionada =
                         coincidencias.FirstOrDefault()
@@ -1134,19 +1369,17 @@ namespace Objetivos_Prioritarios.ControllersServices
         //        };
         //    }
 
-        private void EnriquecerCoincidenciasDetenidos(
-    List<CoincidenciaResultadoViewModel> coincidencias)
+        private void EnriquecerCoincidenciasDetenidos(List<CoincidenciaResultadoViewModel> coincidencias)
         {
-            if (
-                coincidencias == null ||
-                coincidencias.Count == 0
-            )
+            if (coincidencias == null || coincidencias.Count == 0)
             {
                 return;
             }
 
             /*
              * Fuente 6 = Detenidos FGEA.
+             *
+             * IdPersona = Filiacion.dbo.Persona.CLAVE_PERSO
              */
             List<CoincidenciaResultadoViewModel> coincidenciasFuente6 =
                 coincidencias
@@ -1161,61 +1394,51 @@ namespace Objetivos_Prioritarios.ControllersServices
                 return;
             }
 
-            /*
-             * IdPersona corresponde al ID de Nom_perso
-             * almacenado en las tablas biométricas.
-             */
-            List<int> idsNomPerso =
+            List<int> clavesPerso =
                 coincidenciasFuente6
                     .Select(x => x.IdPersona)
                     .Where(x => x > 0)
                     .Distinct()
                     .ToList();
 
-            /*
-             * Ejecuta el procedimiento almacenado:
-             * dbo.SP_SIC_getCoincidenciasDetenidos
-             */
             List<SP_SIC_getCoincidenciasDetenidos_Result> detenidos =
                 _filiacionMunicipalService
-                    .getCoincidenciasDetenidos_Results(
-                        idsNomPerso
+                    .getCoincidenciasDetenidosPorClavePerso_Results(
+                        clavesPerso
                     );
 
-            if (
-                detenidos == null ||
-                detenidos.Count == 0
-            )
+            if (detenidos == null || detenidos.Count == 0)
             {
                 return;
             }
 
-            foreach (
-                CoincidenciaResultadoViewModel coincidencia
-                in coincidenciasFuente6
-            )
+            foreach (CoincidenciaResultadoViewModel coincidencia in coincidenciasFuente6)
             {
-                /*
-                 * El procedimiento puede agrupar varios IDs
-                 * de Nom_perso dentro de la misma CLAVE_PERSO.
-                 */
                 SP_SIC_getCoincidenciasDetenidos_Result detenido =
                     detenidos.FirstOrDefault(x =>
-                        ContieneIdNomPerso(
-                            x.IdsNomPersoOrigenAlerta,
-                            coincidencia.IdPersona
-                        )
-                        ||
-                        ContieneIdNomPerso(
-                            x.IdsNomPerso,
-                            coincidencia.IdPersona
-                        )
+                        Convert.ToInt32(
+                            x.CLAVE_PERSO
+                        ) == coincidencia.IdPersona
                     );
 
                 if (detenido == null)
                 {
                     continue;
                 }
+
+                /* ============================================================
+                   IDENTIDAD
+                   ============================================================ */
+
+                int clavePerso =
+                    Convert.ToInt32(
+                        detenido.CLAVE_PERSO
+                    );
+
+                coincidencia.ClavePerso =
+                    clavePerso > 0
+                        ? (int?)clavePerso
+                        : null;
 
                 coincidencia.NombreCompleto =
                     ValorOTextoPredeterminado(
@@ -1232,51 +1455,85 @@ namespace Objetivos_Prioritarios.ControllersServices
                         detenido.NUM_FILIA
                     );
 
-                /*
-                 * FEC_NAC es DateTime, no DateTime?.
-                 */
+                /* ============================================================
+                   FECHA NACIMIENTO / EDAD
+                   ============================================================ */
+
                 DateTime fechaNacimiento =
                     detenido.FEC_NAC;
 
-                coincidencia.Edad =
+                bool fechaNacimientoValida =
                     fechaNacimiento.Year >= 1900 &&
-                    fechaNacimiento <= DateTime.Today
-                        ? CalcularEdad(
+                    fechaNacimiento <= DateTime.Today;
+
+                if (fechaNacimientoValida)
+                {
+                    coincidencia.FechaNacimiento =
+                        fechaNacimiento;
+
+                    coincidencia.Edad =
+                        CalcularEdad(
                             fechaNacimiento
-                        )
-                        : 0;
+                        );
+                }
+                else
+                {
+                    coincidencia.FechaNacimiento =
+                        null;
+
+                    coincidencia.Edad =
+                        0;
+                }
+
+                /* ============================================================
+                   SEXO
+                   ============================================================ */
 
                 coincidencia.Sexo =
                     NormalizarSexo(
                         detenido.SEXO
                     );
 
-                /*
-                 * Actualmente el SP no devuelve municipio.
-                 */
+                /* ============================================================
+                   MUNICIPIO
+                   Actualmente el SP no lo proporciona.
+                   ============================================================ */
+
                 coincidencia.MunicipioClave =
                     "";
 
                 coincidencia.Municipio =
                     "SIN INFORMACIÓN";
 
-                /*
-                 * Temporalmente utilizamos Expediente para
-                 * mostrar el último delito registrado.
-                 */
-                coincidencia.Expediente =
+                /* ============================================================
+                   ÚLTIMO DELITO
+                   ============================================================ */
+
+                coincidencia.UltimoDelito =
                     ValorOTextoPredeterminado(
                         detenido.UltimoDelito
                     );
 
+                coincidencia.FechaUltimoDelito =
+                    detenido.FechaUltimoDelito;
+
+                /*
+                 * Ya no utilizamos Expediente para guardar el delito.
+                 */
+                coincidencia.Expediente =
+                    "SIN INFORMACIÓN";
+
+                /*
+                 * Lo dejamos temporalmente por compatibilidad con la vista
+                 * actual. Después el detalle utilizará FechaUltimoDelito.
+                 */
                 coincidencia.FechaRegistro =
                     detenido.FechaUltimoDelito
                     ?? DateTime.MinValue;
 
-                int clavePerso =
-                    Convert.ToInt32(
-                        detenido.CLAVE_PERSO
-                    );
+                /* ============================================================
+                   FOTO
+                   ============================================================ */
 
                 coincidencia.FotoUrl =
                     clavePerso > 0
@@ -1519,10 +1776,8 @@ namespace Objetivos_Prioritarios.ControllersServices
             return valor;
         }
 
-
-
         private void EnriquecerCoincidenciasPorFuente(
-      List<CoincidenciaResultadoViewModel> coincidencias)
+    List<CoincidenciaResultadoViewModel> coincidencias)
         {
             if (
                 coincidencias == null ||
@@ -1532,10 +1787,6 @@ namespace Objetivos_Prioritarios.ControllersServices
                 return;
             }
 
-            /*
-             * Aseguramos que todas las coincidencias
-             * tengan el nombre de su fuente.
-             */
             foreach (
                 CoincidenciaResultadoViewModel coincidencia
                 in coincidencias
@@ -1552,35 +1803,112 @@ namespace Objetivos_Prioritarios.ControllersServices
                     );
             }
 
+
             /*
-             * Fuente 6: Detenidos FGEA.
-             * Este enriquecimiento ya funciona.
+             * Fuente 6 - Detenidos FGEA.
              */
             EnriquecerCoincidenciasDetenidos(
                 coincidencias
             );
 
-            /*
-             * Próximos enriquecimientos:
-             *
-             * Fuente 1:
-             * EnriquecerCoincidenciasC5(coincidencias);
-             *
-             * Fuente 5:
-             * EnriquecerCoincidenciasObjetivosPrioritarios(coincidencias);
-             *
-             * Fuentes 2, 7 y 8:
-             * EnriquecerCoincidenciasCapea(coincidencias);
-             */
 
             /*
-             * Mandamientos siempre se consulta al final,
-             * después de obtener los nombres oficiales.
+             * Fuente 5 - Objetivos Prioritarios.
+             */
+            EnriquecerCoincidenciasObjetivosPrioritarios(
+                coincidencias
+            );
+
+
+            /*
+             * Fuentes 2, 7 y 8.
+             *
+             * Todavía falta crear su enriquecimiento
+             * de tarjeta.
+             */
+            //EnriquecerCoincidenciasFiscaliaWeb(
+            //    coincidencias
+            //);
+
+
+            /*
+             * Fuente 1 - C5.
+             */
+            //EnriquecerCoincidenciasC5(
+            //    coincidencias
+            //);
+
+
+            /*
+             * Mandamientos al final.
              */
             AgregarAvisosMandamientos(
                 coincidencias
             );
         }
+
+
+
+        //  private void EnriquecerCoincidenciasPorFuente(
+        //List<CoincidenciaResultadoViewModel> coincidencias)
+        //  {
+        //      if (
+        //          coincidencias == null ||
+        //          coincidencias.Count == 0
+        //      )
+        //      {
+        //          return;
+        //      }
+
+        //      /*
+        //       * Aseguramos que todas las coincidencias
+        //       * tengan el nombre de su fuente.
+        //       */
+        //      foreach (
+        //          CoincidenciaResultadoViewModel coincidencia
+        //          in coincidencias
+        //      )
+        //      {
+        //          coincidencia.NombreFuente =
+        //              ObtenerNombreFuente(
+        //                  coincidencia.IdTbFuente
+        //              );
+
+        //          coincidencia.EsFuenteInformativa =
+        //              EsFuenteInformativa(
+        //                  coincidencia.IdTbFuente
+        //              );
+        //      }
+
+        //      /*
+        //       * Fuente 6: Detenidos FGEA.
+        //       * Este enriquecimiento ya funciona.
+        //       */
+        //      EnriquecerCoincidenciasDetenidos(
+        //          coincidencias
+        //      );
+
+        //      /*
+        //       * Próximos enriquecimientos:
+        //       *
+        //       * Fuente 1:*/
+        //        EnriquecerCoincidenciasC5(coincidencias);
+        //       /*
+        //       * Fuente 5:*/
+        //       EnriquecerCoincidenciasObjetivosPrioritarios(coincidencias);
+        //      /*
+        //      * Fuentes 2, 7 y 8:*/
+        //      EnriquecerCoincidenciasCapea(coincidencias);
+
+
+        //      /*
+        //       * Mandamientos siempre se consulta al final,
+        //       * después de obtener los nombres oficiales.
+        //       */
+        //      AgregarAvisosMandamientos(
+        //          coincidencias
+        //      );
+        //  }
 
         private void AgregarAvisosMandamientos(
     List<CoincidenciaResultadoViewModel> coincidencias)
@@ -2317,8 +2645,7 @@ namespace Objetivos_Prioritarios.ControllersServices
         }
 
 
-        private static string ObtenerNombreFuente(
-    int idTbFuente)
+        private static string ObtenerNombreFuente(int idTbFuente)
         {
             switch (idTbFuente)
             {
@@ -2326,25 +2653,25 @@ namespace Objetivos_Prioritarios.ControllersServices
                     return "C5 - Detenidos";
 
                 case 2:
-                    return "FEMDLP / CAPEA";
+                    return "FGEA - CAPEA / FEMDLP";
 
                 case 3:
-                    return "Personas de interés";
+                    return "FGEA - Personas de interés";
 
                 case 4:
-                    return "Mandamientos judiciales";
+                    return "FGEA - Mandamientos Judiciales";
 
                 case 5:
-                    return "Objetivos prioritarios";
+                    return "FGEA - Objetivos Prioritarios";
 
                 case 6:
-                    return "Detenidos FGEA";
+                    return "FGEA - Detenidos";
 
                 case 7:
-                    return "FEMDLP / CAPEA";
+                    return "Alerta Amber";
 
                 case 8:
-                    return "FEMDLP / CAPEA";
+                    return "Protocolo Alba";
 
                 default:
                     return "Fuente " + idTbFuente;
@@ -2361,5 +2688,987 @@ namespace Objetivos_Prioritarios.ControllersServices
              */
             return idTbFuente == 4;
         }
+
+        private void EnriquecerCoincidenciasObjetivosPrioritarios(List<CoincidenciaResultadoViewModel> coincidencias)
+        {
+            if (coincidencias == null || coincidencias.Count == 0)
+            {
+                return;
+            }
+
+            /*
+             * Fuente 5:
+             *
+             * IdPersona = tb_Objetivo.int_id_objetivo
+             */
+            List<CoincidenciaResultadoViewModel> coincidenciasFuente5 =
+                coincidencias
+                    .Where(x =>
+                        x.IdTbFuente == 5 &&
+                        x.IdPersona > 0
+                    )
+                    .ToList();
+
+            if (coincidenciasFuente5.Count == 0)
+            {
+                return;
+            }
+
+            List<int> idsObjetivo =
+                coincidenciasFuente5
+                    .Select(x => x.IdPersona)
+                    .Where(x => x > 0)
+                    .Distinct()
+                    .ToList();
+
+            DataTable objetivos =
+                _filiacionMunicipalService
+                    .GetInfoObjetivosPrioritariosPorIdObjetivo(
+                        idsObjetivo
+                    );
+
+            if (objetivos == null || objetivos.Rows.Count == 0)
+            {
+                return;
+            }
+
+            foreach (CoincidenciaResultadoViewModel coincidencia in coincidenciasFuente5)
+            {
+                DataRow objetivo =
+                    objetivos
+                        .AsEnumerable()
+                        .FirstOrDefault(x =>
+                            x.Table.Columns.Contains(
+                                "int_id_objetivo"
+                            ) &&
+                            x["int_id_objetivo"] != DBNull.Value &&
+                            Convert.ToInt32(
+                                x["int_id_objetivo"]
+                            ) == coincidencia.IdPersona
+                        );
+
+                if (objetivo == null)
+                {
+                    continue;
+                }
+
+                /* ============================================================
+                   NOMBRE PRINCIPAL
+                   ============================================================ */
+
+                string nombreOrigen =
+                    ObtenerValorDataRow(
+                        objetivo,
+                        "NombreOrigen"
+                    );
+
+                string nombreCompleto =
+                    ObtenerValorDataRow(
+                        objetivo,
+                        "NombreCompleto"
+                    );
+
+                coincidencia.NombreCompleto =
+                    !string.IsNullOrWhiteSpace(nombreOrigen) &&
+                    !nombreOrigen.Equals(
+                        "SIN NOMBRE",
+                        StringComparison.OrdinalIgnoreCase
+                    )
+                        ? nombreOrigen.Trim()
+                        : ValorOTextoPredeterminado(
+                            nombreCompleto
+                        );
+
+                /* ============================================================
+                   OTROS NOMBRES
+                   ============================================================ */
+
+                List<string> nombres =
+                    string.IsNullOrWhiteSpace(nombreCompleto)
+                        ? new List<string>()
+                        : nombreCompleto
+                            .Split(
+                                new[] { ',' },
+                                StringSplitOptions.RemoveEmptyEntries
+                            )
+                            .Select(x => x.Trim())
+                            .Where(x =>
+                                !string.IsNullOrWhiteSpace(x)
+                            )
+                            .Distinct(
+                                StringComparer.OrdinalIgnoreCase
+                            )
+                            .ToList();
+
+                List<string> otrosNombres =
+                    nombres
+                        .Where(x =>
+                            !x.Equals(
+                                coincidencia.NombreCompleto,
+                                StringComparison.OrdinalIgnoreCase
+                            )
+                        )
+                        .ToList();
+
+                coincidencia.OtrosNombres =
+                    otrosNombres.Count > 0
+                        ? string.Join(
+                            ", ",
+                            otrosNombres
+                        )
+                        : "SIN INFORMACIÓN";
+
+                /* ============================================================
+                   ALIAS
+                   ============================================================ */
+
+                /*
+                  * IMPORTANTE:
+                  *
+                  * nvarchar_alias del SP NO representa el alias
+                  * de la persona objetivo.
+                  *
+                  * Ese campo corresponde al alias del grupo delictivo.
+                  *
+                  * Los alias reales del objetivo se obtienen mediante
+                  * el endpoint de detalle.
+                  */
+                coincidencia.Alias =
+                    "SIN INFORMACIÓN";
+
+                /* ============================================================
+                   IDENTIFICADORES
+                   ============================================================ */
+
+                coincidencia.Folio =
+                    "OBJETIVO " +
+                    coincidencia.IdPersona;
+
+                /*
+                 * Puede haber más de una CLAVE_PERSO relacionada
+                 * con los distintos nombres del objetivo.
+                 */
+                string clavesPerso =
+                    ObtenerValorDataRow(
+                        objetivo,
+                        "int_clave_perso"
+                    );
+
+                coincidencia.ClavesPersoRelacionadas =
+                    string.IsNullOrWhiteSpace(clavesPerso) ||
+                    clavesPerso.Equals(
+                        "SIN CLAVE_PERSO",
+                        StringComparison.OrdinalIgnoreCase
+                    )
+                        ? "SIN INFORMACIÓN"
+                        : clavesPerso.Trim();
+
+                /*
+                 * Si existe una sola clave positiva,
+                 * también la colocamos en ClavePerso.
+                 */
+                List<int> clavesValidas =
+                    coincidencia.ClavesPersoRelacionadas
+                        .Split(
+                            new[] { ',', ';', '|' },
+                            StringSplitOptions.RemoveEmptyEntries
+                        )
+                        .Select(x => {
+                            int valor;
+
+                            return int.TryParse(
+                                x.Trim(),
+                                out valor
+                            )
+                                ? valor
+                                : 0;
+                        })
+                        .Where(x => x > 0)
+                        .Distinct()
+                        .ToList();
+
+                coincidencia.ClavePerso =
+                    clavesValidas.Count == 1
+                        ? (int?)clavesValidas[0]
+                        : null;
+
+                /* ============================================================
+                   GRUPO / PUESTO
+                   ============================================================ */
+
+                coincidencia.GrupoDelictivo =
+                    NormalizarValorObjetivo(
+                        ObtenerValorDataRow(
+                            objetivo,
+                            "nvarchar_grupo"
+                        ),
+                        "SIN GRUPO"
+                    );
+
+                coincidencia.Puesto =
+                    NormalizarValorObjetivo(
+                        ObtenerValorDataRow(
+                            objetivo,
+                            "Puesto"
+                        ),
+                        "SIN PUESTO"
+                    );
+
+                coincidencia.EstatusGrupo =
+                    NormalizarValorObjetivo(
+                        ObtenerValorDataRow(
+                            objetivo,
+                            "EstatusGrupo"
+                        ),
+                        "SIN ESTATUS DE GRUPO"
+                    );
+
+                coincidencia.EstatusObjetivo =
+                    NormalizarValorObjetivo(
+                        ObtenerValorDataRow(
+                            objetivo,
+                            "EstatusObjetivo"
+                        ),
+                        "SIN ESTATUS"
+                    );
+
+                /* ============================================================
+                   FECHA NACIMIENTO / EDAD
+                   ============================================================ */
+
+                string fechaNacimientoTexto =
+                    ObtenerValorDataRow(
+                        objetivo,
+                        "date_fecha_nacimiento"
+                    );
+
+                DateTime fechaNacimiento;
+
+                bool fechaValida =
+                    DateTime.TryParseExact(
+                        fechaNacimientoTexto,
+                        "dd/MM/yyyy",
+                        System.Globalization.CultureInfo.InvariantCulture,
+                        System.Globalization.DateTimeStyles.None,
+                        out fechaNacimiento
+                    );
+
+                if (fechaValida &&
+                    fechaNacimiento.Year >= 1900 &&
+                    fechaNacimiento <= DateTime.Today)
+                {
+
+                    coincidencia.FechaNacimiento =
+                        fechaNacimiento;
+
+                    coincidencia.Edad =
+                        CalcularEdad(
+                            fechaNacimiento
+                        );
+                }
+                else
+                {
+                    coincidencia.FechaNacimiento =
+                        null;
+
+                    coincidencia.Edad =
+                        0;
+                }
+
+                /* ============================================================
+                   DATOS NO DISPONIBLES EN ESTE SP
+                   ============================================================ */
+
+                coincidencia.MunicipioClave =
+                    "";
+
+                coincidencia.Municipio =
+                    "SIN INFORMACIÓN";
+
+                coincidencia.Sexo =
+                    "SIN INFORMACIÓN";
+
+                coincidencia.Expediente =
+                    "SIN INFORMACIÓN";
+
+                /* ============================================================
+                   FOTO
+                   ============================================================ */
+
+                string foto =
+                    ObtenerValorDataRow(
+                        objetivo,
+                        "nvarchar_foto"
+                    );
+
+                coincidencia.FotoUrl =
+                    ObtenerFotoObjetivo(
+                        foto
+                    );
+            }
+        }
+
+
+
+        private static string ObtenerFotoObjetivo(string foto)
+        {
+            if (string.IsNullOrWhiteSpace(foto) ||
+                foto.Equals(
+                    "SIN FOTO",
+                    StringComparison.OrdinalIgnoreCase
+                ))
+            {
+                return "~/Content/imagenes/Nodisponible.jpg";
+            }
+
+            foto = foto.Trim();
+
+            if (foto.StartsWith(
+                "data:image",
+                StringComparison.OrdinalIgnoreCase
+            ))
+            {
+                return foto;
+            }
+
+            if (foto.StartsWith("~/"))
+            {
+                return foto;
+            }
+
+            if (foto.StartsWith(
+                "/Content/",
+                StringComparison.OrdinalIgnoreCase
+            ))
+            {
+                return "~" + foto;
+            }
+
+            foto =
+                foto
+                    .Replace("\r", "")
+                    .Replace("\n", "")
+                    .Replace(" ", "");
+
+            return
+                "data:image/jpeg;base64," +
+                foto;
+        }
+        private static string ObtenerValorDataRow(DataRow row, string columna)
+        {
+            if (row == null ||
+                row.Table == null ||
+                !row.Table.Columns.Contains(columna) ||
+                row[columna] == DBNull.Value)
+            {
+
+                return "";
+            }
+
+            return Convert.ToString(
+                row[columna]
+            );
+        }
+        private static string NormalizarValorObjetivo(string valor, string valorSinInformacion)
+        {
+            if (string.IsNullOrWhiteSpace(valor))
+            {
+                return "SIN INFORMACIÓN";
+            }
+
+            valor = valor.Trim();
+
+            if (valor.Equals(
+                valorSinInformacion,
+                StringComparison.OrdinalIgnoreCase
+            ))
+            {
+                return "SIN INFORMACIÓN";
+            }
+
+            return valor;
+        }
+
+
+        private void EnriquecerCoincidenciasC5(List<CoincidenciaResultadoViewModel> coincidencias)
+        {
+            if (coincidencias == null || coincidencias.Count == 0)
+            {
+                return;
+            }
+
+            /*
+             * Fuente 1:
+             *
+             * IdPersona =
+             * Filiacion_Municipios.dbo.tb_DETENIDO_C5.IDDETENIDO
+             */
+            List<CoincidenciaResultadoViewModel> coincidenciasFuente1 =
+                coincidencias
+                    .Where(x =>
+                        x.IdTbFuente == 1 &&
+                        x.IdPersona > 0
+                    )
+                    .ToList();
+
+            if (coincidenciasFuente1.Count == 0)
+            {
+                return;
+            }
+
+            foreach (CoincidenciaResultadoViewModel coincidencia in coincidenciasFuente1)
+            {
+                sp_BuscarDetenido_Result detenido =
+                    _filiacionMunicipalService
+                        .GetInfoDetenido(
+                            coincidencia.IdPersona
+                        );
+
+                if (detenido == null)
+                {
+                    continue;
+                }
+
+                /* ============================================================
+                   NOMBRE
+                   ============================================================ */
+
+                coincidencia.NombreCompleto =
+                    ValorOTextoPredeterminado(
+                        detenido.Nombre
+                    );
+
+                /* ============================================================
+                   ALIAS
+                   ============================================================ */
+
+                coincidencia.Alias =
+                    ValorOTextoPredeterminado(
+                        detenido.ALIAS
+                    );
+
+                /* ============================================================
+                   FOLIO
+                   ============================================================ */
+
+                coincidencia.Folio =
+                    ValorOTextoPredeterminado(
+                        detenido.Folio
+                    );
+
+                /* ============================================================
+                   MUNICIPIO
+                   ============================================================ */
+
+                coincidencia.Municipio =
+                    ValorOTextoPredeterminado(
+                        detenido.MunicipioDetencion
+                    );
+
+                coincidencia.MunicipioClave =
+                    string.IsNullOrWhiteSpace(
+                        detenido.SiglasMunicipio
+                    )
+                        ? ""
+                        : detenido.SiglasMunicipio.Trim();
+
+                /* ============================================================
+                   EDAD
+                   ============================================================ */
+
+                coincidencia.Edad =
+                    Convert.ToInt32(
+                        detenido.EDAD
+                    );
+
+                /* ============================================================
+                   SEXO
+                   ============================================================ */
+
+                coincidencia.Sexo =
+                    NormalizarSexo(
+                        detenido.SEXO
+                    );
+
+                /* ============================================================
+                   ID DETENCIÓN
+                   ============================================================ */
+
+                coincidencia.Expediente =
+                    detenido.IDDETENCION > 0
+                        ? "DETENCIÓN " +
+                          detenido.IDDETENCION
+                        : "SIN INFORMACIÓN";
+
+                /* ============================================================
+                   FOTO
+                   ============================================================ */
+
+                coincidencia.FotoUrl =
+                    detenido.IDDETENIDO > 0
+                        ? "~/SIC/FotoDetenidoC5?idDetenido=" +
+                          detenido.IDDETENIDO
+                        : "~/Content/imagenes/Nodisponible.jpg";
+            }
+        }
+
+
+        public async Task<DetalleObjetivoApiDto> ObtenerDetalleObjetivoAsync(int idObjetivo)
+        {
+            if (idObjetivo <= 0)
+            {
+                throw new ArgumentException(
+                    "El ID del objetivo no es válido."
+                );
+            }
+
+            ValidarConfiguracionApi();
+
+            string url =
+                ConstruirUrlRecursoApi(
+                    "objetivos/" +
+                    idObjetivo +
+                    "/detalle"
+                );
+
+            using (var solicitud =
+                new HttpRequestMessage(
+                    HttpMethod.Get,
+                    url
+                ))
+            {
+                solicitud.Headers.Add(
+                    "X-API-TOKEN",
+                    _tokenApi
+                );
+
+                HttpResponseMessage respuesta =
+                    await ClienteHttp.SendAsync(
+                        solicitud
+                    );
+
+                string contenido =
+                    await respuesta.Content
+                        .ReadAsStringAsync();
+
+                /*
+                 * El objetivo no existe.
+                 */
+                if (respuesta.StatusCode ==
+                    System.Net.HttpStatusCode.NotFound)
+                {
+                    return null;
+                }
+
+                if (!respuesta.IsSuccessStatusCode)
+                {
+                    throw new InvalidOperationException(
+                        ObtenerMensajeErrorApi(
+                            contenido,
+                            respuesta.StatusCode
+                        )
+                    );
+                }
+
+                DetalleObjetivoApiDto detalle =
+                    JsonConvert
+                        .DeserializeObject<DetalleObjetivoApiDto>(
+                            contenido
+                        );
+
+                if (detalle == null)
+                {
+                    throw new InvalidOperationException(
+                        "La API regresó un detalle vacío para el objetivo."
+                    );
+                }
+
+                return detalle;
+            }
+        }
+
+
+        private string ConstruirUrlRecursoApi(string recurso)
+        {
+            string urlBase =
+                (_urlApi ?? "")
+                    .Trim()
+                    .TrimEnd('/');
+
+            const string sufijoBuscar =
+                "/buscar";
+
+            /*
+             * BiometriaApiUrl actualmente termina en:
+             *
+             * /api/busqueda-biometrica/buscar
+             *
+             * Quitamos únicamente /buscar para reutilizar
+             * la misma configuración con otros recursos.
+             */
+            if (urlBase.EndsWith(
+                sufijoBuscar,
+                StringComparison.OrdinalIgnoreCase
+            ))
+            {
+                urlBase =
+                    urlBase.Substring(
+                        0,
+                        urlBase.Length -
+                        sufijoBuscar.Length
+                    );
+            }
+
+            recurso =
+                (recurso ?? "")
+                    .Trim()
+                    .TrimStart('/');
+
+            return
+                urlBase +
+                "/" +
+                recurso;
+        }
+
+        public async Task<byte[]> ObtenerFotoObjetivoAsync(int idObjetivo)
+        {
+            if (idObjetivo <= 0)
+            {
+                return null;
+            }
+
+            ValidarConfiguracionApi();
+
+            string url =
+                ConstruirUrlRecursoApi(
+                    "objetivos/" +
+                    idObjetivo +
+                    "/foto"
+                );
+
+            using (var solicitud =
+                new HttpRequestMessage(
+                    HttpMethod.Get,
+                    url
+                ))
+            {
+                solicitud.Headers.Add(
+                    "X-API-TOKEN",
+                    _tokenApi
+                );
+
+                HttpResponseMessage respuesta =
+                    await ClienteHttp.SendAsync(
+                        solicitud
+                    );
+
+                if (respuesta.StatusCode ==
+                    System.Net.HttpStatusCode.NotFound)
+                {
+                    return null;
+                }
+
+                if (!respuesta.IsSuccessStatusCode)
+                {
+                    string contenido =
+                        await respuesta.Content
+                            .ReadAsStringAsync();
+
+                    throw new InvalidOperationException(
+                        ObtenerMensajeErrorApi(
+                            contenido,
+                            respuesta.StatusCode
+                        )
+                    );
+                }
+
+                return await respuesta.Content
+                    .ReadAsByteArrayAsync();
+            }
+        }
+
+        public async Task<DetalleFiscaliaWebApiDto> ObtenerDetalleFiscaliaWebAsync(
+    int idTbFuente,
+    int idPersona)
+        {
+            if (idPersona <= 0)
+            {
+                throw new ArgumentException(
+                    "El ID de la persona no es válido."
+                );
+            }
+
+            if (
+                idTbFuente != 2 &&
+                idTbFuente != 7 &&
+                idTbFuente != 8
+            )
+            {
+                throw new ArgumentException(
+                    "La fuente indicada no pertenece a fiscalia_web."
+                );
+            }
+
+            ValidarConfiguracionApi();
+
+            string url =
+                ConstruirUrlRecursoApi(
+                    "fiscalia-web/" +
+                    idTbFuente +
+                    "/" +
+                    idPersona +
+                    "/detalle"
+                );
+
+            using (var solicitud =
+                new HttpRequestMessage(
+                    HttpMethod.Get,
+                    url
+                ))
+            {
+                solicitud.Headers.Add(
+                    "X-API-TOKEN",
+                    _tokenApi
+                );
+
+                HttpResponseMessage respuesta =
+                    await ClienteHttp.SendAsync(
+                        solicitud
+                    );
+
+                string contenido =
+                    await respuesta.Content
+                        .ReadAsStringAsync();
+
+                if (respuesta.StatusCode ==
+                    System.Net.HttpStatusCode.NotFound)
+                {
+                    return null;
+                }
+
+                if (!respuesta.IsSuccessStatusCode)
+                {
+                    throw new InvalidOperationException(
+                        ObtenerMensajeErrorApi(
+                            contenido,
+                            respuesta.StatusCode
+                        )
+                    );
+                }
+
+                DetalleFiscaliaWebApiDto detalle =
+                    JsonConvert
+                        .DeserializeObject<DetalleFiscaliaWebApiDto>(
+                            contenido
+                        );
+
+                if (detalle == null)
+                {
+                    throw new InvalidOperationException(
+                        "La API regresó un detalle vacío."
+                    );
+                }
+
+                return detalle;
+            }
+        }
+
+
+        private async Task EnriquecerCoincidenciasFiscaliaWebAsync(
+    List<CoincidenciaResultadoViewModel> coincidencias)
+        {
+            if (
+                coincidencias == null ||
+                coincidencias.Count == 0
+            )
+            {
+                return;
+            }
+
+            /*
+             * Fuentes fiscalia_web:
+             *
+             * 2 = CAPEA / FEMDLP
+             * 7 = Alerta Amber
+             * 8 = Protocolo Alba
+             */
+            List<CoincidenciaResultadoViewModel> coincidenciasFiscaliaWeb =
+                coincidencias
+                    .Where(x =>
+                        x.IdPersona > 0 &&
+                        (
+                            x.IdTbFuente == 2 ||
+                            x.IdTbFuente == 7 ||
+                            x.IdTbFuente == 8
+                        )
+                    )
+                    .ToList();
+
+            if (coincidenciasFiscaliaWeb.Count == 0)
+            {
+                return;
+            }
+
+            foreach (
+                CoincidenciaResultadoViewModel coincidencia
+                in coincidenciasFiscaliaWeb
+            )
+            {
+                try
+                {
+                    DetalleFiscaliaWebApiDto detalle =
+                        await ObtenerDetalleFiscaliaWebAsync(
+                            coincidencia.IdTbFuente,
+                            coincidencia.IdPersona
+                        );
+
+                    if (detalle == null)
+                    {
+                        continue;
+                    }
+
+
+                    /*
+                     * ============================================================
+                     * NOMBRE
+                     * ============================================================
+                     */
+
+                    coincidencia.NombreCompleto =
+                        !string.IsNullOrWhiteSpace(
+                            detalle.NombreCompleto
+                        )
+                            ? detalle.NombreCompleto.Trim()
+                            : coincidencia.NombreCompleto;
+
+
+                    /*
+                     * ============================================================
+                     * ALIAS
+                     * ============================================================
+                     *
+                     * Estas fuentes actualmente no manejan un alias
+                     * dentro del DTO de detalle.
+                     *
+                     * Si la búsqueda nominal trajo AliasCoincidente,
+                     * ya quedó colocado previamente.
+                     */
+                    if (string.IsNullOrWhiteSpace(coincidencia.Alias))
+                    {
+                        coincidencia.Alias =
+                            "SIN INFORMACIÓN";
+                    }
+
+
+                    /*
+                     * ============================================================
+                     * EDAD
+                     * ============================================================
+                     */
+
+                    if (detalle.Edad.HasValue)
+                    {
+                        coincidencia.Edad =
+                            detalle.Edad.Value;
+                    }
+                    else if (
+                        detalle.FechaNacimiento.HasValue &&
+                        detalle.FechaNacimiento.Value.Year >= 1900 &&
+                        detalle.FechaNacimiento.Value.Date <= DateTime.Today
+                    )
+                    {
+                        coincidencia.Edad =
+                            CalcularEdad(
+                                detalle.FechaNacimiento.Value
+                            );
+                    }
+                    else
+                    {
+                        coincidencia.Edad =
+                            0;
+                    }
+
+                    coincidencia.FechaNacimiento =
+                        detalle.FechaNacimiento;
+
+
+                    /*
+                     * ============================================================
+                     * SEXO
+                     * ============================================================
+                     */
+
+                    coincidencia.Sexo =
+                        !string.IsNullOrWhiteSpace(
+                            detalle.Sexo
+                        )
+                            ? detalle.Sexo.Trim()
+                            : "SIN INFORMACIÓN";
+
+
+                    /*
+                     * ============================================================
+                     * FOTO
+                     * ============================================================
+                     */
+
+                    coincidencia.FotoUrl =
+                        detalle.TieneFoto &&
+                        !string.IsNullOrWhiteSpace(
+                            detalle.FotoUrl
+                        )
+                            ? detalle.FotoUrl.Trim()
+                            : "~/Content/imagenes/Nodisponible.jpg";
+
+
+                    /*
+                     * ============================================================
+                     * IDENTIFICADOR
+                     * ============================================================
+                     *
+                     * No inventamos un folio porque las tres fuentes
+                     * manejan identificadores distintos.
+                     */
+                    coincidencia.Folio =
+                        "ID " +
+                        coincidencia.IdPersona;
+
+
+                    /*
+                     * ============================================================
+                     * FECHA DE REGISTRO
+                     * ============================================================
+                     */
+
+                    coincidencia.FechaRegistro =
+                        detalle.FechaAlta
+                        ?? DateTime.MinValue;
+
+
+                    /*
+                     * El detalle completo (lugar de ausencia,
+                     * características físicas, señas particulares,
+                     * resumen de hechos, etc.) NO se mete aquí.
+                     *
+                     * Eso se muestra mediante
+                     * DetalleFiscaliaWebCoincidenciaPartial.
+                     */
+                }
+                catch
+                {
+                    /*
+                     * Si una fuente no puede enriquecerse,
+                     * no cancelamos toda la búsqueda.
+                     *
+                     * Conservamos el resultado básico que ya
+                     * regresó la API biométrica.
+                     */
+                    continue;
+                }
+            }
+        }
+
+
+
     }
 }

@@ -399,6 +399,8 @@
     <Compile Include="Models\Extends\CoincidenciaDetenidoFuente6Dto.cs" />
     <Compile Include="Models\Extends\CoincidenciaResultadoViewModel.cs" />
     <Compile Include="Models\Extends\DetalleCoincidenciaViewModel.cs" />
+    <Compile Include="Models\Extends\DetalleFiscaliaWebApiDto.cs" />
+    <Compile Include="Models\Extends\DetalleObjetivoApiDto.cs" />
     <Compile Include="Models\Extends\MandamientoJudicialViewModel.cs" />
     <Compile Include="Models\Extends\ResultadosCoincidenciasViewModel.cs" />
     <Compile Include="Models\Extends\tb_NombreObjetivo.cs" />
@@ -3632,6 +3634,8 @@
     <Content Include="Views\SIC\Coincidencias\FiltrosCoincidenciasPartial.cshtml" />
     <Content Include="Views\SIC\Coincidencias\ResultadosCoincidenciasPartial.cshtml" />
     <Content Include="Views\SIC\Coincidencias\DetalleCoincidenciaPartial.cshtml" />
+    <Content Include="Views\SIC\Coincidencias\DetalleObjetivoCoincidenciaPartial.cshtml" />
+    <Content Include="Views\SIC\Coincidencias\DetalleFiscaliaWebCoincidenciaPartial.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

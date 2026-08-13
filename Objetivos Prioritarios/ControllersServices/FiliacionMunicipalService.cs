@@ -1530,5 +1530,123 @@ WHERE
         }
 
 
+
+        public List<SP_SIC_getCoincidenciasDetenidos_Result> getCoincidenciasDetenidosPorClavePerso_Results(List<int> clavesPerso)
+        {
+            if (clavesPerso == null || clavesPerso.Count == 0)
+            {
+                return new List<SP_SIC_getCoincidenciasDetenidos_Result>();
+            }
+
+            clavesPerso = clavesPerso
+                .Where(x => x > 0)
+                .Distinct()
+                .ToList();
+
+            if (clavesPerso.Count == 0)
+            {
+                return new List<SP_SIC_getCoincidenciasDetenidos_Result>();
+            }
+
+            string clavesTexto =
+                string.Join(
+                    ",",
+                    clavesPerso
+                );
+
+            using (var db = new FiliacionEntities())
+            {
+                SqlParameter parametroIdsNomPerso =
+                    new SqlParameter(
+                        "@ids_nom_perso",
+                        SqlDbType.NVarChar
+                    );
+
+                parametroIdsNomPerso.Value =
+                    DBNull.Value;
+
+                SqlParameter parametroClavesPerso =
+                    new SqlParameter(
+                        "@claves_perso",
+                        SqlDbType.NVarChar
+                    );
+
+                parametroClavesPerso.Value =
+                    clavesTexto;
+
+                return db.Database
+                    .SqlQuery<SP_SIC_getCoincidenciasDetenidos_Result>(
+                        @"EXEC dbo.SP_SIC_getCoincidenciasDetenidos
+                    @ids_nom_perso,
+                    @claves_perso",
+                        parametroIdsNomPerso,
+                        parametroClavesPerso
+                    )
+                    .ToList();
+            }
+        }
+
+
+        public DataTable GetInfoObjetivosPrioritariosPorIdObjetivo(List<int> idsObjetivo)
+        {
+            DataTable tabla = new DataTable();
+
+            if (idsObjetivo == null || idsObjetivo.Count == 0)
+            {
+                return tabla;
+            }
+
+            idsObjetivo = idsObjetivo
+                .Where(x => x > 0)
+                .Distinct()
+                .ToList();
+
+            if (idsObjetivo.Count == 0)
+            {
+                return tabla;
+            }
+
+            string idsTexto = ConvertirIdsATexto(idsObjetivo);
+
+            using (var db = new Objetivos_PrioritariosEntities())
+            {
+                string conexion = db.Database.Connection.ConnectionString;
+
+                if (conexion.TrimStart().StartsWith("metadata=", StringComparison.OrdinalIgnoreCase))
+                {
+                    var builder = new EntityConnectionStringBuilder(conexion);
+                    conexion = builder.ProviderConnectionString;
+                }
+
+                using (SqlConnection cn = new SqlConnection(conexion))
+                {
+                    cn.Open();
+
+                    using (SqlCommand cmd = new SqlCommand("dbo.SP_SIC_getCoincidenciasDetenidos", cn))
+                    {
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        cmd.CommandTimeout = 300;
+
+                        cmd.Parameters.Add(
+                            "@ids_nombre_objetivo",
+                            SqlDbType.NVarChar
+                        ).Value = DBNull.Value;
+
+                        cmd.Parameters.Add(
+                            "@ids_objetivo",
+                            SqlDbType.NVarChar
+                        ).Value = idsTexto;
+
+                        using (SqlDataAdapter da = new SqlDataAdapter(cmd))
+                        {
+                            da.Fill(tabla);
+                        }
+                    }
+                }
+            }
+
+            return tabla;
+        }
+
     }
 }

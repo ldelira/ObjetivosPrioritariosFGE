@@ -4,11 +4,17 @@ namespace Objetivos_Prioritarios.Models.Extends
 {
     public class ApiBusquedaBiometricaResponse
     {
+        public bool TieneNombreConsulta { get; set; }
+
+        public bool TieneAliasConsulta { get; set; }
+
         public bool TieneFotografiaConsulta { get; set; }
 
         public bool TieneHuellaConsulta { get; set; }
 
         public int TotalCoincidencias { get; set; }
+
+        public int TotalTexto { get; set; }
 
         public int TotalFotografia { get; set; }
 
@@ -16,13 +22,9 @@ namespace Objetivos_Prioritarios.Models.Extends
 
         public int TotalCombinadas { get; set; }
 
-        public List<ApiCoincidenciaBiometricaDto> Resultados { get; set; }
+        public int TotalFotoHuella { get; set; }
 
-        public ApiBusquedaBiometricaResponse()
-        {
-            Resultados =
-                new List<ApiCoincidenciaBiometricaDto>();
-        }
+        public List<ApiCoincidenciaBiometricaDto> Resultados { get; set; }
     }
 
     public class ApiCoincidenciaBiometricaDto
@@ -34,6 +36,16 @@ namespace Objetivos_Prioritarios.Models.Extends
         public int? SimilitudFoto { get; set; }
 
         public int? SimilitudHuella { get; set; }
+
+        public int? SimilitudNombre { get; set; }
+
+        public int? SimilitudAlias { get; set; }
+
+        public string AliasCoincidente { get; set; }
+
+        public string TextoCoincidente { get; set; }
+
+        public int CriteriosCumplidos { get; set; }
 
         public string TipoCoincidencia { get; set; }
     }

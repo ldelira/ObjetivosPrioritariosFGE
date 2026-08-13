@@ -1,0 +1,87 @@
+﻿@model Objetivos_Prioritarios.Models.Extends.DetalleFiscaliaWebApiDto
+
+@{
+    var coincidencia =
+        ViewBag.Coincidencia
+        as Objetivos_Prioritarios.Models.Extends.CoincidenciaResultadoViewModel;
+}
+
+<div style="padding:15px;">
+
+    @if (Model.TieneFoto &&
+         !string.IsNullOrWhiteSpace(Model.FotoUrl))
+    {
+        <img src="@Model.FotoUrl"
+             alt="@Model.NombreCompleto"
+             style="width:120px;height:150px;object-fit:cover;border-radius:10px;"
+             onerror="this.src='@Url.Content("~/Content/imagenes/Nodisponible.jpg")';" />
+    }
+
+    <h3>
+        @Model.NombreCompleto
+    </h3>
+
+    <p>
+        <strong>Fuente:</strong>
+        @Model.Fuente
+    </p>
+
+    <p>
+        <strong>ID:</strong>
+        @Model.IdPersona
+    </p>
+
+    <p>
+        <strong>Edad:</strong>
+        @(Model.Edad.HasValue
+            ? Model.Edad.Value.ToString()
+            : "SIN INFORMACIÓN")
+    </p>
+
+    <p>
+        <strong>Sexo:</strong>
+        @(string.IsNullOrWhiteSpace(Model.Sexo)
+            ? "SIN INFORMACIÓN"
+            : Model.Sexo)
+    </p>
+
+    <p>
+        <strong>Fecha de ausencia / hechos:</strong>
+
+        @(Model.FechaAusencia.HasValue
+            ? Model.FechaAusencia.Value.ToString("dd/MM/yyyy")
+            : "SIN INFORMACIÓN")
+    </p>
+
+    <p>
+        <strong>Lugar:</strong>
+        @(string.IsNullOrWhiteSpace(Model.LugarAusencia)
+            ? "SIN INFORMACIÓN"
+            : Model.LugarAusencia)
+    </p>
+
+    <p>
+        <strong>Señas particulares:</strong>
+        @(string.IsNullOrWhiteSpace(Model.SenasParticulares)
+            ? "SIN INFORMACIÓN"
+            : Model.SenasParticulares)
+    </p>
+
+    <p>
+        <strong>Resumen:</strong>
+        @(string.IsNullOrWhiteSpace(Model.ResumenHechos)
+            ? "SIN INFORMACIÓN"
+            : Model.ResumenHechos)
+    </p>
+
+    @if (coincidencia != null)
+    {
+        <hr />
+
+        <p>
+            <strong>Coincidencia:</strong>
+            @coincidencia.SimilitudGlobal.ToString("0")%
+        </p>
+    }
+
+</div>

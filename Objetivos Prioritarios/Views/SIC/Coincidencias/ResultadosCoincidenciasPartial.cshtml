@@ -39,32 +39,25 @@
             ? 0
             : Model.TotalHuella;
 
+    int totalTexto =
+     Model == null
+         ? 0
+         : Model.TotalTexto;
+
     int totalCombinadas =
         Model == null
             ? 0
             : Model.TotalCombinadas;
 
-    int totalTexto = 0;
-
-    if (Model != null && Model.Coincidencias != null)
-    {
-        foreach (var coincidenciaTexto in Model.Coincidencias)
-        {
-            if (
-                coincidenciaTexto.PorcentajeNombre > 0 ||
-                coincidenciaTexto.PorcentajeAlias > 0 ||
-                coincidenciaTexto.PorcentajeTexto > 0
-            )
-            {
-                totalTexto++;
-            }
-        }
-    }
+    int totalFotoHuella =
+        Model == null
+            ? 0
+            : Model.TotalFotoHuella;
 
     string imagenNoDisponible =
-        Url.Content(
-            "~/Content/imagenes/Nodisponible.jpg"
-        );
+Url.Content(
+    "~/Content/imagenes/Nodisponible.jpg"
+);
 
     var modeloDetalleInicial =
         Model == null
@@ -104,7 +97,7 @@
 
     <div class="sic-resumen-item sic-resumen-combinada">
         <span>Foto y huella</span>
-        <strong>@totalCombinadas</strong>
+        <strong>@totalFotoHuella</strong>
         <i class="fa fa-link"></i>
     </div>
 </div>
@@ -190,7 +183,7 @@ else
                     </button>
                 }
 
-                @if (totalCombinadas > 0)
+                @if (totalFotoHuella > 0)
                 {
                     <button type="button"
                             class="sic-tab-resultado js-tab-coincidencias"
@@ -198,7 +191,7 @@ else
                             role="tab"
                             aria-selected="false">
                         <i class="fa fa-link"></i>
-                        Combinadas (@totalCombinadas)
+                        Foto y huella (@totalFotoHuella)
                     </button>
                 }
             </div>

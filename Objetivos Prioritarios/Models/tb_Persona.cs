@@ -17,6 +17,7 @@ namespace Objetivos_Prioritarios.Models
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public tb_Persona()
         {
+            this.tb_Detencion = new HashSet<tb_Detencion>();
             this.tb_Domicilio = new HashSet<tb_Domicilio>();
             this.tb_Fotografia = new HashSet<tb_Fotografia>();
             this.tb_SenasParticulares = new HashSet<tb_SenasParticulares>();
@@ -35,6 +36,8 @@ namespace Objetivos_Prioritarios.Models
         public int UsuarioRegistro { get; set; }
         public string Observaciones { get; set; }
     
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<tb_Detencion> tb_Detencion { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<tb_Domicilio> tb_Domicilio { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]

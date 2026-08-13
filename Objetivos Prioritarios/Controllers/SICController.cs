@@ -20,7 +20,8 @@ namespace Objetivos_Prioritarios.Controllers
         private const string SessionResultadosCoincidencias =
        "SIC_RESULTADOS_COINCIDENCIAS";
         private const string RutaBaseFotosC5 = @"\\10.13.1.232\detenidos";
-        private const string RutaBaseFotosCapea = @"\\234fgea\temporalfiliacion$\CAPEA\";
+        private const string RutaBaseFotosCapea = @"https://www.fiscalia-aguascalientes.gob.mx/";
+        //private const string RutaBaseFotosCapea = @"\\234fgea\temporalfiliacion$\CAPEA\";
 
         public SICController()
         {
@@ -1434,11 +1435,19 @@ namespace Objetivos_Prioritarios.Controllers
             }
 
             rutaFotoBD = rutaFotoBD
-                .Trim()
-                .Trim('"')
-                .Trim()
-                .TrimStart('/', '\\')
-                .Replace("/", "\\");
+    .Trim()
+    .Trim('"')
+    .Trim('\'')
+    .Trim()
+    .TrimStart('/', '\\')
+    .Replace("\\", "/");
+
+            //rutaFotoBD = rutaFotoBD
+            //   .Trim()
+            //   .Trim('"')
+            //   .Trim()
+            //   .TrimStart('/', '\\')
+            //   .Replace("/", "\\");
 
             string rutaCompleta = Path.Combine(RutaBaseFotosCapea, rutaFotoBD);
 

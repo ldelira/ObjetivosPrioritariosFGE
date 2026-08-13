@@ -14,7 +14,16 @@ namespace Objetivos_Prioritarios.Models
     
     public partial class cat_EstatusAlerta
     {
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
+        public cat_EstatusAlerta()
+        {
+            this.tb_Alerta = new HashSet<tb_Alerta>();
+        }
+    
         public int idEstatus { get; set; }
         public string Estatus { get; set; }
+    
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<tb_Alerta> tb_Alerta { get; set; }
     }
 }

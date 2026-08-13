@@ -1,0 +1,614 @@
+﻿@model System.Data.DataTable
+
+@using System
+@using System.Linq
+@using System.Collections.Generic
+
+@{
+    var objetivosPrioritarios = Model ?? new System.Data.DataTable();
+    var detenidos = ViewBag.Detenidos as System.Data.DataTable ?? new System.Data.DataTable();
+    int idDetenidoC5 = ViewBag.IdDetenidoC5 == null ? 0 : Convert.ToInt32(ViewBag.IdDetenidoC5);
+}
+
+@if (objetivosPrioritarios != null && objetivosPrioritarios.Rows.Count > 0)
+{
+    <div class="sic-rel-list">
+
+        @foreach (System.Data.DataRow row in objetivosPrioritarios.Rows)
+        {
+            int idObjetivo = 0;
+
+            if (row.Table.Columns.Contains("int_id_objetivo") &&
+                row["int_id_objetivo"] != DBNull.Value)
+            {
+                int.TryParse(Convert.ToString(row["int_id_objetivo"]), out idObjetivo);
+            }
+
+            int idOrigenObjetivo = 0;
+
+
+
+            if (row.Table.Columns.Contains("IdNombreOrigen") &&
+                            row["IdNombreOrigen"] != DBNull.Value)
+            {
+                int.TryParse(Convert.ToString(row["IdNombreOrigen"]), out idOrigenObjetivo);
+            }
+
+            if (idOrigenObjetivo == 0 &&
+                row.Table.Columns.Contains("IdsNombreObjetivoOrigenAlerta") &&
+                row["IdsNombreObjetivoOrigenAlerta"] != DBNull.Value)
+            {
+                string idsOrigenObjetivoTexto = Convert.ToString(row["IdsNombreObjetivoOrigenAlerta"]);
+
+                if (!string.IsNullOrWhiteSpace(idsOrigenObjetivoTexto))
+                {
+                    string primerIdOrigen = idsOrigenObjetivoTexto.Split(',')[0].Trim();
+                    int.TryParse(primerIdOrigen, out idOrigenObjetivo);
+                }
+            }
+
+            var idsOrigenObjetivoCoincidencias =
+new System.Collections.Generic.List<int>();
+
+            if (row.Table.Columns.Contains("IdsNombreObjetivoOrigenAlerta") &&
+                row["IdsNombreObjetivoOrigenAlerta"] != DBNull.Value)
+            {
+                string idsTexto =
+                    Convert.ToString(
+                        row["IdsNombreObjetivoOrigenAlerta"]
+                    );
+
+                if (!string.IsNullOrWhiteSpace(idsTexto))
+                {
+                    string[] partes =
+                        idsTexto.Split(
+                            new[] { ',' },
+                            StringSplitOptions.RemoveEmptyEntries
+                        );
+
+                    foreach (string parte in partes)
+                    {
+                        int idConvertido = 0;
+
+                        if (int.TryParse(
+                                parte.Trim(),
+                                out idConvertido
+                            ) &&
+                            idConvertido > 0 &&
+                            !idsOrigenObjetivoCoincidencias.Contains(idConvertido))
+                        {
+                            idsOrigenObjetivoCoincidencias.Add(
+                                idConvertido
+                            );
+                        }
+                    }
+                }
+            }
+
+            if (idOrigenObjetivo > 0 &&
+                !idsOrigenObjetivoCoincidencias.Contains(idOrigenObjetivo))
+            {
+                idsOrigenObjetivoCoincidencias.Add(
+                    idOrigenObjetivo
+                );
+            }
+
+            System.Collections.ArrayList coincidenciasAlertaObjetivo =
+                ViewBag.ObtenerCoincidenciasAlerta(
+                    idsOrigenObjetivoCoincidencias.ToArray(),
+                    new int[] { 5 }
+                ) as System.Collections.ArrayList;
+
+            if (coincidenciasAlertaObjetivo == null)
+            {
+                coincidenciasAlertaObjetivo =
+                    new System.Collections.ArrayList();
+            }
+            int idFuenteAlertaObjetivo =
+                        row.Table.Columns.Contains("IdFuenteAlerta") &&
+                        row["IdFuenteAlerta"] != DBNull.Value
+                        ? Convert.ToInt32(row["IdFuenteAlerta"])
+                        : 0;
+
+            int estatusAlertaObjetivo =
+                row.Table.Columns.Contains("EstatusAlerta") &&
+                row["EstatusAlerta"] != DBNull.Value
+                    ? Convert.ToInt32(row["EstatusAlerta"])
+                    : 0;
+
+            int idTipoAlertaObjetivo =
+                row.Table.Columns.Contains("IdTipoAlerta") &&
+                row["IdTipoAlerta"] != DBNull.Value
+                    ? Convert.ToInt32(row["IdTipoAlerta"])
+                    : 0;
+
+            string nombreTipoAlertaObjetivo =
+                row.Table.Columns.Contains("NombreTipoAlerta") &&
+                row["NombreTipoAlerta"] != DBNull.Value
+                    ? Convert.ToString(row["NombreTipoAlerta"])
+                    : "";
+
+            string nombreObjetivoMostrar = "";
+            string nombreCompletoObjetivoTexto = "";
+            string grupoObjetivo = "";
+            string aliasObjetivoTexto = "";
+            string puestoObjetivo = "";
+            string estatusGrupoObjetivo = "";
+            string estatusObjetivo = "";
+            string fechaNacimientoObjetivo = "";
+            string porcentajeCoincidenciaTexto = "";
+            string fotoObjetivo = "";
+            string fotoObjetivoSrc = "";
+
+
+            string idsNomPersoObjetivo = "";
+
+            if (row.Table.Columns.Contains("IdsNomPerso") &&
+                row["IdsNomPerso"] != DBNull.Value)
+            {
+                idsNomPersoObjetivo =
+                    Convert.ToString(row["IdsNomPerso"]).Trim();
+            }
+
+            bool tieneRegistroDetenidosObjetivo =
+                !string.IsNullOrWhiteSpace(idsNomPersoObjetivo);
+
+
+            if (row.Table.Columns.Contains("NombreOrigen") &&
+                            row["NombreOrigen"] != DBNull.Value &&
+                            !string.IsNullOrWhiteSpace(Convert.ToString(row["NombreOrigen"])) &&
+                            Convert.ToString(row["NombreOrigen"]) != "SIN NOMBRE")
+            {
+                nombreObjetivoMostrar = Convert.ToString(row["NombreOrigen"]);
+            }
+
+            if (row.Table.Columns.Contains("NombreCompleto") &&
+                row["NombreCompleto"] != DBNull.Value)
+            {
+                nombreCompletoObjetivoTexto = Convert.ToString(row["NombreCompleto"]);
+
+                if (string.IsNullOrWhiteSpace(nombreObjetivoMostrar))
+                {
+                    nombreObjetivoMostrar = nombreCompletoObjetivoTexto;
+                }
+            }
+
+            if (row.Table.Columns.Contains("nvarchar_grupo") && row["nvarchar_grupo"] != DBNull.Value)
+            {
+                grupoObjetivo = Convert.ToString(row["nvarchar_grupo"]);
+            }
+
+            if (row.Table.Columns.Contains("nvarchar_alias") && row["nvarchar_alias"] != DBNull.Value)
+            {
+                aliasObjetivoTexto = Convert.ToString(row["nvarchar_alias"]);
+            }
+
+            if (row.Table.Columns.Contains("Puesto") && row["Puesto"] != DBNull.Value)
+            {
+                puestoObjetivo = Convert.ToString(row["Puesto"]);
+            }
+
+            if (row.Table.Columns.Contains("EstatusGrupo") && row["EstatusGrupo"] != DBNull.Value)
+            {
+                estatusGrupoObjetivo = Convert.ToString(row["EstatusGrupo"]);
+            }
+
+            if (row.Table.Columns.Contains("EstatusObjetivo") && row["EstatusObjetivo"] != DBNull.Value)
+            {
+                estatusObjetivo = Convert.ToString(row["EstatusObjetivo"]);
+            }
+
+            if (row.Table.Columns.Contains("date_fecha_nacimiento") && row["date_fecha_nacimiento"] != DBNull.Value)
+            {
+                fechaNacimientoObjetivo = Convert.ToString(row["date_fecha_nacimiento"]);
+            }
+
+            if (row.Table.Columns.Contains("PorcentajeCoincidenciaTexto") &&
+                row["PorcentajeCoincidenciaTexto"] != DBNull.Value)
+            {
+                porcentajeCoincidenciaTexto = Convert.ToString(row["PorcentajeCoincidenciaTexto"]);
+            }
+
+            if (row.Table.Columns.Contains("nvarchar_foto") &&
+                row["nvarchar_foto"] != DBNull.Value)
+            {
+                fotoObjetivo = Convert.ToString(row["nvarchar_foto"]);
+            }
+
+            if (!string.IsNullOrWhiteSpace(fotoObjetivo) &&
+                fotoObjetivo != "SIN FOTO")
+            {
+                fotoObjetivo = fotoObjetivo.Trim();
+
+                if (fotoObjetivo.StartsWith("data:image", StringComparison.OrdinalIgnoreCase))
+                {
+                    fotoObjetivoSrc = fotoObjetivo;
+                }
+                else if (fotoObjetivo.StartsWith("~/"))
+                {
+                    fotoObjetivoSrc = Url.Content(fotoObjetivo);
+                }
+                else if (fotoObjetivo.StartsWith("/Content/", StringComparison.OrdinalIgnoreCase))
+                {
+                    fotoObjetivoSrc = Url.Content("~" + fotoObjetivo);
+                }
+                else
+                {
+                    fotoObjetivo = fotoObjetivo
+                        .Replace("\r", "")
+                        .Replace("\n", "")
+                        .Replace(" ", "");
+
+                    fotoObjetivoSrc = "data:image/jpeg;base64," + fotoObjetivo;
+                }
+            }
+
+            var listaNombresObjetivo = new System.Collections.Generic.List<string>();
+
+            if (!string.IsNullOrWhiteSpace(nombreCompletoObjetivoTexto) &&
+                nombreCompletoObjetivoTexto != "SIN NOMBRE")
+            {
+                listaNombresObjetivo = nombreCompletoObjetivoTexto
+                    .Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                    .Select(x => x.Trim())
+                    .Where(x => !string.IsNullOrWhiteSpace(x))
+                    .Distinct()
+                    .ToList();
+            }
+
+            var otrosNombresObjetivo = listaNombresObjetivo
+                .Where(x => !x.Equals(nombreObjetivoMostrar, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+            var idsNomPersoPorNombre =
+new System.Collections.Generic.Dictionary<string, int>(
+StringComparer.OrdinalIgnoreCase
+);
+
+            string otrosNombresDetenidosJson = "";
+
+            if (row.Table.Columns.Contains("OtrosNombresDetenidosJson") &&
+                row["OtrosNombresDetenidosJson"] != DBNull.Value)
+            {
+                otrosNombresDetenidosJson =
+                    Convert.ToString(
+                        row["OtrosNombresDetenidosJson"]
+                    );
+            }
+
+            if (!string.IsNullOrWhiteSpace(otrosNombresDetenidosJson))
+            {
+                try
+                {
+                    var nombresDetenidos =
+                        Newtonsoft.Json.Linq.JArray.Parse(
+                            otrosNombresDetenidosJson
+                        );
+
+                    foreach (var itemDetenido in nombresDetenidos)
+                    {
+                        string nombreDetenido =
+                            Convert.ToString(
+                                itemDetenido["Nombre"]
+                            );
+
+                        int idNomPerso = 0;
+
+                        int.TryParse(
+                            Convert.ToString(
+                                itemDetenido["IdNomPerso"]
+                            ),
+                            out idNomPerso
+                        );
+
+                        if (!string.IsNullOrWhiteSpace(nombreDetenido) &&
+                            idNomPerso > 0)
+                        {
+                            nombreDetenido =
+                                nombreDetenido.Trim();
+
+                            if (!idsNomPersoPorNombre.ContainsKey(nombreDetenido))
+                            {
+                                idsNomPersoPorNombre.Add(
+                                    nombreDetenido,
+                                    idNomPerso
+                                );
+                            }
+                        }
+                    }
+                }
+                catch
+                {
+                    idsNomPersoPorNombre.Clear();
+                }
+            }
+
+            var listaAliasObjetivo = new System.Collections.Generic.List<string>();
+
+            if (!string.IsNullOrWhiteSpace(aliasObjetivoTexto) &&
+                aliasObjetivoTexto != "SIN ALIAS")
+            {
+                listaAliasObjetivo = aliasObjetivoTexto
+                    .Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                    .Select(x => x.Trim())
+                    .Where(x => !string.IsNullOrWhiteSpace(x))
+                    .Distinct()
+                    .ToList();
+            }
+
+            <div class="sic-rel-card">
+
+                <div class="sic-rel-photo-wrap">
+
+                    <div class="sic-rel-photo">
+                        @if (!string.IsNullOrWhiteSpace(fotoObjetivoSrc))
+                        {
+                            <div class="sic-photo-loader"></div>
+
+                            <img src="@Html.Raw(fotoObjetivoSrc)"
+                                 alt="Foto objetivo prioritario"
+                                 loading="lazy"
+                                 onload="this.parentElement.classList.add('sic-photo-loaded');"
+                                 onerror="this.onerror=null; this.parentElement.classList.add('sic-photo-loaded'); this.parentElement.innerHTML='<i class=&quot;fa fa-crosshairs&quot;></i>';" />
+                        }
+                        else
+                        {
+                            <i class="fa fa-crosshairs"></i>
+                        }
+                    </div>
+
+                    <div class="sic-rel-carousel-footer">
+                        <div>
+                            <div class="sic-info-label">Fecha nacimiento</div>
+                            <div class="sic-info-value">@ViewBag.Texto(fechaNacimientoObjetivo)</div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="sic-rel-info">
+
+                    <div class="sic-rel-title">
+                        <div>
+                            <h5>@ViewBag.Texto(nombreObjetivoMostrar)</h5>
+
+                            <div class="sic-rel-mini-line">
+                                <span>Objetivo Prioritario:</span>
+                                <strong>@ViewBag.Texto(idObjetivo)</strong>
+                            </div>
+
+                            @Html.Partial("~/Views/SIC/DetalleDetenidoC5/CoincidenciasAlertaPartial.cshtml", coincidenciasAlertaObjetivo)
+                        </div>
+
+                        @if (idOrigenObjetivo > 0)
+                        {
+                            <div class="sic-rel-actions">
+
+                                @if (estatusAlertaObjetivo == 1)
+                                {
+                                    <button type="button"
+                                            class="sic-btn-confirmar-identidad js-confirmar-identidad-normal"
+                                            data-id-detenido="@idDetenidoC5"
+                                            data-id-origen="@idOrigenObjetivo"
+                                            data-id-fuente="@idFuenteAlertaObjetivo">
+                                        <i class="fa fa-check"></i>
+                                        Confirmar identidad
+                                    </button>
+
+                                    <button type="button"
+                                            class="sic-btn-warning-soft sic-btn-descartar-alerta"
+                                            data-id-detenido="@idDetenidoC5"
+                                            data-id-origen="@idOrigenObjetivo"
+                                            data-id-fuente="@idFuenteAlertaObjetivo">
+                                        <i class="fa fa-times"></i>
+                                        Descartar
+                                    </button>
+                                }
+                                else if (estatusAlertaObjetivo == 2)
+                                {
+                                    <button type="button"
+                                            class="sic-btn-resguardo-disponible js-confirmar-resguardo-fgea"
+                                            data-id-detenido="@idDetenidoC5"
+                                            data-id-origen="@idOrigenObjetivo"
+                                            data-id-fuente="@idFuenteAlertaObjetivo">
+
+                                        <i class="fa fa-shield"></i>
+                                        Confirmar Resguardo FGEA
+
+                                    </button>
+
+                                    <button type="button"
+                                            class="sic-btn-reactivar-alerta"
+                                            data-estatus-anterior="2"
+                                            data-id-detenido="@idDetenidoC5"
+                                            data-id-origen="@idOrigenObjetivo"
+                                            data-id-fuente="@idFuenteAlertaObjetivo">
+
+                                        <i class="fa fa-undo"></i>
+                                        Cancelar Confirmación
+
+                                    </button>
+                                }
+                                else if (estatusAlertaObjetivo == 3)
+                                {
+                                    <button type="button"
+                                            class="sic-btn-resguardo-confirmado"
+                                            disabled>
+
+                                        <i class="fa fa-university"></i>
+                                        DETENIDO EN RESGUARDO FGEA
+
+                                    </button>
+
+                                    <button type="button"
+                                            class="sic-btn-cancelar-resguardo js-cancelar-resguardo-fgea"
+                                            data-id-detenido="@idDetenidoC5"
+                                            data-id-origen="@idOrigenObjetivo"
+                                            data-id-fuente="@idFuenteAlertaObjetivo">
+
+                                        <i class="fa fa-undo"></i>
+                                        Cancelar Resguardo
+
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button type="button"
+                                            class="sic-btn-descartada"
+                                            disabled>
+                                        <i class="fa fa-times-circle"></i>
+                                        Descartada
+                                    </button>
+
+                                    <button type="button"
+                                            class="sic-btn-reactivar-alerta"
+                                            data-estatus-anterior="0"
+                                            data-id-detenido="@idDetenidoC5"
+                                            data-id-origen="@idOrigenObjetivo"
+                                            data-id-fuente="@idFuenteAlertaObjetivo">
+                                        <i class="fa fa-undo"></i>
+                                        Cancelar Confirmación
+                                    </button>
+                                }
+
+                            </div>
+
+                        }
+                        else
+                        {
+                            <button type="button"
+                                    class="sic-btn-alerta-desactivada"
+                                    disabled>
+                                <i class="fa fa-exclamation-circle"></i>
+                                Sin ID de alerta
+                            </button>
+                        }
+                    </div>
+
+                    <div class="sic-rel-grid">
+
+                        <div class="sic-info-label">Grupo</div>
+                        <div class="sic-info-value">@ViewBag.Texto(grupoObjetivo)</div>
+
+                        <div class="sic-info-label">Puesto</div>
+                        <div class="sic-info-value">@ViewBag.Texto(puestoObjetivo)</div>
+
+                        <div class="sic-info-label">Estatus grupo</div>
+                        <div class="sic-info-value">@ViewBag.Texto(estatusGrupoObjetivo)</div>
+
+                        <div class="sic-info-label">Estatus objetivo</div>
+                        <div class="sic-info-value">@ViewBag.Texto(estatusObjetivo)</div>
+
+                    </div>
+
+                    <div class="sic-rel-extra-grid">
+
+                        <div class="sic-rel-box">
+                            <div class="sic-rel-box-title">
+                                <i class="fa fa-user"></i>
+                                OTROS NOMBRES CONOCIDOS
+                            </div>
+
+                            <div class="sic-rel-box-scroll">
+                                @if (otrosNombresObjetivo.Count > 0)
+                                {
+                                    foreach (var nombreConocido in otrosNombresObjetivo)
+                                    {
+                                        int idNomPersoNombre = 0;
+
+                                        bool tieneIdNomPerso =
+                                            idsNomPersoPorNombre.TryGetValue(
+                                                nombreConocido.Trim(),
+                                                out idNomPersoNombre
+                                            )
+                                            &&
+                                            idNomPersoNombre > 0;
+
+                                        if (tieneIdNomPerso)
+                                        {
+                                            <button type="button"
+                                                    class="sic-rel-box-item sic-nombre-detenido-objetivo js-ver-detenidos-objetivo"
+                                                    data-id-nom-perso="@idNomPersoNombre"
+                                                    data-nombre="@nombreConocido"
+                                                    title="Ver información del detenido">
+
+                                                <i class="fa fa-id-card"></i>
+
+                                                <span>
+                                                    @ViewBag.Texto(nombreConocido)
+                                                </span>
+
+                                                <i class="fa fa-external-link sic-nombre-detenido-objetivo-icono"></i>
+
+                                            </button>
+                                        }
+                                        else
+                                        {
+                                            <button type="button"
+                                                    class="sic-rel-box-item sic-nombre-detenido-deshabilitado"
+                                                    disabled
+                                                    title="Este nombre no tiene un registro relacionado en detenidos">
+
+                                                <i class="fa fa-id-card-o"></i>
+
+                                                <span>
+                                                    @ViewBag.Texto(nombreConocido)
+                                                </span>
+
+                                                <i class="fa fa-ban sic-nombre-detenido-objetivo-icono"></i>
+
+                                            </button>
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    <div class="sic-rel-box-empty">
+                                        Sin otros nombres registrados.
+                                    </div>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="sic-rel-box">
+                            <div class="sic-rel-box-title">
+                                <i class="fa fa-tag"></i>
+                                ALIAS CONOCIDOS
+                            </div>
+
+                            <div class="sic-rel-box-scroll">
+                                @if (listaAliasObjetivo.Count > 0)
+                                {
+                                    foreach (var aliasConocido in listaAliasObjetivo)
+                                    {
+                                        <div class="sic-rel-box-item">
+                                            @ViewBag.Texto(aliasConocido)
+                                        </div>
+                                    }
+                                }
+                                else
+                                {
+                                    <div class="sic-rel-box-empty">
+                                        Sin alias registrados.
+                                    </div>
+                                }
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+        }
+
+    </div>
+}
+else
+{
+    <div class="sic-empty-source">
+        <i class="fa fa-crosshairs"></i>
+        <strong>FGEA - Objetivos Prioritarios</strong>
+        <span>Sin información cargada por el momento.</span>
+    </div>
+}

@@ -327,6 +327,9 @@
     <Compile Include="Models\catalogo_estado_proceso.cs">
       <DependentUpon>Mandamientos.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\cat_Contactos_Municipios.cs">
+      <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\cat_EstatusAlerta.cs">
       <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
     </Compile>
@@ -586,6 +589,12 @@
     <Compile Include="Models\SP_SIC_getCoincidenciasDetenidos_Result.cs">
       <DependentUpon>Filiacion.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\SP_SIC_ObtenerPersonas_Result.cs">
+      <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\sysdiagrams.cs">
+      <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\tb_AlbumFichaObjetivo.cs">
       <DependentUpon>ObjetivosPrioritarios.tt</DependentUpon>
     </Compile>
@@ -606,6 +615,9 @@
     </Compile>
     <Compile Include="Models\tb_CarpetasObjetivo.cs">
       <DependentUpon>ObjetivosPrioritarios.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\tb_Detencion.cs">
+      <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\tb_DETENCION_C5.cs">
       <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
@@ -3634,6 +3646,18 @@
     <Content Include="Views\SIC\Coincidencias\FiltrosCoincidenciasPartial.cshtml" />
     <Content Include="Views\SIC\Coincidencias\ResultadosCoincidenciasPartial.cshtml" />
     <Content Include="Views\SIC\Coincidencias\DetalleCoincidenciaPartial.cshtml" />
+    <Content Include="Views\SIC\DetalleDetenidoC5\TabCapeasPartial.cshtml" />
+    <Content Include="Views\SIC\DetalleDetenidoC5\TabDetenidosPartial.cshtml" />
+    <Content Include="Views\SIC\DetalleDetenidoC5\DetenidoObjetivoPartial.cshtml" />
+    <Content Include="Views\SIC\DetalleDetenidoC5\FotosMunicipioPartial.cshtml" />
+    <Content Include="Views\SIC\DetalleDetenidoC5\HuellasMunicipioPartial.cshtml" />
+    <Content Include="Views\SIC\DetalleDetenidoC5\InformacionDetenidoMunicipioPartial.cshtml" />
+    <Content Include="Views\SIC\DetalleDetenidoC5\RasgosMunicipioPartial.cshtml" />
+    <Content Include="Views\SIC\DetalleDetenidoC5\TabPersonaInteresPartial.cshtml" />
+    <Content Include="Views\SIC\DetalleDetenidoC5\TabObjetivosPartial.cshtml" />
+    <Content Include="Views\SIC\DetalleDetenidoC5\TabMandamientosPartial.cshtml" />
+    <Content Include="Views\SIC\DetalleDetenidoC5\CoincidenciasAlertaPartial.cshtml" />
+    <Content Include="Views\SIC\DetalleDetenidoC5\DetencionMapaPartial.cshtml" />
     <Content Include="Views\SIC\Coincidencias\DetalleObjetivoCoincidenciaPartial.cshtml" />
     <Content Include="Views\SIC\Coincidencias\DetalleFiscaliaWebCoincidenciaPartial.cshtml" />
   </ItemGroup>

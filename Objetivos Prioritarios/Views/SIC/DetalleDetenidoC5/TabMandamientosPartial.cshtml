@@ -1,0 +1,220 @@
+﻿@model System.Data.DataTable
+
+@using System
+
+@{
+    var mandamientos = Model ?? new System.Data.DataTable();
+    int idDetenidoC5 = ViewBag.IdDetenidoC5 == null ? 0 : Convert.ToInt32(ViewBag.IdDetenidoC5);
+}
+
+@if (mandamientos != null && mandamientos.Rows.Count > 0)
+{
+    <div class="sic-rel-list">
+
+        @foreach (System.Data.DataRow row in mandamientos.Rows)
+        {
+            int idOrigenMandamiento = 0;
+
+            if (row.Table.Columns.Contains("IdOrigenAlerta") &&
+                row["IdOrigenAlerta"] != DBNull.Value)
+            {
+                int.TryParse(
+                    Convert.ToString(row["IdOrigenAlerta"]),
+                    out idOrigenMandamiento
+                );
+            }
+
+            System.Collections.ArrayList coincidenciasAlertaMandamiento =
+                ViewBag.ObtenerCoincidenciasAlerta(
+                    new int[] { idOrigenMandamiento },
+                    new int[] { 4 }
+                ) as System.Collections.ArrayList;
+
+            if (coincidenciasAlertaMandamiento == null)
+            {
+                coincidenciasAlertaMandamiento =
+                    new System.Collections.ArrayList();
+            }
+
+            int idFuenteAlertaMandamiento =
+                        row.Table.Columns.Contains("IdFuenteAlerta") &&
+                        row["IdFuenteAlerta"] != DBNull.Value
+                        ? Convert.ToInt32(row["IdFuenteAlerta"])
+                        : 0;
+
+            int estatusAlertaMandamiento =
+                row.Table.Columns.Contains("EstatusAlerta") &&
+                row["EstatusAlerta"] != DBNull.Value
+                    ? Convert.ToInt32(row["EstatusAlerta"])
+                    : 0;
+
+            string porcentajeMandamientoTexto =
+                row.Table.Columns.Contains("PorcentajeCoincidenciaTexto") &&
+                row["PorcentajeCoincidenciaTexto"] != DBNull.Value
+                    ? Convert.ToString(row["PorcentajeCoincidenciaTexto"])
+                    : "";
+
+            int idTipoAlertaMandamiento =
+                row.Table.Columns.Contains("IdTipoAlerta") &&
+                row["IdTipoAlerta"] != DBNull.Value
+                    ? Convert.ToInt32(row["IdTipoAlerta"])
+                    : 0;
+
+            string nombreTipoAlertaMandamiento =
+                row.Table.Columns.Contains("NombreTipoAlerta") &&
+                row["NombreTipoAlerta"] != DBNull.Value
+                    ? Convert.ToString(row["NombreTipoAlerta"])
+                    : "";
+            <div class="sic-rel-card sic-rel-card-sin-foto">
+
+                <div class="sic-rel-info">
+
+                    <div class="sic-rel-title">
+                        <div>
+                            <h5>@ViewBag.Texto(row["Nombre"])</h5>
+
+                            @Html.Partial("~/Views/SIC/DetalleDetenidoC5/CoincidenciasAlertaPartial.cshtml", coincidenciasAlertaMandamiento)
+
+                        </div>
+
+                        @if (idOrigenMandamiento > 0)
+                        {
+                            <div class="sic-rel-actions">
+
+                                @if (estatusAlertaMandamiento == 1)
+                                {
+                                    <button type="button"
+                                            class="sic-btn-confirmar-identidad js-confirmar-identidad-normal"
+                                            data-id-detenido="@idDetenidoC5"
+                                            data-id-origen="@idOrigenMandamiento"
+                                            data-id-fuente="@idFuenteAlertaMandamiento">
+                                        <i class="fa fa-check"></i>
+                                        Confirmar identidad
+                                    </button>
+
+                                    <button type="button"
+                                            class="sic-btn-warning-soft sic-btn-descartar-alerta"
+                                            data-id-detenido="@idDetenidoC5"
+                                            data-id-origen="@idOrigenMandamiento"
+                                            data-id-fuente="@idFuenteAlertaMandamiento">
+                                        <i class="fa fa-times"></i>
+                                        Descartar
+                                    </button>
+                                }
+                                else if (estatusAlertaMandamiento == 2)
+                                {
+                                    <button type="button"
+                                            class="sic-btn-resguardo-disponible js-confirmar-resguardo-fgea"
+                                            data-id-detenido="@idDetenidoC5"
+                                            data-id-origen="@idOrigenMandamiento"
+                                            data-id-fuente="@idFuenteAlertaMandamiento">
+
+                                        <i class="fa fa-shield"></i>
+                                        Confirmar Resguardo FGEA
+
+                                    </button>
+
+                                    <button type="button"
+                                            class="sic-btn-reactivar-alerta"
+                                            data-estatus-anterior="2"
+                                            data-id-detenido="@idDetenidoC5"
+                                            data-id-origen="@idOrigenMandamiento"
+                                            data-id-fuente="@idFuenteAlertaMandamiento">
+
+                                        <i class="fa fa-undo"></i>
+                                        Cancelar Confirmación
+
+                                    </button>
+                                }
+                                else if (estatusAlertaMandamiento == 3)
+                                {
+                                    <button type="button"
+                                            class="sic-btn-resguardo-confirmado"
+                                            disabled>
+
+                                        <i class="fa fa-university"></i>
+                                        DETENIDO EN RESGUARDO FGEA
+
+                                    </button>
+
+                                    <button type="button"
+                                            class="sic-btn-cancelar-resguardo js-cancelar-resguardo-fgea"
+                                            data-id-detenido="@idDetenidoC5"
+                                            data-id-origen="@idOrigenMandamiento"
+                                            data-id-fuente="@idFuenteAlertaMandamiento">
+
+                                        <i class="fa fa-undo"></i>
+                                        Cancelar Resguardo
+
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button type="button"
+                                            class="sic-btn-descartada"
+                                            disabled>
+                                        <i class="fa fa-times-circle"></i>
+                                        Descartada
+                                    </button>
+
+                                    <button type="button"
+                                            class="sic-btn-reactivar-alerta"
+                                            data-estatus-anterior="0"
+                                            data-id-detenido="@idDetenidoC5"
+                                            data-id-origen="@idOrigenMandamiento"
+                                            data-id-fuente="@idFuenteAlertaMandamiento">
+                                        <i class="fa fa-undo"></i>
+                                        Cancelar Confirmación
+                                    </button>
+                                }
+
+                            </div>
+                        }
+                        else
+                        {
+                            <button type="button"
+                                    class="sic-btn-alerta-desactivada"
+                                    disabled>
+                                <i class="fa fa-exclamation-circle"></i>
+                                Sin ID de alerta
+                            </button>
+                        }
+                    </div>
+
+                    <div class="sic-rel-grid">
+
+                        <div class="sic-info-label">ID</div>
+                        <div class="sic-info-value">@ViewBag.Texto(row["id"])</div>
+
+                        <div class="sic-info-label">Número control</div>
+                        <div class="sic-info-value">@ViewBag.Texto(row["numero_control"])</div>
+
+                        <div class="sic-info-label">Expediente</div>
+                        <div class="sic-info-value">@ViewBag.Texto(row["numero_expediente"])</div>
+
+                        <div class="sic-info-label">Mandamiento</div>
+                        <div class="sic-info-value">@ViewBag.Texto(row["mandamiento"])</div>
+
+                        <div class="sic-info-label">Fecha expedición</div>
+                        <div class="sic-info-value">@ViewBag.Fecha(row["fecha_expedicion"])</div>
+
+                        <div class="sic-info-label">Fecha alta</div>
+                        <div class="sic-info-value">@ViewBag.Fecha(row["fecha_alta"])</div>
+
+                    </div>
+
+                </div>
+
+            </div>
+        }
+
+    </div>
+}
+else
+{
+    <div class="sic-empty-source">
+        <i class="fa fa-gavel"></i>
+        <strong>FGEA - Mandamientos Judiciales</strong>
+        <span>Sin información cargada por el momento.</span>
+    </div>
+}

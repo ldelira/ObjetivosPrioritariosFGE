@@ -12,13 +12,11 @@ namespace Objetivos_Prioritarios.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class tb_FichaDecadactilar
+    public partial class cat_Contactos_Municipios
     {
-        public int idFicha { get; set; }
-        public int idPersona { get; set; }
-        public string RutaHuella { get; set; }
-        public Nullable<System.DateTime> FechaRegistro { get; set; }
-        public Nullable<bool> Activo { get; set; }
-        public Nullable<int> IdTbFuente { get; set; }
+        public int ID_Mun { get; set; }
+        public Nullable<int> Municipio { get; set; }
+        public string Telefono { get; set; }
+        public string Contacto { get; set; }
     }
 }

@@ -1,5 +1,22 @@
 ﻿@{
     ViewBag.Title = "Sistema de Identificación Criminal";
+
+
+    var contactosMunicipios =
+        ViewBag.ContactosMunicipios
+        as List<Tuple<int, int, string, string, string>>
+        ?? new List<Tuple<int, int, string, string, string>>();
+
+    var municipiosDirectorio =
+        contactosMunicipios
+            .GroupBy(x => new
+            {
+                IdMunicipio = x.Item2,
+                Municipio = x.Item3
+            })
+            .OrderBy(x => x.Key.Municipio)
+            .ToList();
+
 }
 
 <style>
@@ -251,7 +268,6 @@
         flex-wrap: wrap;
         gap: 10px;
     }
-
 
     /* ============================================================
    BOTONES DE FILTRO
@@ -675,6 +691,43 @@
         box-shadow: 0 0 0 2px rgba(159, 18, 57, .15);
     }
 
+
+    /* ============================================================
+   DETENIDO EN RESGUARDO
+   Verde = detenido físicamente en Resguardo FGEA
+   ============================================================ */
+
+    #tablaSIC tbody tr.sic-estado-detenido-resguardo td {
+        background-color: #f0fdf4 !important;
+        color: #111827 !important;
+        font-weight: 800;
+    }
+
+        #tablaSIC tbody tr.sic-estado-detenido-resguardo td:first-child {
+            box-shadow: inset 6px 0 0 #16a34a;
+            padding-left: 20px !important;
+        }
+
+    #tablaSIC tbody tr.sic-estado-detenido-resguardo:hover td {
+        background-color: #dcfce7 !important;
+    }
+
+    .sic-badge-detenido-resguardo {
+        background-color: #16a34a !important;
+        border-color: #15803d !important;
+        color: #ffffff !important;
+    }
+
+    .sic-catalogo-detenido-resguardo {
+        background-color: #16a34a;
+    }
+
+    .sic-catalogo-item[data-filtro="detenido-resguardo"].active {
+        background-color: #f0fdf4;
+        border-color: #16a34a;
+        box-shadow: 0 0 0 2px rgba(22, 163, 74, .15);
+    }
+
     /* ============================================================
    LOADER: CARGANDO FICHA DEL DETENIDO
    ============================================================ */
@@ -756,6 +809,49 @@
     }
 }
 
+    /* ============================================================
+   BOTÓN REFRESCAR
+   Independiente de los filtros
+   ============================================================ */
+
+    .sic-btn-refrescar {
+        margin-left: auto;
+        align-self: center;
+        width: 145px;
+        height: 36px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        padding: 0 14px;
+        background-color: #003e8b;
+        color: #ffffff;
+        border: 1px solid #003e8b;
+        border-radius: 8px;
+        font-family: inherit;
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background-color .18s ease, border-color .18s ease, box-shadow .18s ease, transform .18s ease;
+    }
+
+        .sic-btn-refrescar:hover {
+            background-color: #002f6c;
+            border-color: #002f6c;
+            color: #ffffff;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(0, 62, 139, .20);
+        }
+
+        .sic-btn-refrescar:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0, 62, 139, .15);
+        }
+
+        .sic-btn-refrescar i {
+            font-size: 12px;
+        }
+    }
 </style>
 
 
@@ -848,7 +944,6 @@
 
                     </button>
 
-
                     <button type="button"
                             class="sic-catalogo-item js-filtro-estado-sic"
                             data-filtro="sin-alerta"
@@ -871,9 +966,34 @@
                         <span class="sic-catalogo-color sic-catalogo-objetivo-confirmado"></span>
 
                         <span class="sic-catalogo-texto">
-                            <strong>Objetivo confirmado</strong>
+                            <strong>Objetivos Confirmados</strong>
                             <small>Coincidencia de interés ya comprobada</small>
                         </span>
+
+                    </button>
+
+                    <button type="button"
+                            class="sic-catalogo-item js-filtro-estado-sic"
+                            data-filtro="detenido-resguardo"
+                            aria-pressed="false">
+
+                        <span class="sic-catalogo-color sic-catalogo-detenido-resguardo"></span>
+
+                        <span class="sic-catalogo-texto">
+                            <strong>Detenido en resguardo</strong>
+                            <small>Detenido físicamente en Resguardo FGEA</small>
+                        </span>
+
+                    </button>
+
+                    <button type="button"
+                            class="sic-btn-refrescar"
+                            onclick="refrescarSIC();"
+                            title="Actualizar información">
+
+                        <i class="fa fa-refresh"></i>
+
+                        <span>Refrescar</span>
 
                     </button>
 
@@ -886,33 +1006,100 @@
 
                 <label class="sic-directorio-titulo"
                        for="sicSelectMunicipio">
+
                     Teléfonos por municipio
+
                 </label>
+
 
                 <select id="sicSelectMunicipio"
                         class="sic-directorio-select">
 
-                    <option value="AGS">Aguascalientes</option>
-                    <option value="ASI">Asientos</option>
-                    <option value="CAL">Calvillo</option>
-                    <option value="COS">Cosío</option>
-                    <option value="JMA">Jesús María</option>
-                    <option value="PAB">Pabellón de Arteaga</option>
-                    <option value="RIN">Rincón de Romos</option>
-                    <option value="SJG">San José de Gracia</option>
-                    <option value="TEP">Tepezalá</option>
-                    <option value="ELL">El Llano</option>
-                    <option value="SFR">San Francisco de los Romo</option>
+                    @foreach (var municipio in municipiosDirectorio)
+                    {
+                        <option value="@municipio.Key.IdMunicipio">
+
+                            @municipio.Key.Municipio
+
+                        </option>
+                    }
 
                 </select>
 
+
                 <div id="sicTelefonosMunicipio"
                      class="sic-directorio-lista">
+
+                    @foreach (var contacto in contactosMunicipios)
+                    {
+                        int idMunicipio =
+                            contacto.Item2;
+
+                        string municipio =
+                            contacto.Item3;
+
+                        string telefono =
+                            contacto.Item4;
+
+                        string nombreContacto =
+                            contacto.Item5;
+
+                        string telefonoMarcacion =
+                            string.IsNullOrWhiteSpace(telefono)
+                                ? ""
+                                : telefono
+                                    .Replace(" ", "")
+                                    .Replace("-", "")
+                                    .Replace("(", "")
+                                    .Replace(")", "");
+
+
+                        <div class="sic-directorio-item js-contacto-municipio"
+                             data-municipio="@idMunicipio"
+                             style="display:none;">
+
+                            <strong title="@nombreContacto">
+
+                                @nombreContacto
+
+                            </strong>
+
+
+                            @if (!string.IsNullOrWhiteSpace(telefono))
+                            {
+                                <span>
+
+                                    <a href="tel:@telefonoMarcacion">
+
+                                        @telefono
+
+                                    </a>
+
+                                </span>
+                            }
+
+                        </div>
+                    }
+
+
+                    <div id="sicDirectorioVacio"
+                         class="sic-directorio-vacio"
+                         style="display:none;">
+
+                        Sin teléfonos registrados.
+
+                    </div>
+
                 </div>
 
             </div>
 
         </div>
+
+
+    </div>
+
+
 
 
         <table id="tablaSIC" class="table w-100">
@@ -941,9 +1128,8 @@
 
         </table>
 
-    </div>
-
 </div>
+
 
 <div id="sicLoaderFichaDetenido"
      class="sic-loader-ficha-overlay"
@@ -971,64 +1157,17 @@
 
     <script>
 
+
+        function refrescarSIC() {
+
+            window.location.reload();
+
+        }
+
+
         let tablaSIC = null;
         let filtroEstadoSic = '';
 
-        var telefonosPorMunicipio = {
-
-            AGS: [
-
-                { area: 'Gabriel Sanchez - Justica Municipal', numero: '449 100 7576' }
-
-            ],
-
-            ASI: [
-
-                { area: 'Juez Claudio - Justica Municipal', numero: '449 128 9598' }
-
-            ],
-
-            CAL: [
-            ],
-
-            COS: [
-
-                { area: 'Justica Municipal', numero: '449 156 2008' }
-
-            ],
-
-            JMA: [
-
-                { area: 'Justica Municipal', numero: '449 963 9973' },
-
-                { area: 'Justica Municipal', numero: ' 449 288 4425' }
-
-            ],
-
-            PAB: [
-
-                { area: 'Justica Municipal', numero: '465 101 5808' },
-
-                { area: 'Justica Municipal', numero: '465 958 0670' }
-
-            ],
-
-            RIN: [
-            ],
-
-            SJG: [
-            ],
-
-            TEP: [
-            ],
-
-            ELL: [
-            ],
-
-            SFR: [
-            ]
-
-        };
 
 
         function escaparHtml(valor) {
@@ -1037,37 +1176,43 @@
 
         }
 
-
         function cargarTelefonosMunicipio() {
 
-            var municipio = $('#sicSelectMunicipio').val();
+            var idMunicipio =
+                $('#sicSelectMunicipio').val();
 
-            var telefonos = telefonosPorMunicipio[municipio] || [];
+            var contactos =
+                $('.js-contacto-municipio');
 
-            var contenido = '';
 
-            if (telefonos.length === 0) {
+            contactos.hide();
 
-                contenido = '<div class="sic-directorio-vacio">Sin teléfonos registrados.</div>';
 
-            } else {
+            var encontrados =
+                contactos.filter(function () {
 
-                telefonos.forEach(function (telefono) {
-
-                    contenido += '<div class="sic-directorio-item">';
-
-                    contenido += '<strong title="' + escaparHtml(telefono.area) + '">' + escaparHtml(telefono.area) + '</strong>';
-
-                    contenido += '<span>' + escaparHtml(telefono.numero) + '</span>';
-
-                    contenido += '</div>';
+                    return $(this)
+                        .attr('data-municipio')
+                        .toString() ===
+                        idMunicipio.toString();
 
                 });
 
+
+            if (encontrados.length > 0) {
+
+                encontrados.show();
+
+                $('#sicDirectorioVacio')
+                    .hide();
+
             }
+            else {
 
-            $('#sicTelefonosMunicipio').html(contenido);
+                $('#sicDirectorioVacio')
+                    .show();
 
+            }
         }
 
 
@@ -1128,6 +1273,9 @@
                 registro.TieneOtraFuenteActiva === true ||
                 registro.TieneOtraFuenteActiva === 'true';
 
+            let tieneDetenidoResguardo =
+                registro.TieneDetenidoResguardo === true ||
+                registro.TieneDetenidoResguardo === 'true';
 
             /* ============================================================
                1. SIN COINCIDENCIAS
@@ -1141,6 +1289,18 @@
                     claseBadge: 'sic-badge-sin-alerta',
                     descripcion:
                         'No tiene coincidencias registradas'
+                };
+            }
+
+
+            if (tieneDetenidoResguardo) {
+
+                return {
+                    codigo: 'detenido-resguardo',
+                    claseFila: 'sic-estado-detenido-resguardo',
+                    claseBadge: 'sic-badge-detenido-resguardo',
+                    descripcion:
+                        'Detenido físicamente en Resguardo FGEA'
                 };
             }
 

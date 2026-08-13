@@ -861,6 +861,22 @@ namespace Objetivos_Prioritarios.ControllersServices
                     return true;
                 }
             }
+            else if (origen == 4)
+            {
+                using (var db = new SICEntities())
+                {
+                    var registro = db.DETENIDO
+                       .FirstOrDefault(x =>
+                           x.IDDETENIDO == idDetenido);
+                    if (registro == null)
+                    {
+                        return false;
+                    }
+                    registro.Situacion = "D";
+                    db.SaveChanges();
+                    return true;
+                }
+            }
 
             return false;
         }
@@ -1083,7 +1099,7 @@ namespace Objetivos_Prioritarios.ControllersServices
 
         int totalConfirmadas = db.tb_Alerta.Count(x =>
             x.idDetenidoC5 == idDetenido &&
-            x.Estatus == 2
+            (x.Estatus == 2 || x.Estatus == 3)
         );
 
         return Tuple.Create(
@@ -1122,7 +1138,8 @@ namespace Objetivos_Prioritarios.ControllersServices
         public int ActualizarEstatusNotificacion( int idDetenido, int idOrigen, int idFuente, int nuevoEstatus) {
             if (nuevoEstatus != 0 &&
                 nuevoEstatus != 1 &&
-                nuevoEstatus != 2)
+                nuevoEstatus != 2 &&
+                nuevoEstatus != 3)
             {
                 throw new ArgumentException("El estatus recibido no es válido.");
             }
@@ -1171,6 +1188,15 @@ namespace Objetivos_Prioritarios.ControllersServices
                                       (x.Estatus != 1 || x.Estatus != 2)))
                     {
                         ActualizarEstatusDetenido(2, idDetenido);
+                    }
+                }else if(nuevoEstatus == 3)
+                {
+                    if (db.tb_Alerta.Any(x =>
+                                     x.idDetenidoC5 == idDetenido &&
+                                     x.IdTbFuente != 6 &&
+                                      (x.Estatus == 3))) 
+                    {
+                        ActualizarEstatusDetenido(4, idDetenido);
                     }
                 }
 
@@ -1529,6 +1555,215 @@ WHERE
             );
         }
 
+
+        public List<Tuple<int, int, string, string, string>> GetContactosMunicipios()
+        {
+            using (var dbFiliacion = new Filiacion_MunicipiosEntities())
+            using (var dbCatalogos = new CatalogosEntities())
+            {
+                /*
+                 * Base Filiacion_Municipios
+                 */
+                var contactos =
+                    dbFiliacion.cat_Contactos_Municipios
+                        .AsNoTracking()
+                        .ToList();
+
+
+                /*
+                 * Base Catalogos
+                 */
+                var municipios =
+                    dbCatalogos.Municipio
+                        .AsNoTracking()
+                        .ToList();
+
+
+                /*
+                 * Como ya hicimos ToList(),
+                 * este JOIN se realiza en memoria.
+                 */
+                var resultado =
+                    (
+                        from contacto in contactos
+
+                        join municipio in municipios
+                            on Convert.ToInt32(contacto.Municipio)
+                            equals Convert.ToInt32(municipio.Cve_mun)
+
+                        select Tuple.Create(
+                            Convert.ToInt32(contacto.ID_Mun),       // Item1 = Id contacto
+                            Convert.ToInt32(municipio.Cve_mun),     // Item2 = Id municipio
+                            Convert.ToString(municipio.Municipio1),  // Item3 = Municipio
+                            Convert.ToString(contacto.Telefono),    // Item4 = Teléfono
+                            Convert.ToString(contacto.Contacto)     // Item5 = Contacto
+                        )
+                    )
+                    .OrderBy(x => x.Item3)
+                    .ThenBy(x => x.Item5)
+                    .ToList();
+
+
+                return resultado;
+            }
+        }
+
+
+        public DataTable GetInfoPersonasFiliacion( List<int> idsPersona)
+        {
+            DataTable tabla =
+                new DataTable();
+
+            /* ============================================================
+               VALIDAR IDS
+               ============================================================ */
+
+            if (idsPersona == null ||
+                idsPersona.Count == 0)
+            {
+                return tabla;
+            }
+
+
+            /* ============================================================
+               LIMPIAR IDS
+
+               Evitamos:
+               - IDs repetidos
+               - IDs inválidos
+               ============================================================ */
+
+            idsPersona =
+                idsPersona
+                    .Where(x => x > 0)
+                    .Distinct()
+                    .ToList();
+
+
+            if (idsPersona.Count == 0)
+            {
+                return tabla;
+            }
+
+
+            /* ============================================================
+               CONVERTIR:
+
+               List<int>
+                   19
+                   20
+                   25
+
+               A:
+
+               "19,20,25"
+               ============================================================ */
+
+            string idsTexto =
+                ConvertirIdsATexto(
+                    idsPersona
+                );
+
+
+            /* ============================================================
+               BASE DE DATOS:
+               Filiacion_Municipios
+               ============================================================ */
+
+            using (var db =
+                new Filiacion_MunicipiosEntities())
+            {
+                string conexion =
+                    db.Database
+                        .Connection
+                        .ConnectionString;
+
+
+                /*
+                 * Si la conexión viene del EDMX como EntityConnection,
+                 * obtenemos solamente la conexión real de SQL Server.
+                 */
+
+                if (
+                    conexion
+                        .TrimStart()
+                        .StartsWith(
+                            "metadata=",
+                            StringComparison.OrdinalIgnoreCase
+                        )
+                )
+                {
+                    var builder =
+                        new EntityConnectionStringBuilder(
+                            conexion
+                        );
+
+                    conexion =
+                        builder.ProviderConnectionString;
+                }
+
+
+                /* ========================================================
+                   EJECUTAR SP
+                   ======================================================== */
+
+                using (SqlConnection cn =
+                    new SqlConnection(conexion))
+                {
+                    cn.Open();
+
+
+                    using (SqlCommand cmd =
+                        new SqlCommand(
+                            "dbo.SP_SIC_ObtenerPersonas",
+                            cn
+                        ))
+                    {
+                        cmd.CommandType =
+                            CommandType.StoredProcedure;
+
+
+                        /*
+                         * Le damos tiempo suficiente porque el resultado
+                         * puede incluir fotografías Base64.
+                         */
+
+                        cmd.CommandTimeout =
+                            300;
+
+
+                        /* =================================================
+                           PARÁMETRO DEL SP
+
+                           @IdsPersona = "19,20,25"
+                           ================================================= */
+
+                        cmd.Parameters
+                            .Add(
+                                "@IdsPersona",
+                                SqlDbType.NVarChar,
+                                -1
+                            )
+                            .Value =
+                                idsTexto;
+
+
+                        /* =================================================
+                           LLENAR DATATABLE
+                           ================================================= */
+
+                        using (SqlDataAdapter da =
+                            new SqlDataAdapter(cmd))
+                        {
+                            da.Fill(tabla);
+                        }
+                    }
+                }
+            }
+
+
+            return tabla;
+        }
 
 
         public List<SP_SIC_getCoincidenciasDetenidos_Result> getCoincidenciasDetenidosPorClavePerso_Results(List<int> clavesPerso)

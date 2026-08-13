@@ -1,0 +1,1048 @@
+﻿@using System
+@using System.Data
+@using System.Linq
+@using System.Collections.Generic
+
+@{
+    /* ============================================================
+       PERSONAS DE INTERÉS
+       ============================================================ */
+
+    DataTable personasInteres =
+        ViewBag.PersonasInteres as DataTable
+        ?? new DataTable();
+
+
+    /* ============================================================
+       ID DEL DETENIDO C5
+       ============================================================ */
+
+    int idDetenidoC5 = 0;
+
+    if (ViewBag.IdDetenidoC5 != null)
+    {
+        int.TryParse(
+            Convert.ToString(
+                ViewBag.IdDetenidoC5
+            ),
+            out idDetenidoC5
+        );
+    }
+
+
+    /* ============================================================
+       FUNCIÓN TEXTO
+       ============================================================ */
+
+    Func<object, string> texto =
+        ViewBag.Texto as Func<object, string>;
+
+    if (texto == null)
+    {
+        texto = delegate (object valor)
+        {
+            if (valor == null ||
+                valor == DBNull.Value)
+            {
+                return "SIN INFORMACIÓN";
+            }
+
+            string resultado =
+                Convert.ToString(valor);
+
+            return string.IsNullOrWhiteSpace(resultado)
+                ? "SIN INFORMACIÓN"
+                : resultado.Trim();
+        };
+    }
+
+
+    /* ============================================================
+       FUNCIÓN FECHA
+       ============================================================ */
+
+    Func<object, string> fecha =
+        ViewBag.Fecha as Func<object, string>;
+
+    if (fecha == null)
+    {
+        fecha = delegate (object valor)
+        {
+            if (valor == null ||
+                valor == DBNull.Value)
+            {
+                return "SIN INFORMACIÓN";
+            }
+
+            DateTime fechaConvertida;
+
+            if (DateTime.TryParse(
+                    Convert.ToString(valor),
+                    out fechaConvertida))
+            {
+                return fechaConvertida
+                    .ToString("dd/MM/yyyy");
+            }
+
+            return texto(valor);
+        };
+    }
+
+
+    /* ============================================================
+       FUNCIÓN PARA OBTENER TODAS LAS COINCIDENCIAS
+       ============================================================ */
+
+    var obtenerCoincidencias =
+        ViewBag.ObtenerCoincidenciasAlerta
+            as Func<
+                int[],
+                int[],
+                System.Collections.ArrayList
+            >;
+}
+
+
+@if (personasInteres != null &&
+     personasInteres.Rows.Count > 0)
+{
+    <div class="sic-rel-carousel sic-persona-interes-carousel">
+
+        <div class="sic-persona-interes-slides">
+
+            @for (int i = 0;
+                  i < personasInteres.Rows.Count;
+                  i++)
+            {
+                DataRow row =
+                    personasInteres.Rows[i];
+
+
+                /* ====================================================
+                   ID PERSONA
+                   ==================================================== */
+
+                int idPersona = 0;
+
+                if (row.Table.Columns.Contains("idPersona") &&
+                    row["idPersona"] != DBNull.Value)
+                {
+                    int.TryParse(
+                        Convert.ToString(
+                            row["idPersona"]
+                        ),
+                        out idPersona
+                    );
+                }
+
+
+                /* ====================================================
+                   DATOS GENERALES
+                   ==================================================== */
+
+                string nombreCompleto =
+                    row.Table.Columns.Contains("NombreCompleto")
+                        ? texto(row["NombreCompleto"])
+                        : "SIN INFORMACIÓN";
+
+
+                string fechaNacimiento =
+                    row.Table.Columns.Contains("FechaNacimiento")
+                        ? fecha(row["FechaNacimiento"])
+                        : "SIN INFORMACIÓN";
+
+
+                string sexo =
+                    row.Table.Columns.Contains("Sexo")
+                        ? texto(row["Sexo"])
+                        : "SIN INFORMACIÓN";
+
+
+                string estatura =
+                    row.Table.Columns.Contains("Estatura")
+                        ? texto(row["Estatura"])
+                        : "SIN INFORMACIÓN";
+
+
+                string observaciones =
+                    row.Table.Columns.Contains("Observaciones")
+                        ? texto(row["Observaciones"])
+                        : "SIN INFORMACIÓN";
+
+
+                /* ====================================================
+                   FOTOGRAFÍA
+                   ==================================================== */
+
+                string archivoB64 = "";
+
+                if (row.Table.Columns.Contains("ArchivoB64") &&
+                    row["ArchivoB64"] != DBNull.Value)
+                {
+                    archivoB64 =
+                        Convert.ToString(
+                            row["ArchivoB64"]
+                        );
+                }
+
+
+                string fotoUrl =
+                    Url.Content(
+                        "~/Content/imagenes/Nodisponible.jpg"
+                    );
+
+
+                if (!string.IsNullOrWhiteSpace(
+                        archivoB64))
+                {
+                    archivoB64 =
+                        archivoB64.Trim();
+
+
+                    /*
+                     * Por si alguna vez el campo ya incluye:
+                     *
+                     * data:image/jpeg;base64,
+                     */
+
+                    if (archivoB64.StartsWith(
+                            "data:image",
+                            StringComparison.OrdinalIgnoreCase))
+                    {
+                        fotoUrl =
+                            archivoB64;
+                    }
+                    else
+                    {
+                        fotoUrl =
+                            "data:image/jpeg;base64," +
+                            archivoB64;
+                    }
+                }
+
+
+                /* ====================================================
+                   ALIAS
+
+                   SQL:
+                   EL APODO, SUPER
+                   ==================================================== */
+
+                string aliasTexto = "";
+
+                if (row.Table.Columns.Contains("Alias") &&
+                    row["Alias"] != DBNull.Value)
+                {
+                    aliasTexto =
+                        Convert.ToString(
+                            row["Alias"]
+                        );
+                }
+
+
+                List<string> alias =
+                    new List<string>();
+
+
+                if (!string.IsNullOrWhiteSpace(
+                        aliasTexto))
+                {
+                    alias =
+                        aliasTexto
+                            .Split(
+                                new[] { ',' },
+                                StringSplitOptions
+                                    .RemoveEmptyEntries
+                            )
+                            .Select(x =>
+                                x.Trim()
+                            )
+                            .Where(x =>
+                                !string.IsNullOrWhiteSpace(x)
+                            )
+                            .Distinct(
+                                StringComparer.OrdinalIgnoreCase
+                            )
+                            .ToList();
+                }
+
+
+                /* ====================================================
+                   DOMICILIOS
+
+                   El SP devuelve:
+
+                   domicilio 1\r\n
+                   domicilio 2\r\n
+                   domicilio 3
+                   ==================================================== */
+
+                string domiciliosTexto = "";
+
+                if (row.Table.Columns.Contains("Domicilios") &&
+                    row["Domicilios"] != DBNull.Value)
+                {
+                    domiciliosTexto =
+                        Convert.ToString(
+                            row["Domicilios"]
+                        );
+                }
+
+
+                List<string> domicilios =
+                    new List<string>();
+
+
+                if (!string.IsNullOrWhiteSpace(
+                        domiciliosTexto))
+                {
+                    domicilios =
+                        domiciliosTexto
+                            .Split(
+                                new[]
+                                {
+                                    "\r\n",
+                                    "\n",
+                                    "\r"
+                                    },
+                                StringSplitOptions
+                                    .RemoveEmptyEntries
+                            )
+                            .Select(x =>
+                                x.Trim()
+                            )
+                            .Where(x =>
+                                !string.IsNullOrWhiteSpace(x)
+                            )
+                            .ToList();
+                }
+
+
+                /* ====================================================
+                   PERIODOS DE BÚSQUEDA
+
+                   El SP devuelve:
+
+                   periodo 1\r\n
+                   periodo 2\r\n
+                   periodo 3
+                   ==================================================== */
+
+                string periodosTexto = "";
+
+                if (row.Table.Columns.Contains("PeriodosBusqueda") &&
+                    row["PeriodosBusqueda"] != DBNull.Value)
+                {
+                    periodosTexto =
+                        Convert.ToString(
+                            row["PeriodosBusqueda"]
+                        );
+                }
+
+
+                List<string> periodos =
+                    new List<string>();
+
+
+                if (!string.IsNullOrWhiteSpace(
+                        periodosTexto))
+                {
+                    periodos =
+                        periodosTexto
+                            .Split(
+                                new[]
+                                {
+                                    "\r\n",
+                                    "\n",
+                                    "\r"
+                                    },
+                                StringSplitOptions
+                                    .RemoveEmptyEntries
+                            )
+                            .Select(x =>
+                                x.Trim()
+                            )
+                            .Where(x =>
+                                !string.IsNullOrWhiteSpace(x)
+                            )
+                            .ToList();
+                }
+
+
+                /* ====================================================
+                   ESTATUS DE BÚSQUEDA ACTUAL
+                   ==================================================== */
+
+                string estatusBusqueda =
+                    row.Table.Columns.Contains("EstatusBusqueda")
+                        ? texto(
+                            row["EstatusBusqueda"]
+                        )
+                        : "SIN BÚSQUEDA";
+
+
+                /* ====================================================
+                   ESTATUS DE ALERTA
+                   ==================================================== */
+
+                int estatusAlerta = 0;
+
+                if (row.Table.Columns.Contains("EstatusAlerta") &&
+                    row["EstatusAlerta"] != DBNull.Value)
+                {
+                    int.TryParse(
+                        Convert.ToString(
+                            row["EstatusAlerta"]
+                        ),
+                        out estatusAlerta
+                    );
+                }
+
+
+                /* ====================================================
+                   COINCIDENCIAS
+                   FUENTE 3 = PERSONA DE INTERÉS
+                   ==================================================== */
+
+                System.Collections.ArrayList coincidenciasAlerta =
+                    new System.Collections.ArrayList();
+
+
+                if (obtenerCoincidencias != null &&
+                    idPersona > 0)
+                {
+                    coincidenciasAlerta =
+                        obtenerCoincidencias(
+                            new int[]
+                            {
+                                idPersona
+                                },
+                            new int[]
+                            {
+                                3
+                                }
+                        );
+
+
+                    if (coincidenciasAlerta == null)
+                    {
+                        coincidenciasAlerta =
+                            new System.Collections.ArrayList();
+                    }
+                }
+
+
+                /* ====================================================
+                   SLIDE
+                   ==================================================== */
+
+                <div class="
+                    sic-rel-slide
+                    sic-persona-interes-slide
+                    @(i == 0 ? "active" : "")
+                "
+                     data-index="@i">
+
+                    <div class="sic-modal-det-card sic-ficha-persona-interes">
+
+                        <div class="sic-modal-det-layout">
+
+
+                            <!-- =========================================
+                                 COLUMNA IZQUIERDA
+                                 ========================================= -->
+
+                            <aside class="sic-modal-det-sidebar">
+
+
+                                <!-- FOTO -->
+
+                                <div class="sic-modal-det-photo">
+
+                                    <div class="sic-photo-loader"></div>
+
+                                    <img src="@fotoUrl"
+                                         alt="Fotografía de @nombreCompleto"
+                                         loading="lazy"
+                                         class="sic-foto-expandible"
+                                         role="button"
+                                         tabindex="0"
+                                         title="Presione para comparar fotografías"
+                                         onload="this.parentElement.classList.add('sic-photo-loaded');"
+                                         onclick="event.stopPropagation(); abrirComparacionFotos(this.currentSrc || this.src, this.alt);"
+                                         onkeydown="if(event.key === 'Enter' || event.key === ' '){ event.preventDefault(); event.stopPropagation(); abrirComparacionFotos(this.currentSrc || this.src, this.alt); }"
+                                         onerror="this.onerror=null; this.parentElement.classList.add('sic-photo-loaded'); this.parentElement.innerHTML='<i class=&quot;fa fa-user-secret&quot;></i>';" />
+
+                                </div>
+
+
+                                <!-- DATOS -->
+
+                                <div class="sic-modal-det-sidebar-data">
+
+
+                                    <div class="sic-modal-det-sidebar-item">
+
+                                        <div class="sic-info-label">
+                                            ID Persona
+                                        </div>
+
+                                        <div class="sic-info-value">
+                                            @idPersona
+                                        </div>
+
+                                    </div>
+
+
+                                    <div class="sic-modal-det-sidebar-item">
+
+                                        <div class="sic-info-label">
+                                            Fecha nacimiento
+                                        </div>
+
+                                        <div class="sic-info-value">
+                                            @fechaNacimiento
+                                        </div>
+
+                                    </div>
+
+
+                                    <div class="sic-modal-det-sidebar-item">
+
+                                        <div class="sic-info-label">
+                                            Sexo
+                                        </div>
+
+                                        <div class="sic-info-value">
+                                            @sexo
+                                        </div>
+
+                                    </div>
+
+
+                                    <div class="sic-modal-det-sidebar-item">
+
+                                        <div class="sic-info-label">
+                                            Estatura
+                                        </div>
+
+                                        <div class="sic-info-value">
+                                            @estatura
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </aside>
+
+
+
+                            <!-- =========================================
+                                 CONTENIDO PRINCIPAL
+                                 ========================================= -->
+
+                            <section class="sic-modal-det-content">
+
+
+                                <!-- =====================================
+                                     ENCABEZADO
+                                     ===================================== -->
+
+                                <header class="sic-modal-det-header">
+
+                                    <div class="sic-modal-det-title-row">
+
+
+                                        <!-- NOMBRE -->
+
+                                        <div class="sic-modal-det-title-content">
+
+                                            <h4>
+                                                @nombreCompleto
+                                            </h4>
+
+                                        </div>
+
+
+
+                                        <!-- ACCIONES -->
+
+                                        <div class="sic-rel-actions">
+
+
+                                            @if (idPersona <= 0)
+                                            {
+                                                <button type="button"
+                                                        class="sic-btn-alerta-desactivada"
+                                                        disabled>
+
+                                                    <i class="fa fa-exclamation-circle"></i>
+                                                    Sin ID de alerta
+
+                                                </button>
+                                            }
+                                            else if (estatusAlerta == 1)
+                                            {
+                                                <button type="button"
+                                                        class="sic-btn-confirmar-identidad js-confirmar-identidad-normal"
+                                                        data-id-detenido="@idDetenidoC5"
+                                                        data-id-origen="@idPersona"
+                                                        data-id-fuente="3">
+
+                                                    <i class="fa fa-check"></i>
+
+                                                    Confirmar identidad
+
+                                                </button>
+
+
+                                                <button type="button"
+                                                        class="sic-btn-warning-soft sic-btn-descartar-alerta"
+                                                        data-id-detenido="@idDetenidoC5"
+                                                        data-id-origen="@idPersona"
+                                                        data-id-fuente="3">
+
+                                                    <i class="fa fa-times"></i>
+
+                                                    Descartar
+
+                                                </button>
+                                            }
+                                            else if (estatusAlerta == 2)
+                                            {
+                                                <button type="button"
+                                                        class="sic-btn-identidad-confirmada"
+                                                        disabled>
+
+                                                    <i class="fa fa-check-circle"></i>
+
+                                                    Identidad confirmada
+
+                                                </button>
+
+
+                                                <button type="button"
+                                                        class="sic-btn-reactivar-alerta"
+                                                        data-estatus-anterior="2"
+                                                        data-id-detenido="@idDetenidoC5"
+                                                        data-id-origen="@idPersona"
+                                                        data-id-fuente="3">
+
+                                                    <i class="fa fa-undo"></i>
+
+                                                    Cancelar Confirmación
+
+                                                </button>
+                                            }
+                                            else
+                                            {
+                                                <button type="button"
+                                                        class="sic-btn-descartada"
+                                                        disabled>
+
+                                                    <i class="fa fa-times-circle"></i>
+
+                                                    Descartada
+
+                                                </button>
+
+
+                                                <button type="button"
+                                                        class="sic-btn-reactivar-alerta"
+                                                        data-estatus-anterior="0"
+                                                        data-id-detenido="@idDetenidoC5"
+                                                        data-id-origen="@idPersona"
+                                                        data-id-fuente="3">
+
+                                                    <i class="fa fa-undo"></i>
+
+                                                    Cancelar Confirmación
+
+                                                </button>
+                                            }
+
+                                        </div>
+
+                                    </div>
+
+
+
+                                    <!-- =================================
+                                         COINCIDENCIAS
+                                         ================================= -->
+
+                                    @if (coincidenciasAlerta != null &&
+                                         coincidenciasAlerta.Count > 0)
+                                    {
+                                        <div class="sic-modal-det-coincidencias">
+
+                                            @Html.Partial(
+                                                "~/Views/SIC/DetalleDetenidoC5/CoincidenciasAlertaPartial.cshtml",
+                                                coincidenciasAlerta
+                                            )
+
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <span class="sic-modal-det-source">
+
+                                            <i class="fa fa-database"></i>
+
+                                            Información proveniente de
+                                            Personas de interés
+
+                                        </span>
+                                    }
+
+                                </header>
+
+
+
+                                <!-- =====================================
+                                     DOMICILIOS
+                                     ARRIBA - TODO EL ANCHO
+                                     ===================================== -->
+
+                                <div class="sic-pi-domicilios-principal">
+
+                                    <div class="sic-modal-det-lista-title">
+
+                                        <i class="fa fa-map-marker"></i>
+
+                                        Domicilios registrados
+
+                                        <span class="sic-modal-det-lista-total">
+                                            @domicilios.Count
+                                        </span>
+
+                                    </div>
+
+
+                                    <div class="sic-pi-domicilios-list">
+
+                                        @if (domicilios.Count > 0)
+                                        {
+                                            foreach (
+                                                string domicilio
+                                                in domicilios
+                                            )
+                                            {
+                                                <div class="
+                                                    sic-modal-det-lista-item
+                                                    sic-pi-domicilio-item">
+
+                                                    <i class="fa fa-map-marker"></i>
+
+                                                    <span>
+                                                        @domicilio
+                                                    </span>
+
+                                                </div>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <div class="sic-modal-det-lista-empty">
+
+                                                Sin domicilios registrados.
+
+                                            </div>
+                                        }
+
+                                    </div>
+
+                                </div>
+
+
+
+                                <!-- =====================================
+                                     FILA INFERIOR
+
+                                     IZQUIERDA = ALIAS
+                                     DERECHA = PERIODOS
+                                     ===================================== -->
+
+                                <div class="
+                                    sic-modal-det-listas
+                                    sic-pi-listas-inferiores">
+
+                                    <!-- =================================
+    PERIODOS DE BÚSQUEDA
+    ================================= -->
+
+                                    <div class="
+      sic-modal-det-lista-box
+      sic-pi-periodos-box">
+
+                                        <div class="sic-modal-det-lista-title">
+
+                                            <i class="fa fa-search"></i>
+
+                                            Periodos de búsqueda
+
+                                            <span class="sic-modal-det-lista-total">
+                                                @periodos.Count
+                                            </span>
+
+                                        </div>
+
+
+                                        <div class="sic-modal-det-lista-scroll">
+
+                                            @if (periodos.Count > 0)
+                                            {
+                                                foreach (
+                                                    string periodo
+                                                    in periodos
+                                                )
+                                                {
+                                                    bool periodoActivo =
+                                                        periodo.IndexOf(
+                                                            "BÚSQUEDA ACTIVA",
+                                                            StringComparison.OrdinalIgnoreCase
+                                                        ) >= 0;
+
+
+                                                    <div class="
+                      sic-modal-det-lista-item
+                      sic-pi-periodo-item
+                      @(periodoActivo
+                          ? "activo"
+                          : "cancelado")">
+
+                                                        <i class="
+                          fa
+                          @(periodoActivo
+                              ? "fa-search"
+                              : "fa-calendar-times-o")">
+                                                        </i>
+
+                                                        <span>
+                                                            @periodo
+                                                        </span>
+
+                                                    </div>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <div class="sic-modal-det-lista-empty">
+
+                                                    Sin periodos de búsqueda
+                                                    registrados.
+
+                                                </div>
+                                            }
+
+                                        </div>
+
+                                    </div>
+
+
+                                    <!-- =================================
+         ALIAS
+         ================================= -->
+
+                                    <div class="sic-modal-det-lista-box">
+
+                                        <div class="sic-modal-det-lista-title">
+
+                                            <i class="fa fa-tag"></i>
+
+                                            Alias conocidos
+
+                                            <span class="sic-modal-det-lista-total">
+                                                @alias.Count
+                                            </span>
+
+                                        </div>
+
+
+                                        <div class="sic-modal-det-lista-scroll">
+
+                                            @if (alias.Count > 0)
+                                            {
+                                                foreach (
+                                                    string aliasConocido
+                                                    in alias
+                                                )
+                                                {
+                                                    <div class="sic-modal-det-lista-item">
+
+                                                        <i class="fa fa-tag"></i>
+
+                                                        <span>
+                                                            @aliasConocido
+                                                        </span>
+
+                                                    </div>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <div class="sic-modal-det-lista-empty">
+
+                                                    Sin alias registrados.
+
+                                                </div>
+                                            }
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+
+
+                                <!-- =====================================
+                                     OBSERVACIONES
+                                     ===================================== -->
+
+                                <!--<div class="sic-pi-observaciones">
+
+                                    <div class="sic-info-label">
+                                        Observaciones
+                                    </div>
+
+                                    <div class="sic-info-value">
+                                        @observaciones
+                                    </div>
+
+                                </div>-->
+
+
+                            </section>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- ================================================
+                         CONTROLES DEL CARRUSEL
+                         ================================================ -->
+
+                    @if (personasInteres.Rows.Count > 1)
+                    {
+                        <div class="
+                            sic-rel-carousel-footer
+                            sic-persona-interes-carousel-footer">
+
+
+                            <!-- ANTERIOR -->
+
+                            <button type="button"
+                                    class="
+                                        sic-rel-nav
+                                        sic-persona-interes-prev"
+                                    title="Anterior">
+
+                                <i class="fa fa-chevron-left"></i>
+
+                            </button>
+
+
+
+                            <!-- CONTADOR -->
+
+                            <span class="sic-rel-counter">
+
+                                <span class="sic-persona-interes-current">
+                                    @(i + 1)
+                                </span>
+
+                                /
+
+                                @personasInteres.Rows.Count
+
+                            </span>
+
+
+
+                            <!-- SIGUIENTE -->
+
+                            <button type="button"
+                                    class="
+                                        sic-rel-nav
+                                        sic-persona-interes-next"
+                                    title="Siguiente">
+
+                                <i class="fa fa-chevron-right"></i>
+
+                            </button>
+
+                        </div>
+                    }
+
+                </div>
+            }
+
+        </div>
+
+    </div>
+}
+else
+{
+    <div class="sic-empty-source">
+
+        <i class="fa fa-user-circle"></i>
+
+        <strong>
+            Personas de interés
+        </strong>
+
+        <span>
+            Sin coincidencias registradas.
+        </span>
+
+    </div>
+}
+
+
+
+<script>
+
+    /* ============================================================
+       CARRUSEL PERSONAS DE INTERÉS
+
+       Se utiliza el mismo helper general que ya utiliza CAPEA:
+
+           moverCarruselSic()
+
+       ============================================================ */
+
+    $(document)
+        .off(
+            'click.tabPersonaInteres',
+            '.sic-persona-interes-next, .sic-persona-interes-prev'
+        )
+        .on(
+            'click.tabPersonaInteres',
+            '.sic-persona-interes-next, .sic-persona-interes-prev',
+            function (e) {
+
+                e.preventDefault();
+
+
+                moverCarruselSic(
+                    $(this),
+
+                    '.sic-persona-interes-slide',
+
+                    '.sic-persona-interes-current',
+
+                    $(this).hasClass(
+                        'sic-persona-interes-next'
+                    )
+                        ? 1
+                        : -1
+                );
+
+            }
+        );
+
+</script>

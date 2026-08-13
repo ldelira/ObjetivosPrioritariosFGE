@@ -2498,3 +2498,4040 @@
         width: calc(100% - 44px);
     }
 }
+
+    /* ============================================================
+   DETALLE DETENIDO C5 / SIC
+   Estilos extraídos de DetalleDetenidoC5.cshtml.
+   ============================================================ */
+
+    /* ============================================================
+   ÍNDICE RÁPIDO DE SECCIONES
+
+   [01] Configuración general y botones base
+   [02] Hero / cabecera azul
+   [03] Estructura general de tarjetas
+   [04] Información de detención y mapa
+   [05] Información del detenido en Municipio
+   [06] Biométricos: estilos compartidos
+   [07] Botones de estado de alerta
+   [08] Placeholders de fotografía
+   [09] Tabs, relaciones y carruseles
+   [10] Acceso y carga de ficha de detenido relacionado
+   [11] Modal de detenidos
+   [12] Ficha reutilizable Tab / Modal
+   [13] Estado de identidad y persona de interés
+   [14] Coincidencias de alerta
+   [15] Contadores detallados del Hero
+   [16] Foto principal y visor
+   [17] Últimos delitos / desplegable
+   [18] Comparación de fotografías
+   [19] Galería expandible
+   [20] Visor carrusel de galería
+   [21] Coincidencias por nombre
+
+   NOTA:
+   Solo se agregaron comentarios, títulos y etiquetas de navegación.
+   No se modificó ninguna regla, valor, selector ni comportamiento CSS.
+   ============================================================ */
+
+    /* ============================================================
+   [01] CONFIGURACIÓN GENERAL Y BOTONES BASE
+   Contenedor principal, acciones del título y botones reutilizables.
+   ============================================================ */
+
+    .sic-ficha-page {
+        color: #111827;
+    }
+
+    .sic-page-title-actions {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 8px;
+    }
+
+    .sic-btn-light,
+    .sic-btn-warning-soft {
+        border-radius: 10px;
+        padding: 9px 13px;
+        font-weight: 800;
+        font-size: 13px;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+    }
+
+    .sic-btn-light,
+    .sic-btn-estatus-soft {
+        border-radius: 10px;
+        padding: 9px 13px;
+        font-weight: 800;
+        font-size: 13px;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+    }
+
+    .sic-btn-light {
+        background: #ffffff;
+        color: #102f55;
+        border: 1px solid #dbe3ef;
+    }
+
+    .sic-btn-warning-soft {
+        background: #fff7ed;
+        color: #9a3412;
+        border: 1px solid #fed7aa;
+    }
+
+        .sic-btn-light:hover,
+        .sic-btn-warning-soft:hover {
+            text-decoration: none;
+            filter: brightness(.98);
+        }
+
+    .sic-btn-estatus-soft {
+        background: #bbf7d0;
+        color: #11923E;
+        border: 1px solid #96F3B6;
+    }
+
+        .sic-btn-light:hover,
+        .sic-btn-estatus-soft:hover {
+            text-decoration: none;
+            filter: brightness(.98);
+        }
+
+    /* ============================================================
+   [02] HERO / CABECERA AZUL DEL DETENIDO
+   Foto principal, nombre, estado de identidad y estructura superior.
+   ============================================================ */
+
+    .sic-hero {
+        background: linear-gradient(135deg, #102f55 0%, #1d63d3 100%);
+        border-radius: 18px;
+        padding: 22px;
+        padding-bottom: 10px;
+        color: #ffffff;
+        box-shadow: 0 12px 28px rgba(15, 35, 75, .16);
+        margin-bottom: 18px;
+        overflow: hidden;
+    }
+
+    .sic-hero-content {
+        display: grid;
+        grid-template-columns: 210px minmax(0, 1fr) 470px;
+        align-items: start;
+        gap: 20px;
+    }
+
+    .sic-photo-main {
+        width: 200px;
+        height: 240px;
+        border-radius: 16px;
+        background: rgba(255,255,255,.18);
+        border: 2px solid rgba(255,255,255,.35);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+
+        .sic-photo-main i {
+            font-size: 64px;
+            color: rgba(255,255,255,.85);
+        }
+
+        .sic-photo-main img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: inherit;
+        }
+
+    .sic-photo-caption {
+        margin-top: 8px;
+        text-align: center;
+        font-size: 12px;
+        font-weight: 800;
+        color: rgba(255,255,255,.88);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+
+    .sic-hero-info {
+        min-width: 0;
+    }
+
+        .sic-hero-info h2 {
+            font-size: 50px;
+            font-weight: 700;
+            margin: 0 0 6px;
+            color: #ffffff;
+            letter-spacing: .4px;
+            text-transform: uppercase;
+            line-height: 1.1;
+        }
+
+    .sic-hero-subtitle {
+        font-size: 13px;
+        font-weight: 700;
+        color: rgba(255,255,255,.82);
+        margin-bottom: 14px;
+    }
+
+    .sic-pill-estado-identidad {
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 7px !important;
+        padding: 8px 14px !important;
+        color: #ffffff !important;
+        font-weight: 800 !important;
+        border: 1px solid transparent !important;
+        background-image: none !important;
+        box-shadow: none;
+        transition: background-color .25s ease, border-color .25s ease, box-shadow .25s ease, transform .25s ease;
+    }
+
+        .sic-pill-estado-identidad i,
+        .sic-pill-estado-identidad span {
+            color: #ffffff !important;
+        }
+
+        .sic-pill-estado-identidad:hover {
+            transform: translateY(-1px);
+        }
+
+
+    /* ============================================================
+       SIN CONFIRMAR
+       Amarillo / naranja
+       ============================================================ */
+
+    .sic-pill-identidad-pendiente {
+        background-color: #d97706 !important;
+        border-color: #fbbf24 !important;
+        box-shadow: 0 4px 12px rgba(217, 119, 6, .28) !important;
+    }
+
+
+    /* ============================================================
+       IDENTIDAD CONFIRMADA
+       Fuente 6
+       Verde completo
+       ============================================================ */
+
+    .sic-pill-identidad-confirmada {
+        background-color: #198754 !important;
+        border-color: #5fd39a !important;
+        box-shadow: 0 4px 12px rgba(25, 135, 84, .28) !important;
+    }
+
+
+    /* ============================================================
+       IDENTIDAD CONFIRMADA DE INTERÉS
+       Fuente diferente de 6
+       Rojo completo y máxima prioridad
+       ============================================================ */
+
+    .sic-pill-identidad-interes {
+        background-color: #b42318 !important;
+        border-color: #ff756b !important;
+        box-shadow: 0 4px 14px rgba(180, 35, 24, .38), 0 0 0 3px rgba(255, 117, 107, .14) !important;
+    }
+
+
+    /* ============================================================
+       ESTADO TEMPORAL MIENTRAS SE COMPRUEBA
+       ============================================================ */
+
+    .sic-pill-identidad-cargando {
+        background-color: #475569 !important;
+        border-color: #94a3b8 !important;
+        box-shadow: 0 4px 12px rgba(71, 85, 105, .25) !important;
+    }
+
+    /* ------------------------------------------------------------
+   [02.1] PÍLDORAS GENERALES DEL HERO
+   Etiquetas visuales adicionales dentro de la cabecera azul.
+   ------------------------------------------------------------ */
+
+    .sic-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 11px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 800;
+        background: rgba(255,255,255,.14);
+        border: 1px solid rgba(255,255,255,.20);
+        color: #ffffff;
+    }
+
+    .sic-pill-alerta {
+        background: #fff1f2;
+        color: #be123c;
+        border-color: #fecdd3;
+    }
+
+    /* ------------------------------------------------------------
+   [02.2] DATOS PRINCIPALES DEL HERO
+   Grid de datos básicos mostrado junto a la fotografía.
+   ------------------------------------------------------------ */
+
+    .sic-main-info-grid {
+        display: grid;
+        margin-top: 5px;
+        grid-template-columns: repeat(1, minmax(130px, 1fr));
+        gap: 6px 12px;
+        max-width: 520px;
+    }
+
+    .sic-main-info-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        min-width: 0;
+    }
+
+    .sic-main-info-icon {
+        width: 28px;
+        height: 28px;
+        border-radius: 9px;
+        background: rgba(255,255,255,.16);
+        border: 1px solid rgba(255,255,255,.18);
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        font-size: 13px;
+    }
+
+    .sic-main-info-item label {
+        display: block;
+        margin: 0;
+        font-size: 10px;
+        font-weight: 800;
+        color: rgba(255,255,255,.75);
+        text-transform: uppercase;
+        letter-spacing: .2px;
+    }
+
+    .sic-main-info-item strong {
+        display: block;
+        color: #ffffff;
+        font-size: 13px;
+        font-weight: 900;
+        line-height: 1.15;
+        word-break: break-word;
+    }
+
+    /* ------------------------------------------------------------
+   [02.3] CONTADORES DEL HERO
+   Tarjetas/contadores superiores de alertas, fotos, huellas, etc.
+   ------------------------------------------------------------ */
+
+    .sic-hero-counters {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        column-gap: 14px;
+        row-gap: 22px;
+        width: 525px;
+        max-width: none;
+        margin-left: 0;
+        margin-right: auto;
+        justify-self: start;
+        align-self: start;
+        box-sizing: border-box;
+        transform: translateX(-45px);
+    }
+
+    .sic-hero-counter {
+        min-height: 62px;
+        border-radius: 14px;
+        padding: 10px;
+        background: rgba(255,255,255,.13);
+        border: 1px solid rgba(255,255,255,.18);
+        box-shadow: 0 8px 18px rgba(0,0,0,.08);
+        display: flex;
+        align-items: center;
+        gap: 9px;
+    }
+
+    .sic-hero-counter-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 11px;
+        background: rgba(255,255,255,.18);
+        border: 1px solid rgba(255,255,255,.20);
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        font-size: 14px;
+    }
+
+    .sic-hero-counter label {
+        display: block;
+        margin: 0;
+        color: rgba(255,255,255,.78);
+        font-size: 10px;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: .2px;
+        line-height: 1.1;
+    }
+
+    .sic-hero-counter strong {
+        display: block;
+        color: #ffffff;
+        font-size: 15px;
+        font-weight: 900;
+        line-height: 1.15;
+        margin-top: 3px;
+    }
+
+    .sic-hero-counter.alerta {
+        background: rgba(255, 241, 242, .96);
+        border-color: #fecdd3;
+    }
+
+        .sic-hero-counter.alerta .sic-hero-counter-icon {
+            background: #ffe4e6;
+            border-color: #fecdd3;
+            color: #dc2626;
+        }
+
+        .sic-hero-counter.alerta label {
+            color: #9f1239;
+        }
+
+        .sic-hero-counter.alerta strong {
+            color: #be123c;
+        }
+
+    /* ============================================================
+   [03] ESTRUCTURA GENERAL DE TARJETAS
+   Grid de secciones, tarjetas, encabezados, datos y botones pequeños.
+   ============================================================ */
+
+    .sic-section-grid {
+        display: grid;
+        grid-template-columns: 1.1fr .9fr;
+        gap: 16px;
+        margin-bottom: 16px;
+    }
+
+    .sic-card {
+        background: #ffffff;
+        border: 1px solid #e8eef8;
+        border-radius: 16px;
+        box-shadow: 0 5px 16px rgba(15, 35, 75, .06);
+        overflow: hidden;
+    }
+
+    .sic-card-header {
+        padding: 14px 16px;
+        border-bottom: 1px solid #e8eef8;
+        background: #f8fafc;
+    }
+
+        .sic-card-header h5 {
+            margin: 0;
+            font-size: 15px;
+            font-weight: 900;
+            color: #102f55;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+    .sic-card-body {
+        padding: 16px;
+    }
+
+    .sic-info-list {
+        display: grid;
+        grid-template-columns: 170px minmax(0, 1fr);
+        row-gap: 10px;
+        column-gap: 14px;
+    }
+
+    .sic-info-label {
+        color: #64748b;
+        font-size: 12px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: .2px;
+    }
+
+    .sic-info-value {
+        color: #111827;
+        font-size: 14px;
+        font-weight: 700;
+        word-break: break-word;
+    }
+
+    .sic-text-box {
+        background: #f8fafc;
+        border: 1px solid #e5eaf1;
+        border-radius: 12px;
+        padding: 12px;
+        color: #111827;
+        font-weight: 600;
+        min-height: 74px;
+    }
+
+    .sic-media-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+    }
+
+    .sic-media-box {
+        border: 1px dashed #cbd5e1;
+        border-radius: 14px;
+        background: #f8fafc;
+        min-height: 170px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        color: #64748b;
+        text-align: center;
+        padding: 12px;
+        overflow: hidden;
+    }
+
+        .sic-media-box i {
+            font-size: 46px;
+            color: #94a3b8;
+        }
+
+        .sic-media-box strong {
+            color: #334155;
+            font-size: 13px;
+        }
+
+    .sic-location-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-top: 12px;
+    }
+
+    .sic-small-btn {
+        border: 1px solid #dbe3ef;
+        background: #ffffff;
+        color: #102f55;
+        border-radius: 10px;
+        padding: 8px 11px;
+        font-size: 13px;
+        font-weight: 800;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+    }
+
+        .sic-small-btn:hover {
+            background: #eef4ff;
+            text-decoration: none;
+        }
+
+    .sic-muted-note {
+        color: #64748b;
+        font-size: 12px;
+        margin-top: 10px;
+    }
+
+    @media (max-width: 1400px) {
+        .sic-hero-content {
+            grid-template-columns: 210px minmax(0, 1fr) 390px;
+        }
+
+        .sic-hero-info h2 {
+            font-size: 42px;
+        }
+    }
+
+    @media (max-width: 1500px) {
+        .sic-hero-content {
+            grid-template-columns: 210px minmax(0, 1fr);
+        }
+
+        .sic-hero-counters {
+            grid-column: 1 / -1;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+    }
+
+    @media (max-width: 992px) {
+        .sic-hero-content {
+            grid-template-columns: 1fr;
+        }
+
+        .sic-main-info-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            max-width: none;
+        }
+
+        .sic-hero-counters {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .sic-section-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 768px) {
+
+        .sic-hero-meta {
+            flex-wrap: wrap;
+        }
+
+        .sic-hero-info h2 {
+            font-size: 32px;
+        }
+
+        .sic-main-info-grid,
+        .sic-hero-counters,
+        .sic-media-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .sic-info-list {
+            grid-template-columns: 1fr;
+        }
+
+        .sic-page-title-actions {
+            flex-wrap: wrap;
+            justify-content: flex-start;
+        }
+    }
+
+    /* ============================================================
+   [04] INFORMACIÓN DE DETENCIÓN
+   Tarjeta compacta con fecha, ubicación y datos de la detención.
+   ============================================================ */
+
+    .sic-detencion-compact {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .sic-detencion-compact-head {
+        display: grid;
+        grid-template-columns: 38px minmax(0, 1fr) auto;
+        align-items: center;
+        gap: 10px;
+        background: #f8fafc;
+        border: 1px solid #e8eef8;
+        border-radius: 12px;
+        padding: 10px 12px;
+    }
+
+    .sic-detencion-compact-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 11px;
+        background: #eff6ff;
+        border: 1px solid #bfdbfe;
+        color: #1d4ed8;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 15px;
+    }
+
+    .sic-detencion-compact-title {
+        min-width: 0;
+    }
+
+        .sic-detencion-compact-title strong {
+            display: block;
+            color: #102f55;
+            font-size: 15px;
+            font-weight: 900;
+            text-transform: uppercase;
+            line-height: 1.1;
+        }
+
+        .sic-detencion-compact-title span {
+            display: block;
+            margin-top: 3px;
+            color: #334155;
+            font-size: 12px;
+            font-weight: 700;
+            line-height: 1.25;
+            word-break: break-word;
+        }
+
+    .sic-detencion-map-btn {
+        padding: 7px 10px;
+        font-size: 12px;
+        white-space: nowrap;
+    }
+
+    .sic-detencion-compact-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        column-gap: 14px;
+        row-gap: 7px;
+    }
+
+    .sic-detencion-line {
+        display: grid;
+        grid-template-columns: 125px minmax(0, 1fr);
+        align-items: baseline;
+        gap: 8px;
+        border-bottom: 1px solid #eef2f7;
+        padding: 4px 0;
+    }
+
+        .sic-detencion-line label {
+            margin: 0;
+            color: #64748b;
+            font-size: 11px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: .2px;
+        }
+
+        .sic-detencion-line strong {
+            color: #111827;
+            font-size: 12px;
+            font-weight: 800;
+            word-break: break-word;
+        }
+
+    @media (max-width: 768px) {
+        .sic-detencion-compact-head {
+            grid-template-columns: 38px minmax(0, 1fr);
+        }
+
+        .sic-detencion-map-btn {
+            grid-column: 1 / -1;
+            justify-content: center;
+        }
+
+        .sic-detencion-compact-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .sic-detencion-line {
+            grid-template-columns: 120px minmax(0, 1fr);
+        }
+    }
+
+
+    /* ------------------------------------------------------------
+   [04.1] MAPA Y COORDENADAS DE LA DETENCIÓN
+   Contenedor del mapa, latitud, longitud y acceso a Google Maps.
+   ------------------------------------------------------------ */
+
+    .sic-map-card {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .sic-map-info {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+        background: #f8fafc;
+        border: 1px solid #e8eef8;
+        border-radius: 12px;
+        padding: 10px 12px;
+    }
+
+        .sic-map-info div {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .sic-map-info label {
+            margin: 0;
+            color: #64748b;
+            font-size: 11px;
+            font-weight: 900;
+            text-transform: uppercase;
+        }
+
+        .sic-map-info strong {
+            color: #111827;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+    .sic-map-frame {
+        width: 100%;
+        height: 260px;
+        border-radius: 14px;
+        overflow: hidden;
+        border: 1px solid #dbe3ef;
+        background: #f1f5f9;
+    }
+
+
+    /* ============================================================
+   [05] INFORMACIÓN DEL DETENIDO EN MUNICIPIO
+   Datos generales provenientes del registro municipal/C5.
+   ============================================================ */
+
+    .sic-detenido-c5 {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .sic-detenido-c5-head {
+        display: grid;
+        grid-template-columns: 38px minmax(0, 1fr);
+        align-items: center;
+        gap: 10px;
+        background: #f8fafc;
+        border: 1px solid #e8eef8;
+        border-radius: 12px;
+        padding: 10px 12px;
+    }
+
+    .sic-detenido-c5-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 11px;
+        background: #eff6ff;
+        border: 1px solid #bfdbfe;
+        color: #1d4ed8;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 15px;
+    }
+
+    .sic-detenido-c5-head strong {
+        display: block;
+        color: #102f55;
+        font-size: 15px;
+        font-weight: 900;
+        text-transform: uppercase;
+        line-height: 1.1;
+    }
+
+    .sic-detenido-c5-head span {
+        display: block;
+        margin-top: 3px;
+        color: #334155;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .sic-detenido-c5-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        column-gap: 14px;
+        row-gap: 7px;
+    }
+
+    .sic-detenido-line {
+        display: grid;
+        grid-template-columns: 105px minmax(0, 1fr);
+        align-items: baseline;
+        gap: 8px;
+        border-bottom: 1px solid #eef2f7;
+        padding: 4px 0;
+    }
+
+        .sic-detenido-line label,
+        .sic-detenido-c5-extra label {
+            margin: 0;
+            color: #64748b;
+            font-size: 11px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: .2px;
+        }
+
+        .sic-detenido-line strong,
+        .sic-detenido-c5-extra strong {
+            color: #111827;
+            font-size: 12px;
+            font-weight: 800;
+            word-break: break-word;
+        }
+
+    .sic-detenido-c5-extra {
+        border: 1px solid #e8eef8;
+        background: #f8fafc;
+        border-radius: 12px;
+        padding: 10px 12px;
+        display: grid;
+        grid-template-columns: 125px minmax(0, 1fr);
+        gap: 8px;
+    }
+
+    @media (max-width: 768px) {
+        .sic-detenido-c5-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .sic-detenido-line {
+            grid-template-columns: 110px minmax(0, 1fr);
+        }
+
+        .sic-detenido-c5-extra {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* ------------------------------------------------------------
+   [02.4] HERO FIJO / STICKY
+   Mantiene la cabecera visible durante el desplazamiento.
+   ------------------------------------------------------------ */
+
+    .sic-hero {
+        position: sticky;
+        top: 75px; /* Ajusta según la altura de tu navbar/header */
+        z-index: 50;
+    }
+
+    /* ============================================================
+   [06] BIOMÉTRICOS - ESTILOS COMPARTIDOS
+   Estructura base reutilizada por Fotos, Huellas y Rasgos.
+   ============================================================ */
+
+    .sic-gallery-box {
+        align-items: stretch;
+        justify-content: flex-start;
+        text-align: left;
+    }
+
+    .sic-gallery-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 12px;
+    }
+
+        .sic-gallery-header strong {
+            display: block;
+            color: #102f55;
+            font-size: 14px;
+            font-weight: 900;
+        }
+
+        .sic-gallery-header span {
+            display: block;
+            color: #64748b;
+            font-size: 12px;
+            font-weight: 700;
+            margin-top: 2px;
+        }
+
+    .sic-gallery-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(115px, 1fr));
+        gap: 10px;
+        max-height: 310px;
+        overflow-y: auto;
+        padding-right: 4px;
+    }
+
+    .sic-gallery-item {
+        border: 1px solid #e8eef8;
+        background: #ffffff;
+        border-radius: 12px;
+        overflow: hidden;
+        min-height: 145px;
+        display: flex;
+        flex-direction: column;
+    }
+
+        .sic-gallery-item img {
+            width: 100%;
+            height: 115px;
+            object-fit: cover;
+            background: #f1f5f9;
+        }
+
+        .sic-gallery-item i {
+            height: 115px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 38px;
+            color: #94a3b8;
+            background: #f1f5f9;
+        }
+
+    .sic-gallery-caption {
+        padding: 7px 8px;
+        border-top: 1px solid #e8eef8;
+        background: #f8fafc;
+    }
+
+        .sic-gallery-caption span {
+            display: block;
+            color: #334155;
+            font-size: 11px;
+            font-weight: 800;
+            white-space: normal;
+            overflow: visible;
+            text-overflow: clip;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+            line-height: 1.25;
+        }
+
+    .sic-gallery-grid::-webkit-scrollbar {
+        width: 7px;
+    }
+
+    .sic-gallery-grid::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 999px;
+    }
+
+    .sic-gallery-grid::-webkit-scrollbar-track {
+        background: #f1f5f9;
+        border-radius: 999px;
+    }
+
+
+    /* ------------------------------------------------------------
+   [02.5] ESTADOS VISUALES DE CONTADORES
+   Variantes de colores para revisadas, alertas y otros estados.
+   ------------------------------------------------------------ */
+
+    .sic-hero-counter.revisada {
+        background: rgba(240, 253, 244, .96);
+        border-color: #bbf7d0;
+    }
+
+        .sic-hero-counter.revisada .sic-hero-counter-icon {
+            background: #dcfce7;
+            border-color: #bbf7d0;
+            color: #16a34a;
+        }
+
+        .sic-hero-counter.revisada label {
+            color: #166534;
+        }
+
+        .sic-hero-counter.revisada strong {
+            color: #15803d;
+        }
+
+    /* ------------------------------------------------------------
+   [07] BOTONES DE ESTADO DE ALERTA
+   Apariencia de botones confirmados/desactivados/reactivables.
+   ------------------------------------------------------------ */
+
+    .sic-btn-alerta-desactivada {
+        border-radius: 10px;
+        padding: 9px 13px;
+        font-weight: 800;
+        font-size: 13px;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        background: #f0fdf4;
+        color: #15803d;
+        border: 1px solid #bbf7d0;
+        cursor: not-allowed;
+        opacity: .95;
+    }
+
+
+    .sic-btn-alerta-desactivada {
+        border-radius: 10px;
+        padding: 9px 13px;
+        font-weight: 800;
+        font-size: 13px;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        background: #f0fdf4;
+        color: #15803d;
+        border: 1px solid #bbf7d0;
+        cursor: pointer;
+        opacity: .95;
+    }
+
+    /* ============================================================
+   [08] FOTOGRAFÍA SIN IMAGEN / PLACEHOLDER
+   Estilos mostrados cuando una fotografía no existe o no carga.
+   ============================================================ */
+
+    .sic-photo-placeholder-wrap {
+        position: relative;
+    }
+
+    .sic-photo-no-existe {
+        width: 100%;
+        height: 100%;
+        min-height: 230px;
+        position: relative;
+        background: #f1f5f9;
+        border: 2px dashed #cbd5e1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+
+        .sic-photo-no-existe i {
+            font-size: 70px;
+            color: #94a3b8;
+            opacity: 100;
+        }
+
+        .sic-photo-no-existe span {
+            position: absolute;
+            width: 100%;
+            text-align: center;
+            background: rgba(185, 28, 28, .88);
+            color: #ffffff;
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            padding: 9px 0;
+            text-transform: uppercase;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, .18);
+        }
+
+
+    /* ============================================================
+            SIC - RELACIONES / TABS / CARRUSELES - LIMPIO
+            ============================================================ */
+
+    .sic-tabs-card .sic-card-body {
+        padding: 0;
+        min-height: 560px;
+    }
+
+    .sic-source-tabs {
+        display: flex;
+        align-items: flex-end;
+        gap: 0;
+        border-bottom: 1px solid #dbe3ef;
+        background: #ffffff;
+        padding: 0 12px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        white-space: nowrap;
+    }
+
+    .sic-source-tab {
+        position: relative;
+        border: 1px solid transparent;
+        border-bottom: none;
+        background: transparent;
+        color: #003cff;
+        padding: 14px 16px;
+        font-size: 13px;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        cursor: pointer;
+        border-radius: 8px 8px 0 0;
+        margin-bottom: -1px;
+    }
+
+        .sic-source-tab i {
+            color: #003cff;
+            font-size: 13px;
+        }
+
+        .sic-source-tab:hover {
+            color: #001f8f;
+            background: #f8fafc;
+        }
+
+            .sic-source-tab:hover i {
+                color: #001f8f;
+            }
+
+        .sic-source-tab.active {
+            background: #ffffff;
+            color: #000000;
+            border-color: #dbe3ef;
+            border-bottom: 1px solid #ffffff;
+            font-weight: 900;
+        }
+
+            .sic-source-tab.active i {
+                color: #000000;
+            }
+
+    .sic-source-tab-content {
+        display: none;
+        padding: 16px;
+    }
+
+        .sic-source-tab-content.active {
+            display: block;
+        }
+
+    .sic-empty-source {
+        min-height: 130px;
+        border: 1px dashed #cbd5e1;
+        background: #f8fafc;
+        border-radius: 14px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        color: #64748b;
+        text-align: center;
+        padding: 18px;
+    }
+
+        .sic-empty-source i {
+            font-size: 38px;
+            color: #94a3b8;
+        }
+
+        .sic-empty-source strong {
+            color: #102f55;
+            font-size: 14px;
+            font-weight: 900;
+        }
+
+        .sic-empty-source span {
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+    /* ------------------------------------------------------------
+   [09.1] CONTENIDO DE RELACIONES
+   Listados, carruseles, slides y tarjetas usados por los tabs.
+   ------------------------------------------------------------ */
+
+    .sic-rel-list {
+        max-height: 540px;
+        overflow-y: auto;
+        padding-right: 6px;
+    }
+
+    .sic-rel-carousel {
+        width: 100%;
+    }
+
+    .sic-rel-slide {
+        display: none;
+    }
+
+        .sic-rel-slide.active {
+            display: block;
+        }
+
+    .sic-rel-card {
+        display: grid;
+        grid-template-columns: 150px minmax(0, 1fr);
+        gap: 16px;
+        width: 100%;
+        min-height: 455px;
+        border: 1px solid #e8eef8;
+        border-radius: 14px;
+        background: #ffffff;
+        padding: 14px;
+        box-shadow: 0 4px 12px rgba(15, 35, 75, .05);
+        margin-bottom: 12px;
+        box-sizing: border-box;
+        align-items: start;
+    }
+
+    .sic-rel-photo-wrap {
+        width: 150px;
+        min-width: 0;
+    }
+
+    .sic-rel-photo {
+        width: 150px;
+        height: 190px;
+        border-radius: 12px;
+        background: #f1f5f9;
+        border: 1px solid #dbe3ef;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        position: relative;
+    }
+
+        .sic-rel-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0;
+            transition: opacity .18s ease-in-out;
+        }
+
+        .sic-rel-photo.sic-photo-loaded img {
+            opacity: 1;
+        }
+
+        .sic-rel-photo i {
+            font-size: 52px;
+            color: #94a3b8;
+        }
+
+    .sic-photo-loader {
+        position: absolute;
+        inset: 0;
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f1f5f9;
+    }
+
+        .sic-photo-loader::after {
+            content: "";
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            border: 4px solid #dbe3ef;
+            border-top-color: #003e8b;
+            animation: sic-photo-spin .8s linear infinite;
+        }
+
+    .sic-photo-loaded .sic-photo-loader {
+        display: none;
+    }
+
+    @keyframes sic-photo-spin {
+        from {
+            transform: rotate(0deg);
+        }
+
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    .sic-rel-info {
+        min-width: 0;
+    }
+
+    .sic-rel-title {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 12px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #e8eef8;
+    }
+
+        .sic-rel-title h5 {
+            margin: 0;
+            color: #102f55;
+            font-size: 17px;
+            font-weight: 900;
+            text-transform: uppercase;
+        }
+
+    .sic-rel-subtitle {
+        display: block;
+        color: #64748b;
+        font-size: 12px;
+        font-weight: 700;
+        margin-top: 2px;
+    }
+
+    .sic-rel-mini-line {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        margin-top: 2px;
+    }
+
+        .sic-rel-mini-line span {
+            color: #64748b;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+    .sic-rel-grid {
+        display: grid;
+        grid-template-columns: 135px minmax(0, 1fr) 135px minmax(0, 1fr);
+        row-gap: 12px;
+        column-gap: 14px;
+    }
+
+    .sic-rel-extra-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+        margin-top: 16px;
+    }
+
+    .sic-rel-box {
+        height: 200px;
+        border: 1px solid #dde7f3;
+        background: #f8fbff;
+        border-radius: 12px;
+        padding: 12px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .sic-rel-box-title {
+        flex: 0 0 auto;
+        font-size: 12px;
+        font-weight: 800;
+        color: #003E8B;
+        text-transform: uppercase;
+        letter-spacing: .4px;
+        margin-bottom: 9px;
+        display: flex;
+        align-items: center;
+        gap: 7px;
+    }
+
+    .sic-rel-box-scroll {
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow-y: auto;
+        overflow-x: hidden;
+        padding-right: 5px;
+    }
+
+    .sic-rel-box-item {
+        font-size: 13px;
+        font-weight: 700;
+        color: #111827;
+        padding: 7px 9px;
+        border-radius: 8px;
+        background: #ffffff;
+        border: 1px solid #edf2f7;
+        margin-bottom: 6px;
+    }
+
+    .sic-rel-box-empty {
+        font-size: 13px;
+        color: #64748b;
+        font-style: italic;
+    }
+
+    /* ------------------------------------------------------------
+   [09.2] COINCIDENCIA Y ACCIONES
+   Porcentajes, botones de confirmar/descartar y navegación.
+   ------------------------------------------------------------ */
+
+    .sic-porcentaje-coincidencia {
+        display: inline-block;
+        margin-top: 6px;
+        padding: 4px 10px;
+        border-radius: 999px;
+        background: #eef6ff;
+        border: 1px solid #bcdcff;
+        color: #003e8b;
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+    .sic-rel-actions {
+        display: flex;
+        align-items: flex-start;
+        justify-content: flex-end;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .sic-btn-confirmar-identidad,
+    .sic-btn-identidad-confirmada {
+        border-radius: 10px;
+        padding: 9px 13px;
+        font-weight: 800;
+        font-size: 13px;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+    }
+
+    .sic-btn-confirmar-identidad {
+        background: #eff6ff;
+        color: #1d4ed8;
+        border: 1px solid #bfdbfe;
+        cursor: pointer;
+    }
+
+        .sic-btn-confirmar-identidad:hover {
+            text-decoration: none;
+            filter: brightness(.98);
+        }
+
+    .sic-btn-identidad-confirmada {
+        background: #f0fdf4;
+        color: #15803d;
+        border: 1px solid #bbf7d0;
+        cursor: default;
+    }
+
+    .sic-rel-carousel-footer {
+        margin-top: 12px;
+        padding-top: 12px;
+        border-top: 1px solid #e8eef8;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .sic-rel-nav {
+        width: 34px;
+        height: 34px;
+        border-radius: 999px;
+        border: 1px solid #dbe3ef;
+        background: #ffffff;
+        color: #102f55;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+    }
+
+        .sic-rel-nav:hover {
+            background: #eef4ff;
+        }
+
+    .sic-rel-counter {
+        font-size: 12px;
+        font-weight: 900;
+        color: #334155;
+        white-space: nowrap;
+    }
+
+    .sic-rel-list::-webkit-scrollbar,
+    .sic-rel-box-scroll::-webkit-scrollbar {
+        width: 7px;
+    }
+
+    .sic-rel-list::-webkit-scrollbar-thumb,
+    .sic-rel-box-scroll::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 999px;
+    }
+
+    .sic-rel-list::-webkit-scrollbar-track,
+    .sic-rel-box-scroll::-webkit-scrollbar-track {
+        background: #f1f5f9;
+        border-radius: 999px;
+    }
+
+    @media (max-width: 1400px) {
+        .sic-rel-grid {
+            grid-template-columns: 135px minmax(0, 1fr);
+        }
+    }
+
+    @media (max-width: 900px) {
+        .sic-rel-card {
+            grid-template-columns: 1fr;
+        }
+
+        .sic-rel-photo-wrap {
+            width: 100%;
+        }
+
+        .sic-rel-photo {
+            width: 100%;
+            height: 240px;
+        }
+
+        .sic-rel-title {
+            flex-direction: column;
+        }
+
+        .sic-rel-extra-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* ============================================================
+        MANDAMIENTOS JUDICIALES - TARJETA COMPACTA
+        ============================================================ */
+
+    #tab-mandamientos .sic-rel-card {
+        min-height: 0;
+        height: auto;
+        grid-template-columns: 120px minmax(0, 1fr);
+        gap: 12px;
+        padding: 12px;
+        align-items: start;
+    }
+
+    /* Cuadro del ícono */
+    #tab-mandamientos .sic-rel-photo-wrap {
+        width: 120px;
+    }
+
+    #tab-mandamientos .sic-rel-photo {
+        width: 120px;
+        height: 145px;
+        border-radius: 10px;
+    }
+
+    /* Cabecera */
+    #tab-mandamientos .sic-rel-title {
+        gap: 10px;
+        margin-bottom: 10px;
+        padding-bottom: 8px;
+    }
+
+
+    /* Datos un poco más compactos */
+    #tab-mandamientos .sic-rel-grid {
+        row-gap: 8px;
+        column-gap: 10px;
+    }
+
+    #tab-mandamientos .sic-info-label {
+        font-size: 11px;
+    }
+
+    #tab-mandamientos .sic-info-value {
+        font-size: 13px;
+    }
+
+    /* En pantallas pequeñas sí permitimos que bajen */
+    @media (max-width: 1100px) {
+        #tab-mandamientos .sic-rel-title {
+            flex-direction: column;
+        }
+
+        #tab-mandamientos .sic-rel-actions {
+            justify-content: flex-start;
+            flex-wrap: wrap;
+        }
+    }
+
+    @media (max-width: 700px) {
+        #tab-mandamientos .sic-rel-card {
+            grid-template-columns: 1fr;
+        }
+
+        #tab-mandamientos .sic-rel-photo-wrap {
+            width: 100%;
+        }
+
+        #tab-mandamientos .sic-rel-photo {
+            width: 120px;
+            height: 145px;
+            margin: 0 auto;
+        }
+    }
+
+    /* ============================================================
+        BOTONES DE ACCIÓN COMPACTOS EN TODOS LOS TABS
+        ============================================================ */
+
+    .sic-rel-actions {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-end;
+        flex-wrap: nowrap;
+        gap: 6px;
+        flex-shrink: 0;
+    }
+
+        /* Mismo tamaño para todos los botones de las tarjetas */
+        .sic-rel-actions button {
+            min-height: 34px;
+            padding: 6px 9px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 800;
+            line-height: 1;
+            white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+            .sic-rel-actions button i {
+                font-size: 11px;
+            }
+
+        /* Ajuste específico a las clases existentes */
+        .sic-rel-actions .sic-btn-confirmar-identidad,
+        .sic-rel-actions .sic-btn-identidad-confirmada,
+        .sic-rel-actions .sic-btn-warning-soft,
+        .sic-rel-actions .sic-btn-alerta-desactivada {
+            min-height: 34px;
+            padding: 6px 9px;
+            border-radius: 8px;
+            font-size: 11px;
+            white-space: nowrap;
+        }
+
+    /* Evita que el título quite espacio innecesario */
+    .sic-rel-title {
+        align-items: flex-start;
+    }
+
+        .sic-rel-title > div:first-child {
+            flex: 1 1 auto;
+            min-width: 0;
+        }
+
+    /* En resoluciones medianas pueden bajar juntos */
+    @media (max-width: 1150px) {
+        .sic-rel-actions {
+            flex-wrap: wrap;
+        }
+    }
+
+    /* En celular se colocan debajo del título */
+    @media (max-width: 850px) {
+        .sic-rel-title {
+            flex-direction: column;
+        }
+
+        .sic-rel-actions {
+            width: 100%;
+            justify-content: flex-start;
+            flex-wrap: wrap;
+        }
+    }
+
+    /* Mandamientos sin columna de fotografía */
+    #tab-mandamientos .sic-rel-card-sin-foto {
+        grid-template-columns: minmax(0, 1fr);
+        min-height: 0;
+        height: auto;
+    }
+
+        #tab-mandamientos .sic-rel-card-sin-foto .sic-rel-info {
+            width: 100%;
+            min-width: 0;
+        }
+
+
+    /* ============================================================
+        CONTADOR DE COINCIDENCIAS CONFIRMADAS
+        ============================================================ */
+
+    .sic-card-header-confirmadas {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+    }
+
+    .sic-confirmadas-counter {
+        min-width: 210px;
+        min-height: 54px;
+        padding: 8px 13px;
+        border-radius: 13px;
+        background: #eff6ff;
+        border: 1px solid #bfdbfe;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .sic-confirmadas-counter-icon {
+        width: 36px;
+        height: 36px;
+        flex: 0 0 36px;
+        border-radius: 11px;
+        background: #dbeafe;
+        border: 1px solid #93c5fd;
+        color: #1d4ed8;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 15px;
+    }
+
+    .sic-confirmadas-counter label {
+        display: block;
+        margin: 0;
+        color: #1e3a8a;
+        font-size: 10px;
+        line-height: 1.1;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: .25px;
+    }
+
+    .sic-confirmadas-counter strong {
+        display: block;
+        margin-top: 3px;
+        color: #1d4ed8;
+        font-size: 17px;
+        line-height: 1;
+        font-weight: 900;
+    }
+
+    @media (max-width: 768px) {
+        .sic-card-header-confirmadas {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .sic-confirmadas-counter {
+            width: 100%;
+        }
+    }
+
+
+    /* ============================================================
+   [10] ACCESO A FICHA DE DETENIDO RELACIONADO
+   Botones/nombres que permiten abrir la ficha reutilizable.
+   ============================================================ */
+
+    .sic-nombre-detenido-objetivo {
+        appearance: none;
+        display: flex;
+        align-items: center;
+        width: 100%;
+        gap: 8px;
+        color: #003e8b;
+        font-family: inherit;
+        font-size: inherit;
+        font-weight: 700;
+        text-align: left;
+        cursor: pointer;
+        transition: background-color .18s ease, border-color .18s ease, box-shadow .18s ease;
+    }
+
+        .sic-nombre-detenido-objetivo:hover {
+            background-color: #eef4ff;
+            border-color: #9dbcf5;
+        }
+
+        .sic-nombre-detenido-objetivo:focus {
+            outline: none;
+            border-color: #003e8b;
+            box-shadow: 0 0 0 3px rgba(0, 62, 139, .12);
+        }
+
+        .sic-nombre-detenido-objetivo > span {
+            flex: 1;
+            min-width: 0;
+        }
+
+    .sic-nombre-detenido-objetivo-icono {
+        margin-left: auto;
+        color: #64748b;
+        font-size: 11px;
+    }
+
+    /* ------------------------------------------------------------
+   [10.1] ESTADOS DE CARGA DEL MODAL
+   Loader, error, carrusel y navegación del modal de detenidos.
+   ------------------------------------------------------------ */
+
+    .sic-modal-detenido-cargando {
+        padding: 45px 20px;
+        color: #64748b;
+        text-align: center;
+    }
+
+        .sic-modal-detenido-cargando i {
+            color: #003e8b;
+            font-size: 28px;
+        }
+
+        .sic-modal-detenido-cargando div {
+            margin-top: 10px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+    .sic-modal-detenido-error {
+        margin: 15px;
+    }
+
+    .sic-modal-detenidos-carousel {
+        width: 100%;
+    }
+
+    .sic-modal-detenido-slide {
+        display: none;
+    }
+
+        .sic-modal-detenido-slide.active {
+            display: block;
+        }
+
+    .sic-modal-detenido-navegacion {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 14px;
+        width: 100%;
+        margin-top: 15px;
+    }
+
+        .sic-modal-detenido-navegacion button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 34px;
+            height: 34px;
+            padding: 0;
+            color: #003e8b;
+            background-color: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+            .sic-modal-detenido-navegacion button:hover {
+                background-color: #eef4ff;
+                border-color: #9dbcf5;
+            }
+
+    .sic-modal-detenido-contador {
+        min-width: 60px;
+        color: #334155;
+        font-size: 12px;
+        font-weight: 800;
+        text-align: center;
+    }
+
+    /* ============================================================
+   [11] MODAL DE DETENIDOS
+   Contenedor Bootstrap y dimensiones generales del modal.
+   ============================================================ */
+
+    #modalDetenidosObjetivo .modal-dialog {
+        width: 950px;
+        max-width: 95%;
+    }
+
+    #modalDetenidosObjetivo .modal-content {
+        border-radius: 10px;
+    }
+
+    #modalDetenidosObjetivo .modal-body {
+        padding: 16px 18px;
+        background: #f7f9fc;
+    }
+
+    /* ============================================================
+       TAMAÑO GENERAL DEL MODAL
+       ============================================================ */
+
+    #modalDetenidosObjetivo .modal-dialog {
+        width: 920px;
+        max-width: calc(100% - 30px);
+        margin: 20px auto;
+    }
+
+    #modalDetenidosObjetivo .modal-content {
+        overflow: hidden;
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 18px 55px rgba(15, 23, 42, .25);
+    }
+
+    #modalDetenidosObjetivo .modal-header {
+        min-height: 58px;
+        padding: 14px 18px;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    #modalDetenidosObjetivo .modal-body {
+        max-height: calc(100vh - 165px);
+        padding: 14px;
+        background-color: #f8fafc;
+        overflow-y: auto;
+    }
+
+    #modalDetenidosObjetivo .modal-footer {
+        min-height: 55px;
+        padding: 10px 16px;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    /* ============================================================
+       FICHA PRINCIPAL
+       ============================================================ */
+
+    .sic-modal-det-card {
+        width: 100%;
+        padding: 15px;
+        background-color: #ffffff;
+        border: 1px solid #dbe3ee;
+        border-radius: 12px;
+        box-sizing: border-box;
+    }
+
+    .sic-modal-det-layout {
+        display: grid;
+        grid-template-columns: 165px minmax(0, 1fr);
+        gap: 18px;
+        align-items: start;
+    }
+
+    /* ============================================================
+       COLUMNA IZQUIERDA
+       ============================================================ */
+
+    .sic-modal-det-sidebar {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        min-width: 0;
+    }
+
+    .sic-modal-det-photo {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 150px;
+        height: 185px;
+        overflow: hidden;
+        background-color: #eef3f9;
+        border: 1px solid #dbe3ee;
+        border-radius: 11px;
+    }
+
+        .sic-modal-det-photo img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            object-fit: cover;
+            transition: opacity .2s ease;
+        }
+
+        .sic-modal-det-photo > i {
+            color: #8ca0bc;
+            font-size: 42px;
+        }
+
+        .sic-modal-det-photo.sic-photo-loaded img {
+            opacity: 1;
+        }
+
+        .sic-modal-det-photo.sic-photo-loaded .sic-photo-loader {
+            display: none;
+        }
+
+    .sic-photo-loader {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #eef3f9;
+    }
+
+        .sic-photo-loader::after {
+            width: 27px;
+            height: 27px;
+            content: "";
+            border: 3px solid #cbd8e9;
+            border-top-color: #2f67d8;
+            border-radius: 50%;
+            animation: sicModalFotoSpin .8s linear infinite;
+        }
+
+    @keyframes sicModalFotoSpin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    .sic-modal-det-sidebar-data {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+    }
+
+    .sic-modal-det-sidebar-item {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+        padding: 0 2px;
+    }
+
+        .sic-modal-det-sidebar-item .sic-info-label {
+            margin: 0;
+            padding: 0;
+            line-height: 1;
+        }
+
+        .sic-modal-det-sidebar-item .sic-info-value {
+            margin: 1px 0 0;
+            padding: 0;
+            line-height: 1;
+        }
+
+        .sic-modal-det-sidebar-item + .sic-modal-det-sidebar-item {
+            margin-top: 10px;
+        }
+
+    /* ============================================================
+       CONTENIDO PRINCIPAL
+       ============================================================ */
+
+    .sic-modal-det-content {
+        display: flex;
+        flex-direction: column;
+        gap: 13px;
+        min-width: 0;
+    }
+
+    .sic-modal-det-header {
+        padding-bottom: 11px;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+        .sic-modal-det-header h4 {
+            margin: 0 0 2px;
+            color: #16345f;
+            font-size: 19px;
+            font-weight: 800;
+            line-height: 1.25;
+            text-transform: uppercase;
+        }
+
+    .sic-modal-det-source {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 10px;
+        color: #0754aa;
+        background-color: #eff6ff;
+        border: 1px solid #bfdbfe;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+    /* ============================================================
+       CLAVE PERSONA Y SEXO
+       ============================================================ */
+
+    .sic-modal-det-identidad {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
+
+    .sic-modal-det-identidad-item {
+        display: grid;
+        grid-template-columns: 125px minmax(0, 1fr);
+        gap: 10px;
+        align-items: center;
+        min-height: 34px;
+        padding: 0 3px;
+    }
+
+    /* ============================================================
+       ÚLTIMO DELITO
+       ============================================================ */
+
+    .sic-modal-det-delito {
+        display: grid;
+        grid-template-columns: 40px minmax(0, 1fr);
+        gap: 11px;
+        align-items: center;
+        padding: 11px 13px;
+        background-color: #fffaf0;
+        border: 1px solid #f4d79b;
+        border-left: 4px solid #d97706;
+        border-radius: 9px;
+    }
+
+    .sic-modal-det-delito-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 37px;
+        height: 37px;
+        color: #b45309;
+        background-color: #ffedd5;
+        border-radius: 9px;
+        font-size: 17px;
+    }
+
+    .sic-modal-det-delito-content {
+        min-width: 0;
+    }
+
+    .sic-modal-det-delito-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 4px;
+    }
+
+    .sic-modal-det-delito-label {
+        color: #92400e;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: .35px;
+        text-transform: uppercase;
+    }
+
+    .sic-modal-det-delito-fecha {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        flex: 0 0 auto;
+        color: #78350f;
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+    .sic-modal-det-delito-value {
+        color: #422006;
+        font-size: 14px;
+        font-weight: 800;
+        line-height: 1.35;
+        overflow-wrap: anywhere;
+    }
+
+    /* ============================================================
+       OTROS NOMBRES Y ALIAS
+       ============================================================ */
+
+    .sic-modal-det-listas {
+        display: grid;
+        grid-template-columns: 3fr 2fr;
+        gap: 13px;
+    }
+
+.sic-modal-det-lista-box {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    height: 175px;
+    padding: 11px;
+    background-color: #f8fbff;
+    border: 1px solid #dbe3ee;
+    border-radius: 10px;
+    box-sizing: border-box;
+}
+
+    .sic-modal-det-lista-title {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        margin-bottom: 9px;
+        color: #003e8b;
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: .3px;
+        text-transform: uppercase;
+    }
+
+    .sic-modal-det-lista-total {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 21px;
+        height: 21px;
+        margin-left: auto;
+        padding: 0 6px;
+        color: #ffffff;
+        background-color: #003e8b;
+        border-radius: 999px;
+        font-size: 10px;
+        font-weight: 800;
+    }
+
+    .sic-modal-det-lista-scroll {
+        flex: 1;
+        min-height: 0;
+        padding-right: 4px;
+        overflow-x: hidden;
+        overflow-y: auto;
+    }
+
+    .sic-modal-det-lista-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-height: 35px;
+        margin-bottom: 6px;
+        padding: 7px 9px;
+        color: #1e293b;
+        background-color: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 7px;
+        box-sizing: border-box;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+        .sic-modal-det-lista-item i {
+            color: #64748b;
+            font-size: 11px;
+        }
+
+        .sic-modal-det-lista-item span {
+            min-width: 0;
+            overflow-wrap: anywhere;
+        }
+
+    .sic-modal-det-lista-empty {
+        padding: 14px 7px;
+        color: #64748b;
+        font-size: 12px;
+        font-style: italic;
+        text-align: center;
+    }
+
+    /* ============================================================
+       TEXTOS GENERALES
+       ============================================================ */
+
+    .sic-info-label {
+        color: #64748b;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: .3px;
+        text-transform: uppercase;
+    }
+
+    .sic-info-value {
+        color: #172033;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    /* ============================================================
+       SIN INFORMACIÓN
+       ============================================================ */
+
+    .sic-modal-sin-detenido {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 220px;
+        padding: 25px;
+        color: #64748b;
+        text-align: center;
+    }
+
+        .sic-modal-sin-detenido > i {
+            margin-bottom: 10px;
+            color: #d97706;
+            font-size: 34px;
+        }
+
+        .sic-modal-sin-detenido > strong {
+            margin-bottom: 6px;
+            color: #334155;
+            font-size: 15px;
+        }
+
+        .sic-modal-sin-detenido > span {
+            max-width: 430px;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+    /* ============================================================
+       RESPONSIVE
+       ============================================================ */
+
+    @media (max-width: 760px) {
+        #modalDetenidosObjetivo .modal-dialog {
+            max-width: calc(100% - 16px);
+            margin: 8px auto;
+        }
+
+        #modalDetenidosObjetivo .modal-body {
+            max-height: calc(100vh - 135px);
+            padding: 10px;
+        }
+
+        .sic-modal-det-layout {
+            grid-template-columns: 1fr;
+        }
+
+        .sic-modal-det-sidebar {
+            display: grid;
+            grid-template-columns: 130px minmax(0, 1fr);
+            gap: 12px;
+        }
+
+        .sic-modal-det-photo {
+            width: 130px;
+            height: 160px;
+        }
+
+        .sic-modal-det-identidad {
+            grid-template-columns: 1fr;
+        }
+
+        .sic-modal-det-identidad-item {
+            grid-template-columns: 120px minmax(0, 1fr);
+        }
+
+        .sic-modal-det-listas {
+            grid-template-columns: 1fr;
+        }
+
+        .sic-modal-det-delito-header {
+            align-items: flex-start;
+            flex-direction: column;
+            gap: 3px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .sic-modal-det-sidebar {
+            grid-template-columns: 1fr;
+        }
+
+        .sic-modal-det-photo {
+            width: 125px;
+            height: 155px;
+        }
+
+        .sic-modal-det-identidad-item {
+            grid-template-columns: 1fr;
+            gap: 3px;
+        }
+
+        .sic-modal-det-delito {
+            grid-template-columns: 1fr;
+        }
+
+        .sic-modal-det-delito-icon {
+            display: none;
+        }
+    }
+
+    /* ============================================================
+   FICHA REUTILIZABLE EN TAB Y MODAL
+   ============================================================ */
+
+    /* ------------------------------------------------------------
+   [12.1] VARIANTES TAB / MODAL DE LA FICHA REUTILIZABLE
+   Ajustes según la ficha se muestre dentro del tab o del modal.
+   ------------------------------------------------------------ */
+
+    .sic-ficha-detenido-tab {
+        margin: 0;
+    }
+
+    .sic-ficha-detenido-modal {
+        margin: 0;
+    }
+
+    .sic-modal-det-title-row {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 15px;
+    }
+
+    .sic-modal-det-title-content {
+        min-width: 0;
+    }
+
+    .sic-ficha-detenido-tab .sic-modal-det-layout {
+        grid-template-columns: 170px minmax(0, 1fr);
+    }
+
+    .sic-ficha-detenido-tab .sic-modal-det-lista-box {
+        height: 185px;
+    }
+
+    .sic-ficha-detenido-modal .sic-rel-actions {
+        display: none;
+    }
+
+    .sic-detenidos-carousel-footer {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        margin-top: 12px;
+    }
+
+    .sic-modal-det-delito-vacio {
+        background-color: #f8fafc;
+        border-color: #e2e8f0;
+        border-left-color: #94a3b8;
+    }
+
+        .sic-modal-det-delito-vacio .sic-modal-det-delito-icon {
+            color: #64748b;
+            background-color: #e2e8f0;
+        }
+
+        .sic-modal-det-delito-vacio .sic-modal-det-delito-label,
+        .sic-modal-det-delito-vacio .sic-modal-det-delito-fecha,
+        .sic-modal-det-delito-vacio .sic-modal-det-delito-value {
+            color: #64748b;
+        }
+
+    @media (max-width: 900px) {
+        .sic-modal-det-title-row {
+            flex-direction: column;
+        }
+
+        .sic-rel-actions {
+            width: 100%;
+        }
+    }
+
+    /* Contenedor de ambos estados */
+
+    /* ============================================================
+   [13] ESTADO DE IDENTIDAD EN EL HERO
+   Contenedor de píldoras, posición respecto a la fotografía y estados.
+   ============================================================ */
+
+    .sic-hero-meta {
+        display: flex;
+        align-items: center;
+        flex-wrap: nowrap;
+        gap: 8px;
+        width: 100%;
+        min-width: 0;
+    }
+
+        .sic-hero-meta > .sic-pill,
+        .sic-estado-identidad-pildoras > .sic-pill {
+            flex: 0 0 auto;
+            white-space: nowrap;
+        }
+
+        .sic-hero-meta .sic-pill {
+            min-height: 34px;
+            padding: 7px 11px;
+            box-sizing: border-box;
+            line-height: 18px;
+        }
+
+    .sic-photo-main-wrap {
+        width: 200px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .sic-estado-identidad-pildoras {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 auto;
+        gap: 8px;
+        width: auto;
+        min-width: max-content;
+        /* Antes tenías margin: 10px */
+        margin: -14px 0 0 0;
+        padding: 0;
+        position: relative;
+        z-index: 5;
+    }
+    /* Píldora principal de identidad */
+
+    .sic-pill-estado-identidad {
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 7px !important;
+        min-height: 34px;
+        padding: 7px 13px !important;
+        color: #ffffff !important;
+        border: 1px solid transparent !important;
+        font-size: 12px;
+        font-weight: 800 !important;
+    }
+
+        .sic-pill-estado-identidad i,
+        .sic-pill-estado-identidad span {
+            color: #ffffff !important;
+        }
+
+    /* Sin confirmar */
+
+    .sic-pill-identidad-pendiente {
+        background-color: #d97706 !important;
+        border-color: #fbbf24 !important;
+        box-shadow: 0 4px 12px rgba(217, 119, 6, .28) !important;
+    }
+
+    /* Identidad confirmada */
+
+    .sic-pill-identidad-confirmada {
+        background-color: #198754 !important;
+        border-color: #5fd39a !important;
+        box-shadow: 0 4px 12px rgba(25, 135, 84, .28) !important;
+    }
+
+    /* Estado temporal */
+
+    .sic-pill-identidad-cargando {
+        background-color: #475569 !important;
+        border-color: #94a3b8 !important;
+        box-shadow: 0 4px 12px rgba(71, 85, 105, .25) !important;
+    }
+
+    /* Píldora roja: solo cuando es de interés */
+
+    .sic-pill-persona-interes {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        min-height: 34px;
+        padding: 7px 13px !important;
+        color: #ffffff !important;
+        background-color: #b42318 !important;
+        border: 1px solid #ff756b !important;
+        font-size: 12px;
+        font-weight: 900 !important;
+        letter-spacing: .3px;
+        box-shadow: 0 4px 14px rgba(180, 35, 24, .38), 0 0 0 3px rgba(255, 117, 107, .14) !important;
+    }
+
+        .sic-pill-persona-interes i,
+        .sic-pill-persona-interes span {
+            color: #ffffff !important;
+        }
+
+        .sic-pill-persona-interes i {
+            font-size: 14px;
+        }
+
+
+    /* ------------------------------------------------------------
+   [13.1] GLOBO DE PERSONA DE INTERÉS
+   Indicador flotante rojo mostrado para personas de interés.
+   ------------------------------------------------------------ */
+
+    .sic-globo-interes-wrap {
+        /* Colores principales del globo */
+        --sic-interes-color-inicio: #e57373;
+        --sic-interes-color-fin: #d94b4b;
+        --sic-interes-color-rgb: 211, 47, 47;
+        --sic-interes-color-texto: #c62828;
+        position: fixed;
+        right: 22px;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .sic-globo-interes-circle {
+        width: 74px;
+        height: 74px;
+        border-radius: 50%;
+        background: linear-gradient( 135deg, var(--sic-interes-color-inicio), var(--sic-interes-color-fin) );
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 2px solid rgba(255, 255, 255, .20);
+        box-shadow: 0 10px 24px rgba(0, 0, 0, .28);
+        animation: sicPulseInteres 1.8s infinite;
+        overflow: hidden;
+    }
+
+    .sic-globo-interes-img {
+        width: 38px;
+        height: 38px;
+        object-fit: contain;
+        display: block;
+    }
+
+    .sic-globo-interes-label {
+        padding: 6px 10px;
+        color: var(--sic-interes-color-texto);
+        background: #ffffff;
+        border: 1px solid #f1c1c1;
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 800;
+        letter-spacing: .5px;
+        white-space: nowrap;
+        box-shadow: 0 6px 16px rgba(0, 0, 0, .18);
+    }
+
+    @keyframes sicPulseInteres {
+        0% {
+            box-shadow: 0 10px 24px rgba(0, 0, 0, .28), 0 0 0 0 rgba(var(--sic-interes-color-rgb), .40);
+        }
+
+        70% {
+            box-shadow: 0 10px 24px rgba(0, 0, 0, .28), 0 0 0 14px rgba(var(--sic-interes-color-rgb), 0);
+        }
+
+        100% {
+            box-shadow: 0 10px 24px rgba(0, 0, 0, .28), 0 0 0 0 rgba(var(--sic-interes-color-rgb), 0);
+        }
+    }
+
+    @media (max-width: 991px) {
+        .sic-globo-interes-wrap {
+            right: 14px;
+            top: auto;
+            bottom: 18px;
+            transform: none;
+        }
+
+        .sic-globo-interes-circle {
+            width: 66px;
+            height: 66px;
+        }
+
+        .sic-globo-interes-img {
+            width: 34px;
+            height: 34px;
+        }
+
+        .sic-globo-interes-label {
+            padding: 5px 9px;
+            font-size: 12px;
+        }
+    }
+
+    /* ============================================================
+   [14] COINCIDENCIAS DE ALERTA
+   Píldoras de porcentaje y estados pendiente/confirmada/descartada.
+   ============================================================ */
+
+    .sic-coincidencias-alerta {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: 7px;
+    }
+
+        .sic-coincidencias-alerta .sic-porcentaje-coincidencia {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            margin: 0;
+            padding: 5px 10px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+            .sic-coincidencias-alerta
+            .sic-porcentaje-coincidencia strong {
+                font-weight: 900;
+            }
+
+    /* Pendiente */
+
+    .sic-coincidencia-pendiente {
+        color: #003e8b;
+        background: #eef6ff;
+        border: 1px solid #bcdcff;
+    }
+
+    /* Confirmada */
+
+    .sic-coincidencia-confirmada {
+        color: #166534;
+        background: #f0fdf4;
+        border: 1px solid #bbf7d0;
+    }
+
+    /* Descartada */
+
+    .sic-coincidencia-descartada {
+        color: #64748b;
+        background: #f8fafc;
+        border: 1px solid #cbd5e1;
+        opacity: .78;
+    }
+
+    /* ------------------------------------------------------------
+   [14.1] COINCIDENCIAS DENTRO DE LA FICHA DEL DETENIDO
+   Ajustes del encabezado y distribución horizontal de coincidencias.
+   ------------------------------------------------------------ */
+
+    .sic-modal-det-header {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .sic-modal-det-title-row {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 15px;
+        width: 100%;
+    }
+
+    .sic-modal-det-title-content {
+        flex: 1 1 auto;
+        min-width: 0;
+    }
+
+    .sic-modal-det-coincidencias {
+        display: block;
+        width: 100%;
+        max-width: none;
+        /*margin-top: 8px;*/
+        padding: 0;
+        /* Quitar barra y corte */
+        overflow: visible;
+    }
+
+        .sic-modal-det-coincidencias .sic-coincidencias-alerta {
+            display: flex !important;
+            flex-direction: row !important;
+            flex-wrap: nowrap !important;
+            align-items: center !important;
+            justify-content: flex-start !important;
+            width: 100% !important;
+            min-width: 0 !important;
+            max-width: none !important;
+            gap: 8px !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            overflow: visible !important;
+        }
+
+        .sic-modal-det-coincidencias .sic-porcentaje-coincidencia {
+            display: inline-flex !important;
+            align-items: center !important;
+            width: auto !important;
+            max-width: none !important;
+            margin: 0 !important;
+            white-space: nowrap !important;
+            flex: 0 0 auto !important;
+        }
+
+    /* ============================================================
+   [15] CONTADORES DETALLADOS DEL HERO
+   Colores y variantes específicas por tipo de contador.
+   ============================================================ */
+
+    .sic-hero-counter {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        min-width: 0;
+        min-height: 64px;
+        padding: 10px 12px;
+        background: rgba(255, 255, 255, .12);
+        border: 1px solid rgba(255, 255, 255, .20);
+        border-radius: 13px;
+        box-sizing: border-box;
+        overflow: hidden;
+    }
+
+    .sic-hero-counter-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 38px;
+        width: 38px;
+        height: 38px;
+        border-radius: 11px;
+        background: rgba(255, 255, 255, .14);
+        border: 1px solid rgba(255, 255, 255, .20);
+        color: #ffffff;
+        font-size: 15px;
+    }
+
+    .sic-hero-counter-texto,
+    .sic-hero-counter > div:last-child {
+        min-width: 0;
+    }
+
+    .sic-hero-counter label {
+        display: block;
+        margin: 0 0 2px 0;
+        color: #ffffff;
+        font-size: 10px;
+        font-weight: 800;
+        line-height: 1.05;
+        text-transform: uppercase;
+        letter-spacing: .2px;
+    }
+
+    .sic-hero-counter strong {
+        display: block;
+        color: #ffffff;
+        font-size: 17px;
+        font-weight: 900;
+        line-height: 1;
+    }
+
+    .sic-hero-counter.alerta {
+        background: #fff1f2;
+        border-color: #fecdd3;
+    }
+
+        .sic-hero-counter.alerta label,
+        .sic-hero-counter.alerta strong {
+            color: #be123c;
+        }
+
+        .sic-hero-counter.alerta .sic-hero-counter-icon {
+            background: #ffe4e6;
+            border-color: #fecdd3;
+            color: #ef4444;
+        }
+
+    .sic-hero-counter.revisada {
+        background: #ecfdf5;
+        border-color: #a7f3d0;
+    }
+
+        .sic-hero-counter.revisada label,
+        .sic-hero-counter.revisada strong {
+            color: #047857;
+        }
+
+        .sic-hero-counter.revisada .sic-hero-counter-icon {
+            background: #d1fae5;
+            border-color: #a7f3d0;
+            color: #10b981;
+        }
+
+    .sic-hero-counter.confirmada {
+        background: #eff6ff;
+        border-color: #bfdbfe;
+    }
+
+        .sic-hero-counter.confirmada label,
+        .sic-hero-counter.confirmada strong {
+            color: #1e40af;
+        }
+
+        .sic-hero-counter.confirmada .sic-hero-counter-icon {
+            background: #dbeafe;
+            border-color: #93c5fd;
+            color: #2563eb;
+        }
+
+    .sic-counter-total {
+        background: #fff1f2;
+        border: 1px solid #fecdd3;
+    }
+
+        .sic-counter-total label,
+        .sic-counter-total strong {
+            color: #be123c;
+        }
+
+        .sic-counter-total .sic-hero-counter-icon {
+            background: #ffe4e6;
+            border: 1px solid #fda4af;
+            color: #e11d48;
+        }
+
+    .sic-counter-activas {
+        background: #fee2e2;
+        border: 1px solid #f87171;
+        box-shadow: 0 8px 18px rgba(185, 28, 28, .18);
+    }
+
+        .sic-counter-activas label,
+        .sic-counter-activas strong {
+            color: #b91c1c;
+        }
+
+        .sic-counter-activas .sic-hero-counter-icon {
+            background: #fecaca;
+            border: 1px solid #f87171;
+            color: #dc2626;
+        }
+
+    .sic-counter-activas {
+        background: #fee2e2;
+        border: 1px solid #f87171;
+        box-shadow: 0 8px 18px rgba(185, 28, 28, .18);
+    }
+
+        .sic-counter-activas label,
+        .sic-counter-activas strong {
+            color: #b91c1c;
+        }
+
+        .sic-counter-activas .sic-hero-counter-icon {
+            background: #fecaca;
+            border: 1px solid #f87171;
+            color: #dc2626;
+        }
+
+    .sic-counter-confirmadas {
+        background: #ecfdf5;
+        border: 1px solid #6ee7b7;
+    }
+
+        .sic-counter-confirmadas label,
+        .sic-counter-confirmadas strong {
+            color: #047857;
+        }
+
+        .sic-counter-confirmadas .sic-hero-counter-icon {
+            background: #d1fae5;
+            border: 1px solid #6ee7b7;
+            color: #059669;
+        }
+
+    .sic-counter-nombre {
+        background: #eff6ff;
+        border: 1px solid #93c5fd;
+    }
+
+        .sic-counter-nombre label,
+        .sic-counter-nombre strong {
+            color: #1d4ed8;
+        }
+
+        .sic-counter-nombre .sic-hero-counter-icon {
+            background: #dbeafe;
+            border: 1px solid #93c5fd;
+            color: #2563eb;
+        }
+
+    .sic-counter-foto {
+        background: #faf5ff;
+        border: 1px solid #d8b4fe;
+    }
+
+        .sic-counter-foto label,
+        .sic-counter-foto strong {
+            color: #7e22ce;
+        }
+
+        .sic-counter-foto .sic-hero-counter-icon {
+            background: #f3e8ff;
+            border: 1px solid #d8b4fe;
+            color: #9333ea;
+        }
+
+    .sic-counter-huella {
+        background: #eef2ff;
+        border: 1px solid #a5b4fc;
+    }
+
+        .sic-counter-huella label,
+        .sic-counter-huella strong {
+            color: #4338ca;
+        }
+
+        .sic-counter-huella .sic-hero-counter-icon {
+            background: #e0e7ff;
+            border: 1px solid #a5b4fc;
+            color: #4f46e5;
+        }
+
+    .sic-icono-huella svg {
+        width: 19px;
+        height: 19px;
+        fill: currentColor;
+    }
+
+    .sic-counter-fotos-municipio {
+        background: #ecfeff;
+        border: 1px solid #67e8f9;
+    }
+
+        .sic-counter-fotos-municipio label,
+        .sic-counter-fotos-municipio strong {
+            color: #0e7490;
+        }
+
+        .sic-counter-fotos-municipio .sic-hero-counter-icon {
+            background: #cffafe;
+            border: 1px solid #67e8f9;
+            color: #0891b2;
+        }
+
+    .sic-counter-huellas-municipio {
+        background: #fffbeb;
+        border: 1px solid #fcd34d;
+    }
+
+        .sic-counter-huellas-municipio label,
+        .sic-counter-huellas-municipio strong {
+            color: #b45309;
+        }
+
+        .sic-counter-huellas-municipio .sic-hero-counter-icon {
+            background: #fef3c7;
+            border: 1px solid #fcd34d;
+            color: #d97706;
+        }
+
+    /* ============================================================
+   FOTO PRINCIPAL EXPANDIBLE
+   ============================================================ */
+
+    /* ------------------------------------------------------------
+   [16.1] FOTO PRINCIPAL AMPLIABLE
+   Comportamiento visual al pasar el cursor o enfocar la foto.
+   ------------------------------------------------------------ */
+
+    .sic-foto-expandible {
+        cursor: zoom-in;
+        transition: transform .2s ease, filter .2s ease;
+    }
+
+        .sic-foto-expandible:hover {
+            transform: scale(1.025);
+            filter: brightness(1.04);
+        }
+
+        .sic-foto-expandible:focus {
+            outline: 3px solid rgba(255, 255, 255, .65);
+            outline-offset: -4px;
+        }
+
+
+    /* ============================================================
+   VISOR DE FOTO
+   ============================================================ */
+
+    .sic-visor-foto {
+        position: fixed;
+        inset: 0;
+        z-index: 99999;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 28px;
+        background: rgba(7, 18, 38, .88);
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+        box-sizing: border-box;
+    }
+
+        .sic-visor-foto.activo {
+            display: flex;
+        }
+
+    .sic-visor-foto-contenido {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        max-width: 95vw;
+        max-height: 94vh;
+    }
+
+    .sic-vista-foto-unica > img {
+        display: block;
+        max-width: 92vw;
+        max-height: 84vh;
+        width: auto;
+        height: auto;
+        object-fit: contain;
+        background: #ffffff;
+        border: 4px solid rgba(255, 255, 255, .88);
+        border-radius: 16px;
+        box-shadow: 0 24px 70px rgba(0, 0, 0, .55);
+    }
+
+    .sic-visor-foto-cerrar {
+        position: absolute;
+        top: -17px;
+        right: -17px;
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 42px;
+        height: 42px;
+        padding: 0;
+        background: #ffffff;
+        color: #102f55;
+        border: 1px solid #dbe3ef;
+        border-radius: 50%;
+        font-size: 18px;
+        cursor: pointer;
+        box-shadow: 0 8px 22px rgba(0, 0, 0, .32);
+    }
+
+        .sic-visor-foto-cerrar:hover {
+            background: #f1f5f9;
+            transform: scale(1.05);
+        }
+
+    .sic-visor-foto-texto {
+        margin-top: 12px;
+        padding: 7px 14px;
+        background: rgba(15, 23, 42, .75);
+        color: #ffffff;
+        border: 1px solid rgba(255, 255, 255, .18);
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+        text-align: center;
+    }
+
+    /* ============================================================
+   [17] ÚLTIMOS DELITOS / LISTA COLAPSABLE
+   Delito principal y desplegable de delitos adicionales.
+   ============================================================ */
+
+    .sic-delito-principal {
+        display: flex;
+        align-items: flex-start;
+        gap: 7px;
+        font-weight: 900;
+        color: #111827;
+    }
+
+        .sic-delito-principal > i {
+            margin-top: 3px;
+            color: #c46308;
+            font-size: 11px;
+        }
+
+    .sic-delitos-collapse {
+        margin-top: 7px;
+    }
+
+        .sic-delitos-collapse summary {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 10px;
+            color: #0753ad;
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 800;
+            cursor: pointer;
+            list-style: none;
+            user-select: none;
+        }
+
+            .sic-delitos-collapse summary::-webkit-details-marker {
+                display: none;
+            }
+
+            .sic-delitos-collapse summary i {
+                font-size: 9px;
+                transition: transform .18s ease;
+            }
+
+        .sic-delitos-collapse[open] summary i {
+            transform: rotate(180deg);
+        }
+
+    .sic-delitos-collapse-list {
+        max-height: 145px;
+        overflow-y: auto;
+        margin-top: 8px;
+        padding: 7px 9px;
+        background: rgba(255, 255, 255, .65);
+        border: 1px solid #f2d19c;
+        border-radius: 9px;
+    }
+
+    .sic-delitos-collapse-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 7px;
+        padding: 6px 3px;
+        color: #374151;
+        font-size: 12px;
+        font-weight: 700;
+        border-bottom: 1px solid rgba(203, 139, 49, .16);
+    }
+
+        .sic-delitos-collapse-item:last-child {
+            border-bottom: 0;
+        }
+
+        .sic-delitos-collapse-item > i {
+            margin-top: 5px;
+            color: #d97706;
+            font-size: 5px;
+            flex-shrink: 0;
+        }
+
+    /* ============================================================
+   [18] COMPARACIÓN DE FOTOGRAFÍAS
+   Vista individual y comparación lado a lado de imágenes.
+   ============================================================ */
+
+    .sic-vista-foto-unica {
+        display: block;
+        text-align: center;
+    }
+
+    .sic-vista-comparacion {
+        display: none;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+        width: min(1180px, 94vw);
+        max-height: 88vh;
+    }
+
+    .sic-comparacion-panel {
+        min-width: 0;
+        padding: 12px;
+        background: rgba(255, 255, 255, .08);
+        border: 1px solid rgba(255, 255, 255, .18);
+        border-radius: 16px;
+        box-sizing: border-box;
+    }
+
+    .sic-comparacion-titulo {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        min-height: 34px;
+        margin-bottom: 9px;
+        padding: 6px 10px;
+        background: rgba(15, 23, 42, .88);
+        color: #ffffff;
+        border-radius: 10px;
+        font-size: 12px;
+        font-weight: 900;
+        text-align: center;
+        text-transform: uppercase;
+    }
+
+    .sic-comparacion-imagen-wrap {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 70vh;
+        max-height: 680px;
+        overflow: hidden;
+        background: #0f172a;
+        border-radius: 12px;
+    }
+
+        .sic-comparacion-imagen-wrap img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            border: 0;
+            border-radius: 12px;
+            background: transparent;
+            box-shadow: none;
+        }
+
+    @media (max-width: 800px) {
+        .sic-vista-comparacion {
+            grid-template-columns: 1fr;
+            overflow-y: auto;
+            max-height: 88vh;
+        }
+
+        .sic-comparacion-imagen-wrap {
+            height: 55vh;
+        }
+    }
+
+    /* ============================================================
+   [19] GALERÍA EXPANDIBLE
+   Items clicables, zoom, imagen, error y comportamiento visual.
+   ============================================================ */
+
+    .sic-gallery-item-expandible {
+        cursor: zoom-in;
+        transition: transform .18s ease, box-shadow .18s ease;
+    }
+
+        .sic-gallery-item-expandible:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 9px 20px rgba(15, 35, 75, .15);
+        }
+
+        .sic-gallery-item-expandible:focus {
+            outline: 3px solid rgba(37, 99, 235, .35);
+            outline-offset: 2px;
+        }
+
+    .sic-gallery-image-wrap {
+        position: relative;
+        width: 100%;
+        height: 115px;
+        overflow: hidden;
+        background: #f1f5f9;
+    }
+
+        .sic-gallery-image-wrap .sic-gallery-foto {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+    .sic-gallery-image-error {
+        display: none;
+        width: 100%;
+        height: 100%;
+        align-items: center;
+        justify-content: center;
+        background: #f1f5f9;
+        color: #94a3b8;
+        font-size: 38px;
+    }
+
+    .sic-gallery-zoom {
+        position: absolute;
+        right: 7px;
+        bottom: 7px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 29px;
+        height: 29px;
+        background: rgba(15, 47, 85, .86);
+        color: #ffffff;
+        border: 1px solid rgba(255, 255, 255, .35);
+        border-radius: 50%;
+        font-size: 12px;
+        opacity: 0;
+        transform: scale(.85);
+        transition: opacity .18s ease, transform .18s ease;
+        pointer-events: none;
+    }
+
+    .sic-gallery-item-expandible:hover .sic-gallery-zoom {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+
+    /* ============================================================
+   VISOR CARRUSEL DE GALERÍA
+   ============================================================ */
+
+    .sic-galeria-visor {
+        position: fixed;
+        inset: 0;
+        z-index: 100001;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+        background: rgba(7, 18, 38, .92);
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+        box-sizing: border-box;
+    }
+
+        .sic-galeria-visor.activo {
+            display: flex;
+        }
+
+    .sic-galeria-visor-contenido {
+        position: relative;
+        width: min(1050px, 94vw);
+        max-height: 94vh;
+        padding: 14px;
+        background: rgba(15, 23, 42, .96);
+        border: 1px solid rgba(255, 255, 255, .18);
+        border-radius: 18px;
+        box-shadow: 0 28px 80px rgba(0, 0, 0, .55);
+        box-sizing: border-box;
+    }
+
+    /* ------------------------------------------------------------
+   [20.1] CABECERA DEL VISOR DE GALERÍA
+   Título, contador y botón para cerrar.
+   ------------------------------------------------------------ */
+
+    .sic-galeria-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        min-height: 38px;
+        margin-bottom: 10px;
+        padding: 0 45px 0 6px;
+        color: #ffffff;
+        font-size: 13px;
+        font-weight: 900;
+        text-transform: uppercase;
+    }
+
+        .sic-galeria-header > div {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .sic-galeria-header span {
+            padding: 5px 10px;
+            background: rgba(255, 255, 255, .12);
+            border: 1px solid rgba(255, 255, 255, .18);
+            border-radius: 999px;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+    .sic-galeria-cerrar {
+        position: absolute;
+        top: 8px;
+        right: 9px;
+        z-index: 5;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 38px;
+        height: 38px;
+        padding: 0;
+        background: #ffffff;
+        color: #102f55;
+        border: 0;
+        border-radius: 50%;
+        font-size: 17px;
+        cursor: pointer;
+        box-shadow: 0 7px 18px rgba(0, 0, 0, .32);
+    }
+
+    /* ------------------------------------------------------------
+   [20.2] IMAGEN Y NAVEGACIÓN DEL VISOR
+   Área central, error de imagen y botones anterior/siguiente.
+   ------------------------------------------------------------ */
+
+    .sic-galeria-imagen-area {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: min(72vh, 680px);
+        overflow: hidden;
+        background: #020617;
+        border-radius: 14px;
+    }
+
+        .sic-galeria-imagen-area > img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+    .sic-galeria-error {
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 9px;
+        color: #cbd5e1;
+        text-align: center;
+    }
+
+        .sic-galeria-error i {
+            font-size: 60px;
+            color: #64748b;
+        }
+
+        .sic-galeria-error span {
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+    .sic-galeria-navegacion {
+        position: absolute;
+        top: 50%;
+        z-index: 3;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 46px;
+        height: 58px;
+        padding: 0;
+        background: rgba(15, 47, 85, .86);
+        color: #ffffff;
+        border: 1px solid rgba(255, 255, 255, .28);
+        border-radius: 12px;
+        font-size: 19px;
+        cursor: pointer;
+        transform: translateY(-50%);
+        transition: background .18s ease, transform .18s ease;
+    }
+
+        .sic-galeria-navegacion:hover {
+            background: rgba(29, 99, 211, .96);
+        }
+
+    .sic-galeria-anterior {
+        left: 14px;
+    }
+
+    .sic-galeria-siguiente {
+        right: 14px;
+    }
+
+    /* ------------------------------------------------------------
+   [20.3] DESCRIPCIÓN Y AYUDA DEL VISOR
+   Texto inferior e indicaciones de navegación.
+   ------------------------------------------------------------ */
+
+    .sic-galeria-descripcion {
+        margin-top: 10px;
+        padding: 8px 14px;
+        background: rgba(255, 255, 255, .08);
+        color: #ffffff;
+        border: 1px solid rgba(255, 255, 255, .14);
+        border-radius: 10px;
+        font-size: 13px;
+        font-weight: 800;
+        text-align: center;
+    }
+
+    .sic-galeria-ayuda {
+        margin-top: 7px;
+        color: #94a3b8;
+        font-size: 10px;
+        font-weight: 700;
+        text-align: center;
+    }
+
+    @media (max-width: 700px) {
+        .sic-galeria-visor {
+            padding: 10px;
+        }
+
+        .sic-galeria-visor-contenido {
+            width: 100%;
+            padding: 10px;
+        }
+
+        .sic-galeria-imagen-area {
+            height: 68vh;
+        }
+
+        .sic-galeria-navegacion {
+            width: 40px;
+            height: 50px;
+        }
+
+        .sic-galeria-anterior {
+            left: 7px;
+        }
+
+        .sic-galeria-siguiente {
+            right: 7px;
+        }
+
+        .sic-galeria-ayuda {
+            display: none;
+        }
+    }
+
+    /* ============================================================
+   [21] COINCIDENCIAS POR NOMBRE
+   Nombre principal, porcentajes y estados visuales de coincidencia.
+   ============================================================ */
+
+    .sic-nombre-principal {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 9px;
+    }
+
+    .sic-nombre-texto {
+        min-width: 0;
+        flex: 1;
+        overflow-wrap: anywhere;
+    }
+
+    .sic-nombre-porcentaje {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        padding: 4px 8px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 900;
+        line-height: 1;
+        white-space: nowrap;
+    }
+
+        .sic-nombre-porcentaje.pendiente {
+            background: #fff7ed;
+            color: #c2410c;
+            border: 1px solid #fdba74;
+        }
+
+        .sic-nombre-porcentaje.confirmada {
+            background: #ecfdf5;
+            color: #047857;
+            border: 1px solid #6ee7b7;
+        }
+
+        .sic-nombre-porcentaje.descartada {
+            background: #f1f5f9;
+            color: #64748b;
+            border: 1px solid #cbd5e1;
+        }
+
+    .sic-nombre-principal-bloque {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .sic-nombre-principal {
+        margin: 0;
+        display: block;
+        width: 100%;
+    }
+
+    .sic-principal-coincidencia-wrap {
+        display: flex;
+        justify-content: flex-start;
+        width: 100%;
+    }
+
+    .sic-principal-coincidencia {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 7px 12px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 800;
+        line-height: 1.2;
+        white-space: nowrap;
+    }
+
+        .sic-principal-coincidencia.pendiente {
+            background: #eff6ff;
+            color: #1d4ed8;
+            border: 1px solid #93c5fd;
+        }
+
+        .sic-principal-coincidencia.confirmada {
+            background: #ecfdf5;
+            color: #047857;
+            border: 1px solid #6ee7b7;
+        }
+
+        .sic-principal-coincidencia.descartada {
+            background: #f8fafc;
+            color: #64748b;
+            border: 1px solid #cbd5e1;
+        }
+
+    .sic-modal-det-lista-item-vertical {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .sic-modal-det-lista-item-head {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        width: 100%;
+    }
+
+    .sic-modal-det-lista-item-pill {
+        width: 100%;
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .sic-nombre-porcentaje {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 5px 10px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 800;
+        line-height: 1.2;
+        white-space: nowrap;
+    }
+
+        .sic-nombre-porcentaje.pendiente {
+            background: #fff7ed;
+            color: #c2410c;
+            border: 1px solid #fdba74;
+        }
+
+        .sic-nombre-porcentaje.confirmada {
+            background: #ecfdf5;
+            color: #047857;
+            border: 1px solid #6ee7b7;
+        }
+
+        .sic-nombre-porcentaje.descartada {
+            background: #f8fafc;
+            color: #64748b;
+            border: 1px solid #cbd5e1;
+        }
+
+/* ============================================================
+   RESGUARDO DISPONIBLE
+   Estatus 2: identidad confirmada, permite registrar ingreso.
+   ============================================================ */
+
+.sic-btn-resguardo-disponible {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 8px 13px;
+    border: 1px solid #123f70;
+    border-radius: 8px;
+    background: #174f87;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(23, 79, 135, .22);
+    transition: background .18s ease, transform .18s ease, box-shadow .18s ease;
+}
+
+    .sic-btn-resguardo-disponible:hover {
+        background: #0f3c69;
+        color: #fff;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 10px rgba(23, 79, 135, .28);
+    }
+
+
+/* ============================================================
+   DETENIDO EN RESGUARDO
+   Estatus 3: ya se encuentra físicamente en FGEA.
+   ============================================================ */
+
+.sic-btn-resguardo-confirmado {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 8px 14px;
+    border: 1px solid #075c3d;
+    border-radius: 8px;
+    background: #087a50;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: .2px;
+    cursor: default;
+    opacity: 1 !important;
+    box-shadow: 0 0 0 3px rgba(8, 122, 80, .12), 0 2px 6px rgba(8, 122, 80, .22);
+}
+
+    .sic-btn-resguardo-confirmado:disabled {
+        opacity: 1 !important;
+        color: #fff;
+    }
+
+
+/* ============================================================
+   CANCELAR RESGUARDO
+   ============================================================ */
+
+.sic-btn-cancelar-resguardo {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 8px 13px;
+    border: 1px solid #b9434d;
+    border-radius: 8px;
+    background: #fff;
+    color: #a52f39;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background .18s ease, color .18s ease;
+}
+
+    .sic-btn-cancelar-resguardo:hover {
+        background: #a52f39;
+        color: #fff;
+    }
+
+/* ============================================================
+   PERSONAS DE INTERÉS
+   ============================================================ */
+
+.sic-persona-interes-slides {
+    position: relative;
+}
+
+.sic-persona-interes-slide {
+    display: none;
+}
+
+    .sic-persona-interes-slide.active {
+        display: block;
+    }
+
+/* ============================================================
+   PERSONA INTERÉS - DOMICILIOS
+   ============================================================ */
+
+.sic-pi-domicilios-principal {
+    min-width: 0;
+    padding: 11px;
+    background-color: #f8fbff;
+    border: 1px solid #dbe3ee;
+    border-radius: 10px;
+    box-sizing: border-box;
+}
+
+    .sic-pi-domicilios-principal > .sic-modal-det-lista-title {
+        margin-bottom: 9px;
+    }
+
+.sic-pi-domicilios-list {
+    height: 60px !important;
+    min-height: 60px !important;
+    max-height: 60px !important;
+    padding-right: 4px;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+}
+
+.sic-pi-domicilio-item {
+    min-height: 0 !important;
+    margin-bottom: 6px !important;
+    padding: 7px 9px !important;
+    align-items: flex-start !important;
+    line-height: 1.35 !important;
+}
+
+    .sic-pi-domicilio-item > i {
+        margin-top: 3px;
+        color: #0f6abf;
+        flex: 0 0 auto;
+    }
+
+    .sic-pi-domicilio-item:last-child {
+        margin-bottom: 0 !important;
+    }
+
+/* ============================================================
+   ALIAS + PERIODOS
+   ============================================================ */
+
+.sic-ficha-persona-interes .sic-pi-listas-inferiores {
+    display: grid;
+    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+    gap: 13px;
+}
+
+
+/* ============================================================
+   PERIODOS DE BÚSQUEDA
+   ============================================================ */
+
+.sic-pi-periodo-item {
+    align-items: flex-start;
+    line-height: 1.35;
+}
+
+    .sic-pi-periodo-item > i {
+        margin-top: 3px;
+        flex: 0 0 auto;
+    }
+
+    .sic-pi-periodo-item.activo {
+        color: #14532d;
+        background-color: #f0fdf4;
+        border-color: #bbf7d0;
+    }
+
+        .sic-pi-periodo-item.activo > i {
+            color: #16a34a;
+        }
+
+    .sic-pi-periodo-item.cancelado {
+        color: #374151;
+        background-color: #ffffff;
+    }
+
+        .sic-pi-periodo-item.cancelado > i {
+            color: #94a3b8;
+        }
+
+
+/* ============================================================
+   OBSERVACIONES
+   ============================================================ */
+
+.sic-pi-observaciones {
+    padding: 10px 12px;
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 9px;
+}
+
+    .sic-pi-observaciones .sic-info-label {
+        margin-bottom: 4px;
+    }
+
+    .sic-pi-observaciones .sic-info-value {
+        line-height: 1.4;
+    }
+
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 767px) {
+
+    .sic-ficha-persona-interes .sic-pi-listas-inferiores {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ============================================================
+   PERSONA INTERÉS
+   ALIAS Y PERIODOS
+   ============================================================ */
+
+.sic-ficha-persona-interes
+.sic-pi-listas-inferiores
+.sic-modal-det-lista-box {
+    height: 125px !important;
+    min-height: 125px !important;
+    max-height: 125px !important;
+}

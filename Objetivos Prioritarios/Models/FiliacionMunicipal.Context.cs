@@ -34,8 +34,9 @@ namespace Objetivos_Prioritarios.Models
         public virtual DbSet<cat_TipoFoto> cat_TipoFoto { get; set; }
         public virtual DbSet<cat_TipoSena> cat_TipoSena { get; set; }
         public virtual DbSet<cat_ZonaCuerpo> cat_ZonaCuerpo { get; set; }
+        public virtual DbSet<sysdiagrams> sysdiagrams { get; set; }
         public virtual DbSet<tb_Alerta> tb_Alerta { get; set; }
-        public virtual DbSet<tb_DETENCION_C5> tb_DETENCION_C5 { get; set; }
+        public virtual DbSet<tb_Detencion> tb_Detencion { get; set; }
         public virtual DbSet<tb_DETENIDO_C5> tb_DETENIDO_C5 { get; set; }
         public virtual DbSet<tb_Domicilio> tb_Domicilio { get; set; }
         public virtual DbSet<tb_FichaDecadactilar> tb_FichaDecadactilar { get; set; }
@@ -46,9 +47,11 @@ namespace Objetivos_Prioritarios.Models
         public virtual DbSet<tb_PersonaAlias> tb_PersonaAlias { get; set; }
         public virtual DbSet<tb_PersonaPeriodoBusqueda> tb_PersonaPeriodoBusqueda { get; set; }
         public virtual DbSet<tb_SenasParticulares> tb_SenasParticulares { get; set; }
+        public virtual DbSet<cat_Contactos_Municipios> cat_Contactos_Municipios { get; set; }
         public virtual DbSet<tb_PersonaBusqueda> tb_PersonaBusqueda { get; set; }
         public virtual DbSet<tb_PersonaEmbedding> tb_PersonaEmbedding { get; set; }
         public virtual DbSet<tb_PersonaSourceAFIS> tb_PersonaSourceAFIS { get; set; }
+        public virtual DbSet<tb_DETENCION_C5> tb_DETENCION_C5 { get; set; }
     
         public virtual ObjectResult<sp_BuscarDetenido_Result> sp_BuscarDetenido(Nullable<int> iDDETENIDO)
         {
@@ -62,6 +65,15 @@ namespace Objetivos_Prioritarios.Models
         public virtual ObjectResult<sp_Alertas_Result> sp_Alertas()
         {
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<sp_Alertas_Result>("sp_Alertas");
+        }
+    
+        public virtual ObjectResult<SP_SIC_ObtenerPersonas_Result> SP_SIC_ObtenerPersonas(string idsPersona)
+        {
+            var idsPersonaParameter = idsPersona != null ?
+                new ObjectParameter("IdsPersona", idsPersona) :
+                new ObjectParameter("IdsPersona", typeof(string));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<SP_SIC_ObtenerPersonas_Result>("SP_SIC_ObtenerPersonas", idsPersonaParameter);
         }
     }
 }

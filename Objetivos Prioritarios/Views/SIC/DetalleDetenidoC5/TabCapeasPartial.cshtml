@@ -1,0 +1,307 @@
+﻿@model System.Collections.Generic.List<Objetivos_Prioritarios.Models.Capea_boletin_busqueda>
+
+@using System
+@using System.Collections
+@using System.Collections.Generic
+
+@{
+    var capeas = Model ?? new List<Objetivos_Prioritarios.Models.Capea_boletin_busqueda>();
+    int idDetenidoC5 = ViewBag.IdDetenidoC5 == null ? 0 : Convert.ToInt32(ViewBag.IdDetenidoC5);
+}
+
+@if (capeas != null && capeas.Count > 0)
+{
+    <div class="sic-rel-carousel sic-capea-carousel">
+
+        <div class="sic-capea-slides">
+
+            @for (int i = 0; i < capeas.Count; i++)
+            {
+                var item = capeas[i];
+
+                string nombreCapea = (
+                    ViewBag.ParteNombre(item.nombre) + " " +
+                    ViewBag.ParteNombre(item.a_paterno) + " " +
+                    ViewBag.ParteNombre(item.a_materno)
+                ).Trim();
+
+                if (string.IsNullOrWhiteSpace(nombreCapea))
+                {
+                    nombreCapea = "SIN INFORMACIÓN";
+                }
+
+                int idOrigenCapea = 0;
+
+                if (item.id_boletin_busqueda != null)
+                {
+                    idOrigenCapea = Convert.ToInt32(item.id_boletin_busqueda);
+                }
+
+                System.Tuple<int, int, int, int, string>
+                datosAlertaCapea =
+                ViewBag.ObtenerDatosAlerta(
+                idOrigenCapea,
+                new int[] { 2, 7, 8 }
+                );
+
+                int idFuenteAlertaCapea =
+                    datosAlertaCapea.Item1;
+
+                int estatusAlertaCapea =
+                    datosAlertaCapea.Item2;
+
+                int porcentajeAlertaCapea =
+                    datosAlertaCapea.Item3;
+
+
+                string nombreTipoAlertaCapea =
+                    datosAlertaCapea.Item5;
+
+                string porcentajeAlertaCapeaTexto =
+                    porcentajeAlertaCapea > 0
+                        ? porcentajeAlertaCapea.ToString() + "%"
+                        : "";
+
+                System.Collections.ArrayList coincidenciasAlertaCapea =
+                ViewBag.ObtenerCoincidenciasAlerta(
+                new int[] { idOrigenCapea },
+                new int[] { 2, 7, 8 }
+                ) as System.Collections.ArrayList;
+
+                if (coincidenciasAlertaCapea == null)
+                {
+                    coincidenciasAlertaCapea =
+                        new System.Collections.ArrayList();
+                }
+
+                <div class="sic-rel-slide sic-capea-slide @(i == 0 ? "active" : "")" data-index="@i">
+
+                    <div class="sic-rel-card">
+
+                        <div class="sic-rel-photo-wrap">
+
+                            <div class="sic-rel-photo">
+                                @if (!string.IsNullOrWhiteSpace(item.url_imagen))
+                                {
+                                    <div class="sic-photo-loader"></div>
+
+                                    <img src="@Url.Action("FotoCapea", "SIC", new { idCapea = item.id_boletin_busqueda })"
+                                         alt="Imagen boletín CAPEA"
+                                         loading="lazy"
+                                         onload="this.parentElement.classList.add('sic-photo-loaded');"
+                                         onerror="this.onerror=null; this.parentElement.classList.add('sic-photo-loaded'); this.parentElement.innerHTML='<i class=&quot;fa fa-user&quot;></i>';" />
+                                }
+                                else
+                                {
+                                    <i class="fa fa-user"></i>
+                                }
+                            </div>
+
+                            @if (capeas.Count > 1)
+                            {
+                                <div class="sic-rel-carousel-footer">
+                                    <button type="button" class="sic-rel-nav sic-capea-prev">
+                                        <i class="fa fa-chevron-left"></i>
+                                    </button>
+
+                                    <span class="sic-rel-counter">
+                                        <span class="sic-capea-current">@(i + 1)</span> / @capeas.Count
+                                    </span>
+
+                                    <button type="button" class="sic-rel-nav sic-capea-next">
+                                        <i class="fa fa-chevron-right"></i>
+                                    </button>
+                                </div>
+                            }
+
+                        </div>
+
+                        <div class="sic-rel-info">
+
+                            <div class="sic-rel-title">
+                                <div>
+                                    <h5>@nombreCapea</h5>
+
+                                    @Html.Partial("~/Views/SIC/DetalleDetenidoC5/CoincidenciasAlertaPartial.cshtml", coincidenciasAlertaCapea)
+                                </div>
+                                @if (idOrigenCapea > 0 && idFuenteAlertaCapea > 0)
+                                {
+                                    <div class="sic-rel-actions">
+
+                                        @if (estatusAlertaCapea == 1)
+                                        {
+                                            <button type="button"
+                                                    class="sic-btn-confirmar-identidad js-confirmar-identidad-normal"
+                                                    data-id-detenido="@idDetenidoC5"
+                                                    data-id-origen="@idOrigenCapea"
+                                                    data-id-fuente="@idFuenteAlertaCapea">
+                                                <i class="fa fa-check"></i>
+                                                Confirmar identidad
+                                            </button>
+
+                                            <button type="button"
+                                                    class="sic-btn-warning-soft sic-btn-descartar-alerta"
+                                                    data-id-detenido="@idDetenidoC5"
+                                                    data-id-origen="@idOrigenCapea"
+                                                    data-id-fuente="@idFuenteAlertaCapea">
+                                                <i class="fa fa-times"></i>
+                                                Descartar
+                                            </button>
+                                        }
+                                        else if (estatusAlertaCapea == 2)
+                                        {
+                                            <button type="button"
+                                                    class="sic-btn-resguardo-disponible js-confirmar-resguardo-fgea"
+                                                    data-id-detenido="@idDetenidoC5"
+                                                    data-id-origen="@idOrigenCapea"
+                                                    data-id-fuente="2">
+
+                                                <i class="fa fa-shield"></i>
+                                                Confirmar Resguardo FGEA
+
+                                            </button>
+
+                                            <button type="button"
+                                                    class="sic-btn-reactivar-alerta"
+                                                    data-estatus-anterior="2"
+                                                    data-id-detenido="@idDetenidoC5"
+                                                    data-id-origen="@idOrigenCapea"
+                                                    data-id-fuente="2">
+
+                                                <i class="fa fa-undo"></i>
+                                                Cancelar Confirmación
+
+                                            </button>
+                                        }
+                                        else if (estatusAlertaCapea == 3)
+                                        {
+                                            <button type="button"
+                                                    class="sic-btn-resguardo-confirmado"
+                                                    disabled>
+
+                                                <i class="fa fa-university"></i>
+                                                DETENIDO EN RESGUARDO FGEA
+
+                                            </button>
+
+                                            <button type="button"
+                                                    class="sic-btn-cancelar-resguardo js-cancelar-resguardo-fgea"
+                                                    data-id-detenido="@idDetenidoC5"
+                                                    data-id-origen="@idOrigenCapea"
+                                                    data-id-fuente="2">
+
+                                                <i class="fa fa-undo"></i>
+                                                Cancelar Resguardo
+
+                                            </button>
+                                        }
+                                        else
+                                        {
+                                            <button type="button"
+                                                    class="sic-btn-descartada"
+                                                    disabled>
+                                                <i class="fa fa-times-circle"></i>
+                                                Descartada
+                                            </button>
+
+                                            <button type="button"
+                                                    class="sic-btn-reactivar-alerta"
+                                                    data-estatus-anterior="0"
+                                                    data-id-detenido="@idDetenidoC5"
+                                                    data-id-origen="@idOrigenCapea"
+                                                    data-id-fuente="@idFuenteAlertaCapea">
+                                                <i class="fa fa-undo"></i>
+                                                Cancelar Confirmación
+                                            </button>
+                                        }
+
+                                    </div>
+                                }
+                                else
+                                {
+                                    <button type="button"
+                                            class="sic-btn-alerta-desactivada"
+                                            disabled>
+                                        <i class="fa fa-exclamation-circle"></i>
+                                        Sin ID de alerta
+                                    </button>
+                                }
+                            </div>
+
+                            <div class="sic-rel-grid">
+
+                                <div class="sic-info-label">ID Boletín</div>
+                                <div class="sic-info-value">@ViewBag.Texto(item.id_boletin_busqueda)</div>
+
+                                <div class="sic-info-label">Edad</div>
+                                <div class="sic-info-value">@ViewBag.Texto(item.edad)</div>
+
+                                <div class="sic-info-label">Sexo</div>
+                                <div class="sic-info-value">@ViewBag.Texto(item.sexo)</div>
+
+                                <div class="sic-info-label">Fecha nacimiento</div>
+                                <div class="sic-info-value">@ViewBag.Fecha(item.fecha_nacimiento)</div>
+
+                                <div class="sic-info-label">Fecha ausencia</div>
+                                <div class="sic-info-value">@ViewBag.Fecha(item.fecha_ausencia)</div>
+
+                                <div class="sic-info-label">Lugar ausencia</div>
+                                <div class="sic-info-value">@ViewBag.Texto(item.lugar_ausencia)</div>
+
+                                <div class="sic-info-label">Estatura</div>
+                                <div class="sic-info-value">@ViewBag.Texto(item.estatura)</div>
+
+                                <div class="sic-info-label">Peso</div>
+                                <div class="sic-info-value">@ViewBag.Texto(item.peso)</div>
+
+                                <div class="sic-info-label">Complexión</div>
+                                <div class="sic-info-value">@ViewBag.Texto(item.complexion)</div>
+
+                                <div class="sic-info-label">Color cabello</div>
+                                <div class="sic-info-value">@ViewBag.Texto(item.tipo_color_cabello)</div>
+
+                                <div class="sic-info-label">Color ojos</div>
+                                <div class="sic-info-value">@ViewBag.Texto(item.tipo_color_ojos)</div>
+
+                                <div class="sic-info-label">Señas particulares</div>
+                                <div class="sic-info-value">@ViewBag.Texto(item.senas_particulares)</div>
+
+                                <div class="sic-info-label">Observaciones</div>
+                                <div class="sic-info-value">@ViewBag.Texto(item.observaciones)</div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
+
+    </div>
+}
+else
+{
+    <div class="sic-empty-source">
+        <i class="fa fa-search"></i>
+        <strong>FGEA - FEMDLP Boletín Búsqueda</strong>
+        <span>Sin información cargada por el momento.</span>
+    </div>
+}
+
+<script>
+    $(document)
+        .off('click.tabCapea', '.sic-capea-next, .sic-capea-prev')
+        .on('click.tabCapea', '.sic-capea-next, .sic-capea-prev', function (e) {
+            e.preventDefault();
+
+            moverCarruselSic(
+                $(this),
+                '.sic-capea-slide',
+                '.sic-capea-current',
+                $(this).hasClass('sic-capea-next') ? 1 : -1
+            );
+        });
+</script>

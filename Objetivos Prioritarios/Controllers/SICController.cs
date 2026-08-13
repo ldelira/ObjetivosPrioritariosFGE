@@ -20,7 +20,8 @@ namespace Objetivos_Prioritarios.Controllers
         private const string SessionResultadosCoincidencias =
        "SIC_RESULTADOS_COINCIDENCIAS";
         private const string RutaBaseFotosC5 = @"\\10.13.1.232\detenidos";
-        private const string RutaBaseFotosCapea = @"\\234fgea\temporalfiliacion$\CAPEA\";
+        private const string RutaBaseFotosCapea = @"https://www.fiscalia-aguascalientes.gob.mx/";
+        //private const string RutaBaseFotosCapea = @"\\234fgea\temporalfiliacion$\CAPEA\";
 
         public SICController()
         {
@@ -31,6 +32,8 @@ namespace Objetivos_Prioritarios.Controllers
         {
             ViewBag.Title = "SIC";
 
+            ViewBag.ContactosMunicipios = _filiacionService.GetContactosMunicipios();
+
             return View();
         }
 
@@ -39,6 +42,7 @@ namespace Objetivos_Prioritarios.Controllers
         {
             try
             {
+
                 var registros =
                     _filiacionService.GetAlertas()
                     ?? new List<sp_Alertas_Result>();
@@ -75,26 +79,34 @@ namespace Objetivos_Prioritarios.Controllers
                         .ToList();
 
                     var resumenPorDetenido = alertasDetalle
-    .GroupBy(x =>
-        Convert.ToInt32(x.idDetenidoC5)
-    )
-    .ToDictionary(
-        grupo => grupo.Key,
-        grupo => new
-        {
+                        .GroupBy(x =>
+                            Convert.ToInt32(x.idDetenidoC5)
+                        )
+                        .ToDictionary(
+                            grupo => grupo.Key,
+                            grupo => new
+                            {
             TieneConfirmacionDetenidos =
                 grupo.Any(x =>
                     Convert.ToInt32(x.IdTbFuente) == 6 &&
-                    Convert.ToInt32(x.Estatus) == 2
+                    (
+                        Convert.ToInt32(x.Estatus) == 2 
+                    )
                 ),
 
             TieneObjetivoConfirmado =
                 grupo.Any(x =>
                     Convert.ToInt32(x.IdTbFuente) != 6 &&
-                    Convert.ToInt32(x.Estatus) == 2
+                    (
+                        Convert.ToInt32(x.Estatus) == 2
+                    )
                 ),
-
-            TieneFuente6Activa =
+            TieneDetenidoResguardo =
+                grupo.Any(x =>
+                    Convert.ToInt32(x.IdTbFuente) != 6 &&
+                    Convert.ToInt32(x.Estatus) == 3
+                ),
+                                TieneFuente6Activa =
                 grupo.Any(x =>
                     Convert.ToInt32(x.IdTbFuente) == 6 &&
                     Convert.ToInt32(x.Estatus) != 0
@@ -187,7 +199,11 @@ namespace Objetivos_Prioritarios.Controllers
 
                                 TieneObjetivoConfirmado =
                                     resumen != null &&
-                                    resumen.TieneObjetivoConfirmado
+                                    resumen.TieneObjetivoConfirmado,
+
+                                TieneDetenidoResguardo =
+                                    resumen != null &&
+                                    resumen.TieneDetenidoResguardo
 
                             };
                         })
@@ -261,12 +277,17 @@ namespace Objetivos_Prioritarios.Controllers
 
             if (alertasTipo != null && alertasTipo.Count > 0)
             {
-                identidadConfirmada = alertasTipo.Any(x => x.Item3 == 2);
+                identidadConfirmada =
+                                        alertasTipo.Any(x =>
+                                            x.Item3 == 2 ||
+                                            x.Item3 == 3
+                                        );
 
-                esDeInteres = alertasTipo.Any(x =>
-                    x.Item3 == 2 &&
-                    x.Item2 != 6
-                );
+                esDeInteres =
+                                alertasTipo.Any(x =>
+                                    (x.Item3 == 2 || x.Item3 == 3) &&
+                                    x.Item2 != 6
+                                );
             }
 
             ViewBag.IdentidadConfirmada = identidadConfirmada;
@@ -379,33 +400,60 @@ namespace Objetivos_Prioritarios.Controllers
 
 
             /* ============================================================
-               PERSONAS DE INTERÉS
-               Fuente: 3
+   PERSONAS DE INTERÉS
+   Fuente: 3
 
-               Actualmente no existe en este controlador una llamada al
-               servicio que traiga los datos completos de las personas.
-               Por ahora se envían todos los datos de alerta disponibles.
+   Los Item1 de las alertas corresponden a idPersona
+   de Filiacion_Municipios.
+
+   El SP devuelve:
+   - Datos generales
+   - Alias
+   - Fotografía principal
+   - Domicilios
+   - Periodos de búsqueda
+   ============================================================ */
+
+            var personasInteres =
+                _filiacionService.GetInfoPersonasFiliacion(
+                    idsPersonaInteres
+                );
+
+
+            /* ============================================================
+               AGREGAR DATOS DE LA ALERTA
+
+               El SP devuelve una fila por idPersona, por lo tanto
+               utilizamos la columna "idPersona" para relacionarla con
+               Item1 de alertasTipo.
+
+               Fuente 3 = Personas de interés
                ============================================================ */
 
-            var alertasPersonaInteres = alertasTipo
-    .Where(x => x.Item2 == 3)
-    .GroupBy(x => x.Item1)
-    .Select(grupo => grupo
-        .OrderByDescending(x => x.Item4)
-        .ThenByDescending(x =>
-            x.Item3 == 1
-                ? 3
-                : x.Item3 == 2
-                    ? 2
-                    : 1
-        )
-        .First()
-    )
-    .OrderByDescending(x => x.Item4)
-    .ToList();
+            AgregarDatosAlertaADataTable(
+                personasInteres,
+                alertasTipo,
+                new int[] { 3 },
+                "idPersona"
+            );
 
-            ViewBag.AlertasPersonaInteres =
-                alertasPersonaInteres;
+
+            /* ============================================================
+               ORDENAR POR MAYOR PORCENTAJE DE COINCIDENCIA
+               ============================================================ */
+
+            personasInteres =
+                OrdenarPorPorcentaje(
+                    personasInteres
+                );
+
+
+            /* ============================================================
+               ENVIAR A LA VISTA
+               ============================================================ */
+
+            ViewBag.PersonasInteres =
+                personasInteres;
 
 
             /* ============================================================
@@ -751,12 +799,14 @@ namespace Objetivos_Prioritarios.Controllers
                 )
                 .OrderByDescending(x => x.Item4)
                 .ThenByDescending(x =>
-                    x.Item3 == 1
-                        ? 3
-                        : x.Item3 == 2
-                            ? 2
-                            : 1
-                )
+    x.Item3 == 3
+        ? 4
+        : x.Item3 == 1
+            ? 3
+            : x.Item3 == 2
+                ? 2
+                : 1
+)
                 .FirstOrDefault();
 
             if (alertaSeleccionada == null)
@@ -849,12 +899,14 @@ namespace Objetivos_Prioritarios.Controllers
                         grupo
                             .OrderByDescending(x => x.Item4)
                             .ThenByDescending(x =>
-                                x.Item3 == 1
-                                    ? 3
-                                    : x.Item3 == 2
-                                        ? 2
-                                        : 1
-                            )
+    x.Item3 == 3
+        ? 4
+        : x.Item3 == 1
+            ? 3
+            : x.Item3 == 2
+                ? 2
+                : 1
+)
                             .First()
                     )
                     .OrderByDescending(x => x.Item4)
@@ -955,7 +1007,7 @@ namespace Objetivos_Prioritarios.Controllers
 
             var confirmadasDeInteres = alertasTipo
                 .Where(x =>
-                    x.Item3 == 2 &&
+                    (x.Item3 == 2 || x.Item3 == 3) &&
                     x.Item2 != 6
                 )
                 .ToList();
@@ -1383,40 +1435,48 @@ namespace Objetivos_Prioritarios.Controllers
             }
 
             rutaFotoBD = rutaFotoBD
-                .Trim()
-                .Trim('"')
-                .Trim()
-                .TrimStart('/', '\\')
-                .Replace("/", "\\");
+    .Trim()
+    .Trim('"')
+    .Trim('\'')
+    .Trim()
+    .TrimStart('/', '\\')
+    .Replace("\\", "/");
+
+            //rutaFotoBD = rutaFotoBD
+            //   .Trim()
+            //   .Trim('"')
+            //   .Trim()
+            //   .TrimStart('/', '\\')
+            //   .Replace("/", "\\");
 
             string rutaCompleta = Path.Combine(RutaBaseFotosCapea, rutaFotoBD);
 
-            if (!System.IO.File.Exists(rutaCompleta))
-            {
-                return HttpNotFound();
-            }
+            //if (!System.IO.File.Exists(rutaCompleta))
+            //{
+            //    return HttpNotFound();
+            //}
 
-            string extension = Path.GetExtension(rutaCompleta).ToLower();
-            string contentType = "image/jpeg";
+            //string extension = Path.GetExtension(rutaCompleta).ToLower();
+            //string contentType = "image/jpeg";
 
-            if (extension == ".png")
-            {
-                contentType = "image/png";
-            }
-            else if (extension == ".gif")
-            {
-                contentType = "image/gif";
-            }
-            else if (extension == ".bmp")
-            {
-                contentType = "image/bmp";
-            }
-            else if (extension == ".webp")
-            {
-                contentType = "image/webp";
-            }
+            //if (extension == ".png")
+            //{
+            //    contentType = "image/png";
+            //}
+            //else if (extension == ".gif")
+            //{
+            //    contentType = "image/gif";
+            //}
+            //else if (extension == ".bmp")
+            //{
+            //    contentType = "image/bmp";
+            //}
+            //else if (extension == ".webp")
+            //{
+            //    contentType = "image/webp";
+            //}
 
-            return File(rutaCompleta, contentType);
+            return Redirect(rutaCompleta);
         }
 
 
@@ -1543,12 +1603,13 @@ namespace Objetivos_Prioritarios.Controllers
                Fuente diferente de 6
                ============================================================ */
 
-            var alertasConfirmadasInteres = alertasTipo
-                .Where(x =>
-                    x.Item3 == 2 &&
-                    x.Item2 != 6
-                )
-                .ToList();
+            var alertasConfirmadasInteres =
+                alertasTipo
+                    .Where(x =>
+                        (x.Item3 == 2 || x.Item3 == 3) &&
+                        x.Item2 != 6
+                    )
+        .ToList();
 
             if (alertasConfirmadasInteres.Count > 0)
             {
@@ -2111,93 +2172,169 @@ namespace Objetivos_Prioritarios.Controllers
             }
         }
 
-
-        private Dictionary< int, Tuple<int, int, int, int, string> > ConstruirDatosAlertaPorOrigen(  List<Tuple<int, int, int, int, int, string>> alertasTipo, IEnumerable<int> idsFuentes )
+        [HttpPost]
+        public JsonResult ResguardoFGEA(
+    int idDetenido,
+    int idOrigen,
+    int idFuente)
         {
-            var resultado =
-                new Dictionary<
-                    int,
-                    Tuple<int, int, int, int, string>
-                >();
-
-            if (alertasTipo == null || alertasTipo.Count == 0)
+            try
             {
-                return resultado;
-            }
+                int totalActualizadas =
+                    _filiacionService.ActualizarEstatusNotificacion(
+                        idDetenido,
+                        idOrigen,
+                        idFuente,
+                        3
+                    );
 
-            var fuentesPermitidas = idsFuentes == null
-                ? new List<int>()
-                : idsFuentes
-                    .Distinct()
-                    .ToList();
-
-            var grupos = alertasTipo
-                .Where(x =>
-                    fuentesPermitidas.Contains(x.Item2)
-                )
-                .GroupBy(x => x.Item1)
-                .ToList();
-
-            foreach (var grupo in grupos)
-            {
-                /*
-                 * Item1 = idPersonaFGEA / idOrigen
-                 * Item2 = IdTbFuente
-                 * Item3 = Estatus
-                 * Item4 = Porcentaje
-                 * Item5 = IdTipoAlerta
-                 * Item6 = NombreTipoAlerta
-                 */
-
-                var alertaSeleccionada = grupo
-                    .OrderByDescending(x =>
-                        x.Item3 == 1
-                            ? 3
-                            : x.Item3 == 2
-                                ? 2
-                                : 1
-                    )
-                    .ThenByDescending(x => x.Item4)
-                    .FirstOrDefault();
-
-                if (alertaSeleccionada == null)
+                return Json(new
                 {
-                    continue;
-                }
-
-                int idOrigen =
-                    alertaSeleccionada.Item1;
-
-                int idFuente =
-                    alertaSeleccionada.Item2;
-
-                int estatus =
-                    alertaSeleccionada.Item3;
-
-                int porcentaje =
-                    alertaSeleccionada.Item4;
-
-                int idTipoAlerta =
-                    alertaSeleccionada.Item5;
-
-                string nombreTipoAlerta =
-                    string.IsNullOrWhiteSpace(
-                        alertaSeleccionada.Item6
-                    )
-                        ? "SIN TIPO DE ALERTA"
-                        : alertaSeleccionada.Item6.Trim();
-
-                resultado[idOrigen] = Tuple.Create(
-                    idFuente,
-                    estatus,
-                    porcentaje,
-                    idTipoAlerta,
-                    nombreTipoAlerta
-                );
+                    success = totalActualizadas > 0,
+                    estatus = 3,
+                    totalActualizadas = totalActualizadas,
+                    message = totalActualizadas > 0
+                        ? "Registro puesto en Resguardo FGEA correctamente."
+                        : "No se encontró la coincidencia para actualizar."
+                });
             }
-
-            return resultado;
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message =
+                        "Error al poner el registro en Resguardo FGEA: " +
+                        ex.Message
+                });
+            }
         }
+
+        [HttpPost]
+        public JsonResult CancelarResguardoFGEA(
+    int idDetenido,
+    int idOrigen,
+    int idFuente)
+        {
+            try
+            {
+                int totalActualizadas =
+                    _filiacionService.ActualizarEstatusNotificacion(
+                        idDetenido,
+                        idOrigen,
+                        idFuente,
+                        2
+                    );
+
+                return Json(new
+                {
+                    success = totalActualizadas > 0,
+                    estatus = 2,
+                    totalActualizadas = totalActualizadas,
+                    message = totalActualizadas > 0
+                        ? "Resguardo FGEA cancelado correctamente."
+                        : "No se encontró la coincidencia para actualizar."
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message =
+                        "Error al cancelar el Resguardo FGEA: " +
+                        ex.Message
+                });
+            }
+        }
+
+
+        //private Dictionary< int, Tuple<int, int, int, int, string> > ConstruirDatosAlertaPorOrigen(  List<Tuple<int, int, int, int, int, string>> alertasTipo, IEnumerable<int> idsFuentes )
+        //{
+        //    var resultado =
+        //        new Dictionary<
+        //            int,
+        //            Tuple<int, int, int, int, string>
+        //        >();
+
+        //    if (alertasTipo == null || alertasTipo.Count == 0)
+        //    {
+        //        return resultado;
+        //    }
+
+        //    var fuentesPermitidas = idsFuentes == null
+        //        ? new List<int>()
+        //        : idsFuentes
+        //            .Distinct()
+        //            .ToList();
+
+        //    var grupos = alertasTipo
+        //        .Where(x =>
+        //            fuentesPermitidas.Contains(x.Item2)
+        //        )
+        //        .GroupBy(x => x.Item1)
+        //        .ToList();
+
+        //    foreach (var grupo in grupos)
+        //    {
+        //        /*
+        //         * Item1 = idPersonaFGEA / idOrigen
+        //         * Item2 = IdTbFuente
+        //         * Item3 = Estatus
+        //         * Item4 = Porcentaje
+        //         * Item5 = IdTipoAlerta
+        //         * Item6 = NombreTipoAlerta
+        //         */
+
+        //        var alertaSeleccionada = grupo
+        //            .OrderByDescending(x =>
+        //                x.Item3 == 1
+        //                    ? 3
+        //                    : x.Item3 == 2
+        //                        ? 2
+        //                        : 1
+        //            )
+        //            .ThenByDescending(x => x.Item4)
+        //            .FirstOrDefault();
+
+        //        if (alertaSeleccionada == null)
+        //        {
+        //            continue;
+        //        }
+
+        //        int idOrigen =
+        //            alertaSeleccionada.Item1;
+
+        //        int idFuente =
+        //            alertaSeleccionada.Item2;
+
+        //        int estatus =
+        //            alertaSeleccionada.Item3;
+
+        //        int porcentaje =
+        //            alertaSeleccionada.Item4;
+
+        //        int idTipoAlerta =
+        //            alertaSeleccionada.Item5;
+
+        //        string nombreTipoAlerta =
+        //            string.IsNullOrWhiteSpace(
+        //                alertaSeleccionada.Item6
+        //            )
+        //                ? "SIN TIPO DE ALERTA"
+        //                : alertaSeleccionada.Item6.Trim();
+
+        //        resultado[idOrigen] = Tuple.Create(
+        //            idFuente,
+        //            estatus,
+        //            porcentaje,
+        //            idTipoAlerta,
+        //            nombreTipoAlerta
+        //        );
+        //    }
+
+        //    return resultado;
+        //}
 
 
         [HttpGet]

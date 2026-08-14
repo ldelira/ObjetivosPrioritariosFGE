@@ -6535,3 +6535,245 @@
     min-height: 125px !important;
     max-height: 125px !important;
 }
+
+/* =========================================================
+   LEGIBILIDAD FINAL - RESULTADOS DE COINCIDENCIAS
+   ========================================================= */
+
+
+/* =========================================================
+   TARJETAS DE RESUMEN SUPERIOR
+   ========================================================= */
+
+.sic-resumen-item span {
+    font-size: 11px !important;
+    line-height: 1.3 !important;
+}
+
+.sic-resumen-item strong {
+    font-size: 22px !important;
+    line-height: 1.2 !important;
+}
+
+.sic-resumen-item > i {
+    font-size: 23px !important;
+}
+
+
+/* =========================================================
+   ENCABEZADO DEL LISTADO
+   ========================================================= */
+
+.sic-listado-header h3 {
+    font-size: 17px !important;
+    line-height: 1.3 !important;
+}
+
+.sic-listado-header > div > span {
+    font-size: 11px !important;
+    line-height: 1.45 !important;
+}
+
+.sic-listado-total {
+    font-size: 13px !important;
+}
+
+
+/* =========================================================
+   TABS
+   ========================================================= */
+
+.sic-tab-resultado {
+    font-size: 12px !important;
+    line-height: 1.3 !important;
+}
+
+    .sic-tab-resultado i {
+        font-size: 12px !important;
+    }
+
+
+/* =========================================================
+   NOMBRE DE LA PERSONA
+   ========================================================= */
+
+.sic-resultado-nombre {
+    font-size: 16px !important;
+    line-height: 1.3 !important;
+}
+
+
+/* =========================================================
+   FUENTE
+   ========================================================= */
+
+.sic-resultado-fuente {
+    font-size: 10px !important;
+    line-height: 1.3 !important;
+}
+
+    .sic-resultado-fuente i {
+        font-size: 10px !important;
+    }
+
+.sic-resultado-fuente-icono {
+    font-size: 11px !important;
+}
+
+
+/* =========================================================
+   ALIAS
+   ========================================================= */
+
+.sic-resultado-alias {
+    font-size: 12px !important;
+    line-height: 1.4 !important;
+}
+
+    .sic-resultado-alias span {
+        font-size: 12px !important;
+    }
+
+    .sic-resultado-alias strong {
+        font-size: 12px !important;
+    }
+
+    .sic-resultado-alias i {
+        font-size: 12px !important;
+    }
+
+
+/* =========================================================
+   EVIDENCIAS
+   Foto 97% / Huella / Nombre
+   ========================================================= */
+
+.sic-evidencia-badge {
+    font-size: 11px !important;
+    line-height: 1.35 !important;
+}
+
+    .sic-evidencia-badge strong {
+        font-size: 12px !important;
+    }
+
+    .sic-evidencia-badge i {
+        font-size: 11px !important;
+    }
+
+
+/* =========================================================
+   TEXTO QUE COINCIDIÓ
+   ========================================================= */
+
+.sic-texto-coincidente {
+    font-size: 11px !important;
+    line-height: 1.45 !important;
+}
+
+    .sic-texto-coincidente span {
+        font-size: 11px !important;
+    }
+
+    .sic-texto-coincidente strong {
+        font-size: 12px !important;
+    }
+
+
+/* =========================================================
+   AVISO DE MANDAMIENTOS
+   ========================================================= */
+
+.sic-aviso-mandamiento-listado {
+    font-size: 11px !important;
+    line-height: 1.4 !important;
+}
+
+    .sic-aviso-mandamiento-listado span {
+        font-size: 11px !important;
+    }
+
+    .sic-aviso-mandamiento-listado strong {
+        font-size: 12px !important;
+    }
+
+
+/* =========================================================
+   DATOS INFERIORES
+   Folio / Municipio / Edad / Sexo
+   ========================================================= */
+
+.sic-resultado-datos {
+    font-size: 12px !important;
+    line-height: 1.5 !important;
+}
+
+    .sic-resultado-datos span {
+        font-size: 12px !important;
+    }
+
+    .sic-resultado-datos b {
+        font-size: 12px !important;
+        font-weight: 700 !important;
+    }
+
+
+/* =========================================================
+   PORCENTAJE DE COINCIDENCIA
+   ========================================================= */
+
+.sic-resultado-puntaje small {
+    font-size: 10px !important;
+    line-height: 1.3 !important;
+}
+
+.sic-resultado-puntaje > strong {
+    font-size: 24px !important;
+    line-height: 1.15 !important;
+}
+
+.sic-resultado-tipo {
+    font-size: 10px !important;
+    line-height: 1.3 !important;
+}
+
+
+/* =========================================================
+   BOTÓN VER DETALLE
+   ========================================================= */
+
+.sic-resultado-puntaje .js-ver-coincidencia {
+    font-size: 11px !important;
+    font-weight: 700 !important;
+}
+
+    .sic-resultado-puntaje .js-ver-coincidencia i {
+        font-size: 11px !important;
+    }
+
+
+/* =========================================================
+   SIN RESULTADOS
+   ========================================================= */
+
+.sic-sin-resultados > strong {
+    font-size: 16px !important;
+}
+
+.sic-sin-resultados > span {
+    font-size: 12px !important;
+    line-height: 1.5 !important;
+}
+
+
+/* =========================================================
+   LOADER DEL DETALLE
+   ========================================================= */
+
+.sic-detalle-loader {
+    font-size: 13px !important;
+}
+
+    .sic-detalle-loader span {
+        font-size: 13px !important;
+    }

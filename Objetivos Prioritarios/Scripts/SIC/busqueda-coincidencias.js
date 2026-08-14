@@ -1397,7 +1397,6 @@
                                 '<span>Buscando...</span>'
                             );
                     },
-
                 success:
                     function (html) {
                         $('#contenedorResultadosCoincidencias')
@@ -1440,7 +1439,30 @@
                             );
 
                         actualizarEstadoBotonBusqueda();
+
+                        /*
+                         * Esperamos a que finalice completamente
+                         * la petición de búsqueda antes de solicitar
+                         * el detalle.
+                         */
+                        window.setTimeout(
+                            function () {
+                                const primerResultado =
+                                    $('.sic-resultado-persona:visible')
+                                        .first();
+
+                                if (primerResultado.length === 0) {
+                                    return;
+                                }
+
+                                seleccionarResultadoDesdeElemento(
+                                    primerResultado
+                                );
+                            },
+                            100
+                        );
                     }
+                
             });
     }
 

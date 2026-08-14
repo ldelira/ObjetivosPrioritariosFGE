@@ -1118,6 +1118,21 @@ namespace Objetivos_Prioritarios.ControllersServices
 
 
             /*
+             * ============================================================
+             * ALIAS REALES DE OBJETIVOS PRIORITARIOS
+             * ============================================================
+             *
+             * El SP utilizado para la tarjeta no devuelve los alias
+             * reales de la persona objetivo.
+             *
+             * Los obtenemos desde el detalle de Fuente 5.
+             */
+            await EnriquecerAliasObjetivosPrioritariosAsync(
+                coincidencias
+            );
+
+
+            /*
              * Después del enriquecimiento guardamos
              * los candidatos completos en sesión.
              *
@@ -1834,9 +1849,9 @@ namespace Objetivos_Prioritarios.ControllersServices
             /*
              * Fuente 1 - C5.
              */
-            //EnriquecerCoincidenciasC5(
-            //    coincidencias
-            //);
+            EnriquecerCoincidenciasC5(
+                coincidencias
+            );
 
 
             /*
@@ -2833,8 +2848,7 @@ namespace Objetivos_Prioritarios.ControllersServices
                   * Los alias reales del objetivo se obtienen mediante
                   * el endpoint de detalle.
                   */
-                coincidencia.Alias =
-                    "SIN INFORMACIÓN";
+                
 
                 /* ============================================================
                    IDENTIFICADORES
@@ -3668,6 +3682,235 @@ namespace Objetivos_Prioritarios.ControllersServices
             }
         }
 
+        public async Task<DetalleC5ApiDto> ObtenerDetalleC5Async(int idDetenido)
+        {
+            if (idDetenido <= 0)
+            {
+                throw new ArgumentException(
+                    "El ID del detenido no es válido."
+                );
+            }
+
+            ValidarConfiguracionApi();
+
+            string url =
+                ConstruirUrlRecursoApi(
+                    "c5/" +
+                    idDetenido +
+                    "/detalle"
+                );
+
+            using (var solicitud =
+                new HttpRequestMessage(
+                    HttpMethod.Get,
+                    url
+                ))
+            {
+                solicitud.Headers.Add(
+                    "X-API-TOKEN",
+                    _tokenApi
+                );
+
+                HttpResponseMessage respuesta =
+                    await ClienteHttp.SendAsync(
+                        solicitud
+                    );
+
+                string contenido =
+                    await respuesta.Content
+                        .ReadAsStringAsync();
+
+                if (respuesta.StatusCode ==
+                    System.Net.HttpStatusCode.NotFound)
+                {
+                    return null;
+                }
+
+                if (!respuesta.IsSuccessStatusCode)
+                {
+                    throw new InvalidOperationException(
+                        ObtenerMensajeErrorApi(
+                            contenido,
+                            respuesta.StatusCode
+                        )
+                    );
+                }
+
+                DetalleC5ApiDto detalle =
+                    JsonConvert
+                        .DeserializeObject<DetalleC5ApiDto>(
+                            contenido
+                        );
+
+                if (detalle == null)
+                {
+                    throw new InvalidOperationException(
+                        "La API regresó un detalle C5 vacío."
+                    );
+                }
+
+                return detalle;
+            }
+        }
+
+
+        public async Task<DetalleFGEADetenidoApiDto>
+    ObtenerDetalleFGEADetenidoAsync(int clavePerso)
+        {
+            if (clavePerso <= 0)
+            {
+                throw new ArgumentException(
+                    "La CLAVE_PERSO no es válida."
+                );
+            }
+
+            ValidarConfiguracionApi();
+
+            string url =
+                ConstruirUrlRecursoApi(
+                    "fgea-detenidos/" +
+                    clavePerso +
+                    "/detalle"
+                );
+
+            using (var solicitud =
+                new HttpRequestMessage(
+                    HttpMethod.Get,
+                    url
+                ))
+            {
+                solicitud.Headers.Add(
+                    "X-API-TOKEN",
+                    _tokenApi
+                );
+
+                HttpResponseMessage respuesta =
+                    await ClienteHttp.SendAsync(
+                        solicitud
+                    );
+
+                string contenido =
+                    await respuesta.Content
+                        .ReadAsStringAsync();
+
+                if (
+                    respuesta.StatusCode ==
+                    System.Net.HttpStatusCode.NotFound
+                )
+                {
+                    return null;
+                }
+
+                if (!respuesta.IsSuccessStatusCode)
+                {
+                    throw new InvalidOperationException(
+                        ObtenerMensajeErrorApi(
+                            contenido,
+                            respuesta.StatusCode
+                        )
+                    );
+                }
+
+                DetalleFGEADetenidoApiDto detalle =
+                    JsonConvert
+                        .DeserializeObject<DetalleFGEADetenidoApiDto>(
+                            contenido
+                        );
+
+                if (detalle == null)
+                {
+                    throw new InvalidOperationException(
+                        "La API regresó un detalle FGEA Detenidos vacío."
+                    );
+                }
+
+                return detalle;
+            }
+        }
+
+
+        private async Task EnriquecerAliasObjetivosPrioritariosAsync(
+    List<CoincidenciaResultadoViewModel> coincidencias)
+        {
+            if (
+                coincidencias == null ||
+                coincidencias.Count == 0
+            )
+            {
+                return;
+            }
+
+            List<CoincidenciaResultadoViewModel> objetivos =
+                coincidencias
+                    .Where(x =>
+                        x.IdTbFuente == 5 &&
+                        x.IdPersona > 0
+                    )
+                    .ToList();
+
+            if (objetivos.Count == 0)
+            {
+                return;
+            }
+
+            foreach (
+                CoincidenciaResultadoViewModel coincidencia
+                in objetivos
+            )
+            {
+                try
+                {
+                    DetalleObjetivoApiDto detalle =
+                        await ObtenerDetalleObjetivoAsync(
+                            coincidencia.IdPersona
+                        );
+
+                    if (
+                        detalle == null ||
+                        detalle.Alias == null ||
+                        detalle.Alias.Count == 0
+                    )
+                    {
+                        continue;
+                    }
+
+                    List<string> aliasReales =
+                        detalle.Alias
+                            .Where(x =>
+                                !string.IsNullOrWhiteSpace(x)
+                            )
+                            .Select(x =>
+                                x.Trim()
+                            )
+                            .Distinct(
+                                StringComparer.OrdinalIgnoreCase
+                            )
+                            .ToList();
+
+                    if (aliasReales.Count == 0)
+                    {
+                        continue;
+                    }
+
+                    coincidencia.Alias =
+                        string.Join(
+                            ", ",
+                            aliasReales
+                        );
+                }
+                catch
+                {
+                    /*
+                     * Si falla el detalle del objetivo,
+                     * no tumbamos toda la búsqueda.
+                     *
+                     * Conservamos el AliasCoincidente que ya
+                     * pudiera haber regresado la API biométrica.
+                     */
+                    continue;
+                }
+            }
+        }
 
 
     }

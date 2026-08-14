@@ -86,164 +86,438 @@
         Model.AsuntosRelacionados == null
             ? 0
             : Model.AsuntosRelacionados.Count;
+
+
+    string imagenNoDisponible =
+    Url.Content(
+        "~/Content/imagenes/Nodisponible.jpg"
+    );
+
+    string nombrePrincipal =
+        string.IsNullOrWhiteSpace(Model.NombrePrincipal)
+            ? "SIN INFORMACIÓN"
+            : Model.NombrePrincipal.Trim();
+
+    string aliasPrincipal =
+        Model.Alias != null &&
+        Model.Alias.Count > 0
+            ? Model.Alias.FirstOrDefault()
+            : "";
+
+    string fechaNacimientoTexto =
+        Model.FechaNacimiento.HasValue
+            ? Model.FechaNacimiento.Value.ToString("dd/MM/yyyy")
+            : "SIN INFORMACIÓN";
+
+    string clavePersonaTexto =
+        Model.ClavesPersoRelacionadas != null &&
+        Model.ClavesPersoRelacionadas.Count > 0
+            ? string.Join(
+                ", ",
+                Model.ClavesPersoRelacionadas
+            )
+            : "SIN INFORMACIÓN";
+
+
+
+    /*
+ * ============================================================
+ * EVIDENCIA PRINCIPAL
+ * ============================================================
+ *
+ * Se muestra la evidencia individual con mayor porcentaje.
+ *
+ * En caso de empate:
+ *
+ * Huella > Fotografía > Alias > Nombre
+ * ============================================================
+ */
+
+    decimal porcentajeEvidenciaPrincipal = 0;
+
+    string evidenciaTexto =
+        "Coincidencia encontrada";
+
+    string evidenciaIcono =
+        "fa-check-circle";
+
+
+    if (coincidencia != null)
+    {
+        decimal porcentajeNombre =
+            coincidencia.PorcentajeNombre;
+
+        decimal porcentajeAlias =
+            coincidencia.PorcentajeAlias;
+
+        decimal porcentajeFoto =
+            coincidencia.PorcentajeFoto;
+
+        decimal porcentajeHuella =
+            coincidencia.PorcentajeHuella;
+
+
+        /*
+         * NOMBRE
+         */
+        if (porcentajeNombre > 0)
+        {
+            porcentajeEvidenciaPrincipal =
+                porcentajeNombre;
+
+            evidenciaTexto =
+                "Coincidencia por nombre";
+
+            evidenciaIcono =
+                "fa-user";
+        }
+
+
+        /*
+         * ALIAS
+         */
+        if (
+            porcentajeAlias > 0 &&
+            porcentajeAlias > porcentajeEvidenciaPrincipal
+        )
+        {
+            porcentajeEvidenciaPrincipal =
+                porcentajeAlias;
+
+            evidenciaTexto =
+                "Coincidencia por alias";
+
+            evidenciaIcono =
+                "fa-user-secret";
+        }
+
+
+        /*
+         * TEXTO
+         *
+         * Respaldo por si la API trae PorcentajeTexto
+         * pero no separó Nombre / Alias.
+         */
+        if (
+            porcentajeEvidenciaPrincipal <= 0 &&
+            coincidencia.PorcentajeTexto > 0
+        )
+        {
+            porcentajeEvidenciaPrincipal =
+                coincidencia.PorcentajeTexto;
+
+            evidenciaTexto =
+                "Coincidencia textual";
+
+            evidenciaIcono =
+                "fa-font";
+        }
+
+
+        /*
+         * FOTOGRAFÍA
+         *
+         * >= para que biometría gane en caso de empate.
+         */
+        if (
+            porcentajeFoto > 0 &&
+            porcentajeFoto >= porcentajeEvidenciaPrincipal
+        )
+        {
+            porcentajeEvidenciaPrincipal =
+                porcentajeFoto;
+
+            evidenciaTexto =
+                "Comparación de fotografía";
+
+            evidenciaIcono =
+                "fa-camera";
+        }
+
+
+        /*
+         * HUELLA
+         *
+         * >= para que huella gane también un empate
+         * contra fotografía.
+         */
+        if (
+            porcentajeHuella > 0 &&
+            porcentajeHuella >= porcentajeEvidenciaPrincipal
+        )
+        {
+            porcentajeEvidenciaPrincipal =
+                porcentajeHuella;
+
+            evidenciaTexto =
+                "Comparación de huella";
+
+            evidenciaIcono =
+                "fa-hand-pointer-o";
+        }
+    }
+
+
+
+
 }
 
 
 <style>
+
+    /* =========================================================
+       CONTENEDOR GENERAL
+       ========================================================= */
+
     .sic-obj-detalle {
+        padding: 28px;
+        color: #111a3b;
+        box-sizing: border-box;
         font-family: inherit;
-        color: #0d1b55;
     }
 
+
+    /* =========================================================
+       CABECERA
+       ========================================================= */
+
     .sic-obj-header {
-        border: 1px solid #dbe3f3;
-        border-radius: 14px;
-        padding: 14px;
-        background: #fff;
-        margin-bottom: 12px;
+        padding-bottom: 20px;
+        margin-bottom: 14px;
+        border-bottom: 1px solid #e3e8f1;
     }
 
     .sic-obj-header-grid {
         display: grid;
-        grid-template-columns: 115px minmax(0, 1fr);
-        gap: 16px;
+        grid-template-columns: 112px minmax(0, 1fr);
+        gap: 18px;
         align-items: start;
     }
 
     .sic-obj-foto {
-        width: 115px;
-        height: 145px;
-        border-radius: 12px;
+        width: 112px;
+        height: 135px;
         overflow: hidden;
-        border: 1px solid #dbe3f3;
-        background: #f4f6fb;
+        border: 1px solid #d8dfec;
+        border-radius: 10px;
+        background: #f5f7fb;
     }
 
         .sic-obj-foto img {
+            display: block;
             width: 100%;
             height: 100%;
             object-fit: cover;
-            display: block;
         }
+
+
+    /* =========================================================
+       FUENTE
+       ========================================================= */
 
     .sic-obj-fuente {
         display: inline-flex;
         align-items: center;
         gap: 6px;
-        padding: 5px 9px;
-        border-radius: 999px;
-        font-size: 10px;
+        margin-bottom: 10px;
+        padding: 7px 11px;
+        border: 1px solid #efb8c0;
+        border-radius: 18px;
+        background: #fff0f2;
+        color: #a22638;
+        font-size: 11px;
+        line-height: 1.3;
         font-weight: 800;
         text-transform: uppercase;
-        background: #fff0f1;
-        color: #a92335;
-        border: 1px solid #f0bbc2;
-        margin-bottom: 8px;
     }
 
+
+    /* =========================================================
+       IDENTIDAD PRINCIPAL
+       ========================================================= */
+
     .sic-obj-nombre {
-        margin: 0 0 5px 0;
-        font-size: 18px;
-        line-height: 1.15;
+        margin: 0;
+        color: #0d1743;
+        font-size: 23px;
+        line-height: 1.2;
         font-weight: 900;
-        color: #09165f;
+        text-transform: uppercase;
     }
 
     .sic-obj-id {
-        color: #61708f;
-        font-size: 11px;
-        margin-bottom: 12px;
+        margin-top: 7px;
+        margin-bottom: 0;
+        color: #626d84;
+        font-size: 13px;
+        line-height: 1.4;
     }
+
+        .sic-obj-id strong {
+            color: #121b39;
+        }
+
+
+    /* =========================================================
+       RESUMEN SUPERIOR
+       ========================================================= */
 
     .sic-obj-info-grid {
         display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 8px;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 9px;
+        margin-top: 17px;
     }
 
     .sic-obj-info {
-        border: 1px solid #e1e6f0;
-        border-radius: 9px;
-        padding: 8px 9px;
+        min-height: 75px;
+        padding: 12px;
+        border: 1px solid #e0e6f0;
+        border-radius: 8px;
         background: #fafbfe;
+        box-sizing: border-box;
     }
 
     .sic-obj-label {
         display: block;
-        font-size: 9px;
-        font-weight: 800;
+        margin-bottom: 10px;
+        color: #7e879c;
+        font-size: 11px;
+        line-height: 1.3;
+        font-weight: 700;
         text-transform: uppercase;
-        color: #71809f;
-        margin-bottom: 3px;
     }
 
     .sic-obj-value {
-        font-size: 11px;
+        color: #0d1738;
+        font-size: 14px;
+        line-height: 1.4;
         font-weight: 800;
-        color: #0c1556;
         overflow-wrap: anywhere;
     }
 
+
+    /* =========================================================
+       EVIDENCIA PRINCIPAL
+       ========================================================= */
+
     .sic-obj-evidencia {
-        border: 1px solid #b9ebd1;
-        border-left: 4px solid #36ba79;
-        border-radius: 11px;
-        background: #f1fff7;
-        padding: 11px;
-        margin-bottom: 12px;
+        margin-bottom: 14px;
+        padding: 0;
+        border: 1px solid #b9e1c4;
+        border-radius: 9px;
+        background: #f0fbf3;
+        overflow: hidden;
     }
 
-    .sic-obj-evidencia-titulo {
-        font-size: 10px;
-        font-weight: 900;
-        color: #17824e;
-        text-transform: uppercase;
-        margin-bottom: 8px;
+    .sic-obj-evidencia-principal {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px;
     }
+
+    .sic-obj-evidencia-icono {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        min-width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: #daf3e1;
+        color: #30964d;
+        font-size: 14px;
+    }
+
+    .sic-obj-evidencia-info {
+        flex: 1;
+    }
+
+        .sic-obj-evidencia-info small {
+            display: block;
+            margin-bottom: 5px;
+            color: #52745b;
+            font-size: 10px;
+            line-height: 1.3;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .sic-obj-evidencia-info span {
+            color: #142319;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+    .sic-obj-evidencia-porcentaje {
+        color: #247438;
+        font-size: 20px;
+        line-height: 1.2;
+        font-weight: 900;
+    }
+
+
+    /* =========================================================
+       DESGLOSE DE EVIDENCIAS
+       ========================================================= */
 
     .sic-obj-evidencia-grid {
         display: flex;
         flex-wrap: wrap;
-        gap: 7px;
+        gap: 8px;
+        padding: 11px 14px;
+        border-top: 1px solid #d7eadc;
+        background: rgba(255,255,255,.45);
     }
 
     .sic-obj-evidencia-item {
-        background: #fff;
+        min-width: 100px;
+        padding: 7px 10px;
         border: 1px solid #c9ead8;
-        border-radius: 8px;
-        padding: 6px 9px;
-        min-width: 90px;
+        border-radius: 7px;
+        background: #fff;
     }
 
         .sic-obj-evidencia-item span {
             display: block;
-            font-size: 9px;
+            margin-bottom: 4px;
             color: #738079;
+            font-size: 10px;
+            line-height: 1.3;
         }
 
         .sic-obj-evidencia-item strong {
             display: block;
-            margin-top: 2px;
-            font-size: 13px;
             color: #15804c;
+            font-size: 14px;
+            line-height: 1.3;
+            font-weight: 900;
         }
 
+
+    /* =========================================================
+       SECCIONES
+       ========================================================= */
+
     .sic-obj-seccion {
-        border: 1px solid #dfe5f0;
-        border-radius: 11px;
-        background: #fff;
-        margin-bottom: 8px;
+        margin-bottom: 9px;
         overflow: hidden;
+        border: 1px solid #dce3ef;
+        border-radius: 8px;
+        background: #fff;
     }
 
         .sic-obj-seccion summary {
-            list-style: none;
-            cursor: pointer;
-            padding: 11px 12px;
+            position: relative;
             display: flex;
             align-items: center;
             justify-content: space-between;
             gap: 10px;
+            padding: 12px 14px;
+            background: #f7f9fd;
+            cursor: pointer;
+            list-style: none;
             user-select: none;
         }
 
@@ -253,7 +527,6 @@
 
         .sic-obj-seccion[open] summary {
             border-bottom: 1px solid #e4e9f2;
-            background: #fafbfe;
         }
 
     .sic-obj-seccion-titulo {
@@ -261,41 +534,65 @@
         align-items: center;
         gap: 8px;
         min-width: 0;
-        font-size: 11px;
-        font-weight: 900;
-        color: #0c1556;
+        color: #101a42;
+        font-size: 14px;
+        line-height: 1.4;
+        font-weight: 800;
     }
 
         .sic-obj-seccion-titulo i {
             width: 18px;
-            text-align: center;
             color: #5158ff;
+            text-align: center;
         }
 
+        .sic-obj-seccion-titulo > span {
+            color: #7c879e !important;
+            font-size: 11px !important;
+            font-weight: 500 !important;
+        }
+
+
+    /* =========================================================
+       CONTADORES
+       ========================================================= */
+
     .sic-obj-contador {
-        flex: 0 0 auto;
-        min-width: 25px;
-        height: 25px;
-        border-radius: 999px;
-        background: #eef0ff;
-        color: #4b52e8;
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        font-size: 10px;
+        flex: 0 0 auto;
+        min-width: 23px;
+        height: 23px;
+        padding: 0 6px;
+        border-radius: 12px;
+        background: #e9edff;
+        color: #4b52e8;
+        font-size: 11px;
         font-weight: 900;
+        box-sizing: border-box;
     }
+
+
+    /* =========================================================
+       CONTENIDO
+       ========================================================= */
 
     .sic-obj-contenido {
-        padding: 12px;
+        padding: 13px;
     }
 
+
+    /* =========================================================
+       REGISTROS
+       ========================================================= */
+
     .sic-obj-registro {
+        margin-bottom: 9px;
+        padding: 13px 14px;
         border: 1px solid #e3e7ef;
-        border-radius: 9px;
-        padding: 10px;
-        margin-bottom: 8px;
-        background: #fff;
+        border-radius: 8px;
+        background: #fbfcfe;
     }
 
         .sic-obj-registro:last-child {
@@ -303,31 +600,43 @@
         }
 
     .sic-obj-registro-titulo {
-        font-size: 11px;
-        font-weight: 900;
+        margin-bottom: 7px;
         color: #10185c;
-        margin-bottom: 5px;
+        font-size: 14px;
+        line-height: 1.4;
+        font-weight: 900;
     }
 
     .sic-obj-registro-sub {
-        color: #697693;
-        font-size: 10px;
-        line-height: 1.45;
+        color: #58647d;
+        font-size: 12px;
+        line-height: 1.65;
     }
+
+        .sic-obj-registro-sub strong {
+            color: #222d4d;
+            font-weight: 800;
+        }
+
+
+    /* =========================================================
+       TAGS
+       ========================================================= */
 
     .sic-obj-tags {
         display: flex;
         flex-wrap: wrap;
-        gap: 5px;
-        margin-top: 7px;
+        gap: 6px;
+        margin-top: 9px;
     }
 
     .sic-obj-tag {
+        padding: 5px 9px;
+        border-radius: 12px;
         background: #eef0ff;
         color: #434ae0;
-        border-radius: 999px;
-        padding: 4px 7px;
-        font-size: 9px;
+        font-size: 11px;
+        line-height: 1.3;
         font-weight: 800;
     }
 
@@ -341,40 +650,80 @@
         color: #b52839;
     }
 
-    .sic-obj-vacio {
-        font-size: 10px;
-        color: #8791a6;
-        padding: 4px 0;
-    }
 
-    .sic-obj-alerta-mandamientos {
-        border: 1px solid #efd27c;
-        background: #fff9e7;
-        border-radius: 10px;
-        padding: 10px;
-        margin-top: 8px;
-        color: #705500;
-        font-size: 10px;
-    }
+    /* =========================================================
+       OBSERVACIONES
+       ========================================================= */
 
     .sic-obj-observacion {
-        margin-top: 8px;
-        background: #f8f9fc;
+        margin-top: 9px;
+        padding: 10px 12px;
         border-left: 3px solid #b7bfce;
-        padding: 7px 9px;
-        font-size: 10px;
-        line-height: 1.45;
+        border-radius: 4px;
+        background: #f8f9fc;
         color: #535e75;
+        font-size: 12px;
+        line-height: 1.65;
     }
 
-    @@media (max-width: 1100px) {
-        .sic-obj-header-grid {
-            grid-template-columns: 95px minmax(0, 1fr);
+        .sic-obj-observacion strong {
+            color: #303a54;
+            font-weight: 800;
         }
 
-        .sic-obj-foto {
-            width: 95px;
-            height: 125px;
+
+    /* =========================================================
+       VACÍOS
+       ========================================================= */
+
+    .sic-obj-vacio {
+        padding: 7px 0;
+        color: #8791a6;
+        font-size: 12px;
+        line-height: 1.5;
+    }
+
+
+    /* =========================================================
+       MANDAMIENTOS
+       ========================================================= */
+
+    .sic-obj-alerta-mandamientos {
+        margin-top: 10px;
+        padding: 12px;
+        border: 1px solid #efd27c;
+        border-radius: 8px;
+        background: #fff9e7;
+        color: #705500;
+        font-size: 12px;
+        line-height: 1.55;
+    }
+
+
+    /* =========================================================
+       RESPONSIVE
+       ========================================================= */
+
+    @@media (max-width: 1100px) {
+
+        .sic-obj-detalle {
+            padding: 18px;
+        }
+
+        .sic-obj-info-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+
+    @@media (max-width: 750px) {
+
+        .sic-obj-header-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .sic-obj-info-grid {
+            grid-template-columns: 1fr;
         }
     }
 </style>
@@ -391,70 +740,84 @@
         <div class="sic-obj-header-grid">
 
             <div class="sic-obj-foto">
+
                 <img src="@fotoUrl"
-                     alt="@Model.NombrePrincipal"
-                     onerror="this.src='@Url.Content("~/Content/imagenes/Nodisponible.jpg")';" />
+                     alt="@nombrePrincipal"
+                     onerror="this.onerror=null;this.src='@imagenNoDisponible';" />
+
             </div>
+
 
             <div>
 
                 <div class="sic-obj-fuente">
+
                     <i class="fa fa-database"></i>
+
                     FGEA - OBJETIVOS PRIORITARIOS
+
                 </div>
 
+
                 <h2 class="sic-obj-nombre">
-                    @(string.IsNullOrWhiteSpace(Model.NombrePrincipal)
-                        ? "SIN INFORMACIÓN"
-                        : Model.NombrePrincipal)
+                    @nombrePrincipal
                 </h2>
 
+
                 <div class="sic-obj-id">
-                    Objetivo #@Model.IdObjetivo
+
+                    Objetivo:
+
+                    <strong>
+                        #@Model.IdObjetivo
+                    </strong>
+
+                    @if (!string.IsNullOrWhiteSpace(aliasPrincipal))
+                    {
+                        <text>
+                            &nbsp; · &nbsp; Alias:
+                            <strong>@aliasPrincipal</strong>
+                        </text>
+                    }
+
                 </div>
 
 
                 <div class="sic-obj-info-grid">
 
-                    <div class="sic-obj-info">
-                        <span class="sic-obj-label">
-                            Alias
-                        </span>
-
-                        <div class="sic-obj-value">
-                            @(Model.Alias != null && Model.Alias.Count > 0
-                                ? string.Join(", ", Model.Alias)
-                                : "SIN INFORMACIÓN")
-                        </div>
-                    </div>
-
 
                     <div class="sic-obj-info">
+
                         <span class="sic-obj-label">
-                            Fecha de nacimiento
+                            Edad
                         </span>
 
                         <div class="sic-obj-value">
 
-                            @if (Model.FechaNacimiento.HasValue)
-                            {
-                                @Model.FechaNacimiento.Value.ToString("dd/MM/yyyy")
-
-                                if (edad > 0)
-                                {
-                                    <text> · @edad años</text>
-                                }
-                            }
-                            else
-                            {
-                                <text>SIN INFORMACIÓN</text>
-                            }
+                            @(edad > 0
+                            ? edad + " años"
+                            : "SIN INFORMACIÓN")
 
                         </div>
+
                     </div>
 
 
                     <div class="sic-obj-info">
+
+                        <span class="sic-obj-label">
+                            Fecha nacimiento
+                        </span>
+
+                        <div class="sic-obj-value">
+                            @fechaNacimientoTexto
+                        </div>
+
+                    </div>
+
+
+                    <div class="sic-obj-info">
+
                         <span class="sic-obj-label">
                             Estatus del proceso
                         </span>
@@ -462,23 +825,20 @@
                         <div class="sic-obj-value">
                             @estatusProceso
                         </div>
+
                     </div>
 
 
                     <div class="sic-obj-info">
+
                         <span class="sic-obj-label">
                             Clave persona
                         </span>
 
                         <div class="sic-obj-value">
-                            @(Model.ClavesPersoRelacionadas != null &&
-                              Model.ClavesPersoRelacionadas.Count > 0
-                                ? string.Join(
-                                    ", ",
-                                    Model.ClavesPersoRelacionadas
-                                )
-                                : "SIN INFORMACIÓN")
+                            @clavePersonaTexto
                         </div>
+
                     </div>
 
                 </div>
@@ -491,16 +851,27 @@
         @if (!string.IsNullOrWhiteSpace(Model.DescripcionEstatusProceso))
         {
             <div class="sic-obj-observacion">
-                <strong>Descripción del estatus:</strong>
+
+                <strong>
+                    Descripción del estatus:
+                </strong>
+
                 @Model.DescripcionEstatusProceso
+
             </div>
         }
+
 
         @if (!string.IsNullOrWhiteSpace(Model.ObservacionesFicha))
         {
             <div class="sic-obj-observacion">
-                <strong>Observaciones:</strong>
+
+                <strong>
+                    Observaciones:
+                </strong>
+
                 @Model.ObservacionesFicha
+
             </div>
         }
 
@@ -515,9 +886,34 @@
     {
         <div class="sic-obj-evidencia">
 
-            <div class="sic-obj-evidencia-titulo">
-                <i class="fa fa-check-circle"></i>
-                Evidencia de la coincidencia
+            <div class="sic-obj-evidencia-principal">
+
+                <div class="sic-obj-evidencia-icono">
+
+                    <i class="fa @evidenciaIcono"></i>
+
+                </div>
+
+
+                <div class="sic-obj-evidencia-info">
+
+                    <small>
+                        Evidencia principal
+                    </small>
+
+                    <span>
+                        @evidenciaTexto
+                    </span>
+
+                </div>
+
+
+                <div class="sic-obj-evidencia-porcentaje">
+
+                    @porcentajeEvidenciaPrincipal.ToString("0")%
+
+                </div>
+
             </div>
 
 
@@ -526,10 +922,15 @@
                 @if (coincidencia.PorcentajeNombre > 0)
                 {
                     <div class="sic-obj-evidencia-item">
-                        <span>Nombre</span>
+
+                        <span>
+                            Nombre
+                        </span>
+
                         <strong>
                             @coincidencia.PorcentajeNombre.ToString("0")%
                         </strong>
+
                     </div>
                 }
 
@@ -537,10 +938,15 @@
                 @if (coincidencia.PorcentajeAlias > 0)
                 {
                     <div class="sic-obj-evidencia-item">
-                        <span>Alias</span>
+
+                        <span>
+                            Alias
+                        </span>
+
                         <strong>
                             @coincidencia.PorcentajeAlias.ToString("0")%
                         </strong>
+
                     </div>
                 }
 
@@ -548,10 +954,15 @@
                 @if (coincidencia.PorcentajeFoto > 0)
                 {
                     <div class="sic-obj-evidencia-item">
-                        <span>Fotografía</span>
+
+                        <span>
+                            Fotografía
+                        </span>
+
                         <strong>
                             @coincidencia.PorcentajeFoto.ToString("0")%
                         </strong>
+
                     </div>
                 }
 
@@ -559,31 +970,32 @@
                 @if (coincidencia.PorcentajeHuella > 0)
                 {
                     <div class="sic-obj-evidencia-item">
-                        <span>Huella</span>
+
+                        <span>
+                            Huella
+                        </span>
+
                         <strong>
                             @coincidencia.PorcentajeHuella.ToString("0")%
                         </strong>
+
                     </div>
                 }
-
-
-                <div class="sic-obj-evidencia-item">
-                    <span>Mejor coincidencia</span>
-                    <strong>
-                        @coincidencia.SimilitudGlobal.ToString("0")%
-                    </strong>
-                </div>
 
             </div>
 
 
             @if (!string.IsNullOrWhiteSpace(coincidencia.TextoCoincidente))
             {
-                <div class="sic-obj-observacion">
+                <div class="sic-obj-observacion"
+                     style="margin:0 14px 14px 14px;">
+
                     Coincidió con:
+
                     <strong>
                         @coincidencia.TextoCoincidente
                     </strong>
+
                 </div>
             }
 

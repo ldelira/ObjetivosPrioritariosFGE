@@ -1,0 +1,1365 @@
+﻿@model Objetivos_Prioritarios.Models.Extends.DetalleC5ApiDto
+
+@using System
+@using Objetivos_Prioritarios.Models.Extends
+
+@{
+    CoincidenciaResultadoViewModel coincidencia =
+        ViewBag.Coincidencia
+        as CoincidenciaResultadoViewModel;
+
+    string imagenNoDisponible =
+        Url.Content(
+            "~/Content/imagenes/Nodisponible.jpg"
+        );
+
+    string fotoUrl =
+        imagenNoDisponible;
+
+    if (
+        coincidencia != null &&
+        !string.IsNullOrWhiteSpace(
+            coincidencia.FotoUrl
+        )
+    )
+    {
+        if (
+            coincidencia.FotoUrl.StartsWith(
+                "http",
+                StringComparison.OrdinalIgnoreCase
+            )
+        )
+        {
+            fotoUrl =
+                coincidencia.FotoUrl;
+        }
+        else
+        {
+            fotoUrl =
+                Url.Content(
+                    coincidencia.FotoUrl
+                );
+        }
+    }
+
+
+    string nombre =
+        string.IsNullOrWhiteSpace(
+            Model.NombreCompleto
+        )
+            ? "SIN INFORMACIÓN"
+            : Model.NombreCompleto.Trim();
+
+
+    string alias =
+        string.IsNullOrWhiteSpace(
+            Model.Alias
+        )
+            ? "SIN INFORMACIÓN"
+            : Model.Alias.Trim();
+
+
+    string sexo =
+        string.IsNullOrWhiteSpace(
+            Model.Sexo
+        )
+            ? "SIN INFORMACIÓN"
+            : Model.Sexo.Trim();
+
+
+    string edad =
+        Model.Edad.HasValue &&
+        Model.Edad.Value > 0
+            ? Model.Edad.Value + " años"
+            : "SIN INFORMACIÓN";
+
+
+    string municipio =
+        string.IsNullOrWhiteSpace(
+            Model.Municipio
+        )
+            ? "SIN INFORMACIÓN"
+            : Model.Municipio.Trim();
+
+
+    string folio =
+        string.IsNullOrWhiteSpace(
+            Model.Folio
+        )
+            ? "SIN INFORMACIÓN"
+            : Model.Folio.Trim();
+
+
+    string fuente =
+        string.IsNullOrWhiteSpace(
+            Model.Fuente
+        )
+            ? "C5 - Detenidos"
+            : Model.Fuente.Trim();
+
+
+    string fuenteMostrar =
+        municipio.Equals(
+            "SIN INFORMACIÓN",
+            StringComparison.OrdinalIgnoreCase
+        )
+            ? fuente
+            : fuente + " · " + municipio;
+
+
+    string fechaDetencion =
+        Model.FechaDetencion.HasValue
+            ? Model.FechaDetencion.Value
+                .ToString("dd/MM/yyyy")
+            : "SIN INFORMACIÓN";
+
+
+    string horaDetencion =
+        string.IsNullOrWhiteSpace(
+            Model.HoraDetencion
+        )
+            ? "SIN INFORMACIÓN"
+            : Model.HoraDetencion.Trim();
+
+
+    /*
+* ============================================================
+* EVIDENCIA PRINCIPAL
+* ============================================================
+*
+* Determina cuál fue la evidencia individual con el
+* porcentaje más alto.
+*
+* En caso de empate damos prioridad a biometría:
+*
+* Huella > Fotografía > Alias > Nombre
+* ============================================================
+*/
+
+    decimal porcentajeEvidenciaPrincipal = 0;
+
+    string evidenciaTexto =
+        "Coincidencia encontrada";
+
+    string evidenciaIcono =
+        "fa-check-circle";
+
+
+    if (coincidencia != null)
+    {
+        decimal porcentajeNombre =
+            coincidencia.PorcentajeNombre;
+
+        decimal porcentajeAlias =
+            coincidencia.PorcentajeAlias;
+
+        decimal porcentajeFoto =
+            coincidencia.PorcentajeFoto;
+
+        decimal porcentajeHuella =
+            coincidencia.PorcentajeHuella;
+
+
+        /*
+         * NOMBRE
+         */
+        if (porcentajeNombre > 0)
+        {
+            porcentajeEvidenciaPrincipal =
+                porcentajeNombre;
+
+            evidenciaTexto =
+                "Coincidencia por nombre";
+
+            evidenciaIcono =
+                "fa-user";
+        }
+
+
+        /*
+         * ALIAS
+         */
+        if (
+            porcentajeAlias > 0 &&
+            porcentajeAlias > porcentajeEvidenciaPrincipal
+        )
+        {
+            porcentajeEvidenciaPrincipal =
+                porcentajeAlias;
+
+            evidenciaTexto =
+                "Coincidencia por alias";
+
+            evidenciaIcono =
+                "fa-user-secret";
+        }
+
+
+        /*
+         * TEXTO
+         *
+         * Solamente se utiliza como respaldo si por alguna razón
+         * la API trae PorcentajeTexto pero no separó Nombre/Alias.
+         */
+        if (
+            porcentajeEvidenciaPrincipal <= 0 &&
+            coincidencia.PorcentajeTexto > 0
+        )
+        {
+            porcentajeEvidenciaPrincipal =
+                coincidencia.PorcentajeTexto;
+
+            evidenciaTexto =
+                "Coincidencia textual";
+
+            evidenciaIcono =
+                "fa-font";
+        }
+
+
+        /*
+         * FOTOGRAFÍA
+         *
+         * >= porque si empata con texto/nombre/alias,
+         * preferimos mostrar la evidencia biométrica.
+         */
+        if (
+            porcentajeFoto > 0 &&
+            porcentajeFoto >= porcentajeEvidenciaPrincipal
+        )
+        {
+            porcentajeEvidenciaPrincipal =
+                porcentajeFoto;
+
+            evidenciaTexto =
+                "Comparación de fotografía";
+
+            evidenciaIcono =
+                "fa-camera";
+        }
+
+
+        /*
+         * HUELLA
+         *
+         * >= hace que huella gane también un empate
+         * contra fotografía.
+         */
+        if (
+            porcentajeHuella > 0 &&
+            porcentajeHuella >= porcentajeEvidenciaPrincipal
+        )
+        {
+            porcentajeEvidenciaPrincipal =
+                porcentajeHuella;
+
+            evidenciaTexto =
+                "Comparación de huella";
+
+            evidenciaIcono =
+                "fa-hand-pointer-o";
+        }
+    }
+
+
+    bool tieneUbicacion =
+!string.IsNullOrWhiteSpace(Model.Calle) ||
+!string.IsNullOrWhiteSpace(Model.Colonia) ||
+!string.IsNullOrWhiteSpace(Model.Cp) ||
+!string.IsNullOrWhiteSpace(Model.Municipio);
+
+
+    bool tieneHechos =
+        !string.IsNullOrWhiteSpace(Model.Hecho) ||
+        !string.IsNullOrWhiteSpace(Model.Causa) ||
+        !string.IsNullOrWhiteSpace(Model.Observaciones) ||
+        !string.IsNullOrWhiteSpace(Model.FueroDescripcion);
+
+
+    bool tieneAseguramientos =
+        !string.IsNullOrWhiteSpace(Model.Aseguramientos) ||
+        !string.IsNullOrWhiteSpace(Model.Envoltorios) ||
+        !string.IsNullOrWhiteSpace(Model.Armas) ||
+        !string.IsNullOrWhiteSpace(Model.Cartuchos) ||
+        !string.IsNullOrWhiteSpace(Model.Cargadores) ||
+        !string.IsNullOrWhiteSpace(Model.Vehiculo) ||
+        Model.Gramos.HasValue;
+
+
+    bool tieneDatosPersona =
+        Model.FechaNacimiento.HasValue ||
+        !string.IsNullOrWhiteSpace(Model.Originario) ||
+        !string.IsNullOrWhiteSpace(Model.Ocupacion) ||
+        !string.IsNullOrWhiteSpace(Model.CaracteristicasDetenido) ||
+        !string.IsNullOrWhiteSpace(Model.Curp) ||
+        !string.IsNullOrWhiteSpace(Model.Rfc) ||
+        !string.IsNullOrWhiteSpace(Model.Telefono);
+
+
+    bool tieneCoordenadas =
+    Model.Latitud.HasValue &&
+    Model.Longitud.HasValue &&
+    Model.Latitud.Value != 0 &&
+    Model.Longitud.Value != 0;
+
+    string urlMapa =
+        tieneCoordenadas
+            ? "https://www.google.com/maps/search/?api=1&query=" +
+              Model.Latitud.Value
+                  .ToString(
+                      System.Globalization.CultureInfo.InvariantCulture
+                  ) +
+              "," +
+              Model.Longitud.Value
+                  .ToString(
+                      System.Globalization.CultureInfo.InvariantCulture
+                  )
+            : "";
+
+}
+
+
+<style>
+
+    .sic-c5-detalle {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        padding: 16px;
+    }
+
+    .sic-c5-cabecera {
+        display: grid;
+        grid-template-columns: 125px 1fr;
+        gap: 16px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #e6ebf4;
+    }
+
+    .sic-c5-foto {
+        width: 125px;
+        height: 145px;
+        object-fit: cover;
+        border-radius: 12px;
+        border: 1px solid #dce3ef;
+        background: #f5f7fb;
+    }
+
+    .sic-c5-identidad {
+        min-width: 0;
+    }
+
+    .sic-c5-fuente {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin-bottom: 9px;
+        padding: 6px 10px;
+        border-radius: 20px;
+        background: #eef4ff;
+        border: 1px solid #ccdafa;
+        color: #234f9d;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    .sic-c5-nombre {
+        margin: 0 0 5px 0;
+        color: #101c42;
+        font-size: 21px;
+        font-weight: 800;
+    }
+
+    .sic-c5-alias {
+        margin-bottom: 12px;
+        color: #59647b;
+        font-size: 13px;
+    }
+
+        .sic-c5-alias strong {
+            color: #19264b;
+        }
+
+    .sic-c5-resumen {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 8px;
+    }
+
+    .sic-c5-dato {
+        padding: 9px 10px;
+        border-radius: 9px;
+        background: #f8faff;
+        border: 1px solid #e3e9f3;
+    }
+
+        .sic-c5-dato span {
+            display: block;
+            margin-bottom: 3px;
+            color: #7c879e;
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .sic-c5-dato strong {
+            display: block;
+            color: #172143;
+            font-size: 12px;
+        }
+
+    /* =========================================================
+   EVIDENCIA PRINCIPAL
+   ========================================================= */
+
+    .sic-c5-evidencia {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px;
+        border: 1px solid #b9e1c4;
+        border-radius: 9px;
+        background: #f0fbf3;
+    }
+
+    .sic-c5-evidencia-icono {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        min-width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: #daf3e1;
+        color: #30964d;
+        font-size: 14px;
+    }
+
+    .sic-c5-evidencia-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+        .sic-c5-evidencia-info small {
+            display: block;
+            margin-bottom: 5px;
+            color: #52745b;
+            font-size: 10px !important;
+            line-height: 1.3;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .sic-c5-evidencia-info span {
+            display: block;
+            color: #142319;
+            font-size: 14px !important;
+            line-height: 1.4;
+            font-weight: 600;
+        }
+
+    .sic-c5-evidencia > strong {
+        margin-left: auto;
+        color: #247438;
+        font-size: 20px !important;
+        line-height: 1.2;
+        font-weight: 900;
+        white-space: nowrap;
+    }
+
+    .sic-c5-seccion {
+        overflow: hidden;
+        border: 1px solid #dfe6f1;
+        border-radius: 11px;
+        background: #fff;
+    }
+
+        .sic-c5-seccion summary {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 12px 14px;
+            cursor: pointer;
+            color: #172350;
+            font-size: 13px;
+            font-weight: 800;
+            background: #f8faff;
+            list-style: none;
+        }
+
+            .sic-c5-seccion summary::-webkit-details-marker {
+                display: none;
+            }
+
+            .sic-c5-seccion summary::after {
+                content: "\f107";
+                margin-left: auto;
+                font-family: FontAwesome;
+                color: #68758e;
+            }
+
+        .sic-c5-seccion[open] summary::after {
+            content: "\f106";
+        }
+
+    .sic-c5-seccion-contenido {
+        padding: 14px;
+    }
+
+    .sic-c5-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+    }
+
+    .sic-c5-campo {
+        padding: 9px 10px;
+        border-radius: 8px;
+        background: #fafbfd;
+        border: 1px solid #edf0f5;
+    }
+
+        .sic-c5-campo span {
+            display: block;
+            margin-bottom: 4px;
+            color: #7f899e;
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .sic-c5-campo strong {
+            color: #192342;
+            font-size: 12px;
+            line-height: 1.45;
+        }
+
+    .sic-c5-campo-completo {
+        grid-column: 1 / -1;
+    }
+
+    .sic-c5-texto-largo {
+        white-space: pre-line;
+        line-height: 1.6;
+        font-weight: 400 !important;
+    }
+
+    @@media (max-width: 1200px) {
+
+        .sic-c5-resumen {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    .sic-c5-ubicacion-acciones {
+        grid-column: 1 / -1;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+        padding: 11px 12px;
+        border: 1px solid #e2e8f3;
+        border-radius: 9px;
+        background: #fafbfd;
+    }
+
+    .sic-c5-coordenadas-titulo {
+        display: block;
+        margin-bottom: 4px;
+        color: #7f899e;
+        font-size: 9px;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    .sic-c5-ubicacion-acciones strong {
+        color: #192342;
+        font-size: 12px;
+    }
+
+    .sic-c5-btn-mapa {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 12px;
+        border: 1px solid #bccdf8;
+        border-radius: 8px;
+        background: #eef4ff;
+        color: #3153a4;
+        font-size: 10px;
+        font-weight: 800;
+        text-decoration: none !important;
+        text-transform: uppercase;
+        white-space: nowrap;
+    }
+
+        .sic-c5-btn-mapa:hover {
+            background: #e4edff;
+            color: #213f8e;
+        }
+
+
+    /* =========================================================
+   LEGIBILIDAD FINAL - C5 DETENIDOS
+   ========================================================= */
+
+    /* Fuente / badge */
+    .sic-c5-fuente {
+        font-size: 11px !important;
+    }
+
+    /* Nombre y alias */
+    .sic-c5-nombre {
+        font-size: 23px !important;
+        line-height: 1.2 !important;
+    }
+
+    .sic-c5-alias {
+        font-size: 14px !important;
+    }
+
+
+ 
+
+
+   
+
+
+    /* =========================================================
+   TÍTULOS DE SECCIONES
+   ========================================================= */
+
+    .sic-c5-seccion > summary {
+        font-size: 14px !important;
+        line-height: 1.35 !important;
+    }
+
+
+    /* =========================================================
+   CAMPOS
+   ========================================================= */
+
+    .sic-c5-campo {
+        min-height: 78px !important;
+        padding: 13px 14px !important;
+    }
+
+        .sic-c5-campo span {
+            font-size: 11px !important;
+            line-height: 1.3 !important;
+            margin-bottom: 10px !important;
+        }
+
+        .sic-c5-campo strong {
+            font-size: 14px !important;
+            line-height: 1.45 !important;
+        }
+
+
+    /* Hechos, observaciones y textos largos */
+
+    .sic-c5-texto-largo {
+        font-size: 13px !important;
+        line-height: 1.65 !important;
+    }
+
+
+    /* =========================================================
+   UBICACIÓN
+   ========================================================= */
+
+    .sic-c5-coordenadas-titulo {
+        font-size: 10px !important;
+    }
+
+    .sic-c5-ubicacion-acciones strong {
+        font-size: 13px !important;
+    }
+
+    .sic-c5-btn-mapa {
+        font-size: 10px !important;
+    }
+
+
+    /* =========================================================
+   SUBTÍTULOS / INFORMACIÓN COMPLEMENTARIA
+   ========================================================= */
+
+    .sic-c5-subtitulo {
+        font-size: 11px !important;
+    }
+
+
+    /* Si tienes metadatos o textos secundarios */
+    .sic-c5-meta {
+        font-size: 12px !important;
+    }
+
+        .sic-c5-meta strong {
+            font-size: 12px !important;
+        }
+
+    /* =========================================================
+   CORRECCIÓN DE SELECTORES - C5
+   ========================================================= */
+
+    /* RESUMEN SUPERIOR */
+
+    .sic-c5-dato span {
+        font-size: 11px !important;
+        line-height: 1.3 !important;
+        margin-bottom: 8px !important;
+    }
+
+    .sic-c5-dato strong {
+        font-size: 14px !important;
+        line-height: 1.4 !important;
+    }
+
+
+    /* EVIDENCIA */
+
+    .sic-c5-evidencia small {
+        font-size: 10px !important;
+        line-height: 1.3 !important;
+        margin-bottom: 5px !important;
+    }
+
+    .sic-c5-evidencia-info span {
+        font-size: 14px !important;
+        line-height: 1.4 !important;
+    }
+
+    .sic-c5-evidencia > strong {
+        font-size: 20px !important;
+    }
+
+
+    /* CAMPOS */
+
+    .sic-c5-campo span {
+        font-size: 11px !important;
+        line-height: 1.3 !important;
+        margin-bottom: 10px !important;
+    }
+
+    .sic-c5-campo strong {
+        font-size: 14px !important;
+        line-height: 1.45 !important;
+       
+    }
+
+
+    /* TEXTOS LARGOS */
+
+    .sic-c5-texto-largo {
+        font-size: 13px !important;
+        line-height: 1.7 !important;
+    }
+
+
+    /* TÍTULOS */
+
+    .sic-c5-seccion summary {
+        font-size: 14px !important;
+        line-height: 1.4 !important;
+    }
+    .sic-c5-evidencia-desglose {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 8px;
+        margin-top: -5px;
+        margin-bottom: 14px;
+    }
+
+    .sic-c5-evidencia-item {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        min-height: 58px;
+        padding: 9px 11px;
+        border: 1px solid #dce6df;
+        border-radius: 8px;
+        background: #fbfefc;
+    }
+
+        .sic-c5-evidencia-item > i {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 31px;
+            min-width: 31px;
+            height: 31px;
+            border-radius: 50%;
+            background: #e7f6eb;
+            color: #368a4d;
+            font-size: 12px;
+        }
+
+        .sic-c5-evidencia-item span {
+            display: block;
+            margin-bottom: 3px;
+            color: #6e7b72;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .sic-c5-evidencia-item strong {
+            display: block;
+            color: #176b31;
+            font-size: 15px;
+            font-weight: 900;
+        }
+
+    @@media (max-width: 1100px) {
+        .sic-c5-evidencia-desglose {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+</style>
+
+
+<div class="sic-c5-detalle">
+
+    <!-- ==========================================================
+         CABECERA
+         ========================================================== -->
+    <div class="sic-c5-cabecera">
+
+        <div>
+            <img src="@fotoUrl"
+                 class="sic-c5-foto"
+                 alt="Fotografía de @nombre"
+                 onerror="this.onerror=null;this.src='@imagenNoDisponible';" />
+        </div>
+
+        <div class="sic-c5-identidad">
+
+            <div class="sic-c5-fuente">
+                <i class="fa fa-database"></i>
+                @fuenteMostrar
+            </div>
+
+            <h2 class="sic-c5-nombre">
+                @nombre
+            </h2>
+
+            <div class="sic-c5-alias">
+                Alias:
+                <strong>@alias</strong>
+            </div>
+
+            <div class="sic-c5-resumen">
+
+                <div class="sic-c5-dato">
+                    <span>Sexo</span>
+                    <strong>@sexo</strong>
+                </div>
+
+                <div class="sic-c5-dato">
+                    <span>Edad</span>
+                    <strong>@edad</strong>
+                </div>
+
+                <div class="sic-c5-dato">
+                    <span>Municipio</span>
+                    <strong>@municipio</strong>
+                </div>
+
+                <div class="sic-c5-dato">
+                    <span>Folio</span>
+                    <strong>@folio</strong>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ==========================================================
+         EVIDENCIA
+         ========================================================== -->
+    @if (coincidencia != null)
+    {
+        <div class="sic-c5-evidencia">
+
+            <div class="sic-c5-evidencia-icono">
+                <i class="fa @evidenciaIcono"></i>
+            </div>
+
+            <div class="sic-c5-evidencia-info">
+
+                <small>
+                    Evidencia principal
+                </small>
+
+                <span>
+                    @evidenciaTexto
+                </span>
+
+            </div>
+
+            <strong>
+                @porcentajeEvidenciaPrincipal.ToString("0")%
+            </strong>
+
+        </div>
+    }
+
+    @if (
+    coincidencia != null &&
+    (
+        coincidencia.PorcentajeNombre > 0 ||
+        coincidencia.PorcentajeAlias > 0 ||
+        coincidencia.PorcentajeFoto > 0 ||
+        coincidencia.PorcentajeHuella > 0
+    )
+)
+    {
+        <div class="sic-c5-evidencia-desglose">
+
+            @if (coincidencia.PorcentajeNombre > 0)
+            {
+                <div class="sic-c5-evidencia-item">
+                    <i class="fa fa-user"></i>
+
+                    <div>
+                        <span>Nombre</span>
+                        <strong>@coincidencia.PorcentajeNombre.ToString("0")%</strong>
+                    </div>
+                </div>
+            }
+
+            @if (coincidencia.PorcentajeAlias > 0)
+            {
+                <div class="sic-c5-evidencia-item">
+                    <i class="fa fa-user-secret"></i>
+
+                    <div>
+                        <span>Alias</span>
+                        <strong>@coincidencia.PorcentajeAlias.ToString("0")%</strong>
+                    </div>
+                </div>
+            }
+
+            @if (coincidencia.PorcentajeFoto > 0)
+            {
+                <div class="sic-c5-evidencia-item">
+                    <i class="fa fa-camera"></i>
+
+                    <div>
+                        <span>Fotografía</span>
+                        <strong>@coincidencia.PorcentajeFoto.ToString("0")%</strong>
+                    </div>
+                </div>
+            }
+
+            @if (coincidencia.PorcentajeHuella > 0)
+            {
+                <div class="sic-c5-evidencia-item">
+                    <i class="fa fa-hand-pointer-o"></i>
+
+                    <div>
+                        <span>Huella</span>
+                        <strong>@coincidencia.PorcentajeHuella.ToString("0")%</strong>
+                    </div>
+                </div>
+            }
+
+        </div>
+    }
+    <!-- ==========================================================
+         DETENCIÓN
+         ========================================================== -->
+    <details class="sic-c5-seccion" open>
+
+        <summary>
+            <i class="fa fa-shield"></i>
+            Información de la detención
+        </summary>
+
+        <div class="sic-c5-seccion-contenido">
+
+            <div class="sic-c5-grid">
+
+                <div class="sic-c5-campo">
+                    <span>Folio</span>
+                    <strong>@folio</strong>
+                </div>
+
+                <div class="sic-c5-campo">
+                    <span>ID detención</span>
+                    <strong>@Model.IdDetencion</strong>
+                </div>
+
+                <div class="sic-c5-campo">
+                    <span>Fecha</span>
+                    <strong>@fechaDetencion</strong>
+                </div>
+
+                <div class="sic-c5-campo">
+                    <span>Hora</span>
+                    <strong>@horaDetencion</strong>
+                </div>
+
+                @if (!string.IsNullOrWhiteSpace(Model.Fuero))
+                {
+                    <div class="sic-c5-campo">
+                        <span>Fuero</span>
+                        <strong>@Model.Fuero</strong>
+                    </div>
+                }
+
+                @if (!string.IsNullOrWhiteSpace(Model.Causa))
+                {
+                    <div class="sic-c5-campo">
+                        <span>Causa</span>
+                        <strong>@Model.Causa</strong>
+                    </div>
+                }
+
+                @if (
+                    Model.NumeroDetenidos.HasValue &&
+                    Model.NumeroDetenidos.Value > 0
+                    )
+                {
+                    <div class="sic-c5-campo">
+                        <span>Personas detenidas</span>
+                        <strong>@Model.NumeroDetenidos.Value</strong>
+                    </div>
+                }
+
+            </div>
+
+        </div>
+
+    </details>
+
+
+    <!-- ==========================================================
+         UBICACIÓN
+         ========================================================== -->
+    @if (tieneUbicacion)
+    {
+        <details class="sic-c5-seccion">
+
+            <summary>
+                <i class="fa fa-map-marker"></i>
+                Lugar de la detención
+            </summary>
+
+            <div class="sic-c5-seccion-contenido">
+
+                <div class="sic-c5-grid">
+
+                    @if (!string.IsNullOrWhiteSpace(Model.Municipio))
+                    {
+                        <div class="sic-c5-campo">
+                            <span>Municipio</span>
+                            <strong>@Model.Municipio</strong>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(Model.Colonia))
+                    {
+                        <div class="sic-c5-campo">
+                            <span>Colonia</span>
+                            <strong>@Model.Colonia</strong>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(Model.Calle))
+                    {
+                        <div class="sic-c5-campo">
+                            <span>Calle</span>
+                            <strong>@Model.Calle</strong>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(Model.NumeroExterior))
+                    {
+                        <div class="sic-c5-campo">
+                            <span>Número exterior</span>
+                            <strong>@Model.NumeroExterior</strong>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(Model.NumeroInterior))
+                    {
+                        <div class="sic-c5-campo">
+                            <span>Número interior</span>
+                            <strong>@Model.NumeroInterior</strong>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(Model.Cp))
+                    {
+                        <div class="sic-c5-campo">
+                            <span>Código postal</span>
+                            <strong>@Model.Cp</strong>
+                        </div>
+                    }
+
+                    @if (tieneCoordenadas)
+                    {
+                        <div class="sic-c5-ubicacion-acciones">
+
+                            <div>
+                                <span class="sic-c5-coordenadas-titulo">
+                                    Coordenadas
+                                </span>
+
+                                <strong>
+                                    @Model.Latitud.Value,
+                                    @Model.Longitud.Value
+                                </strong>
+                            </div>
+
+                            <a href="@urlMapa"
+                               target="_blank"
+                               rel="noopener noreferrer"
+                               class="sic-c5-btn-mapa">
+
+                                <i class="fa fa-map-marker"></i>
+                                Ver ubicación
+
+                            </a>
+
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+
+        </details>
+    }
+
+
+    <!-- ==========================================================
+         HECHOS
+         ========================================================== -->
+    @if (tieneHechos)
+    {
+        <details class="sic-c5-seccion">
+
+            <summary>
+                <i class="fa fa-file-text-o"></i>
+                Hechos y motivo de la detención
+            </summary>
+
+            <div class="sic-c5-seccion-contenido">
+
+                <div class="sic-c5-grid">
+
+                    @if (!string.IsNullOrWhiteSpace(Model.FueroDescripcion))
+                    {
+                        <div class="sic-c5-campo sic-c5-campo-completo">
+                            <span>Descripción del fuero</span>
+
+                            <strong class="sic-c5-texto-largo">
+                                @Model.FueroDescripcion
+                            </strong>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(Model.Hecho))
+                    {
+                        <div class="sic-c5-campo sic-c5-campo-completo">
+                            <span>Hechos</span>
+
+                            <strong class="sic-c5-texto-largo">
+                                @Model.Hecho
+                            </strong>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(Model.Observaciones))
+                    {
+                        <div class="sic-c5-campo sic-c5-campo-completo">
+                            <span>Observaciones</span>
+
+                            <strong class="sic-c5-texto-largo">
+                                @Model.Observaciones
+                            </strong>
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+
+        </details>
+    }
+
+
+    <!-- ==========================================================
+         ASEGURAMIENTOS
+         ========================================================== -->
+    @if (tieneAseguramientos)
+    {
+        <details class="sic-c5-seccion">
+
+            <summary>
+                <i class="fa fa-archive"></i>
+                Aseguramientos
+            </summary>
+
+            <div class="sic-c5-seccion-contenido">
+
+                <div class="sic-c5-grid">
+
+                    @if (!string.IsNullOrWhiteSpace(Model.Aseguramientos))
+                    {
+                        <div class="sic-c5-campo sic-c5-campo-completo">
+                            <span>Aseguramientos</span>
+                            <strong>@Model.Aseguramientos</strong>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(Model.Envoltorios))
+                    {
+                        <div class="sic-c5-campo">
+                            <span>Envoltorios</span>
+                            <strong>@Model.Envoltorios</strong>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(Model.Armas))
+                    {
+                        <div class="sic-c5-campo">
+                            <span>Armas</span>
+                            <strong>@Model.Armas</strong>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(Model.Cartuchos))
+                    {
+                        <div class="sic-c5-campo">
+                            <span>Cartuchos</span>
+                            <strong>@Model.Cartuchos</strong>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(Model.Cargadores))
+                    {
+                        <div class="sic-c5-campo">
+                            <span>Cargadores</span>
+                            <strong>@Model.Cargadores</strong>
+                        </div>
+                    }
+
+                    @if (Model.Gramos.HasValue)
+                    {
+                        <div class="sic-c5-campo">
+                            <span>Gramos</span>
+                            <strong>@Model.Gramos.Value</strong>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(Model.Vehiculo))
+                    {
+                        <div class="sic-c5-campo sic-c5-campo-completo">
+                            <span>Vehículo</span>
+                            <strong>@Model.Vehiculo</strong>
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+
+        </details>
+    }
+
+
+    <!-- ==========================================================
+         DATOS PERSONALES COMPLEMENTARIOS
+         ========================================================== -->
+    @if (tieneDatosPersona)
+    {
+        <details class="sic-c5-seccion">
+
+            <summary>
+                <i class="fa fa-user"></i>
+                Información complementaria
+            </summary>
+
+            <div class="sic-c5-seccion-contenido">
+
+                <div class="sic-c5-grid">
+
+                    @if (Model.FechaNacimiento.HasValue)
+                    {
+                        <div class="sic-c5-campo">
+                            <span>Fecha de nacimiento</span>
+                            <strong>
+                                @Model.FechaNacimiento.Value.ToString("dd/MM/yyyy")
+                            </strong>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(Model.Originario))
+                    {
+                        <div class="sic-c5-campo">
+                            <span>Originario</span>
+                            <strong>@Model.Originario</strong>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(Model.Ocupacion))
+                    {
+                        <div class="sic-c5-campo">
+                            <span>Ocupación</span>
+                            <strong>@Model.Ocupacion</strong>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(Model.Telefono))
+                    {
+                        <div class="sic-c5-campo">
+                            <span>Teléfono</span>
+                            <strong>@Model.Telefono</strong>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(Model.Curp))
+                    {
+                        <div class="sic-c5-campo">
+                            <span>CURP</span>
+                            <strong>@Model.Curp</strong>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(Model.Rfc))
+                    {
+                        <div class="sic-c5-campo">
+                            <span>RFC</span>
+                            <strong>@Model.Rfc</strong>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(Model.CaracteristicasDetenido))
+                    {
+                        <div class="sic-c5-campo sic-c5-campo-completo">
+                            <span>Características del detenido</span>
+
+                            <strong class="sic-c5-texto-largo">
+                                @Model.CaracteristicasDetenido
+                            </strong>
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+
+        </details>
+    }
+
+</div>

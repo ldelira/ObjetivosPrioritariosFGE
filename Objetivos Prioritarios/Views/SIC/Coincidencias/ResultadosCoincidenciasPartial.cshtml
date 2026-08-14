@@ -59,15 +59,7 @@ Url.Content(
     "~/Content/imagenes/Nodisponible.jpg"
 );
 
-    var modeloDetalleInicial =
-        Model == null
-            ? null
-            : new Objetivos_Prioritarios.Models.Extends.DetalleCoincidenciaViewModel
-            {
-                Coincidencia = Model.CoincidenciaSeleccionada,
-                TieneFotografiaConsulta = tieneFotografiaConsulta,
-                TieneHuellaConsulta = tieneHuellaConsulta
-            };
+   
 }
 
 <div class="sic-resumen-coincidencias">
@@ -349,6 +341,25 @@ else
                             ? "Fuente " + item.IdTbFuente
                             : item.NombreFuente.Trim();
 
+
+                    string nombreFuenteMostrar =
+                            nombreFuente;
+
+                    if (
+                        item.IdTbFuente == 1 &&
+                        !string.IsNullOrWhiteSpace(municipio) &&
+                        !municipio.Equals(
+                            "SIN INFORMACIÓN",
+                            StringComparison.OrdinalIgnoreCase
+                        )
+                    )
+                    {
+                        nombreFuenteMostrar =
+                            nombreFuente +
+                            " · " +
+                            municipio;
+                    }
+
                     string claseFuente;
 
                     switch (item.IdTbFuente)
@@ -457,7 +468,7 @@ else
                                  onerror="this.onerror=null;this.src='@imagenNoDisponible';" />
 
                             <span class="sic-resultado-fuente-icono @claseFuente"
-                                  title="@nombreFuente">
+                                  title="@nombreFuenteMostrar">
                                 <i class="fa fa-database"></i>
                             </span>
                         </div>
@@ -468,7 +479,7 @@ else
 
                                 <span class="sic-resultado-fuente @claseFuente">
                                     <i class="fa fa-database"></i>
-                                    @nombreFuente
+                                    @nombreFuenteMostrar
                                 </span>
                             </div>
 
@@ -541,7 +552,7 @@ else
                         </div>
 
                         <div class="sic-resultado-puntaje">
-                            <small>Mejor coincidencia</small>
+                            <small>Mejor evidencia</small>
                             <strong class="@claseNivel">@porcentajeGlobal</strong>
                             <span class="sic-resultado-tipo">@tipoResultadoTexto</span>
 
@@ -561,12 +572,13 @@ else
         <section id="panelDetalleCoincidencia"
                  class="sic-panel-detalle"
                  aria-live="polite"
-                 aria-busy="false">
+                 aria-busy="true">
 
-            @Html.Partial(
-                "Coincidencias/DetalleCoincidenciaPartial",
-                modeloDetalleInicial
-            )
+            <div class="sic-detalle-loader">
+                <i class="fa fa-spinner fa-spin"></i>
+                <span>Cargando detalle...</span>
+            </div>
+
         </section>
     </div>
 }

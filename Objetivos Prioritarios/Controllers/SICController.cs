@@ -2573,10 +2573,8 @@ namespace Objetivos_Prioritarios.Controllers
              * ============================================================
              * FUENTE 5 - OBJETIVOS PRIORITARIOS
              * ============================================================
-             *
-             * Para Objetivos utilizamos el nuevo detalle enriquecido
-             * proveniente de la API.
              */
+
             if (coincidencia.IdTbFuente == 5)
             {
                 DetalleObjetivoApiDto detalleObjetivo =
@@ -2595,73 +2593,6 @@ namespace Objetivos_Prioritarios.Controllers
                     );
                 }
 
-
-                /*
- * ============================================================
- * FUENTES 2, 7 Y 8 - FISCALIA WEB
- * ============================================================
- *
- * 2 = CAPEA / FEMDLP
- * 7 = Alerta Amber
- * 8 = Protocolo Alba
- */
-                if (
-                    coincidencia.IdTbFuente == 2 ||
-                    coincidencia.IdTbFuente == 7 ||
-                    coincidencia.IdTbFuente == 8
-                )
-                {
-                    DetalleFiscaliaWebApiDto detalleFiscaliaWeb =
-                        await CoincidenciasBiometricasService
-                            .ObtenerDetalleFiscaliaWebAsync(
-                                coincidencia.IdTbFuente,
-                                coincidencia.IdPersona
-                            );
-
-                    if (detalleFiscaliaWeb == null)
-                    {
-                        Response.StatusCode = 404;
-
-                        return Content(
-                            "No fue posible obtener el detalle del registro.",
-                            "text/plain"
-                        );
-                    }
-
-                    /*
-                     * Conservamos la coincidencia original para:
-                     *
-                     * - porcentaje nombre
-                     * - porcentaje alias
-                     * - fotografía
-                     * - huella
-                     * - evidencia textual
-                     * - mandamientos nominales
-                     */
-                    ViewBag.Coincidencia =
-                        coincidencia;
-
-                    ViewBag.TieneFotografiaConsulta =
-                        resultados.TieneFotografiaConsulta;
-
-                    ViewBag.TieneHuellaConsulta =
-                        resultados.TieneHuellaConsulta;
-
-                    return PartialView(
-                        "Coincidencias/DetalleFiscaliaWebCoincidenciaPartial",
-                        detalleFiscaliaWeb
-                    );
-                }
-
-                /*
-                 * Conservamos la coincidencia original para utilizar:
-                 *
-                 * - porcentajes
-                 * - evidencia textual
-                 * - evidencia biométrica
-                 * - mandamientos nominales
-                 * - tipo de coincidencia
-                 */
                 ViewBag.Coincidencia =
                     coincidencia;
 
@@ -2680,23 +2611,160 @@ namespace Objetivos_Prioritarios.Controllers
 
             /*
              * ============================================================
+             * FUENTES 2, 7 Y 8 - FISCALIA WEB
+             * ============================================================
+             *
+             * 2 = CAPEA / FEMDLP
+             * 7 = Alerta Amber
+             * 8 = Protocolo Alba
+             */
+
+            if (
+                coincidencia.IdTbFuente == 2 ||
+                coincidencia.IdTbFuente == 7 ||
+                coincidencia.IdTbFuente == 8
+            )
+            {
+                DetalleFiscaliaWebApiDto detalleFiscaliaWeb =
+                    await CoincidenciasBiometricasService
+                        .ObtenerDetalleFiscaliaWebAsync(
+                            coincidencia.IdTbFuente,
+                            coincidencia.IdPersona
+                        );
+
+                if (detalleFiscaliaWeb == null)
+                {
+                    Response.StatusCode = 404;
+
+                    return Content(
+                        "No fue posible obtener el detalle del registro.",
+                        "text/plain"
+                    );
+                }
+
+                ViewBag.Coincidencia =
+                    coincidencia;
+
+                ViewBag.TieneFotografiaConsulta =
+                    resultados.TieneFotografiaConsulta;
+
+                ViewBag.TieneHuellaConsulta =
+                    resultados.TieneHuellaConsulta;
+
+                return PartialView(
+                    "Coincidencias/DetalleFiscaliaWebCoincidenciaPartial",
+                    detalleFiscaliaWeb
+                );
+            }
+
+
+            /*
+             * ============================================================
+             * FUENTE 1 - C5 DETENIDOS
+             * ============================================================
+             */
+
+            if (coincidencia.IdTbFuente == 1)
+            {
+                DetalleC5ApiDto detalleC5 =
+                    await CoincidenciasBiometricasService
+                        .ObtenerDetalleC5Async(
+                            coincidencia.IdPersona
+                        );
+
+                if (detalleC5 == null)
+                {
+                    Response.StatusCode = 404;
+
+                    return Content(
+                        "No fue posible obtener el detalle C5.",
+                        "text/plain"
+                    );
+                }
+
+                ViewBag.Coincidencia =
+                    coincidencia;
+
+                ViewBag.TieneFotografiaConsulta =
+                    resultados.TieneFotografiaConsulta;
+
+                ViewBag.TieneHuellaConsulta =
+                    resultados.TieneHuellaConsulta;
+
+                return PartialView(
+                    "Coincidencias/DetalleC5CoincidenciaPartial",
+                    detalleC5
+                );
+            }
+
+
+            /*
+             * ============================================================
+             * FUENTE 6 - FGEA DETENIDOS
+             * ============================================================
+             *
+             * En Fuente 6:
+             *
+             * coincidencia.IdPersona =
+             * Filiacion.dbo.Persona.CLAVE_PERSO
+             */
+
+            if (coincidencia.IdTbFuente == 6)
+            {
+                DetalleFGEADetenidoApiDto detalleFGEA =
+                    await CoincidenciasBiometricasService
+                        .ObtenerDetalleFGEADetenidoAsync(
+                            coincidencia.IdPersona
+                        );
+
+                if (detalleFGEA == null)
+                {
+                    Response.StatusCode = 404;
+
+                    return Content(
+                        "No fue posible obtener el detalle del detenido FGEA.",
+                        "text/plain"
+                    );
+                }
+
+                ViewBag.Coincidencia =
+                    coincidencia;
+
+                ViewBag.TieneFotografiaConsulta =
+                    resultados.TieneFotografiaConsulta;
+
+                ViewBag.TieneHuellaConsulta =
+                    resultados.TieneHuellaConsulta;
+
+                return PartialView(
+                    "Coincidencias/DetalleFGEADetenidoCoincidenciaPartial",
+                    detalleFGEA
+                );
+            }
+
+
+            /*
+             * ============================================================
              * DEMÁS FUENTES
              * ============================================================
              *
-             * Fuente 6 - Detenidos
-             * Fuente 1 - C5
-             * Fuente 2 - CAPEA
-             * Fuente 3 - Personas de interés
-             * Fuente 7 - Amber
-             * Fuente 8 - Alba
+             * Las fuentes que todavía no tengan detalle especializado
+             * continúan utilizando el partial genérico.
              *
-             * Estas fuentes siguen utilizando el partial original.
+             * Actualmente principalmente:
+             *
+             * Fuente 3 - Personas de interés
              *
              * IMPORTANTE:
-             * DetalleCoincidenciaPartial.cshtml espera
-             * DetalleCoincidenciaViewModel, NO
-             * CoincidenciaResultadoViewModel directamente.
+             *
+             * DetalleCoincidenciaPartial.cshtml espera:
+             *
+             * DetalleCoincidenciaViewModel
+             *
+             * NO CoincidenciaResultadoViewModel directamente.
+             * ============================================================
              */
+
             DetalleCoincidenciaViewModel modelo =
                 new DetalleCoincidenciaViewModel
                 {

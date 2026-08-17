@@ -292,6 +292,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Helpers\BiometriaApiHelper.cs" />
     <Compile Include="Helpers\NetworkConnection.cs" />
     <Compile Include="Models\Alias.cs">
       <DependentUpon>Filiacion.tt</DependentUpon>

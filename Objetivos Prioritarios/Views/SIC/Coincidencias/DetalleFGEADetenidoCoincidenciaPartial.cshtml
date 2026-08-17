@@ -360,10 +360,26 @@ Model.FechaFiliacion.HasValue ||
 
         <div class="sic-fgea-foto-wrap">
 
-            <img src="@fotoUrl"
-                 alt="@nombre"
-                 class="sic-fgea-foto"
-                 onerror="this.onerror=null;this.src='@imagenNoDisponible';" />
+            <button type="button"
+                    class="sic-fgea-btn-foto js-ampliar-foto"
+                    data-foto="@fotoUrl"
+                    data-nombre="@nombre"
+                    data-fuente="FGEA - DETENIDOS"
+                    title="Ver fotografía en grande">
+
+                <img src="@fotoUrl"
+                     alt="@nombre"
+                     class="sic-fgea-foto"
+                     onerror="this.onerror=null;this.src='@imagenNoDisponible';" />
+
+
+                <span class="sic-fgea-foto-zoom">
+
+                    <i class="fa fa-search-plus"></i>
+
+                </span>
+
+            </button>
 
         </div>
 

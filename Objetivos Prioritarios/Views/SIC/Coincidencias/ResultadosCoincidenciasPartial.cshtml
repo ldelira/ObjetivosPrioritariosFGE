@@ -110,357 +110,361 @@ Url.Content(
 }
 else
 {
-    <div id="sicResultadosContexto"
-         class="sic-resultados-layout"
-         data-tiene-fotografia="@tieneFotografiaTexto"
-         data-tiene-huella="@tieneHuellaTexto">
+<div id="sicResultadosContexto"
+     class="sic-resultados-layout"
+     data-tiene-fotografia="@tieneFotografiaTexto"
+     data-tiene-huella="@tieneHuellaTexto">
 
-        <section class="sic-listado-coincidencias">
+    <section class="sic-listado-coincidencias">
 
-            <div class="sic-listado-header">
-                <div>
-                    <h3>Posibles coincidencias</h3>
-                    <span>Los registros pueden proceder de diferentes fuentes institucionales.</span>
-                </div>
-
-                <span class="sic-listado-total">@totalCoincidencias</span>
+        <div class="sic-listado-header">
+            <div>
+                <h3>Posibles coincidencias</h3>
+                <span>Los registros pueden proceder de diferentes fuentes institucionales.</span>
             </div>
 
-            <div class="sic-tabs-resultados"
-                 role="tablist"
-                 aria-label="Tipos de coincidencia">
+            <span class="sic-listado-total">@totalCoincidencias</span>
+        </div>
 
+        <div class="sic-tabs-resultados"
+             role="tablist"
+             aria-label="Tipos de coincidencia">
+
+            <button type="button"
+                    class="sic-tab-resultado active js-tab-coincidencias"
+                    data-tipo="TODOS"
+                    role="tab"
+                    aria-selected="true">
+                <i class="fa fa-list"></i>
+                Todos (@totalCoincidencias)
+            </button>
+
+            @if (totalTexto > 0)
+            {
                 <button type="button"
-                        class="sic-tab-resultado active js-tab-coincidencias"
-                        data-tipo="TODOS"
+                        class="sic-tab-resultado js-tab-coincidencias"
+                        data-tipo="TEXTO"
                         role="tab"
-                        aria-selected="true">
-                    <i class="fa fa-list"></i>
-                    Todos (@totalCoincidencias)
+                        aria-selected="false">
+                    <i class="fa fa-font"></i>
+                    Nombre o alias (@totalTexto)
                 </button>
+            }
 
-                @if (totalTexto > 0)
+            @if (tieneFotografiaConsulta || totalFotografia > 0)
+            {
+                <button type="button"
+                        class="sic-tab-resultado js-tab-coincidencias"
+                        data-tipo="FOTO"
+                        role="tab"
+                        aria-selected="false">
+                    <i class="fa fa-camera"></i>
+                    Fotografía (@totalFotografia)
+                </button>
+            }
+
+            @if (tieneHuellaConsulta || totalHuella > 0)
+            {
+                <button type="button"
+                        class="sic-tab-resultado js-tab-coincidencias"
+                        data-tipo="HUELLA"
+                        role="tab"
+                        aria-selected="false">
+                    <i class="fa fa-hand-pointer-o"></i>
+                    Huella (@totalHuella)
+                </button>
+            }
+
+            @if (totalFotoHuella > 0)
+            {
+                <button type="button"
+                        class="sic-tab-resultado js-tab-coincidencias"
+                        data-tipo="COMBINADA"
+                        role="tab"
+                        aria-selected="false">
+                    <i class="fa fa-link"></i>
+                    Foto y huella (@totalFotoHuella)
+                </button>
+            }
+        </div>
+
+        <div class="sic-lista-resultados">
+            @foreach (var item in Model.Coincidencias)
+            {
+                bool seleccionado =
+                    Model.CoincidenciaSeleccionada != null &&
+                    Model.CoincidenciaSeleccionada.IdCoincidencia == item.IdCoincidencia;
+
+                string claseSeleccionado =
+                    seleccionado
+                        ? "active"
+                        : "";
+
+                bool tieneTexto =
+                    item.PorcentajeTexto > 0 ||
+                    item.PorcentajeNombre > 0 ||
+                    item.PorcentajeAlias > 0;
+
+                bool tieneFoto =
+                    item.PorcentajeFoto > 0;
+
+                bool tieneHuella =
+                    item.PorcentajeHuella > 0;
+
+                bool esCombinada =
+                    tieneFoto &&
+                    tieneHuella;
+
+                bool esTextoYBiometria =
+                    tieneTexto &&
+                    (tieneFoto || tieneHuella);
+
+                string tipoFiltro;
+
+                if (esTextoYBiometria)
                 {
-                    <button type="button"
-                            class="sic-tab-resultado js-tab-coincidencias"
-                            data-tipo="TEXTO"
-                            role="tab"
-                            aria-selected="false">
-                        <i class="fa fa-font"></i>
-                        Nombre o alias (@totalTexto)
-                    </button>
+                    tipoFiltro = "TEXTO_BIOMETRIA";
+                }
+                else if (esCombinada)
+                {
+                    tipoFiltro = "COMBINADA";
+                }
+                else if (tieneFoto)
+                {
+                    tipoFiltro = "FOTO";
+                }
+                else if (tieneHuella)
+                {
+                    tipoFiltro = "HUELLA";
+                }
+                else if (tieneTexto)
+                {
+                    tipoFiltro = "TEXTO";
+                }
+                else
+                {
+                    tipoFiltro =
+                        string.IsNullOrWhiteSpace(item.TipoCoincidencia)
+                            ? "SIN_TIPO"
+                            : item.TipoCoincidencia.Trim().ToUpperInvariant();
                 }
 
-                @if (tieneFotografiaConsulta || totalFotografia > 0)
+                decimal porcentajeTexto =
+                    item.PorcentajeTexto;
+
+                if (porcentajeTexto <= 0)
                 {
-                    <button type="button"
-                            class="sic-tab-resultado js-tab-coincidencias"
-                            data-tipo="FOTO"
-                            role="tab"
-                            aria-selected="false">
-                        <i class="fa fa-camera"></i>
-                        Fotografía (@totalFotografia)
-                    </button>
-                }
-
-                @if (tieneHuellaConsulta || totalHuella > 0)
-                {
-                    <button type="button"
-                            class="sic-tab-resultado js-tab-coincidencias"
-                            data-tipo="HUELLA"
-                            role="tab"
-                            aria-selected="false">
-                        <i class="fa fa-hand-pointer-o"></i>
-                        Huella (@totalHuella)
-                    </button>
-                }
-
-                @if (totalFotoHuella > 0)
-                {
-                    <button type="button"
-                            class="sic-tab-resultado js-tab-coincidencias"
-                            data-tipo="COMBINADA"
-                            role="tab"
-                            aria-selected="false">
-                        <i class="fa fa-link"></i>
-                        Foto y huella (@totalFotoHuella)
-                    </button>
-                }
-            </div>
-
-            <div class="sic-lista-resultados">
-                @foreach (var item in Model.Coincidencias)
-                {
-                    bool seleccionado =
-                        Model.CoincidenciaSeleccionada != null &&
-                        Model.CoincidenciaSeleccionada.IdCoincidencia == item.IdCoincidencia;
-
-                    string claseSeleccionado =
-                        seleccionado
-                            ? "active"
-                            : "";
-
-                    bool tieneTexto =
-                        item.PorcentajeTexto > 0 ||
-                        item.PorcentajeNombre > 0 ||
-                        item.PorcentajeAlias > 0;
-
-                    bool tieneFoto =
-                        item.PorcentajeFoto > 0;
-
-                    bool tieneHuella =
-                        item.PorcentajeHuella > 0;
-
-                    bool esCombinada =
-                        tieneFoto &&
-                        tieneHuella;
-
-                    bool esTextoYBiometria =
-                        tieneTexto &&
-                        (tieneFoto || tieneHuella);
-
-                    string tipoFiltro;
-
-                    if (esTextoYBiometria)
-                    {
-                        tipoFiltro = "TEXTO_BIOMETRIA";
-                    }
-                    else if (esCombinada)
-                    {
-                        tipoFiltro = "COMBINADA";
-                    }
-                    else if (tieneFoto)
-                    {
-                        tipoFiltro = "FOTO";
-                    }
-                    else if (tieneHuella)
-                    {
-                        tipoFiltro = "HUELLA";
-                    }
-                    else if (tieneTexto)
-                    {
-                        tipoFiltro = "TEXTO";
-                    }
-                    else
-                    {
-                        tipoFiltro =
-                            string.IsNullOrWhiteSpace(item.TipoCoincidencia)
-                                ? "SIN_TIPO"
-                                : item.TipoCoincidencia.Trim().ToUpperInvariant();
-                    }
-
-                    decimal porcentajeTexto =
-                        item.PorcentajeTexto;
-
-                    if (porcentajeTexto <= 0)
-                    {
-                        porcentajeTexto =
-                            Math.Max(
-                                item.PorcentajeNombre,
-                                item.PorcentajeAlias
-                            );
-                    }
-
-                    decimal similitudMostrada =
-                        item.SimilitudGlobal;
-
-                    if (similitudMostrada <= 0)
-                    {
-                        similitudMostrada =
-                            Math.Max(
-                                porcentajeTexto,
-                                Math.Max(
-                                    item.PorcentajeFoto,
-                                    item.PorcentajeHuella
-                                )
-                            );
-                    }
-
-                    string claseNivel;
-
-                    if (similitudMostrada >= 85)
-                    {
-                        claseNivel = "sic-nivel-alto";
-                    }
-                    else if (similitudMostrada >= 75)
-                    {
-                        claseNivel = "sic-nivel-medio";
-                    }
-                    else
-                    {
-                        claseNivel = "sic-nivel-bajo";
-                    }
-
-                    string fotoUrl =
-                        string.IsNullOrWhiteSpace(item.FotoUrl)
-                            ? imagenNoDisponible
-                            : Url.Content(item.FotoUrl);
-
-                    string nombreCompleto =
-                        string.IsNullOrWhiteSpace(item.NombreCompleto)
-                            ? "SIN INFORMACIÓN"
-                            : item.NombreCompleto.Trim();
-
-                    string alias =
-                        string.IsNullOrWhiteSpace(item.Alias)
-                            ? ""
-                            : item.Alias.Trim();
-
-                    bool mostrarAlias =
-                        !string.IsNullOrWhiteSpace(alias) &&
-                        !alias.Equals(
-                            "SIN INFORMACIÓN",
-                            StringComparison.OrdinalIgnoreCase
+                    porcentajeTexto =
+                        Math.Max(
+                            item.PorcentajeNombre,
+                            item.PorcentajeAlias
                         );
+                }
 
-                    string folio =
-                        string.IsNullOrWhiteSpace(item.Folio)
-                            ? "SIN INFORMACIÓN"
-                            : item.Folio.Trim();
+                decimal similitudMostrada =
+                    item.SimilitudGlobal;
 
-                    string municipio =
-                        string.IsNullOrWhiteSpace(item.Municipio)
-                            ? "SIN INFORMACIÓN"
-                            : item.Municipio.Trim();
+                if (similitudMostrada <= 0)
+                {
+                    similitudMostrada =
+                        Math.Max(
+                            porcentajeTexto,
+                            Math.Max(
+                                item.PorcentajeFoto,
+                                item.PorcentajeHuella
+                            )
+                        );
+                }
 
-                    string sexo =
-                        string.IsNullOrWhiteSpace(item.Sexo)
-                            ? "SIN INFORMACIÓN"
-                            : item.Sexo.Trim();
+                string claseNivel;
 
-                    string edadTexto =
-                        item.Edad > 0
-                            ? item.Edad + " años"
-                            : "SIN INFORMACIÓN";
+                if (similitudMostrada >= 85)
+                {
+                    claseNivel = "sic-nivel-alto";
+                }
+                else if (similitudMostrada >= 75)
+                {
+                    claseNivel = "sic-nivel-medio";
+                }
+                else
+                {
+                    claseNivel = "sic-nivel-bajo";
+                }
 
-                    string porcentajeGlobal =
-                        similitudMostrada.ToString("0") + "%";
+                string fotoUrl =
+                    string.IsNullOrWhiteSpace(item.FotoUrl)
+                        ? imagenNoDisponible
+                        : Url.Content(item.FotoUrl);
 
-                    string nombreFuente =
-                        string.IsNullOrWhiteSpace(item.NombreFuente)
-                            ? "Fuente " + item.IdTbFuente
-                            : item.NombreFuente.Trim();
+                string nombreCompleto =
+                    string.IsNullOrWhiteSpace(item.NombreCompleto)
+                        ? "SIN INFORMACIÓN"
+                        : item.NombreCompleto.Trim();
+
+                string alias =
+                    string.IsNullOrWhiteSpace(item.Alias)
+                        ? ""
+                        : item.Alias.Trim();
+
+                bool mostrarAlias =
+                    !string.IsNullOrWhiteSpace(alias) &&
+                    !alias.Equals(
+                        "SIN INFORMACIÓN",
+                        StringComparison.OrdinalIgnoreCase
+                    );
+
+                string folio =
+                    string.IsNullOrWhiteSpace(item.Folio)
+                        ? "SIN INFORMACIÓN"
+                        : item.Folio.Trim();
+
+                string municipio =
+                    string.IsNullOrWhiteSpace(item.Municipio)
+                        ? "SIN INFORMACIÓN"
+                        : item.Municipio.Trim();
+
+                string sexo =
+                    string.IsNullOrWhiteSpace(item.Sexo)
+                        ? "SIN INFORMACIÓN"
+                        : item.Sexo.Trim();
+
+                string edadTexto =
+                    item.Edad > 0
+                        ? item.Edad + " años"
+                        : "SIN INFORMACIÓN";
+
+                string porcentajeGlobal =
+                    similitudMostrada.ToString("0") + "%";
+
+                string nombreFuente =
+                    string.IsNullOrWhiteSpace(item.NombreFuente)
+                        ? "Fuente " + item.IdTbFuente
+                        : item.NombreFuente.Trim();
 
 
-                    string nombreFuenteMostrar =
-                            nombreFuente;
+                string nombreFuenteMostrar =
+                        nombreFuente;
 
-                    if (
-                        item.IdTbFuente == 1 &&
-                        !string.IsNullOrWhiteSpace(municipio) &&
-                        !municipio.Equals(
-                            "SIN INFORMACIÓN",
-                            StringComparison.OrdinalIgnoreCase
-                        )
+                if (
+                    item.IdTbFuente == 1 &&
+                    !string.IsNullOrWhiteSpace(municipio) &&
+                    !municipio.Equals(
+                        "SIN INFORMACIÓN",
+                        StringComparison.OrdinalIgnoreCase
                     )
-                    {
-                        nombreFuenteMostrar =
-                            nombreFuente +
-                            " · " +
-                            municipio;
-                    }
+                )
+                {
+                    nombreFuenteMostrar =
+                        nombreFuente +
+                        " · " +
+                        municipio;
+                }
 
-                    string claseFuente;
+                string claseFuente;
 
-                    switch (item.IdTbFuente)
-                    {
-                        case 1:
-                            claseFuente = "sic-fuente-c5";
-                            break;
+                switch (item.IdTbFuente)
+                {
+                    case 1:
+                        claseFuente = "sic-fuente-c5";
+                        break;
 
-                        case 2:
-                        case 7:
-                        case 8:
-                            claseFuente = "sic-fuente-alerta";
-                            break;
+                    case 2:
+                    case 7:
+                    case 8:
+                        claseFuente = "sic-fuente-alerta";
+                        break;
 
-                        case 3:
-                            claseFuente = "sic-fuente-interes";
-                            break;
+                    case 3:
+                        claseFuente = "sic-fuente-interes";
+                        break;
 
-                        case 4:
-                            claseFuente = "sic-fuente-informativa";
-                            break;
+                    case 4:
+                        claseFuente = "sic-fuente-informativa";
+                        break;
 
-                        case 5:
-                            claseFuente = "sic-fuente-objetivos";
-                            break;
+                    case 5:
+                        claseFuente = "sic-fuente-objetivos";
+                        break;
 
-                        case 6:
-                            claseFuente = "sic-fuente-detenidos";
-                            break;
+                    case 6:
+                        claseFuente = "sic-fuente-detenidos";
+                        break;
 
-                        default:
-                            claseFuente = "sic-fuente-generica";
-                            break;
-                    }
+                    default:
+                        claseFuente = "sic-fuente-generica";
+                        break;
+                }
 
-                    string origenTexto =
-                        string.IsNullOrWhiteSpace(item.OrigenCoincidenciaTexto)
-                            ? ""
-                            : item.OrigenCoincidenciaTexto.Trim().ToUpperInvariant();
+                string origenTexto =
+                    string.IsNullOrWhiteSpace(item.OrigenCoincidenciaTexto)
+                        ? ""
+                        : item.OrigenCoincidenciaTexto.Trim().ToUpperInvariant();
 
-                    string textoCoincidente =
-                        string.IsNullOrWhiteSpace(item.TextoCoincidente)
-                            ? ""
-                            : item.TextoCoincidente.Trim();
+                string textoCoincidente =
+                    string.IsNullOrWhiteSpace(item.TextoCoincidente)
+                        ? ""
+                        : item.TextoCoincidente.Trim();
 
-                    string descripcionTexto =
-                        "Coincidencia textual";
+                string descripcionTexto =
+                    "Coincidencia textual";
 
-                    if (origenTexto == "ALIAS")
-                    {
-                        descripcionTexto = "Por alias";
-                    }
-                    else if (origenTexto == "NOMBRE")
-                    {
-                        descripcionTexto = "Por nombre";
-                    }
-                    else if (origenTexto == "NOMBRE_Y_ALIAS" || origenTexto == "AMBOS")
-                    {
-                        descripcionTexto = "Nombre y alias";
-                    }
+                if (origenTexto == "ALIAS")
+                {
+                    descripcionTexto = "Por alias";
+                }
+                else if (origenTexto == "NOMBRE")
+                {
+                    descripcionTexto = "Por nombre";
+                }
+                else if (origenTexto == "NOMBRE_Y_ALIAS" || origenTexto == "AMBOS")
+                {
+                    descripcionTexto = "Nombre y alias";
+                }
 
-                    string tipoResultadoTexto;
+                string tipoResultadoTexto;
 
-                    if (tipoFiltro == "TEXTO_BIOMETRIA")
-                    {
-                        tipoResultadoTexto = "Texto y biometría";
-                    }
-                    else if (tipoFiltro == "COMBINADA")
-                    {
-                        tipoResultadoTexto = "Foto y huella";
-                    }
-                    else if (tipoFiltro == "FOTO")
-                    {
-                        tipoResultadoTexto = "Fotografía";
-                    }
-                    else if (tipoFiltro == "HUELLA")
-                    {
-                        tipoResultadoTexto = "Huella";
-                    }
-                    else if (tipoFiltro == "TEXTO")
-                    {
-                        tipoResultadoTexto = "Texto";
-                    }
-                    else
-                    {
-                        tipoResultadoTexto = "Coincidencia";
-                    }
+                if (tipoFiltro == "TEXTO_BIOMETRIA")
+                {
+                    tipoResultadoTexto = "Texto y biometría";
+                }
+                else if (tipoFiltro == "COMBINADA")
+                {
+                    tipoResultadoTexto = "Foto y huella";
+                }
+                else if (tipoFiltro == "FOTO")
+                {
+                    tipoResultadoTexto = "Fotografía";
+                }
+                else if (tipoFiltro == "HUELLA")
+                {
+                    tipoResultadoTexto = "Huella";
+                }
+                else if (tipoFiltro == "TEXTO")
+                {
+                    tipoResultadoTexto = "Texto";
+                }
+                else
+                {
+                    tipoResultadoTexto = "Coincidencia";
+                }
 
-                    <article class="sic-resultado-persona @claseSeleccionado"
-                             data-tipo="@tipoFiltro"
-                             data-id="@item.IdCoincidencia"
-                             data-fuente="@item.IdTbFuente"
-                             data-tiene-texto="@(tieneTexto ? "true" : "false")"
-                             data-tiene-foto="@(tieneFoto ? "true" : "false")"
-                             data-tiene-huella="@(tieneHuella ? "true" : "false")"
-                             data-es-combinada="@(esCombinada ? "true" : "false")"
-                             tabindex="0"
-                             role="button"
-                             aria-label="Seleccionar coincidencia de @nombreCompleto">
+                <article class="sic-resultado-persona
+                @claseSeleccionado
+                @(tieneFotografiaConsulta && tieneFoto
+                    ? "sic-resultado-con-comparacion"
+                    : "")"
+                         data-tipo="@tipoFiltro"
+                         data-id="@item.IdCoincidencia"
+                         data-fuente="@item.IdTbFuente"
+                         data-tiene-texto="@(tieneTexto ? "true" : "false")"
+                         data-tiene-foto="@(tieneFoto ? "true" : "false")"
+                         data-tiene-huella="@(tieneHuella ? "true" : "false")"
+                         data-es-combinada="@(esCombinada ? "true" : "false")"
+                         tabindex="0"
+                         role="button"
+                         aria-label="Seleccionar coincidencia de @nombreCompleto">
 
-                        <div class="sic-resultado-foto-contenedor">
+                    @*<div class="sic-resultado-foto-contenedor">
                             <img src="@fotoUrl"
                                  alt="Fotografía de @nombreCompleto"
                                  class="sic-resultado-foto"
@@ -471,114 +475,437 @@ else
                                   title="@nombreFuenteMostrar">
                                 <i class="fa fa-database"></i>
                             </span>
-                        </div>
+                        </div>*@
+                    <div class="sic-resultado-foto-contenedor">
 
-                        <div class="sic-resultado-informacion">
-                            <div class="sic-resultado-identidad">
-                                <strong class="sic-resultado-nombre">@nombreCompleto</strong>
+                        @if (tieneFotografiaConsulta && tieneFoto)
+                        {
+                            <button type="button"
+                                    class="sic-resultado-comparador-foto js-abrir-comparacion-foto"
+                                    data-nombre="@nombreCompleto"
+                                    data-fuente="@nombreFuenteMostrar"
+                                    data-porcentaje="@item.PorcentajeFoto.ToString("0")"
+                                    data-foto-candidato="@fotoUrl"
+                                    title="Comparar fotografía consultada con el registro">
 
-                                <span class="sic-resultado-fuente @claseFuente">
+                                <div class="sic-resultado-mini-foto">
+
+                                    <span>
+                                        Consulta
+                                    </span>
+
+                                    <img src=""
+                                         class="js-foto-consulta-mini"
+                                         alt="Fotografía consultada" />
+
+                                </div>
+
+
+                                <div class="sic-resultado-comparacion-separador">
+                                    <i class="fa fa-exchange"></i>
+                                </div>
+
+
+                                <div class="sic-resultado-mini-foto">
+
+                                    <span>
+                                        Candidato
+                                    </span>
+
+                                    <img src="@fotoUrl"
+                                         alt="Fotografía de @nombreCompleto"
+                                         loading="lazy"
+                                         onerror="this.onerror=null;this.src='@imagenNoDisponible';" />
+
+                                </div>
+
+                            </button>
+                        }
+                        else
+                        {
+                            <button type="button"
+                                    class="sic-btn-ampliar-foto js-ampliar-foto"
+                                    data-foto="@fotoUrl"
+                                    data-nombre="@nombreCompleto"
+                                    data-fuente="@nombreFuenteMostrar"
+                                    title="Ver fotografía en grande">
+
+                                <img src="@fotoUrl"
+                                     alt="Fotografía de @nombreCompleto"
+                                     class="sic-resultado-foto"
+                                     loading="lazy"
+                                     onerror="this.onerror=null;this.src='@imagenNoDisponible';" />
+
+                                <span class="sic-ampliar-foto-icono">
+                                    <i class="fa fa-search-plus"></i>
+                                </span>
+
+                            </button>
+                        }
+
+
+                        <span class="sic-resultado-fuente-icono @claseFuente"
+                              title="@nombreFuenteMostrar">
+
+                            <i class="fa fa-database"></i>
+
+                        </span>
+
+                    </div>
+                    <div class="sic-resultado-informacion">
+                        <div class="sic-resultado-identidad">
+                            <strong class="sic-resultado-nombre">@nombreCompleto</strong>
+
+                            @*<span class="sic-resultado-fuente @claseFuente">
                                     <i class="fa fa-database"></i>
                                     @nombreFuenteMostrar
+                                </span>*@
+                            <div class="sic-resultado-origen">
+
+                                <span class="sic-resultado-fuente @claseFuente"
+                                      title="@nombreFuente">
+
+                                    <i class="fa fa-database"></i>
+
+                                    @nombreFuente
+
                                 </span>
-                            </div>
 
-                            @if (mostrarAlias)
-                            {
-                                <div class="sic-resultado-alias">
-                                    <i class="fa fa-user-secret"></i>
-                                    <span>Alias:</span>
-                                    <strong>@alias</strong>
-                                </div>
-                            }
 
-                            <div class="sic-resultado-evidencias">
-                                @if (tieneTexto)
+                                @if (
+                                    item.IdTbFuente == 1 &&
+                                    !string.IsNullOrWhiteSpace(municipio) &&
+                                    !municipio.Equals(
+                                        "SIN INFORMACIÓN",
+                                        StringComparison.OrdinalIgnoreCase
+                                    )
+                                )
                                 {
-                                    <span class="sic-evidencia-badge sic-evidencia-texto"
-                                          title="@textoCoincidente">
-                                        <i class="fa fa-font"></i>
-                                        @descripcionTexto
-                                        <strong>@porcentajeTexto.ToString("0")%</strong>
+                                    <span class="sic-resultado-municipio"
+                                          title="@municipio">
+
+                                        <i class="fa fa-map-marker"></i>
+
+                                        @municipio
+
                                     </span>
                                 }
 
-                                @if (tieneFoto)
-                                {
-                                    <span class="sic-evidencia-badge sic-evidencia-foto">
-                                        <i class="fa fa-camera"></i>
-                                        Foto
-                                        <strong>@item.PorcentajeFoto.ToString("0")%</strong>
-                                    </span>
-                                }
-
-                                @if (tieneHuella)
-                                {
-                                    <span class="sic-evidencia-badge sic-evidencia-huella">
-                                        <i class="fa fa-hand-pointer-o"></i>
-                                        Huella
-                                        <strong>@item.PorcentajeHuella.ToString("0")%</strong>
-                                    </span>
-                                }
                             </div>
 
-                            @if (
-                                tieneTexto &&
-                                !string.IsNullOrWhiteSpace(textoCoincidente)
-                            )
-                            {
-                                <div class="sic-texto-coincidente">
-                                    <i class="fa fa-check-circle"></i>
-                                    <span>Coincidió con:</span>
-                                    <strong>@textoCoincidente</strong>
-                                </div>
-                            }
-
-                            @if (item.TieneAvisoMandamientos)
-                            {
-                                <div class="sic-aviso-mandamiento-listado">
-                                    <i class="fa fa-exclamation-triangle"></i>
-                                    <span>Coincidencia nominal en Mandamientos Judiciales</span>
-                                    <strong>@item.TotalMandamientos</strong>
-                                </div>
-                            }
-
-                            <div class="sic-resultado-datos">
-                                <span><b>Folio:</b> @folio</span>
-                                <span><b>Municipio:</b> @municipio</span>
-                                <span><b>Edad:</b> @edadTexto</span>
-                                <span><b>Sexo:</b> @sexo</span>
-                            </div>
                         </div>
 
-                        <div class="sic-resultado-puntaje">
-                            <small>Mejor evidencia</small>
-                            <strong class="@claseNivel">@porcentajeGlobal</strong>
-                            <span class="sic-resultado-tipo">@tipoResultadoTexto</span>
+                        @if (mostrarAlias)
+                        {
+                            <div class="sic-resultado-alias">
+                                <i class="fa fa-user-secret"></i>
+                                <span>Alias:</span>
+                                <strong>@alias</strong>
+                            </div>
+                        }
 
-                            <button type="button"
-                                    class="btn js-ver-coincidencia"
-                                    data-id="@item.IdCoincidencia"
-                                    aria-label="Ver detalle de @nombreCompleto">
-                                <i class="fa fa-eye"></i>
-                                Ver detalle
-                            </button>
+                        <div class="sic-resultado-evidencias">
+                            @if (tieneTexto)
+                            {
+                                <span class="sic-evidencia-badge sic-evidencia-texto"
+                                      title="@textoCoincidente">
+                                    <i class="fa fa-font"></i>
+                                    @descripcionTexto
+                                    <strong>@porcentajeTexto.ToString("0")%</strong>
+                                </span>
+                            }
+
+                            @if (tieneFoto)
+                            {
+                                <span class="sic-evidencia-badge sic-evidencia-foto">
+                                    <i class="fa fa-camera"></i>
+                                    Foto
+                                    <strong>@item.PorcentajeFoto.ToString("0")%</strong>
+                                </span>
+                            }
+
+                            @if (tieneHuella)
+                            {
+                                <span class="sic-evidencia-badge sic-evidencia-huella">
+                                    <i class="fa fa-hand-pointer-o"></i>
+                                    Huella
+                                    <strong>@item.PorcentajeHuella.ToString("0")%</strong>
+                                </span>
+                            }
                         </div>
-                    </article>
-                }
+
+                        @if (
+                            tieneTexto &&
+                            !string.IsNullOrWhiteSpace(textoCoincidente)
+                        )
+                        {
+                            <div class="sic-texto-coincidente">
+                                <i class="fa fa-check-circle"></i>
+                                <span>Coincidió con:</span>
+                                <strong>@textoCoincidente</strong>
+                            </div>
+                        }
+
+                        @if (item.TieneAvisoMandamientos)
+                        {
+                            <div class="sic-aviso-mandamiento-listado">
+                                <i class="fa fa-exclamation-triangle"></i>
+                                <span>Coincidencia nominal en Mandamientos Judiciales</span>
+                                <strong>@item.TotalMandamientos</strong>
+                            </div>
+                        }
+
+                        <div class="sic-resultado-datos">
+                            <span><b>Folio:</b> @folio</span>
+                            <span><b>Municipio:</b> @municipio</span>
+                            <span><b>Edad:</b> @edadTexto</span>
+                            <span><b>Sexo:</b> @sexo</span>
+                        </div>
+                    </div>
+
+                    <div class="sic-resultado-puntaje">
+                        <small>Mejor evidencia</small>
+                        <strong class="@claseNivel">@porcentajeGlobal</strong>
+                        <span class="sic-resultado-tipo">@tipoResultadoTexto</span>
+
+                        <button type="button"
+                                class="btn js-ver-coincidencia"
+                                data-id="@item.IdCoincidencia"
+                                aria-label="Ver detalle de @nombreCompleto">
+                            <i class="fa fa-eye"></i>
+                            Ver detalle
+                        </button>
+                    </div>
+                </article>
+            }
+        </div>
+    </section>
+
+    <section id="panelDetalleCoincidencia"
+             class="sic-panel-detalle"
+             aria-live="polite"
+             aria-busy="true">
+
+        <div class="sic-detalle-loader">
+            <i class="fa fa-spinner fa-spin"></i>
+            <span>Cargando detalle...</span>
+        </div>
+
+    </section>
+
+
+    @if (tieneFotografiaConsulta)
+    {
+        <div id="sicModalComparacionFoto"
+             class="sic-modal-comparacion"
+             aria-hidden="true">
+
+            <div class="sic-modal-comparacion-fondo
+                    js-cerrar-comparacion-foto">
             </div>
-        </section>
 
-        <section id="panelDetalleCoincidencia"
-                 class="sic-panel-detalle"
-                 aria-live="polite"
-                 aria-busy="true">
 
-            <div class="sic-detalle-loader">
-                <i class="fa fa-spinner fa-spin"></i>
-                <span>Cargando detalle...</span>
+            <div class="sic-modal-comparacion-dialogo"
+                 role="dialog"
+                 aria-modal="true"
+                 aria-labelledby="sicComparacionFotoTitulo">
+
+
+                <!-- =====================================================
+                CABECERA
+                ===================================================== -->
+
+                <div class="sic-modal-comparacion-header">
+
+                    <div>
+
+                        <small>
+                            Comparación biométrica
+                        </small>
+
+                        <h3 id="sicComparacionFotoTitulo">
+                            Comparación de fotografías
+                        </h3>
+
+                        <div class="sic-modal-comparacion-meta">
+
+                            <span id="sicComparacionFotoNombre">
+                            </span>
+
+                            <span>
+                                ·
+                            </span>
+
+                            <span id="sicComparacionFotoFuente">
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <button type="button"
+                            class="sic-modal-comparacion-cerrar
+                               js-cerrar-comparacion-foto"
+                            aria-label="Cerrar comparación">
+
+                        <i class="fa fa-times"></i>
+
+                    </button>
+
+                </div>
+
+
+                <!-- =====================================================
+                PORCENTAJE
+                ===================================================== -->
+
+                <div class="sic-modal-comparacion-evidencia">
+
+                    <div>
+
+                        <i class="fa fa-camera"></i>
+
+                        <span>
+                            Similitud fotográfica
+                        </span>
+
+                    </div>
+
+
+                    <strong id="sicComparacionFotoPorcentaje">
+                        0%
+                    </strong>
+
+                </div>
+
+
+                <!-- =====================================================
+                FOTOGRAFÍAS
+                ===================================================== -->
+
+                <div class="sic-modal-comparacion-body">
+
+
+                    <!-- FOTO BUSCADA -->
+
+                    <div class="sic-modal-comparacion-columna">
+
+                        <div class="sic-modal-comparacion-titulo-foto">
+
+                            <i class="fa fa-search"></i>
+
+                            Fotografía consultada
+
+                        </div>
+
+
+                        <div class="sic-modal-comparacion-imagen-contenedor">
+
+                            <img id="sicComparacionFotoConsulta"
+                                 src=""
+                                 alt="Fotografía consultada" />
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- FOTO CANDIDATO -->
+
+                    <div class="sic-modal-comparacion-columna">
+
+                        <div class="sic-modal-comparacion-titulo-foto">
+
+                            <i class="fa fa-database"></i>
+
+                            Fotografía del candidato
+
+                        </div>
+
+
+                        <div class="sic-modal-comparacion-imagen-contenedor">
+
+                            <img id="sicComparacionFotoCandidato"
+                                 src=""
+                                 alt="Fotografía del candidato"
+                                 onerror="this.onerror=null;this.src='@imagenNoDisponible';" />
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
             </div>
 
-        </section>
+        </div>
+    }
+
+
+    <!-- ==========================================================
+     VISOR DE FOTOGRAFÍA DEL REGISTRO
+     EXISTE CON O SIN FOTO DE CONSULTA
+     ========================================================== -->
+
+    <div id="sicModalFotoGrande"
+         class="sic-modal-foto-grande"
+         aria-hidden="true">
+
+        <div class="sic-modal-foto-grande-fondo
+                js-cerrar-foto-grande">
+        </div>
+
+
+        <div class="sic-modal-foto-grande-dialogo"
+             role="dialog"
+             aria-modal="true"
+             aria-labelledby="sicFotoGrandeNombre">
+
+
+            <button type="button"
+                    class="sic-modal-foto-grande-cerrar
+                       js-cerrar-foto-grande"
+                    aria-label="Cerrar fotografía">
+
+                <i class="fa fa-times"></i>
+
+            </button>
+
+
+            <div class="sic-modal-foto-grande-header">
+
+                <small>
+                    Fotografía del registro
+                </small>
+
+
+                <strong id="sicFotoGrandeNombre">
+                    Fotografía
+                </strong>
+
+
+                <span id="sicFotoGrandeFuente">
+                </span>
+
+            </div>
+
+
+            <div class="sic-modal-foto-grande-contenedor">
+
+                <img id="sicFotoGrandeImagen"
+                     src=""
+                     alt="Fotografía ampliada"
+                     onerror="this.onerror=null;this.src='@imagenNoDisponible';" />
+
+            </div>
+
+        </div>
+
     </div>
+
+</div>
 }
+
+

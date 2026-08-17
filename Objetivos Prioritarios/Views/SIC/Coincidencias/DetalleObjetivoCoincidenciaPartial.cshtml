@@ -741,9 +741,22 @@
 
             <div class="sic-obj-foto">
 
-                <img src="@fotoUrl"
-                     alt="@nombrePrincipal"
-                     onerror="this.onerror=null;this.src='@imagenNoDisponible';" />
+                <button type="button"
+                        class="sic-obj-btn-foto js-ampliar-foto"
+                        data-foto="@fotoUrl"
+                        data-nombre="@nombrePrincipal"
+                        data-fuente="FGEA - OBJETIVOS PRIORITARIOS"
+                        title="Ver fotografía en grande">
+
+                    <img src="@fotoUrl"
+                         alt="@nombrePrincipal"
+                         onerror="this.onerror=null;this.src='@imagenNoDisponible';" />
+
+                    <span class="sic-obj-foto-zoom">
+                        <i class="fa fa-search-plus"></i>
+                    </span>
+
+                </button>
 
             </div>
 

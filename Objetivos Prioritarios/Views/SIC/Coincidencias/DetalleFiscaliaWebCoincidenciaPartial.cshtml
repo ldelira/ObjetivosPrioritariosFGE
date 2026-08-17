@@ -308,10 +308,23 @@
 
         <div class="sic-fw-foto-wrap">
 
-            <img src="@fotoUrl"
-                 alt="@nombre"
-                 class="sic-fw-foto"
-                 onerror="this.onerror=null;this.src='@imagenNoDisponible';" />
+            <button type="button"
+                    class="sic-fw-btn-foto js-ampliar-foto"
+                    data-foto="@fotoUrl"
+                    data-nombre="@nombre"
+                    data-fuente="@fuente"
+                    title="Ver fotografía en grande">
+
+                <img src="@fotoUrl"
+                     alt="@nombre"
+                     class="sic-fw-foto"
+                     onerror="this.onerror=null;this.src='@imagenNoDisponible';" />
+
+                <span class="sic-fw-foto-zoom">
+                    <i class="fa fa-search-plus"></i>
+                </span>
+
+            </button>
 
         </div>
 

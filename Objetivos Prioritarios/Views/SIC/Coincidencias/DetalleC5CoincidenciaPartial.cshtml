@@ -829,11 +829,26 @@
          ========================================================== -->
     <div class="sic-c5-cabecera">
 
-        <div>
-            <img src="@fotoUrl"
-                 class="sic-c5-foto"
-                 alt="Fotografía de @nombre"
-                 onerror="this.onerror=null;this.src='@imagenNoDisponible';" />
+        <div class="sic-c5-foto-wrap">
+
+            <button type="button"
+                    class="sic-c5-btn-foto js-ampliar-foto"
+                    data-foto="@fotoUrl"
+                    data-nombre="@nombre"
+                    data-fuente="@fuenteMostrar"
+                    title="Ver fotografía en grande">
+
+                <img src="@fotoUrl"
+                     class="sic-c5-foto"
+                     alt="Fotografía de @nombre"
+                     onerror="this.onerror=null;this.src='@imagenNoDisponible';" />
+
+                <span class="sic-c5-foto-zoom">
+                    <i class="fa fa-search-plus"></i>
+                </span>
+
+            </button>
+
         </div>
 
         <div class="sic-c5-identidad">

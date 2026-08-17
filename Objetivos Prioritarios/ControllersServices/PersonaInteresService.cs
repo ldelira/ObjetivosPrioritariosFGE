@@ -266,6 +266,53 @@ namespace Objetivos_Prioritarios.ControllersServices
                     };
                 }
 
+                /*
+ * ============================================================
+ * EMBEDDING FACIAL
+ * ============================================================
+ *
+ * Fuente 3 = Personas de Interés
+ *
+ * Únicamente usamos la fotografía FRONTAL.
+ *
+ * 1 = Frontal
+ * 2 = Perfil izquierdo
+ * 3 = Perfil derecho
+ * 4 = Otra
+ * ============================================================
+ */
+
+                ResultadoEmbeddingApi resultadoEmbedding = null;
+
+
+                if (idTipoFoto == 1)
+                {
+                    resultadoEmbedding =
+                        BiometriaApiHelper
+                            .GuardarOActualizarEmbedding(
+                                idPersona,
+                                3,
+                                bytes,
+                                archivo.FileName,
+                                archivo.ContentType
+                            );
+
+
+                    if (!resultadoEmbedding.Success)
+                    {
+                        return new BasicOperationResponse
+                        {
+                            IsSuccess = false,
+
+                            Message =
+                                "No se guardó la fotografía frontal porque no fue posible "
+                                + "generar el embedding facial. "
+                                + resultadoEmbedding.Message
+                        };
+                    }
+                }
+
+
                 string base64 = Convert.ToBase64String(bytes);
 
                 string rutaBase = ConfigurationManager.AppSettings["PersonasInteres.RutaBaseArchivos"];

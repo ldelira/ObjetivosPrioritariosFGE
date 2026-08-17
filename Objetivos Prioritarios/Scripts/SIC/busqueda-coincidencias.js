@@ -1570,6 +1570,230 @@
        ============================================================ */
 
     function inicializarEventosResultados() {
+
+        $(document)
+            .off(
+                'click.sicFotoGrande',
+                '.js-ampliar-foto'
+            )
+            .on(
+                'click.sicFotoGrande',
+                '.js-ampliar-foto',
+                function (evento) {
+
+                    evento.preventDefault();
+                    evento.stopPropagation();
+
+                    const boton =
+                        $(this);
+
+                    const foto =
+                        boton.attr(
+                            'data-foto'
+                        ) || '';
+
+                    const nombre =
+                        boton.attr(
+                            'data-nombre'
+                        ) || 'Fotografía';
+
+                    const fuente =
+                        boton.attr(
+                            'data-fuente'
+                        ) || '';
+
+
+                    if (!foto) {
+                        return;
+                    }
+
+
+                    $('#sicFotoGrandeImagen')
+                        .attr(
+                            'src',
+                            foto
+                        );
+
+
+                    $('#sicFotoGrandeNombre')
+                        .text(
+                            nombre
+                        );
+
+
+                    $('#sicFotoGrandeFuente')
+                        .text(
+                            fuente
+                        );
+
+
+                    $('#sicModalFotoGrande')
+                        .addClass(
+                            'abierto'
+                        )
+                        .attr(
+                            'aria-hidden',
+                            'false'
+                        );
+
+
+                    $('body')
+                        .addClass(
+                            'sic-modal-abierto'
+                        );
+                }
+        );
+        $(document)
+            .off(
+                'click.sicCerrarFotoGrande',
+                '.js-cerrar-foto-grande'
+            )
+            .on(
+                'click.sicCerrarFotoGrande',
+                '.js-cerrar-foto-grande',
+                function (evento) {
+
+                    evento.preventDefault();
+                    evento.stopPropagation();
+
+                    cerrarFotoGrande();
+                }
+            );
+
+        $(document)
+            .off(
+                'keydown.sicComparacionFoto'
+            )
+            .on(
+                'keydown.sicComparacionFoto',
+                function (evento) {
+
+                    if (
+                        evento.key === 'Escape' &&
+                        $('#sicModalComparacionFoto')
+                            .hasClass('abierto')
+                    ) {
+                        cerrarComparacionFoto();
+                    }
+                }
+            );
+
+        $(document)
+            .off(
+                'click.sicComparacionFoto',
+                '.js-abrir-comparacion-foto'
+            )
+            .on(
+                'click.sicComparacionFoto',
+                '.js-abrir-comparacion-foto',
+                function (evento) {
+
+                    evento.preventDefault();
+                    evento.stopPropagation();
+
+                    const boton =
+                        $(this);
+
+                    const fotoConsulta =
+                        $('#previewFotografia').is(':visible')
+                            ? $('#previewFotografia').attr('src')
+                            : '';
+
+                    const fotoCandidato =
+                        boton.attr(
+                            'data-foto-candidato'
+                        ) || '';
+
+                    const nombre =
+                        boton.attr(
+                            'data-nombre'
+                        ) || '';
+
+                    const fuente =
+                        boton.attr(
+                            'data-fuente'
+                        ) || '';
+
+                    const porcentaje =
+                        boton.attr(
+                            'data-porcentaje'
+                        ) || '0';
+
+
+                    if (!fotoConsulta) {
+                        mostrarMensaje(
+                            'No se encontró la fotografía utilizada en la consulta.',
+                            'warning'
+                        );
+
+                        return;
+                    }
+
+
+                    $('#sicComparacionFotoConsulta')
+                        .attr(
+                            'src',
+                            fotoConsulta
+                        );
+
+
+                    $('#sicComparacionFotoCandidato')
+                        .attr(
+                            'src',
+                            fotoCandidato
+                        );
+
+
+                    $('#sicComparacionFotoNombre')
+                        .text(
+                            nombre
+                        );
+
+
+                    $('#sicComparacionFotoFuente')
+                        .text(
+                            fuente
+                        );
+
+
+                    $('#sicComparacionFotoPorcentaje')
+                        .text(
+                            porcentaje + '%'
+                        );
+
+
+                    $('#sicModalComparacionFoto')
+                        .addClass(
+                            'abierto'
+                        )
+                        .attr(
+                            'aria-hidden',
+                            'false'
+                        );
+
+
+                    $('body')
+                        .addClass(
+                            'sic-modal-abierto'
+                        );
+                }
+            );
+        $(document)
+            .off(
+                'click.sicCerrarComparacionFoto',
+                '.js-cerrar-comparacion-foto'
+            )
+            .on(
+                'click.sicCerrarComparacionFoto',
+                '.js-cerrar-comparacion-foto',
+                function (evento) {
+
+                    evento.preventDefault();
+                    evento.stopPropagation();
+
+                    cerrarComparacionFoto();
+                }
+            );
         $(document)
             .off(
                 'click.sicCoincidencias',
@@ -1683,10 +1907,98 @@
                         tipo
                     );
                 }
+        );
+
+        $(document)
+            .off(
+                'keydown.sicModalesFoto'
+            )
+            .on(
+                'keydown.sicModalesFoto',
+                function (evento) {
+
+                    if (evento.key !== 'Escape') {
+                        return;
+                    }
+
+
+                    if (
+                        $('#sicModalComparacionFoto')
+                            .hasClass('abierto')
+                    ) {
+                        cerrarComparacionFoto();
+
+                        return;
+                    }
+
+
+                    if (
+                        $('#sicModalFotoGrande')
+                            .hasClass('abierto')
+                    ) {
+                        cerrarFotoGrande();
+                    }
+                }
+            );
+
+    }
+
+    function cerrarFotoGrande() {
+
+        $('#sicModalFotoGrande')
+            .removeClass(
+                'abierto'
+            )
+            .attr(
+                'aria-hidden',
+                'true'
+            );
+
+
+        $('#sicFotoGrandeImagen')
+            .attr(
+                'src',
+                ''
+            );
+
+
+        $('body')
+            .removeClass(
+                'sic-modal-abierto'
             );
     }
 
+    function cerrarComparacionFoto() {
 
+        $('#sicModalComparacionFoto')
+            .removeClass(
+                'abierto'
+            )
+            .attr(
+                'aria-hidden',
+                'true'
+            );
+
+
+        $('#sicComparacionFotoConsulta')
+            .attr(
+                'src',
+                ''
+            );
+
+
+        $('#sicComparacionFotoCandidato')
+            .attr(
+                'src',
+                ''
+            );
+
+
+        $('body')
+            .removeClass(
+                'sic-modal-abierto'
+            );
+    }
     function seleccionarResultadoDesdeElemento(
         elementoResultado
     ) {
@@ -1992,6 +2304,17 @@
             .attr(
                 'src',
                 fotoConsulta || ''
+            );
+
+        $('.js-foto-consulta-mini')
+            .attr(
+                'src',
+                fotoConsulta || ''
+            );
+
+        $('.js-abrir-comparacion-foto')
+            .toggle(
+                !!fotoConsulta
             );
 
         $('.js-imagen-consulta-huella')

@@ -6777,3 +6777,763 @@
     .sic-detalle-loader span {
         font-size: 13px !important;
     }
+
+/* ============================================================
+   COMPARADOR FOTOGRÁFICO - RESULTADOS
+   ============================================================ */
+
+.sic-resultado-comparador-foto {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px;
+    border: 1px solid #d9e2f0;
+    border-radius: 10px;
+    background: #f8faff;
+    cursor: pointer;
+    transition: .18s ease;
+}
+
+    .sic-resultado-comparador-foto:hover {
+        border-color: #7ca5ff;
+        background: #eef4ff;
+        box-shadow: 0 3px 10px rgba(37, 99, 235, .10);
+    }
+
+.sic-resultado-mini-foto {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+}
+
+    .sic-resultado-mini-foto span {
+        color: #748099;
+        font-size: 7px;
+        line-height: 1;
+        font-weight: 800;
+        text-transform: uppercase;
+    }
+
+    .sic-resultado-mini-foto img {
+        display: block;
+        width: 52px;
+        height: 66px;
+        object-fit: cover;
+        border-radius: 7px;
+        background: #eef1f6;
+    }
+
+.sic-resultado-comparacion-separador {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 17px;
+    min-width: 17px;
+    height: 17px;
+    border-radius: 50%;
+    background: #e9efff;
+    color: #4564d9;
+    font-size: 8px;
+}
+
+/* ============================================================
+   MODAL - COMPARACIÓN FOTOGRÁFICA
+   ============================================================ */
+
+.sic-modal-comparacion {
+    position: fixed;
+    inset: 0;
+    z-index: 10050;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 25px;
+}
+
+    .sic-modal-comparacion.abierto {
+        display: flex;
+    }
+
+.sic-modal-comparacion-fondo {
+    position: absolute;
+    inset: 0;
+    background: rgba(9, 18, 45, .82);
+    backdrop-filter: blur(2px);
+}
+
+.sic-modal-comparacion-dialogo {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    width: min(1180px, 94vw);
+    max-height: 92vh;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,.14);
+    border-radius: 16px;
+    background: #111a35;
+    box-shadow: 0 22px 65px rgba(0, 0, 0, .45);
+}
+
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+
+.sic-modal-comparacion-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 16px 20px;
+    border-bottom: 1px solid rgba(255,255,255,.12);
+}
+
+    .sic-modal-comparacion-header small {
+        display: block;
+        margin-bottom: 3px;
+        color: #92a4ca;
+        font-size: 9px;
+        font-weight: 800;
+        text-transform: uppercase;
+    }
+
+    .sic-modal-comparacion-header h3 {
+        margin: 0;
+        color: #fff;
+        font-size: 18px;
+        line-height: 1.3;
+        font-weight: 900;
+    }
+
+.sic-modal-comparacion-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 5px;
+    color: #bcc8df;
+    font-size: 11px;
+    line-height: 1.4;
+}
+
+.sic-modal-comparacion-cerrar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    min-width: 38px;
+    height: 38px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: #fff;
+    color: #152042;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+
+/* ============================================================
+   EVIDENCIA
+   ============================================================ */
+
+.sic-modal-comparacion-evidencia {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 10px 20px;
+    background: rgba(44, 135, 76, .16);
+    border-bottom: 1px solid rgba(77, 190, 114, .25);
+}
+
+    .sic-modal-comparacion-evidencia > div {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #bce8c8;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .sic-modal-comparacion-evidencia strong {
+        color: #68d887;
+        font-size: 20px;
+        font-weight: 900;
+    }
+
+
+/* ============================================================
+   CUERPO
+   ============================================================ */
+
+.sic-modal-comparacion-body {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    min-height: 0;
+    padding: 14px;
+    overflow: auto;
+}
+
+.sic-modal-comparacion-columna {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    padding: 10px;
+    border: 1px solid rgba(255,255,255,.13);
+    border-radius: 12px;
+    background: #17213d;
+}
+
+.sic-modal-comparacion-titulo-foto {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    min-height: 34px;
+    margin-bottom: 9px;
+    padding: 7px 10px;
+    border-radius: 8px;
+    background: #0e1731;
+    color: #e1e8f7;
+    font-size: 11px;
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+.sic-modal-comparacion-imagen-contenedor {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    min-height: 360px;
+    overflow: hidden;
+    border-radius: 9px;
+    background: #0b1228;
+}
+
+    .sic-modal-comparacion-imagen-contenedor img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        max-height: 65vh;
+        object-fit: contain;
+    }
+
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 850px) {
+
+    .sic-modal-comparacion {
+        padding: 10px;
+    }
+
+    .sic-modal-comparacion-body {
+        grid-template-columns: 1fr;
+    }
+
+    .sic-modal-comparacion-imagen-contenedor {
+        min-height: 280px;
+    }
+}
+
+body.sic-modal-abierto {
+    overflow: hidden;
+}
+
+/* ============================================================
+   RESULTADO CON COMPARACIÓN FOTOGRÁFICA
+   ============================================================ */
+
+.sic-resultado-persona.sic-resultado-con-comparacion {
+    grid-template-columns: 130px minmax(0, 1fr) 110px;
+    gap: 10px;
+}
+
+.sic-resultado-con-comparacion
+.sic-resultado-foto-contenedor {
+    width: 130px;
+    min-width: 130px;
+}
+
+.sic-resultado-con-comparacion
+.sic-resultado-informacion {
+    min-width: 0;
+}
+
+/* ============================================================
+   FUENTE + MUNICIPIO EN RESULTADOS
+   ============================================================ */
+
+.sic-resultado-origen {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 5px;
+    min-width: 0;
+}
+
+    .sic-resultado-origen .sic-resultado-fuente {
+        flex: 0 0 auto;
+        max-width: 100%;
+    }
+
+.sic-resultado-municipio {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    max-width: 145px;
+    padding: 4px 7px;
+    border: 1px solid #d9e1ed;
+    border-radius: 999px;
+    background: #f8fafc;
+    color: #53627c;
+    font-size: 9px;
+    line-height: 1.2;
+    font-weight: 800;
+    text-transform: uppercase;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+    .sic-resultado-municipio i {
+        flex: 0 0 auto;
+        color: #6c7ba0;
+        font-size: 9px;
+    }
+
+.sic-resultado-con-comparacion
+.sic-resultado-origen {
+    gap: 4px;
+}
+
+.sic-resultado-con-comparacion
+.sic-resultado-municipio {
+    max-width: 120px;
+}
+
+
+/* ============================================================
+   FOTO AMPLIABLE - RESULTADOS
+   ============================================================ */
+
+.sic-btn-ampliar-foto {
+    position: relative;
+    display: block;
+    width: 78px;
+    height: 92px;
+    padding: 0;
+    overflow: hidden;
+    border: 0;
+    border-radius: 9px;
+    background: transparent;
+    cursor: zoom-in;
+}
+
+    .sic-btn-ampliar-foto .sic-resultado-foto {
+        display: block;
+        width: 100%;
+        height: 100%;
+    }
+
+.sic-ampliar-foto-icono {
+    position: absolute;
+    right: 5px;
+    bottom: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: rgba(7, 29, 85, .82);
+    color: #fff;
+    font-size: 9px;
+    opacity: 0;
+    transform: scale(.85);
+    transition: .15s ease;
+}
+
+.sic-btn-ampliar-foto:hover
+.sic-ampliar-foto-icono {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.sic-btn-ampliar-foto:hover
+.sic-resultado-foto {
+    transform: scale(1.04);
+}
+
+.sic-btn-ampliar-foto
+.sic-resultado-foto {
+    transition: transform .18s ease;
+}
+
+/* ============================================================
+   MODAL - FOTOGRAFÍA AMPLIADA
+   ============================================================ */
+
+.sic-modal-foto-grande {
+    position: fixed;
+    inset: 0;
+    z-index: 10060;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+}
+
+    .sic-modal-foto-grande.abierto {
+        display: flex;
+    }
+
+.sic-modal-foto-grande-fondo {
+    position: absolute;
+    inset: 0;
+    background: rgba(7, 16, 39, .84);
+    backdrop-filter: blur(2px);
+}
+
+.sic-modal-foto-grande-dialogo {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    width: min(720px, 92vw);
+    max-height: 92vh;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,.15);
+    border-radius: 16px;
+    background: #111a35;
+    box-shadow: 0 25px 70px rgba(0,0,0,.5);
+}
+
+.sic-modal-foto-grande-header {
+    padding: 15px 60px 13px 18px;
+    border-bottom: 1px solid rgba(255,255,255,.11);
+}
+
+    .sic-modal-foto-grande-header small {
+        display: block;
+        margin-bottom: 4px;
+        color: #8fa0c4;
+        font-size: 9px;
+        font-weight: 800;
+        text-transform: uppercase;
+    }
+
+    .sic-modal-foto-grande-header strong {
+        display: block;
+        color: #fff;
+        font-size: 17px;
+        line-height: 1.3;
+        font-weight: 900;
+    }
+
+    .sic-modal-foto-grande-header span {
+        display: block;
+        margin-top: 4px;
+        color: #aebbd3;
+        font-size: 11px;
+    }
+
+.sic-modal-foto-grande-cerrar {
+    position: absolute;
+    z-index: 2;
+    top: 13px;
+    right: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: #fff;
+    color: #142044;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.sic-modal-foto-grande-contenedor {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 450px;
+    padding: 14px;
+    overflow: auto;
+    background: #0b1228;
+}
+
+    .sic-modal-foto-grande-contenedor img {
+        display: block;
+        width: auto;
+        max-width: 100%;
+        height: auto;
+        max-height: 72vh;
+        object-fit: contain;
+        border-radius: 8px;
+    }
+
+@media (max-width: 700px) {
+
+    .sic-modal-foto-grande {
+        padding: 10px;
+    }
+
+    .sic-modal-foto-grande-contenedor {
+        min-height: 300px;
+    }
+}
+
+/* =========================================================
+   FOTO AMPLIABLE
+   ========================================================= */
+
+.sic-fgea-btn-foto {
+    position: relative;
+    display: block;
+    width: 100%;
+    padding: 0;
+    overflow: hidden;
+    border: 0;
+    border-radius: 10px;
+    background: transparent;
+    cursor: zoom-in;
+}
+
+    .sic-fgea-btn-foto .sic-fgea-foto {
+        display: block;
+        transition: transform .18s ease, filter .18s ease;
+    }
+
+    .sic-fgea-btn-foto:hover .sic-fgea-foto {
+        transform: scale(1.035);
+        filter: brightness(1.04);
+    }
+
+.sic-fgea-foto-zoom {
+    position: absolute;
+    right: 7px;
+    bottom: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 27px;
+    height: 27px;
+    border: 2px solid rgba(255,255,255,.9);
+    border-radius: 50%;
+    background: rgba(7,29,85,.82);
+    color: #fff;
+    font-size: 10px;
+    opacity: 0;
+    transform: scale(.85);
+    transition: .15s ease;
+}
+
+.sic-fgea-btn-foto:hover .sic-fgea-foto-zoom {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.sic-fgea-btn-foto:focus {
+    outline: none;
+}
+
+.sic-fgea-btn-foto:focus-visible {
+    box-shadow: 0 0 0 3px rgba(53,87,212,.20);
+}
+
+/* =========================================================
+   FOTO AMPLIABLE - C5
+   ========================================================= */
+
+.sic-c5-foto-wrap {
+    width: 125px;
+}
+
+.sic-c5-btn-foto {
+    position: relative;
+    display: block;
+    width: 125px;
+    height: 145px;
+    padding: 0;
+    overflow: hidden;
+    border: 0;
+    border-radius: 12px;
+    background: transparent;
+    cursor: zoom-in;
+}
+
+    .sic-c5-btn-foto .sic-c5-foto {
+        display: block;
+        width: 125px;
+        height: 145px;
+        transition: transform .18s ease, filter .18s ease;
+    }
+
+    .sic-c5-btn-foto:hover .sic-c5-foto {
+        transform: scale(1.035);
+        filter: brightness(1.04);
+    }
+
+.sic-c5-foto-zoom {
+    position: absolute;
+    right: 7px;
+    bottom: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 27px;
+    height: 27px;
+    border: 2px solid rgba(255,255,255,.9);
+    border-radius: 50%;
+    background: rgba(7,29,85,.82);
+    color: #fff;
+    font-size: 10px;
+    opacity: 0;
+    transform: scale(.85);
+    transition: .15s ease;
+}
+
+.sic-c5-btn-foto:hover .sic-c5-foto-zoom {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.sic-c5-btn-foto:focus {
+    outline: none;
+}
+
+.sic-c5-btn-foto:focus-visible {
+    box-shadow: 0 0 0 3px rgba(53,87,212,.20);
+}
+
+/* =========================================================
+   FOTO AMPLIABLE - OBJETIVOS PRIORITARIOS
+   ========================================================= */
+
+.sic-obj-btn-foto {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    overflow: hidden;
+    border: 0;
+    border-radius: 10px;
+    background: transparent;
+    cursor: zoom-in;
+}
+
+    .sic-obj-btn-foto img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform .18s ease, filter .18s ease;
+    }
+
+    .sic-obj-btn-foto:hover img {
+        transform: scale(1.035);
+        filter: brightness(1.04);
+    }
+
+.sic-obj-foto-zoom {
+    position: absolute;
+    right: 7px;
+    bottom: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 27px;
+    height: 27px;
+    border: 2px solid rgba(255,255,255,.9);
+    border-radius: 50%;
+    background: rgba(7,29,85,.82);
+    color: #fff;
+    font-size: 10px;
+    opacity: 0;
+    transform: scale(.85);
+    transition: .15s ease;
+}
+
+.sic-obj-btn-foto:hover .sic-obj-foto-zoom {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.sic-obj-btn-foto:focus {
+    outline: none;
+}
+
+.sic-obj-btn-foto:focus-visible {
+    box-shadow: 0 0 0 3px rgba(53,87,212,.20);
+}
+
+/* =========================================================
+   FOTO AMPLIABLE - AMBER / ALBA / CAPEA
+   ========================================================= */
+
+.sic-fw-btn-foto {
+    position: relative;
+    display: block;
+    width: 100%;
+    padding: 0;
+    overflow: hidden;
+    border: 0;
+    border-radius: 10px;
+    background: transparent;
+    cursor: zoom-in;
+}
+
+    .sic-fw-btn-foto .sic-fw-foto {
+        display: block;
+        transition: transform .18s ease, filter .18s ease;
+    }
+
+    .sic-fw-btn-foto:hover .sic-fw-foto {
+        transform: scale(1.035);
+        filter: brightness(1.04);
+    }
+
+.sic-fw-foto-zoom {
+    position: absolute;
+    right: 7px;
+    bottom: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 27px;
+    height: 27px;
+    border: 2px solid rgba(255,255,255,.9);
+    border-radius: 50%;
+    background: rgba(7,29,85,.82);
+    color: #fff;
+    font-size: 10px;
+    opacity: 0;
+    transform: scale(.85);
+    transition: .15s ease;
+}
+
+.sic-fw-btn-foto:hover .sic-fw-foto-zoom {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.sic-fw-btn-foto:focus {
+    outline: none;
+}
+
+.sic-fw-btn-foto:focus-visible {
+    box-shadow: 0 0 0 3px rgba(53,87,212,.20);
+}

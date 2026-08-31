@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 
@@ -68,6 +69,7 @@ namespace Objetivos_Prioritarios.Models.Extends
 
         public HttpPostedFileBase Huella { get; set; }
 
+        public List<HttpPostedFileBase> Huellas { get; set; }
 
         /* =========================================================
          * FILTROS AVANZADOS
@@ -157,9 +159,27 @@ namespace Objetivos_Prioritarios.Models.Extends
         {
             get
             {
-                return
+                /*
+                 * Primero revisamos la nueva colección.
+                 */
+                bool tieneHuellasMultiples =
+                    Huellas != null &&
+                    Huellas.Any(x =>
+                        x != null &&
+                        x.ContentLength > 0
+                    );
+
+                /*
+                 * Conservamos temporalmente compatibilidad
+                 * con la huella individual anterior.
+                 */
+                bool tieneHuellaAnterior =
                     Huella != null &&
                     Huella.ContentLength > 0;
+
+                return
+                    tieneHuellasMultiples ||
+                    tieneHuellaAnterior;
             }
         }
 
@@ -239,7 +259,7 @@ namespace Objetivos_Prioritarios.Models.Extends
                 null;
 
             PorcentajeMinimo =
-                70;
+                50;
 
             Municipio =
                 string.Empty;
@@ -258,6 +278,8 @@ namespace Objetivos_Prioritarios.Models.Extends
 
             TiposCoincidencia =
                 new List<SelectListItem>();
+            Huellas =
+                new List<HttpPostedFileBase>();
         }
     }
 }

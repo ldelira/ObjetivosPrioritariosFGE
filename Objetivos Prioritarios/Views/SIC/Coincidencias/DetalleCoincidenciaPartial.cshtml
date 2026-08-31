@@ -562,6 +562,10 @@ else
                             )
                                 ? "SIN INFORMACIÓN"
                                 : mandamiento.EstadoProceso.Trim();
+                        string delito =
+                            string.IsNullOrWhiteSpace(mandamiento.Delito)
+                                ? "SIN INFORMACIÓN"
+                                : mandamiento.Delito;
 
 
                         <article class="sic-mandamiento-item">
@@ -631,7 +635,10 @@ else
                                     </strong>
 
                                 </div>
-
+                                <div>
+                                    <small>Delito</small>
+                                    <strong>@delito</strong>
+                                </div>
 
                                 <div>
 

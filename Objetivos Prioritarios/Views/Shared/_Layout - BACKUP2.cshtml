@@ -1,0 +1,1906 @@
+﻿@{
+    var controllerName =
+        (ViewContext.RouteData.Values["controller"] ?? "")
+            .ToString();
+
+    var actionName =
+        (ViewContext.RouteData.Values["action"] ?? "")
+            .ToString();
+
+    var nombreUsuario =
+        (Session["NombreUsuario"] ?? "FGEA")
+            .ToString();
+
+    var pageTitle =
+        ((ViewBag.Title ?? ViewBag.title) ?? "")
+            .ToString();
+
+
+    /* =========================================================
+       IDENTIFICACIÓN DE PANTALLAS
+       ========================================================= */
+
+    var isMapa =
+        controllerName.Equals(
+            "MapaRelaciones",
+            StringComparison.OrdinalIgnoreCase
+        );
+
+    var isAsuntos =
+        controllerName.Equals(
+            "Asuntos",
+            StringComparison.OrdinalIgnoreCase
+        );
+
+
+    /*
+     * La búsqueda utiliza el controlador SIC,
+     * pero será una opción principal independiente.
+     */
+    var isBusquedaCoincidencias =
+        controllerName.Equals(
+            "SIC",
+            StringComparison.OrdinalIgnoreCase
+        )
+        &&
+        actionName.Equals(
+            "BusquedaCoincidencias",
+            StringComparison.OrdinalIgnoreCase
+        );
+
+
+    /*
+     * Pantalla principal de consulta SIC.
+     */
+    var isConsultaSic =
+        controllerName.Equals(
+            "SIC",
+            StringComparison.OrdinalIgnoreCase
+        )
+        &&
+        actionName.Equals(
+            "Index",
+            StringComparison.OrdinalIgnoreCase
+        );
+
+
+    /*
+     * Acciones pertenecientes al módulo SIC.
+     * Se excluye la búsqueda de coincidencias porque
+     * aparecerá como una opción independiente.
+     */
+    var isSic =
+        (
+            controllerName.Equals(
+                "SIC",
+                StringComparison.OrdinalIgnoreCase
+            )
+            ||
+            controllerName.Equals(
+                "SicNotificador",
+                StringComparison.OrdinalIgnoreCase
+            )
+        )
+        &&
+        !isBusquedaCoincidencias;
+
+
+    var isPersonasInteres =
+        controllerName.Equals(
+            "PersonasInteres",
+            StringComparison.OrdinalIgnoreCase
+        );
+
+
+    var isAlbum =
+        controllerName.Equals(
+            "FichaObjetivo",
+            StringComparison.OrdinalIgnoreCase
+        )
+        &&
+        actionName.Equals(
+            "IndexAlbum",
+            StringComparison.OrdinalIgnoreCase
+        );
+
+
+    var isObjetivos =
+        controllerName.Equals(
+            "Objetivo",
+            StringComparison.OrdinalIgnoreCase
+        )
+        ||
+        (
+            controllerName.Equals(
+                "FichaObjetivo",
+                StringComparison.OrdinalIgnoreCase
+            )
+            &&
+            !isAlbum
+        );
+
+
+    /* =========================================================
+       MÓDULOS ACTIVOS
+       ========================================================= */
+
+    var isModuloObjetivos =
+        isMapa ||
+        isObjetivos ||
+        isAsuntos ||
+        isAlbum;
+
+    var isModuloSic =
+        isSic;
+
+    var isModuloPersonasInteres =
+        isPersonasInteres;
+
+
+    /* =========================================================
+       TEXTO DEL MÓDULO ACTIVO
+       ========================================================= */
+
+    var moduloActivo =
+        "Objetivos Prioritarios";
+
+    var moduloActivoSubtitulo =
+        "Gestión de inteligencia";
+
+
+    if (isModuloSic)
+    {
+        moduloActivo =
+            "Sistema de Identificación Criminal";
+
+        moduloActivoSubtitulo =
+            "Consulta y filiación";
+    }
+
+
+    if (isBusquedaCoincidencias)
+    {
+        moduloActivo =
+            "Búsqueda de coincidencias";
+
+        moduloActivoSubtitulo =
+            "Consulta biométrica por fotografía y huella";
+    }
+
+
+    if (isModuloPersonasInteres)
+    {
+        moduloActivo =
+            "Personas de Interés";
+
+        moduloActivoSubtitulo =
+            "Registros parciales, fotos y huellas";
+    }
+}
+
+<!DOCTYPE html>
+<html lang="es-mx">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+    <title>@(string.IsNullOrWhiteSpace(pageTitle) ? "Objetivos Prioritarios" : pageTitle + " | Objetivos Prioritarios")</title>
+
+    <meta content="" name="description">
+    <meta content="" name="keywords">
+
+    <link href="@Url.Content("~/assets/images/logoIcono.png")" rel="icon">
+    <link href="@Url.Content("~/assets/images/logoIcono.png")" rel="apple-touch-icon">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.gstatic.com" rel="preconnect">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+
+    <!-- Vendor CSS Files -->
+    <link href="@Url.Content("~/Content/assets/vendor/bootstrap/css/bootstrap.min.css")" rel="stylesheet">
+    <link href="@Url.Content("~/Content/assets/vendor/bootstrap-icons/bootstrap-icons.css")" rel="stylesheet">
+    <link href="@Url.Content("~/Content/assets/vendor/boxicons/css/boxicons.min.css")" rel="stylesheet">
+    <link href="@Url.Content("~/Content/assets/vendor/quill/quill.snow.css")" rel="stylesheet">
+    <link href="@Url.Content("~/Content/assets/vendor/quill/quill.bubble.css")" rel="stylesheet">
+    <link href="@Url.Content("~/Content/assets/vendor/remixicon/remixicon.css")" rel="stylesheet">
+    <link href="@Url.Content("~/Content/assets/vendor/simple-datatables/style.css")" rel="stylesheet">
+    <link href="@Url.Content("~/assets/plugins/font-awesome/css/font-awesome.min.css")" rel="stylesheet" />
+
+    <!-- Template Main CSS File -->
+    <link href="@Url.Content("~/Content/assets/css/style.css")" rel="stylesheet">
+
+    <!-- Plugins CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.6.4/css/buttons.dataTables.min.css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/v/dt/dt-1.10.22/datatables.min.css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.22/css/jquery.dataTables.min.css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/fixedheader/3.1.7/css/fixedHeader.dataTables.min.css" />
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+    <link rel="stylesheet" href="@Url.Content("~/Content/Selectize/css/selectize.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/Selectize/css/selectize.bootstrap3.css")">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-colorpicker/2.5.3/css/bootstrap-colorpicker.css" rel="stylesheet">
+    <link href="@Url.Content("~/assets/plugins/sweetalert/css/sweetalert.min.css")" rel="stylesheet" />
+
+    @Styles.Render("~/bundles/css2")
+    @RenderSection("styles", required: false)
+
+    <style>
+        :root {
+            --op-header-height: 64px;
+            --op-sidebar-width: 272px;
+            --op-bg: #f4f7fb;
+            --op-card: #ffffff;
+            --op-primary: #2f5bff;
+            --op-primary-dark: #0b2364;
+            --op-primary-soft: #eef4ff;
+            --op-border: #dfe7f2;
+            --op-text: #071b3a;
+            --op-muted: #6f7d93;
+            --op-shadow: 0 10px 28px rgba(15, 35, 75, .08);
+        }
+
+        html,
+        body {
+            min-height: 100%;
+            font-family: Arial, Helvetica, sans-serif !important;
+            background: var(--op-bg);
+            color: var(--op-text);
+        }
+
+        label, input, select, textarea, button,
+        p, span, div, table, th, td,
+        h1, h2, h3, h4, h5, h6,
+        a {
+            font-family: Arial, Helvetica, sans-serif !important;
+        }
+
+        body {
+            overflow-x: hidden;
+        }
+
+        /* ================================
+           HEADER
+        ================================ */
+
+        .header {
+            height: var(--op-header-height);
+            background: linear-gradient(90deg, #bfeaf6 0%, #d7f3fb 100%);
+            border-bottom: 1px solid rgba(11, 35, 100, .08);
+            box-shadow: 0 4px 14px rgba(15, 35, 75, .05);
+            padding: 0 18px;
+            z-index: 997;
+        }
+
+        .op-header-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            min-width: 0;
+        }
+
+        .toggle-sidebar-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--op-primary-dark);
+            background: rgba(255, 255, 255, .45);
+            border: 1px solid rgba(255, 255, 255, .65);
+            transition: .15s ease;
+            font-size: 22px;
+            cursor: pointer;
+        }
+
+            .toggle-sidebar-btn:hover {
+                background: #fff;
+                color: var(--op-primary);
+                transform: translateY(-1px);
+            }
+
+        .op-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            min-width: 0;
+        }
+
+            .op-brand img {
+                width: 38px;
+                height: 38px;
+                object-fit: contain;
+                border-radius: 10px;
+                background: rgba(255,255,255,.55);
+                padding: 3px;
+            }
+
+        .op-brand-title {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.1;
+        }
+
+            .op-brand-title strong {
+                color: var(--op-primary-dark);
+                font-size: 16px;
+                font-weight: 800;
+                letter-spacing: .2px;
+                white-space: nowrap;
+            }
+
+            .op-brand-title small {
+                color: #50617b;
+                font-size: 11px;
+                margin-top: 3px;
+                white-space: nowrap;
+            }
+
+        .header-nav .nav-profile img {
+            width: 32px;
+            height: 32px;
+            padding: 2px;
+            background: #fff;
+            border: 1px solid rgba(11,35,100,.15);
+        }
+
+        .header-nav .nav-profile span {
+            color: var(--op-primary-dark);
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .dropdown-menu.profile {
+            border: 1px solid var(--op-border);
+            box-shadow: var(--op-shadow);
+            border-radius: 14px;
+            overflow: hidden;
+        }
+
+        /* ================================
+           SIDEBAR
+        ================================ */
+
+        .sidebar {
+            width: var(--op-sidebar-width);
+            top: var(--op-header-height);
+            background: #fff;
+            border-right: 1px solid var(--op-border);
+            box-shadow: 5px 0 18px rgba(15, 35, 75, .04);
+            padding: 16px 14px;
+            z-index: 996;
+        }
+
+        .op-sidebar-title {
+            margin: 4px 6px 18px;
+            padding: 14px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, var(--op-primary-dark), #264dd9);
+            color: #fff;
+            box-shadow: 0 12px 26px rgba(47, 91, 255, .22);
+        }
+
+            .op-sidebar-title small {
+                display: block;
+                color: rgba(255,255,255,.78);
+                font-size: 11px;
+                margin-bottom: 4px;
+                text-transform: uppercase;
+                letter-spacing: .6px;
+            }
+
+            .op-sidebar-title strong {
+                display: block;
+                font-size: 15px;
+                line-height: 1.25;
+            }
+
+        .sidebar-nav {
+            padding: 0;
+        }
+
+            .sidebar-nav .nav-heading {
+                color: #8b98ad;
+                font-size: 11px;
+                margin: 16px 12px 8px;
+                text-transform: uppercase;
+                letter-spacing: .7px;
+                font-weight: 800;
+            }
+
+            .sidebar-nav .nav-item {
+                margin-bottom: 6px;
+            }
+
+            .sidebar-nav .nav-link {
+                min-height: 46px;
+                padding: 11px 13px;
+                border-radius: 13px;
+                color: #24364b;
+                background: transparent;
+                border: 1px solid transparent;
+                font-weight: 700;
+                font-size: 14px;
+                gap: 10px;
+                transition: .15s ease;
+            }
+
+                .sidebar-nav .nav-link i {
+                    width: 24px;
+                    height: 24px;
+                    min-width: 24px;
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    border-radius: 9px;
+                    color: var(--op-primary);
+                    background: var(--op-primary-soft);
+                    font-size: 14px;
+                }
+
+                .sidebar-nav .nav-link:hover {
+                    background: #f6f9ff;
+                    border-color: #e8eef8;
+                    color: var(--op-primary);
+                    transform: translateX(2px);
+                }
+
+                .sidebar-nav .nav-link.active,
+                .sidebar-nav .nav-link:not(.collapsed) {
+                    background: var(--op-primary);
+                    color: #fff;
+                    border-color: var(--op-primary);
+                    box-shadow: 0 10px 22px rgba(47, 91, 255, .23);
+                }
+
+                    .sidebar-nav .nav-link.active i,
+                    .sidebar-nav .nav-link:not(.collapsed) i {
+                        background: rgba(255,255,255,.18);
+                        color: #fff;
+                    }
+
+        /* ================================
+           CONTENT
+        ================================ */
+
+        #main.main {
+            margin-top: var(--op-header-height);
+            padding: 24px 28px;
+            min-height: calc(100vh - var(--op-header-height));
+            background: linear-gradient(180deg, #f6f9ff 0%, #f1f5fb 100%);
+        }
+
+        .pagetitle {
+            margin-bottom: 14px;
+        }
+
+            .pagetitle h1 {
+                color: var(--op-primary-dark);
+                font-size: 24px;
+                font-weight: 800;
+                margin: 0;
+            }
+
+        .section.dashboard {
+            min-height: calc(100vh - 180px);
+        }
+
+        .card:not(.op-card-flat),
+        .op-card:not(.op-card-flat),
+        .op-header-card,
+        .op-tabs-wrapper {
+            border: 1px solid #e8eef8 !important;
+            box-shadow: var(--op-shadow);
+        }
+
+        .btn-primary,
+        .btn.btn-primary {
+            background: var(--op-primary) !important;
+            border-color: var(--op-primary) !important;
+        }
+
+            .btn-primary:hover,
+            .btn.btn-primary:hover {
+                background: #2448d8 !important;
+                border-color: #2448d8 !important;
+            }
+
+        .btn-outline-primary {
+            color: var(--op-primary) !important;
+            border-color: var(--op-primary) !important;
+        }
+
+            .btn-outline-primary:hover {
+                color: #fff !important;
+                background: var(--op-primary) !important;
+            }
+
+        .btn-success {
+            background: #198754 !important;
+            border-color: #198754 !important;
+        }
+
+        .btn-danger {
+            background: #dc3545 !important;
+            border-color: #dc3545 !important;
+        }
+
+        .btn-info {
+            background: #0ea5e9 !important;
+            border-color: #0ea5e9 !important;
+            color: #fff !important;
+        }
+
+        .btn-secondary {
+            background: #64748b !important;
+            border-color: #64748b !important;
+            color: #fff !important;
+        }
+
+        #footer.footer {
+            background: transparent;
+            color: var(--op-primary-dark);
+            font-size: 12px;
+            border-top: 1px solid var(--op-border);
+        }
+
+        .back-to-top {
+            background: var(--op-primary);
+            border-radius: 10px;
+        }
+
+        /* ================================
+           DATATABLES GLOBAL
+        ================================ */
+
+        .table,
+        table.dataTable {
+            width: 100% !important;
+            border-collapse: separate !important;
+            border-spacing: 0 !important;
+            background: #fff;
+            color: #0f172a;
+            font-size: 14px;
+        }
+
+            table.dataTable thead th,
+            .table thead th {
+                background: #f8fafc;
+                color: #0b2364;
+                font-weight: 700;
+                font-size: 13px;
+                text-transform: none;
+                border-bottom: 1px solid #dbe3ef !important;
+                padding: 12px 10px !important;
+                vertical-align: middle;
+                white-space: nowrap;
+            }
+
+            table.dataTable tbody td,
+            .table tbody td {
+                padding: 11px 10px !important;
+                vertical-align: middle !important;
+                border-bottom: 1px solid #e5eaf1 !important;
+                color: #182235;
+            }
+
+            table.dataTable tbody tr,
+            .table tbody tr {
+                transition: background-color .15s ease;
+            }
+
+                table.dataTable tbody tr:hover,
+                .table tbody tr:hover {
+                    background: #f5f8ff !important;
+                }
+
+            table.dataTable.stripe tbody tr.odd,
+            table.dataTable.display tbody tr.odd,
+            .table-striped tbody tr:nth-of-type(odd) {
+                background-color: #fbfcff;
+            }
+
+            table.dataTable.no-footer {
+                border-bottom: 1px solid #dbe3ef !important;
+            }
+
+        .dataTables_wrapper {
+            width: 100%;
+        }
+
+            .dataTables_wrapper .dataTables_length,
+            .dataTables_wrapper .dataTables_filter {
+                margin-bottom: 14px;
+                color: #334155;
+                font-size: 13px;
+            }
+
+                .dataTables_wrapper .dataTables_length select {
+                    border: 1px solid #cbd5e1;
+                    border-radius: 8px;
+                    padding: 5px 28px 5px 8px;
+                    background-color: #fff;
+                    height: 34px;
+                }
+
+                .dataTables_wrapper .dataTables_filter input {
+                    border: 1px solid #cbd5e1;
+                    border-radius: 8px;
+                    padding: 7px 10px;
+                    height: 34px;
+                    margin-left: 8px;
+                    outline: none;
+                    transition: border-color .15s ease, box-shadow .15s ease;
+                }
+
+                    .dataTables_wrapper .dataTables_filter input:focus {
+                        border-color: #2f5bff;
+                        box-shadow: 0 0 0 3px rgba(47, 91, 255, .12);
+                    }
+
+            .dataTables_wrapper .dataTables_info {
+                color: #64748b;
+                font-size: 13px;
+                padding-top: 14px;
+            }
+
+            .dataTables_wrapper .dataTables_paginate {
+                padding-top: 10px;
+            }
+
+                .dataTables_wrapper .dataTables_paginate .paginate_button {
+                    border: 1px solid #dbe3ef !important;
+                    background: #fff !important;
+                    color: #0b2364 !important;
+                    border-radius: 8px !important;
+                    padding: 6px 10px !important;
+                    margin-left: 4px !important;
+                    font-size: 13px;
+                }
+
+                    .dataTables_wrapper .dataTables_paginate .paginate_button.current,
+                    .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+                        background: #2f5bff !important;
+                        color: #fff !important;
+                        border-color: #2f5bff !important;
+                    }
+
+                    .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+                        background: #eef4ff !important;
+                        color: #2f5bff !important;
+                        border-color: #bfd0ff !important;
+                    }
+
+                    .dataTables_wrapper .dataTables_paginate .paginate_button.disabled {
+                        color: #94a3b8 !important;
+                        background: #f8fafc !important;
+                        border-color: #e2e8f0 !important;
+                    }
+
+        .dataTables_scrollBody {
+            border-bottom: 1px solid #dbe3ef !important;
+        }
+
+            .dataTables_scrollBody::-webkit-scrollbar {
+                height: 8px;
+                width: 8px;
+            }
+
+            .dataTables_scrollBody::-webkit-scrollbar-track {
+                background: #f1f5f9;
+                border-radius: 8px;
+            }
+
+            .dataTables_scrollBody::-webkit-scrollbar-thumb {
+                background: #cbd5e1;
+                border-radius: 8px;
+            }
+
+                .dataTables_scrollBody::-webkit-scrollbar-thumb:hover {
+                    background: #94a3b8;
+                }
+
+            /* Corrige encabezado duplicado cuando DataTables usa scrollX */
+            .dataTables_scrollBody thead {
+                visibility: collapse !important;
+            }
+
+                .dataTables_scrollBody thead tr,
+                .dataTables_scrollBody thead th {
+                    height: 0 !important;
+                    padding-top: 0 !important;
+                    padding-bottom: 0 !important;
+                    border-top: 0 !important;
+                    border-bottom: 0 !important;
+                    line-height: 0 !important;
+                }
+
+                    .dataTables_scrollBody thead th::before,
+                    .dataTables_scrollBody thead th::after {
+                        display: none !important;
+                    }
+
+                    .dataTables_scrollBody thead th * {
+                        display: none !important;
+                    }
+
+            .dataTables_scrollBody table.dataTable {
+                margin-top: 0 !important;
+            }
+
+        /* Quitar bordes/marcos visuales de DataTables */
+        .op-card,
+        .card,
+        .card-body,
+        .card-fixed {
+            border: none !important;
+        }
+
+        .dataTables_wrapper,
+        .dataTables_scroll,
+        .dataTables_scrollHead,
+        .dataTables_scrollBody,
+        .dataTables_scrollFoot {
+            border: none !important;
+            box-shadow: none !important;
+        }
+
+        .dataTables_scrollHead {
+            border-bottom: none !important;
+        }
+
+        .dataTables_scrollBody {
+            border-top: none !important;
+            border-bottom: none !important;
+        }
+
+        table.dataTable,
+        table.dataTable.no-footer {
+            border: none !important;
+        }
+
+            table.dataTable thead th {
+                border-top: none !important;
+                border-bottom: 1px solid #dbe3ef !important;
+            }
+
+            table.dataTable thead tr {
+                border: none !important;
+            }
+
+        .op-table-container {
+            width: 100%;
+            border: none !important;
+            box-shadow: none !important;
+            background: transparent !important;
+            overflow: visible;
+        }
+
+        .op-card-flat {
+            border: none !important;
+            box-shadow: none !important;
+            background: transparent !important;
+            padding: 0 !important;
+        }
+
+            .op-card-flat .card,
+            .op-card-flat .card-body,
+            .op-card-flat .card-fixed {
+                border: none !important;
+                box-shadow: none !important;
+                background: transparent !important;
+                padding-left: 0 !important;
+                padding-right: 0 !important;
+            }
+
+            .op-card-flat .dataTables_wrapper,
+            .op-card-flat .dataTables_scroll,
+            .op-card-flat .dataTables_scrollHead,
+            .op-card-flat .dataTables_scrollHeadInner,
+            .op-card-flat .dataTables_scrollBody,
+            .op-card-flat .dataTables_scrollFoot {
+                border: none !important;
+                box-shadow: none !important;
+                background: transparent !important;
+            }
+
+            .op-card-flat table.dataTable,
+            .op-card-flat table.dataTable.no-footer {
+                border: none !important;
+                box-shadow: none !important;
+            }
+
+                .op-card-flat table.dataTable thead th {
+                    border-top: none !important;
+                    border-bottom: 1px solid #dbe3ef !important;
+                }
+
+        /* ================================
+           BOTONES TABLAS
+        ================================ */
+
+        .dt-actions {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+
+            .dt-actions .btn {
+                width: 30px;
+                height: 30px;
+                padding: 0 !important;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 8px !important;
+                font-size: 12px !important;
+            }
+
+                .dt-actions .btn i {
+                    margin: 0;
+                }
+
+        .op-text-limit {
+            max-width: 420px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            line-height: 1.35;
+        }
+
+        .op-text-limit-sm {
+            max-width: 260px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            line-height: 1.35;
+        }
+
+        .op-table-empty {
+            color: #64748b;
+            background: #f8fafc;
+            border: 1px dashed #dbe3ef;
+            border-radius: 10px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .op-badge {
+            display: inline-flex;
+            align-items: center;
+            border-radius: 999px;
+            padding: 4px 10px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .op-badge-success {
+            background: #e8f7ee;
+            color: #18864b;
+        }
+
+        .op-badge-danger {
+            background: #fde8e8;
+            color: #b42318;
+        }
+
+        .op-badge-muted {
+            background: #f1f5f9;
+            color: #475569;
+        }
+
+        /* ================================
+           CONTADORES FICHA
+        ================================ */
+
+        .op-summary-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 14px;
+            margin-bottom: 18px;
+        }
+
+        .op-summary-card {
+            background: #fff;
+            border: 1px solid #e8eef8;
+            border-radius: 14px;
+            padding: 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 4px 14px rgba(15, 35, 75, .05);
+        }
+
+        .op-summary-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            background: #eef4ff;
+            color: #2f5bff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .op-summary-card label {
+            display: block;
+            margin: 0;
+            color: #64748b;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .op-summary-card strong {
+            display: block;
+            color: #0b2364;
+            font-size: 24px;
+            line-height: 1.1;
+            font-weight: 800;
+        }
+
+        /* ================================
+           RESPONSIVE
+        ================================ */
+
+        @@media (min-width: 1200px) {
+            #main,
+            #footer {
+                margin-left: var(--op-sidebar-width);
+            }
+
+            body.toggle-sidebar #main,
+            body.toggle-sidebar #footer {
+                margin-left: 0;
+            }
+        }
+
+        @@media (max-width: 1199px) {
+            .sidebar {
+                left: calc(var(--op-sidebar-width) * -1);
+            }
+
+            body.toggle-sidebar .sidebar {
+                left: 0;
+            }
+
+            #main.main,
+            #footer.footer {
+                margin-left: 0;
+            }
+        }
+
+        @@media (max-width: 992px) {
+            .op-summary-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @@media (max-width: 768px) {
+            .op-brand-title small {
+                display: none;
+            }
+
+            .op-brand-title strong {
+                font-size: 14px;
+            }
+
+            #main.main {
+                padding: 16px 12px;
+            }
+
+            .dataTables_wrapper .dataTables_length,
+            .dataTables_wrapper .dataTables_filter {
+                float: none;
+                text-align: left;
+                width: 100%;
+            }
+
+                .dataTables_wrapper .dataTables_filter input {
+                    width: 100%;
+                    margin-left: 0;
+                    margin-top: 6px;
+                }
+
+            table.dataTable thead th,
+            .table thead th {
+                font-size: 12px;
+            }
+
+            table.dataTable tbody td,
+            .table tbody td {
+                font-size: 13px;
+            }
+        }
+
+        @@media (max-width: 576px) {
+            .op-summary-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+    @Scripts.Render("~/bundles/JQueryjs")
+    @Scripts.Render("~/bundles/js")
+
+    <script src="@Url.Content("~/Content/Selectize/js/standalone/selectize.min.js")"></script>
+    <script src="@Url.Content("~/assets/plugins/sweetalert/js/sweetalert.min.js")"></script>
+
+
+</head>
+
+<style>
+    /* ==========================================================================
+       OVERRIDE INSTITUCIONAL (Basado en el nuevo diseño)
+       ========================================================================== */
+
+    /* 1. Fondo general del sistema */
+    body, .main {
+        background-color: #f4f6f9 !important; /* Gris súper claro para contrastar las tablas */
+    }
+
+    /* 2. Barra Lateral (Sidebar) Azul Marino */
+    .sidebar {
+        background-color: #113255 !important; /* Azul institucional */
+        border-right: none !important;
+        box-shadow: 2px 0 10px rgba(0,0,0,0.1) !important;
+    }
+
+    /* 3. Enlaces del menú lateral */
+    .sidebar-nav .nav-link {
+        background-color: transparent !important;
+        color: #b0c4d9 !important; /* Texto gris claro/azulado */
+        border-radius: 4px;
+        margin-bottom: 4px;
+    }
+
+        .sidebar-nav .nav-link i {
+            color: #b0c4d9 !important; /* Iconos en gris claro */
+        }
+
+        /* 4. Efecto Hover y Activo en el menú lateral */
+        .sidebar-nav .nav-link:hover,
+        .sidebar-nav .nav-link:focus,
+        .sidebar-nav .nav-item .nav-link:not(.collapsed) {
+            background-color: #1a497c !important; /* Azul un poco más claro al pasar el mouse */
+            color: #ffffff !important;
+        }
+
+            .sidebar-nav .nav-link:hover i,
+            .sidebar-nav .nav-link:focus i,
+            .sidebar-nav .nav-item .nav-link:not(.collapsed) i {
+                color: #ffffff !important;
+            }
+
+    /* 5. Barra Superior (Header) más limpia */
+    .header {
+        background-color: #ffffff !important;
+        box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05) !important; /* Sombra más suave */
+    }
+
+    .toggle-sidebar-btn {
+        color: #113255 !important; /* Botón de hamburguesa en azul oscuro */
+    }
+
+    /* 6. Botones principales (Como el de "Agregar Nuevo Objetivo") */
+    .btn-primary,
+    .dt-button { /* Aplica también a los botones de DataTables */
+        background-color: #1d63d3 !important; /* Azul rey del mockup */
+        border-color: #1d63d3 !important;
+        border-radius: 6px !important;
+        font-weight: 500;
+        box-shadow: 0 2px 6px rgba(29, 99, 211, 0.3) !important;
+        transition: all 0.2s ease;
+    }
+
+        .btn-primary:hover {
+            background-color: #154bad !important;
+            transform: translateY(-1px);
+        }
+
+    /* 7. Contenedores de las tablas (Cards) */
+    .card {
+        border-radius: 8px !important;
+        border: none !important;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.04) !important;
+    }
+
+
+    /* ======================================================================
+       MEJORA FINAL: BRAND SUPERIOR Y MENÚ LATERAL POR MÓDULOS
+       ====================================================================== */
+
+    :root {
+        --op-sidebar-width: 288px;
+        --op-sidebar-bg: #16375b;
+        --op-sidebar-bg-2: #102a48;
+        --op-sidebar-active: #3e57ff;
+        --op-sidebar-text: #d7e4f5;
+        --op-sidebar-muted: #91a7c2;
+    }
+
+    .header {
+        background: linear-gradient(90deg, #c9eff8 0%, #dff7fc 100%) !important;
+        border-bottom: 1px solid rgba(11, 35, 100, .10) !important;
+    }
+
+    .op-header-left {
+        gap: 12px !important;
+    }
+
+    .toggle-sidebar-btn {
+        width: 42px !important;
+        height: 42px !important;
+        border-radius: 14px !important;
+        background: rgba(255, 255, 255, .60) !important;
+        border: 1px solid rgba(11, 35, 100, .10) !important;
+        box-shadow: 0 5px 14px rgba(15, 35, 75, .08) !important;
+    }
+
+    .op-brand-modern {
+        padding: 6px 12px 6px 7px;
+        border-radius: 16px;
+        background: rgba(255, 255, 255, .34);
+        border: 1px solid rgba(255, 255, 255, .55);
+        transition: .16s ease;
+    }
+
+        .op-brand-modern:hover {
+            background: rgba(255, 255, 255, .62);
+            transform: translateY(-1px);
+        }
+
+    .op-brand-logo-wrap {
+        width: 42px;
+        height: 42px;
+        min-width: 42px;
+        border-radius: 14px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: #ffffff;
+        box-shadow: 0 6px 16px rgba(15, 35, 75, .10);
+        overflow: hidden;
+    }
+
+        .op-brand-logo-wrap img {
+            width: 34px !important;
+            height: 34px !important;
+            padding: 0 !important;
+            background: transparent !important;
+            border-radius: 0 !important;
+        }
+
+    .op-brand-title strong {
+        font-size: 16px !important;
+        letter-spacing: .1px !important;
+    }
+
+    .op-brand-title small {
+        color: #50617b !important;
+        font-size: 10.5px !important;
+    }
+
+    .sidebar {
+        width: var(--op-sidebar-width) !important;
+        background: linear-gradient(180deg, var(--op-sidebar-bg) 0%, var(--op-sidebar-bg-2) 100%) !important;
+        border-right: none !important;
+        padding: 16px 14px !important;
+        box-shadow: 8px 0 24px rgba(5, 18, 45, .18) !important;
+    }
+
+    .op-sidebar-title-modern {
+        margin: 0 0 16px 0 !important;
+        padding: 14px 14px 15px !important;
+        border-radius: 18px !important;
+        background: linear-gradient(135deg, #2636a7 0%, #4054f6 100%) !important;
+        border: 1px solid rgba(255, 255, 255, .12) !important;
+        box-shadow: 0 14px 28px rgba(47, 91, 255, .28) !important;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .op-sidebar-title-modern::after {
+            content: "";
+            position: absolute;
+            width: 130px;
+            height: 130px;
+            right: -60px;
+            top: -65px;
+            background: rgba(255, 255, 255, .13);
+            border-radius: 50%;
+        }
+
+    .op-sidebar-title-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+        position: relative;
+        z-index: 1;
+    }
+
+        .op-sidebar-title-top span {
+            display: inline-flex;
+            align-items: center;
+            padding: 3px 7px;
+            border-radius: 8px;
+            background: rgba(255,255,255,.12);
+            color: rgba(255,255,255,.82);
+            font-size: 10px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: .7px;
+        }
+
+        .op-sidebar-title-top i {
+            color: rgba(255,255,255,.72);
+            font-size: 16px;
+        }
+
+    .op-sidebar-title-modern strong {
+        color: #fff !important;
+        font-size: 16px !important;
+        line-height: 1.25 !important;
+        position: relative;
+        z-index: 1;
+    }
+
+    .op-sidebar-title-modern small {
+        color: rgba(255,255,255,.72) !important;
+        font-size: 11px !important;
+        margin-top: 4px;
+        margin-bottom: 0 !important;
+        text-transform: none !important;
+        letter-spacing: 0 !important;
+        position: relative;
+        z-index: 1;
+    }
+
+    .op-sidebar-nav-modern .nav-heading {
+        color: var(--op-sidebar-muted) !important;
+        font-size: 11px !important;
+        margin: 18px 10px 8px !important;
+        letter-spacing: .8px !important;
+    }
+
+    .op-module-item {
+        margin-bottom: 8px !important;
+    }
+
+    .op-module-toggle {
+        min-height: 48px !important;
+        border-radius: 14px !important;
+        padding: 12px 12px !important;
+        color: var(--op-sidebar-text) !important;
+        background: rgba(255,255,255,.035) !important;
+        border: 1px solid rgba(255,255,255,.06) !important;
+        box-shadow: none !important;
+    }
+
+        .op-module-toggle i:first-child {
+            width: 30px !important;
+            height: 30px !important;
+            min-width: 30px !important;
+            border-radius: 11px !important;
+            color: #ffffff !important;
+            background: rgba(255,255,255,.12) !important;
+        }
+
+        .op-module-toggle span {
+            flex: 1;
+            font-weight: 800;
+        }
+
+        .op-module-toggle .op-module-chevron {
+            width: auto !important;
+            height: auto !important;
+            min-width: auto !important;
+            background: transparent !important;
+            color: rgba(255,255,255,.58) !important;
+            font-size: 11px !important;
+            transition: transform .18s ease;
+        }
+
+        .op-module-toggle:not(.collapsed) {
+            background: rgba(255,255,255,.075) !important;
+            color: #ffffff !important;
+            border-color: rgba(255,255,255,.12) !important;
+        }
+
+            .op-module-toggle:not(.collapsed) .op-module-chevron {
+                transform: rotate(180deg);
+            }
+
+    .op-sidebar-nav-modern .nav-content {
+        list-style: none;
+        margin: 6px 0 0 0;
+        padding: 0 0 0 12px;
+        border-left: 1px dashed rgba(255,255,255,.13);
+    }
+
+        .op-sidebar-nav-modern .nav-content li {
+            margin: 4px 0 4px 10px;
+        }
+
+        .op-sidebar-nav-modern .nav-content a {
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 10px;
+            border-radius: 12px;
+            color: #c9d7ea !important;
+            font-size: 13px;
+            font-weight: 700;
+            text-decoration: none;
+            border: 1px solid transparent;
+            transition: .15s ease;
+        }
+
+            .op-sidebar-nav-modern .nav-content a i {
+                width: 24px;
+                height: 24px;
+                min-width: 24px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 9px;
+                background: rgba(255,255,255,.08) !important;
+                color: #d7e4f5 !important;
+                font-size: 12px;
+            }
+
+            .op-sidebar-nav-modern .nav-content a:hover {
+                background: rgba(255,255,255,.07) !important;
+                color: #ffffff !important;
+                transform: translateX(2px);
+            }
+
+            .op-sidebar-nav-modern .nav-content a.active {
+                background: linear-gradient(135deg, #3652ff 0%, #4f64ff 100%) !important;
+                color: #ffffff !important;
+                border-color: rgba(255,255,255,.16) !important;
+                box-shadow: 0 10px 20px rgba(47, 91, 255, .24) !important;
+            }
+
+                .op-sidebar-nav-modern .nav-content a.active i {
+                    background: rgba(255,255,255,.18) !important;
+                    color: #fff !important;
+                }
+
+            .op-sidebar-nav-modern .nav-content a.disabled {
+                opacity: .48;
+                cursor: not-allowed;
+                pointer-events: none;
+            }
+
+            .op-sidebar-nav-modern .nav-content a em {
+                margin-left: auto;
+                font-size: 10px;
+                font-style: normal;
+                color: rgba(255,255,255,.55);
+                background: rgba(255,255,255,.08);
+                padding: 2px 6px;
+                border-radius: 999px;
+            }
+
+    @@media (min-width: 1200px) {
+        #main,
+        #footer {
+            margin-left: var(--op-sidebar-width) !important;
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .op-brand-modern {
+            padding-right: 8px;
+        }
+
+        .op-brand-title small {
+            display: none !important;
+        }
+    }
+
+    .op-module-toggle .op-module-custom-icon {
+        width: 30px !important;
+        height: 30px !important;
+        min-width: 30px !important;
+        max-width: 30px !important;
+        flex: 0 0 30px !important;
+        border-radius: 11px !important;
+        background: rgba(255,255,255,.12) !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 0 !important;
+    }
+
+        .op-module-toggle .op-module-custom-icon img {
+            width: 18px !important;
+            height: 18px !important;
+            object-fit: contain !important;
+            display: block !important;
+            filter: brightness(0) invert(1);
+        }
+
+    .op-module-toggle .op-module-label {
+        flex: 1 !important;
+        font-weight: 800 !important;
+        min-width: 0 !important;
+        white-space: normal !important;
+        line-height: 1.25 !important;
+    }
+</style>
+
+<body>
+    <header id="header" class="header fixed-top d-flex align-items-center">
+        <div class="op-header-left">
+            <i class="bi bi-list toggle-sidebar-btn"></i>
+
+            <a href="@Url.Action("Index", "Objetivo")" class="op-brand op-brand-modern">
+                <span class="op-brand-logo-wrap">
+                    <img src="@Url.Content("~/assets/images/logoIcono.png")" alt="Logo" />
+                </span>
+                <span class="op-brand-title">
+                    <strong>@moduloActivo</strong>
+                    <small>@moduloActivoSubtitulo</small>
+                </span>
+            </a>
+        </div>
+
+        <nav class="header-nav ms-auto">
+            <ul class="d-flex align-items-center">
+                <li class="nav-item dropdown pe-2">
+                    <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
+                        <img src="@Url.Content("~/assets/images/person.png")" alt="Profile" class="rounded-circle">
+                        <span class="d-none d-md-block dropdown-toggle ps-2">@nombreUsuario</span>
+                    </a>
+
+                    <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
+                        <li class="dropdown-header">
+                            <h6>@nombreUsuario</h6>
+                            <span>Usuario del sistema</span>
+                        </li>
+
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center" href="@Url.Action("Index", "Login")">
+                                <i class="bi bi-box-arrow-right"></i>
+                                <span>Cerrar sesión</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <aside id="sidebar" class="sidebar">
+
+        <!-- ======================================================
+         MÓDULO ACTIVO
+         ====================================================== -->
+
+        <div class="op-sidebar-title op-sidebar-title-modern">
+
+            <div class="op-sidebar-title-top">
+
+                <span>Módulo activo</span>
+
+                <i class="fa fa-cubes"></i>
+
+            </div>
+
+            <strong>
+                @moduloActivo
+            </strong>
+
+            <small>
+                @moduloActivoSubtitulo
+            </small>
+
+        </div>
+
+
+        <!-- ======================================================
+         MENÚ PRINCIPAL
+         ====================================================== -->
+
+        <ul class="sidebar-nav op-sidebar-nav-modern"
+            id="sidebar-nav">
+
+            <li class="nav-heading">
+                Módulos del sistema
+            </li>
+
+
+            <!-- ==================================================
+             OBJETIVOS PRIORITARIOS
+             ================================================== -->
+
+            <li class="nav-item op-module-item">
+
+                <a class="nav-link op-module-toggle @(isModuloObjetivos ? "" : "collapsed")"
+                   data-bs-target="#menuObjetivosPrioritarios"
+                   data-bs-toggle="collapse"
+                   href="#"
+                   aria-expanded="@(isModuloObjetivos ? "true" : "false")">
+
+                    <i class="fa fa-shield"></i>
+
+                    <span>
+                        Objetivos Prioritarios
+                    </span>
+
+                    <i class="fa fa-chevron-down op-module-chevron"></i>
+
+                </a>
+
+
+                <ul id="menuObjetivosPrioritarios"
+                    class="nav-content collapse @(isModuloObjetivos ? "show" : "")"
+                    data-bs-parent="#sidebar-nav">
+
+
+                    <li>
+
+                        <a class="@(isMapa ? "active" : "")"
+                           href="@Url.Action("Index", "MapaRelaciones")">
+
+                            <i class="fa fa-sitemap"></i>
+
+                            <span>
+                                Red de inteligencia
+                            </span>
+
+                        </a>
+
+                    </li>
+
+
+                    <li>
+
+                        <a class="@(isObjetivos ? "active" : "")"
+                           href="@Url.Action("Index", "Objetivo")">
+
+                            <i class="fa fa-user"></i>
+
+                            <span>
+                                Objetivos
+                            </span>
+
+                        </a>
+
+                    </li>
+
+
+                    <li>
+
+                        <a class="@(isAsuntos ? "active" : "")"
+                           href="@Url.Action("Index", "Asuntos")">
+
+                            <i class="fa fa-link"></i>
+
+                            <span>
+                                Asuntos relacionados
+                            </span>
+
+                        </a>
+
+                    </li>
+
+
+                    <li>
+
+                        <a class="@(isAlbum ? "active" : "")"
+                           href="@Url.Action("IndexAlbum", "FichaObjetivo")">
+
+                            <i class="fa fa-folder-open"></i>
+
+                            <span>
+                                Álbum de fichas
+                            </span>
+
+                        </a>
+
+                    </li>
+
+
+                    <li>
+
+                        <a class="disabled"
+                           href="javascript:void(0);"
+                           title="Pendiente de enlazar a la ruta de catálogos">
+
+                            <i class="fa fa-list"></i>
+
+                            <span>
+                                Catálogos
+                            </span>
+
+                            <em>
+                                Próximo
+                            </em>
+
+                        </a>
+
+                    </li>
+
+                </ul>
+
+            </li>
+
+
+            <!-- ==================================================
+             SIC
+             ================================================== -->
+
+            <li class="nav-item op-module-item">
+
+                <a class="nav-link op-module-toggle @(isModuloSic ? "" : "collapsed")"
+                   data-bs-target="#menuSic"
+                   data-bs-toggle="collapse"
+                   href="#"
+                   aria-expanded="@(isModuloSic ? "true" : "false")">
+
+                    <i class="fa fa-user-secret"></i>
+
+                    <span>
+                        SIC
+                    </span>
+
+                    <i class="fa fa-chevron-down op-module-chevron"></i>
+
+                </a>
+
+
+                <ul id="menuSic"
+                    class="nav-content collapse @(isModuloSic ? "show" : "")"
+                    data-bs-parent="#sidebar-nav">
+
+
+                    <li>
+
+                        <a class="@(isConsultaSic ? "active" : "")"
+                           href="@Url.Action("Index", "SIC")">
+
+                            <i class="fa fa-id-card-o"></i>
+
+                            <span>
+                                Consulta SIC
+                            </span>
+
+                        </a>
+
+                    </li>
+
+
+                    <li>
+
+                        <a class="disabled"
+                           href="javascript:void(0);">
+
+                            <i class="fa fa-tags"></i>
+
+                            <span>
+                                Catálogos SIC
+                            </span>
+
+                            <em>
+                                Próximo
+                            </em>
+
+                        </a>
+
+                    </li>
+
+                </ul>
+
+            </li>
+
+
+            <!-- ==================================================
+             BÚSQUEDA DE COINCIDENCIAS
+             OPCIÓN PRINCIPAL INDEPENDIENTE
+             ================================================== -->
+
+            <li class="nav-item op-module-item">
+
+                <a class="nav-link op-module-toggle @(isBusquedaCoincidencias ? "active" : "collapsed")"
+                   href="@Url.Action("BusquedaCoincidencias", "SIC")">
+
+                    <i class="fa fa-search"></i>
+
+                    <span>
+                        Búsqueda Intencionada
+                    </span>
+
+                </a>
+
+            </li>
+
+
+            <!-- ==================================================
+             PERSONAS DE INTERÉS
+             ================================================== -->
+
+            <li class="nav-item op-module-item">
+
+                <a class="nav-link op-module-toggle @(isModuloPersonasInteres ? "" : "collapsed")"
+                   data-bs-target="#menuPersonasInteres"
+                   data-bs-toggle="collapse"
+                   href="#"
+                   aria-expanded="@(isModuloPersonasInteres ? "true" : "false")">
+
+
+                    <span class="op-module-custom-icon">
+
+                        <img src="@Url.Content("~/images/icons8-target-audience-24.png")"
+                             alt="Personas de Interés" />
+
+                    </span>
+
+
+                    <span class="op-module-label">
+                        Personas de Interés
+                    </span>
+
+
+                    <i class="fa fa-chevron-down op-module-chevron"></i>
+
+                </a>
+
+
+                <ul id="menuPersonasInteres"
+                    class="nav-content collapse @(isModuloPersonasInteres ? "show" : "")"
+                    data-bs-parent="#sidebar-nav">
+
+
+                    <li>
+
+                        <a class="@(isPersonasInteres && actionName.Equals("Index", StringComparison.OrdinalIgnoreCase) ? "active" : "")"
+                           href="@Url.Action("Index", "PersonasInteres")">
+
+                            <i class="fa fa-users"></i>
+
+                            <span>
+                                Personas
+                            </span>
+
+                        </a>
+
+                    </li>
+
+
+                    @*
+                    <li>
+
+                        <a class="@(isPersonasInteres && actionName.Equals("AddEditPersonaInteres", StringComparison.OrdinalIgnoreCase) ? "active" : "")"
+                           href="@Url.Action("AddEditPersonaInteres", "PersonasInteres")">
+
+                            <i class="fa fa-plus"></i>
+
+                            <span>
+                                Registrar persona
+                            </span>
+
+                        </a>
+
+                    </li>
+
+
+                    <li>
+
+                        <a class="disabled"
+                           href="javascript:void(0);">
+
+                            <i class="fa fa-camera"></i>
+
+                            <span>
+                                Fotografías
+                            </span>
+
+                            <em>
+                                Próximo
+                            </em>
+
+                        </a>
+
+                    </li>
+
+
+                    <li>
+
+                        <a class="disabled"
+                           href="javascript:void(0);">
+
+                            <i class="fa fa-hand-paper-o"></i>
+
+                            <span>
+                                Huellas
+                            </span>
+
+                            <em>
+                                Próximo
+                            </em>
+
+                        </a>
+
+                    </li>
+                    *@
+
+                </ul>
+
+            </li>
+
+        </ul>
+
+    </aside>
+
+
+    <main id="main" class="main">
+        @if (!string.IsNullOrWhiteSpace(pageTitle))
+        {
+            <div class="pagetitle">
+                <h1>@pageTitle</h1>
+            </div>
+        }
+
+        <section class="section dashboard">
+            @RenderBody()
+        </section>
+    </main>
+
+    @*<footer id="footer" class="footer">
+        <div class="credits">
+            2023 - Fiscalía General del Estado de Aguascalientes. Un desarrollo por el área de TI
+        </div>
+    </footer>*@
+
+    <a href="#" class="back-to-top d-flex align-items-center justify-content-center">
+        <i class="bi bi-arrow-up-short"></i>
+    </a>
+
+
+
+    <!-- Plugins JS -->
+    <script src="@Url.Content("~/assets/plugins/chartjs/Chart.min.js")"></script>
+    <script src="@Url.Content("~/assets/plugins/chartjs/utils.js")"></script>
+
+    <script src="@Url.Content("~/Scripts/DataTables/js/datatables.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/DataTables/js/jquery.dataTables.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/DataTables/js/dataTables.buttons.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/DataTables/js/dataTables.fixedHeader.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/DataTables/js/moment.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/DataTables/js/datetime.js")"></script>
+
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.2/jquery.validate.min.js" integrity="sha512-UdIMMlVx0HEynClOIFSyOrPggomfhBKJE28LKl8yR3ghkgugPnG6iLfRfHwushZl1MOPSY6TsuBDGPK2X4zYKg==" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/additional-methods.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-colorpicker/2.5.3/js/bootstrap-colorpicker.js"></script>
+
+    <script src="@Url.Content("~/assets/plugins/fullcalendar-6.0.2/dist/index.global.js")"></script>
+    <!-- Template JS -->
+    <script src="@Url.Content("~/Content/assets/vendor/apexcharts/apexcharts.min.js")"></script>
+    <script src="@Url.Content("~/Content/assets/vendor/bootstrap/js/bootstrap.bundle.min.js")"></script>
+    <script src="@Url.Content("~/Content/assets/vendor/chart.js/chart.umd.js")"></script>
+    <script src="@Url.Content("~/Content/assets/vendor/echarts/echarts.min.js")"></script>
+    <script src="@Url.Content("~/Content/assets/vendor/quill/quill.min.js")"></script>
+    <script src="@Url.Content("~/Content/assets/vendor/simple-datatables/simple-datatables.js")"></script>
+    <script src="@Url.Content("~/Content/assets/vendor/tinymce/tinymce.min.js")"></script>
+    <script src="@Url.Content("~/Content/assets/vendor/php-email-form/validate.js")"></script>
+    <script src="@Url.Content("~/Content/assets/js/main.js")"></script>
+
+    @RenderSection("scripts", required: false)
+</body>
+
+</html>

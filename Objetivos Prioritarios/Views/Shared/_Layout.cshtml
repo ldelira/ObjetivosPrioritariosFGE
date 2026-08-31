@@ -1,4 +1,9 @@
-﻿@{
+﻿@using Objetivos_Prioritarios.Models.Extends
+@using System
+@using System.Collections.Generic
+@using System.Linq
+
+@{
     var controllerName =
         (ViewContext.RouteData.Values["controller"] ?? "")
             .ToString();
@@ -14,6 +19,9 @@
     var pageTitle =
         ((ViewBag.Title ?? ViewBag.title) ?? "")
             .ToString();
+
+
+
 
 
     /* =========================================================
@@ -1438,7 +1446,284 @@
     }
 </style>
 
-<body>
+<style>
+    /* ==========================================================================
+       BÚSQUEDA INTENCIONADA - MODO TABLET / ESPACIO COMPACTO
+       --------------------------------------------------------------------------
+       Estos estilos SOLO afectan la pantalla SIC/BusquedaCoincidencias.
+       Escritorio grande conserva el menú completo.
+       Tablet horizontal utiliza una barra lateral compacta de iconos.
+       Tablet vertical / móvil conserva el comportamiento off-canvas original.
+       ========================================================================== */
+
+    .op-busqueda-page {
+        --op-busqueda-sidebar-compact: 72px;
+        --op-busqueda-header-tablet: 54px;
+    }
+
+        /* Mejor transición al abrir/cerrar el menú en la búsqueda. */
+        .op-busqueda-page .sidebar,
+        .op-busqueda-page #main.main,
+        .op-busqueda-page #footer.footer,
+        .op-busqueda-page .header {
+            transition: width .18s ease, left .18s ease, margin-left .18s ease, height .18s ease, top .18s ease, padding .18s ease;
+        }
+
+    /* --------------------------------------------------------------------------
+       TABLET HORIZONTAL / LAPTOP PEQUEÑA
+       769px - 1399px
+       -------------------------------------------------------------------------- */
+    @@media (min-width: 769px) and (max-width: 1399px) {
+        /* HEADER MÁS BAJO */
+        .op-busqueda-page .header {
+            height: var(--op-busqueda-header-tablet) !important;
+            min-height: var(--op-busqueda-header-tablet) !important;
+            padding: 0 10px !important;
+        }
+
+        .op-busqueda-page .op-header-left {
+            gap: 8px !important;
+        }
+
+        .op-busqueda-page .toggle-sidebar-btn {
+            width: 36px !important;
+            height: 36px !important;
+            min-width: 36px !important;
+            border-radius: 11px !important;
+            font-size: 20px !important;
+        }
+
+        .op-busqueda-page .op-brand-modern {
+            padding: 4px 9px 4px 5px !important;
+            border-radius: 13px !important;
+            gap: 7px !important;
+        }
+
+        .op-busqueda-page .op-brand-logo-wrap {
+            width: 34px !important;
+            height: 34px !important;
+            min-width: 34px !important;
+            border-radius: 10px !important;
+        }
+
+            .op-busqueda-page .op-brand-logo-wrap img {
+                width: 28px !important;
+                height: 28px !important;
+            }
+
+        .op-busqueda-page .op-brand-title strong {
+            font-size: 14px !important;
+        }
+
+        .op-busqueda-page .op-brand-title small {
+            display: none !important;
+        }
+
+        .op-busqueda-page .header-nav .nav-profile img {
+            width: 30px !important;
+            height: 30px !important;
+        }
+
+        .op-busqueda-page .header-nav .nav-profile span {
+            font-size: 13px !important;
+        }
+        /* SIDEBAR COMPACTO */
+        .op-busqueda-page .sidebar {
+            top: var(--op-busqueda-header-tablet) !important;
+            left: 0 !important;
+            width: var(--op-busqueda-sidebar-compact) !important;
+            padding: 10px 8px !important;
+            overflow-x: visible !important;
+            overflow-y: auto !important;
+        }
+        /* En compacto no necesitamos la tarjeta grande de módulo activo. */
+        .op-busqueda-page:not(.toggle-sidebar) .op-sidebar-title-modern,
+        .op-busqueda-page:not(.toggle-sidebar) .op-sidebar-nav-modern .nav-heading {
+            display: none !important;
+        }
+
+        .op-busqueda-page:not(.toggle-sidebar) .op-sidebar-nav-modern {
+            padding-top: 2px !important;
+        }
+
+        .op-busqueda-page:not(.toggle-sidebar) .op-module-item {
+            margin: 0 0 9px 0 !important;
+        }
+
+        .op-busqueda-page:not(.toggle-sidebar) .op-module-toggle {
+            width: 54px !important;
+            height: 54px !important;
+            min-height: 54px !important;
+            padding: 0 !important;
+            margin: 0 auto !important;
+            justify-content: center !important;
+            border-radius: 15px !important;
+            gap: 0 !important;
+        }
+
+            .op-busqueda-page:not(.toggle-sidebar) .op-module-toggle > span:not(.op-module-custom-icon),
+            .op-busqueda-page:not(.toggle-sidebar) .op-module-toggle .op-module-label,
+            .op-busqueda-page:not(.toggle-sidebar) .op-module-toggle .op-module-chevron {
+                display: none !important;
+            }
+
+            .op-busqueda-page:not(.toggle-sidebar) .op-module-toggle i:first-child,
+            .op-busqueda-page:not(.toggle-sidebar) .op-module-toggle .op-module-custom-icon {
+                width: 34px !important;
+                height: 34px !important;
+                min-width: 34px !important;
+                max-width: 34px !important;
+                flex: 0 0 34px !important;
+                margin: 0 !important;
+                border-radius: 11px !important;
+                font-size: 16px !important;
+            }
+
+                .op-busqueda-page:not(.toggle-sidebar) .op-module-toggle .op-module-custom-icon img {
+                    width: 20px !important;
+                    height: 20px !important;
+                }
+        /* Los submenús se muestran cuando el usuario expande el lateral. */
+        .op-busqueda-page:not(.toggle-sidebar) .op-sidebar-nav-modern .nav-content {
+            display: none !important;
+        }
+        /* CONTENIDO: siempre aprovecha el espacio dejado por los 72px. */
+        .op-busqueda-page #main.main,
+        .op-busqueda-page #footer.footer {
+            margin-left: var(--op-busqueda-sidebar-compact) !important;
+        }
+
+        .op-busqueda-page #main.main {
+            margin-top: var(--op-busqueda-header-tablet) !important;
+            min-height: calc(100vh - var(--op-busqueda-header-tablet)) !important;
+            padding: 14px 16px !important;
+        }
+        /* Al pulsar hamburguesa el menú se expande por ENCIMA del contenido. */
+        .op-busqueda-page.toggle-sidebar .sidebar {
+            width: var(--op-sidebar-width) !important;
+            left: 0 !important;
+            padding: 16px 14px !important;
+            box-shadow: 12px 0 34px rgba(5, 18, 45, .28) !important;
+            z-index: 1002 !important;
+        }
+
+        .op-busqueda-page.toggle-sidebar .op-sidebar-title-modern {
+            display: block !important;
+        }
+
+        .op-busqueda-page.toggle-sidebar .op-sidebar-nav-modern .nav-heading {
+            display: block !important;
+        }
+
+        .op-busqueda-page.toggle-sidebar .op-module-toggle > span,
+        .op-busqueda-page.toggle-sidebar .op-module-toggle .op-module-label,
+        .op-busqueda-page.toggle-sidebar .op-module-toggle .op-module-chevron {
+            display: flex !important;
+        }
+
+        .op-busqueda-page.toggle-sidebar .op-module-toggle .op-module-chevron {
+            display: inline-flex !important;
+        }
+
+        .op-busqueda-page.toggle-sidebar .op-sidebar-nav-modern .nav-content.show {
+            display: block !important;
+        }
+        /* El contenido NO salta cuando se expande el menú. */
+        .op-busqueda-page.toggle-sidebar #main.main,
+        .op-busqueda-page.toggle-sidebar #footer.footer {
+            margin-left: var(--op-busqueda-sidebar-compact) !important;
+        }
+
+        .op-busqueda-page .pagetitle {
+            margin-bottom: 10px !important;
+        }
+
+            .op-busqueda-page .pagetitle h1 {
+                font-size: 22px !important;
+            }
+    }
+
+    /* --------------------------------------------------------------------------
+       TABLET VERTICAL / MÓVIL
+       Conservamos el off-canvas de la plantilla.
+       -------------------------------------------------------------------------- */
+    @@media (max-width: 768px) {
+        .op-busqueda-page .header {
+            height: 54px !important;
+            min-height: 54px !important;
+            padding: 0 8px !important;
+        }
+
+        .op-busqueda-page .sidebar {
+            top: 54px !important;
+        }
+
+        .op-busqueda-page #main.main {
+            margin-top: 54px !important;
+            margin-left: 0 !important;
+            padding: 12px 10px !important;
+        }
+
+        .op-busqueda-page .toggle-sidebar-btn {
+            width: 36px !important;
+            height: 36px !important;
+            min-width: 36px !important;
+        }
+
+        .op-busqueda-page .op-brand-modern {
+            padding: 3px 7px 3px 4px !important;
+        }
+
+        .op-busqueda-page .op-brand-logo-wrap {
+            width: 34px !important;
+            height: 34px !important;
+            min-width: 34px !important;
+        }
+
+            .op-busqueda-page .op-brand-logo-wrap img {
+                width: 28px !important;
+                height: 28px !important;
+            }
+
+        .op-busqueda-page .op-brand-title strong {
+            font-size: 13px !important;
+        }
+    }
+
+    /* --------------------------------------------------------------------------
+       ESCRITORIO GRANDE
+       Mantiene el diseño original completo.
+       -------------------------------------------------------------------------- */
+    @@media (min-width: 1400px) {
+        /* =========================================================
+       SIDEBAR ABIERTO
+       ========================================================= */
+
+        .op-busqueda-page:not(.toggle-sidebar) .sidebar {
+            width: var(--op-sidebar-width) !important;
+            left: 0 !important;
+        }
+
+        .op-busqueda-page:not(.toggle-sidebar) #main.main,
+        .op-busqueda-page:not(.toggle-sidebar) #footer.footer {
+            margin-left: var(--op-sidebar-width) !important;
+        }
+        /* =========================================================
+       SIDEBAR CERRADO
+       ========================================================= */
+
+        .op-busqueda-page.toggle-sidebar .sidebar {
+            left: calc(var(--op-sidebar-width) * -1) !important;
+        }
+
+        .op-busqueda-page.toggle-sidebar #main.main,
+        .op-busqueda-page.toggle-sidebar #footer.footer {
+            margin-left: 0 !important;
+        }
+    }
+</style>
+
+<body class="@(isBusquedaCoincidencias ? "op-busqueda-page" : "")">
     <header id="header" class="header fixed-top d-flex align-items-center">
         <div class="op-header-left">
             <i class="bi bi-list toggle-sidebar-btn"></i>
@@ -1782,60 +2067,60 @@
 
 
                     @*
-                    <li>
+                        <li>
 
-                        <a class="@(isPersonasInteres && actionName.Equals("AddEditPersonaInteres", StringComparison.OrdinalIgnoreCase) ? "active" : "")"
-                           href="@Url.Action("AddEditPersonaInteres", "PersonasInteres")">
+                            <a class="@(isPersonasInteres && actionName.Equals("AddEditPersonaInteres", StringComparison.OrdinalIgnoreCase) ? "active" : "")"
+                               href="@Url.Action("AddEditPersonaInteres", "PersonasInteres")">
 
-                            <i class="fa fa-plus"></i>
+                                <i class="fa fa-plus"></i>
 
-                            <span>
-                                Registrar persona
-                            </span>
+                                <span>
+                                    Registrar persona
+                                </span>
 
-                        </a>
+                            </a>
 
-                    </li>
-
-
-                    <li>
-
-                        <a class="disabled"
-                           href="javascript:void(0);">
-
-                            <i class="fa fa-camera"></i>
-
-                            <span>
-                                Fotografías
-                            </span>
-
-                            <em>
-                                Próximo
-                            </em>
-
-                        </a>
-
-                    </li>
+                        </li>
 
 
-                    <li>
+                        <li>
 
-                        <a class="disabled"
-                           href="javascript:void(0);">
+                            <a class="disabled"
+                               href="javascript:void(0);">
 
-                            <i class="fa fa-hand-paper-o"></i>
+                                <i class="fa fa-camera"></i>
 
-                            <span>
-                                Huellas
-                            </span>
+                                <span>
+                                    Fotografías
+                                </span>
 
-                            <em>
-                                Próximo
-                            </em>
+                                <em>
+                                    Próximo
+                                </em>
 
-                        </a>
+                            </a>
 
-                    </li>
+                        </li>
+
+
+                        <li>
+
+                            <a class="disabled"
+                               href="javascript:void(0);">
+
+                                <i class="fa fa-hand-paper-o"></i>
+
+                                <span>
+                                    Huellas
+                                </span>
+
+                                <em>
+                                    Próximo
+                                </em>
+
+                            </a>
+
+                        </li>
                     *@
 
                 </ul>
@@ -1861,10 +2146,10 @@
     </main>
 
     @*<footer id="footer" class="footer">
-        <div class="credits">
-            2023 - Fiscalía General del Estado de Aguascalientes. Un desarrollo por el área de TI
-        </div>
-    </footer>*@
+            <div class="credits">
+                2023 - Fiscalía General del Estado de Aguascalientes. Un desarrollo por el área de TI
+            </div>
+        </footer>*@
 
     <a href="#" class="back-to-top d-flex align-items-center justify-content-center">
         <i class="bi bi-arrow-up-short"></i>
@@ -1900,7 +2185,79 @@
     <script src="@Url.Content("~/Content/assets/vendor/php-email-form/validate.js")"></script>
     <script src="@Url.Content("~/Content/assets/js/main.js")"></script>
 
+    <script>
+        (function () {
+            function esPaginaBusqueda() {
+                return document.body && document.body.classList.contains('op-busqueda-page');
+            }
+
+            function estaEnModoTablet() {
+                var ancho = window.innerWidth || document.documentElement.clientWidth;
+                return ancho >= 769 && ancho <= 1399;
+            }
+
+            function normalizarSidebarBusqueda() {
+                if (!esPaginaBusqueda()) {
+                    return;
+                }
+
+                var ancho = window.innerWidth || document.documentElement.clientWidth;
+
+                /*
+                 * Al entrar a escritorio grande, quitamos el estado especial
+                 * que pudo haberse usado para expandir el menú en tablet.
+                 */
+                if (ancho >= 1400) {
+                    document.body.classList.remove('toggle-sidebar');
+                }
+
+                /*
+                 * En móvil queremos iniciar con el off-canvas cerrado.
+                 * No se toca mientras el usuario lo abre mediante hamburguesa.
+                 */
+            }
+
+            document.addEventListener('DOMContentLoaded', function () {
+                if (!esPaginaBusqueda()) {
+                    return;
+                }
+
+                normalizarSidebarBusqueda();
+
+                /*
+                 * Si el lateral está compacto y se pulsa un módulo con submenú,
+                 * primero expandimos el lateral para que el usuario vea las opciones.
+                 */
+                document.querySelectorAll('.op-module-toggle[data-bs-toggle="collapse"]').forEach(function (elemento) {
+                    elemento.addEventListener('click', function () {
+                        if (estaEnModoTablet() && !document.body.classList.contains('toggle-sidebar')) {
+                            document.body.classList.add('toggle-sidebar');
+                        }
+                    });
+                });
+            });
+
+            window.addEventListener('resize', function () {
+                normalizarSidebarBusqueda();
+            });
+        })();
+
+        $(document).ajaxError(function (event, xhr) {
+
+        if (xhr.status === 440) {
+
+            window.location.href =
+                '@Url.Action("Index", "Login")';
+
+        }
+
+    });
+
+    </script>
+
     @RenderSection("scripts", required: false)
 </body>
 
 </html>
+
+

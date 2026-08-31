@@ -26,17 +26,33 @@
     let buscandoCoincidencias =
         false;
 
+    const maximoHuellasConsulta =
+        10;
+
+
+    let huellasSeleccionadas =
+        [];
+
+
+    let criteriosBusquedaAbiertos =
+        true;
+
+
 
     $(document).ready(function () {
         inicializarBusquedaTexto();
         inicializarModoCombinacion();
         inicializarCargaBiometrica();
+        inicializarCargaHuellasMultiples();
+        inicializarCarruselHuellas();
+        inicializarPanelCriteriosBusqueda();
         inicializarPorcentaje();
         inicializarFiltrosAvanzados();
         inicializarConteoFiltros();
         inicializarFormulario();
         inicializarLimpieza();
         inicializarEventosResultados();
+        inicializarModalDetalleTablet();
 
         normalizarModoBusquedaInicial();
         normalizarModoCombinacionInicial();
@@ -44,8 +60,469 @@
         actualizarConteoFiltrosAvanzados();
         abrirFiltrosAvanzadosIniciales();
         actualizarEstadoBotonBusqueda();
+        actualizarResumenCriteriosBusqueda();
         inicializarMandamientosDesplegables();
     });
+
+
+
+    /* ============================================================
+       PANEL COMPACTO DE CRITERIOS
+       ============================================================ */
+
+    function inicializarPanelCriteriosBusqueda() {
+
+        $('#btnToggleCriteriosBusqueda')
+            .off(
+                'click.sicCriterios'
+            )
+            .on(
+                'click.sicCriterios',
+                function () {
+
+                    establecerEstadoPanelCriterios(
+                        !criteriosBusquedaAbiertos,
+                        true
+                    );
+                }
+            );
+
+
+        $('#formBusquedaCoincidencias')
+            .off(
+                'input.sicResumenCriterios ' +
+                'change.sicResumenCriterios'
+            )
+            .on(
+                'input.sicResumenCriterios ' +
+                'change.sicResumenCriterios',
+                'input, select',
+                function () {
+
+                    actualizarResumenCriteriosBusqueda();
+                }
+            );
+    }
+
+
+    function establecerEstadoPanelCriterios(
+        abierto,
+        animar
+    ) {
+        criteriosBusquedaAbiertos =
+            !!abierto;
+
+
+        const panel =
+            $('#panelCriteriosBusqueda');
+
+        const contenido =
+            $('#contenidoCriteriosBusqueda');
+
+        const boton =
+            $('#btnToggleCriteriosBusqueda');
+
+
+        panel
+            .toggleClass(
+                'sic-criterios-abiertos',
+                criteriosBusquedaAbiertos
+            )
+            .toggleClass(
+                'sic-criterios-cerrados',
+                !criteriosBusquedaAbiertos
+            );
+
+
+        boton
+            .attr(
+                'aria-expanded',
+                criteriosBusquedaAbiertos
+                    ? 'true'
+                    : 'false'
+            );
+
+
+        boton
+            .find(
+                '.sic-criterios-toggle-etiqueta'
+            )
+            .text(
+                criteriosBusquedaAbiertos
+                    ? 'Ocultar'
+                    : 'Mostrar'
+            );
+
+
+        if (animar) {
+
+            contenido
+                .stop(
+                    true,
+                    true
+                );
+
+
+            if (criteriosBusquedaAbiertos) {
+
+                contenido
+                    .slideDown(
+                        180
+                    );
+            }
+            else {
+
+                contenido
+                    .slideUp(
+                        180
+                    );
+            }
+        }
+        else {
+
+            contenido
+                .toggle(
+                    criteriosBusquedaAbiertos
+                );
+        }
+    }
+
+
+    function actualizarResumenCriteriosBusqueda() {
+
+        const partes =
+            [];
+
+
+        if (tieneNombreBusquedaValido()) {
+            partes.push(
+                'Nombre'
+            );
+        }
+
+
+        if (tieneAliasBusquedaValido()) {
+            partes.push(
+                'Alias'
+            );
+        }
+
+
+        if (
+            inputTieneArchivo(
+                'Fotografia'
+            )
+        ) {
+            partes.push(
+                'Fotografía'
+            );
+        }
+
+
+        const totalHuellas =
+            huellasSeleccionadas.length;
+
+
+        if (totalHuellas > 0) {
+
+            partes.push(
+                totalHuellas +
+                (
+                    totalHuellas === 1
+                        ? ' huella'
+                        : ' huellas'
+                )
+            );
+        }
+
+
+        if (partes.length === 0) {
+
+            partes.push(
+                'Sin criterios capturados'
+            );
+        }
+
+
+        const modoCombinacion =
+            obtenerModoCombinacion() ===
+                'ESTRICTO'
+                ? 'Exigir todos'
+                : 'Priorizar';
+
+
+        const porcentaje =
+            parseInt(
+                $('#PorcentajeMinimo')
+                    .val(),
+                10
+            ) ||
+            porcentajePredeterminado;
+
+
+        $('#resumenCriteriosBusqueda')
+            .text(
+                partes.join(
+                    ' + '
+                ) +
+                ' · ' +
+                modoCombinacion +
+                ' · ' +
+                porcentaje +
+                '%'
+            );
+    }
+
+
+    /* ============================================================
+       CARRUSEL DE HUELLAS
+       ============================================================ */
+
+    function inicializarCarruselHuellas() {
+
+        const contenedor =
+            $('#contenedorHuellasSeleccionadas');
+
+
+        if (
+            contenedor.length === 0
+        ) {
+            return;
+        }
+
+
+        if (
+            !contenedor
+                .parent()
+                .hasClass(
+                    'sic-huellas-carrusel-shell'
+                )
+        ) {
+
+            contenedor
+                .wrap(
+                    '<div class="sic-huellas-carrusel-shell"></div>'
+                );
+
+
+            const shell =
+                contenedor
+                    .parent();
+
+
+            shell
+                .prepend(
+                    '<button type="button" ' +
+                    'class="sic-huellas-carrusel-btn sic-huellas-carrusel-prev js-huellas-carrusel-prev" ' +
+                    'aria-label="Ver huellas anteriores" title="Anteriores">' +
+                    '<i class="fa fa-chevron-left"></i>' +
+                    '</button>'
+                )
+                .append(
+                    '<button type="button" ' +
+                    'class="sic-huellas-carrusel-btn sic-huellas-carrusel-next js-huellas-carrusel-next" ' +
+                    'aria-label="Ver huellas siguientes" title="Siguientes">' +
+                    '<i class="fa fa-chevron-right"></i>' +
+                    '</button>'
+                );
+        }
+
+
+        $(document)
+            .off(
+                'click.sicCarruselHuellas',
+                '.js-huellas-carrusel-prev'
+            )
+            .on(
+                'click.sicCarruselHuellas',
+                '.js-huellas-carrusel-prev',
+                function () {
+
+                    desplazarCarruselHuellas(
+                        -1
+                    );
+                }
+            );
+
+
+        $(document)
+            .off(
+                'click.sicCarruselHuellas',
+                '.js-huellas-carrusel-next'
+            )
+            .on(
+                'click.sicCarruselHuellas',
+                '.js-huellas-carrusel-next',
+                function () {
+
+                    desplazarCarruselHuellas(
+                        1
+                    );
+                }
+            );
+
+
+        contenedor
+            .off(
+                'scroll.sicCarruselHuellas'
+            )
+            .on(
+                'scroll.sicCarruselHuellas',
+                function () {
+
+                    actualizarEstadoCarruselHuellas();
+                }
+            );
+
+
+        actualizarEstadoCarruselHuellas();
+    }
+
+
+    function desplazarCarruselHuellas(
+        direccion
+    ) {
+
+        const contenedor =
+            document.getElementById(
+                'contenedorHuellasSeleccionadas'
+            );
+
+
+        if (!contenedor) {
+            return;
+        }
+
+
+        const tarjeta =
+            contenedor.querySelector(
+                '.sic-huella-consulta-item'
+            );
+
+
+        let paso =
+            contenedor.clientWidth *
+            0.82;
+
+
+        if (tarjeta) {
+
+            const estilo =
+                window.getComputedStyle(
+                    contenedor
+                );
+
+
+            const gap =
+                parseFloat(
+                    estilo.columnGap ||
+                    estilo.gap ||
+                    '8'
+                ) ||
+                8;
+
+
+            paso =
+                Math.max(
+                    tarjeta.getBoundingClientRect()
+                        .width +
+                    gap,
+                    paso
+                );
+        }
+
+
+        contenedor.scrollBy({
+            left:
+                direccion *
+                paso,
+
+            behavior:
+                'smooth'
+        });
+    }
+
+
+    function actualizarEstadoCarruselHuellas() {
+
+        const contenedor =
+            $('#contenedorHuellasSeleccionadas');
+
+        const shell =
+            contenedor
+                .closest(
+                    '.sic-huellas-carrusel-shell'
+                );
+
+
+        if (
+            contenedor.length === 0 ||
+            shell.length === 0
+        ) {
+            return;
+        }
+
+
+        const total =
+            huellasSeleccionadas.length;
+
+
+        shell
+            .toggle(
+                total > 0
+            );
+
+
+        if (total === 0) {
+            return;
+        }
+
+
+        const elemento =
+            contenedor.get(
+                0
+            );
+
+
+        const maxScroll =
+            Math.max(
+                0,
+                elemento.scrollWidth -
+                elemento.clientWidth
+            );
+
+
+        const alInicio =
+            elemento.scrollLeft <=
+            4;
+
+
+        const alFinal =
+            elemento.scrollLeft >=
+            maxScroll -
+            4;
+
+
+        shell
+            .find(
+                '.js-huellas-carrusel-prev'
+            )
+            .prop(
+                'disabled',
+                alInicio
+            );
+
+
+        shell
+            .find(
+                '.js-huellas-carrusel-next'
+            )
+            .prop(
+                'disabled',
+                alFinal ||
+                maxScroll <= 4
+            );
+    }
 
 
     /* ============================================================
@@ -894,7 +1371,621 @@
         );
     }
 
+    /* ================================================================
+   HUELLAS MÚLTIPLES
+   ================================================================ */
 
+    function inicializarCargaHuellasMultiples() {
+
+        $(document)
+            .off(
+                'change.sicHuellasMultiples',
+                '#Huellas'
+            )
+            .on(
+                'change.sicHuellasMultiples',
+                '#Huellas',
+                function () {
+
+                    agregarHuellasSeleccionadas(
+                        this.files
+                    );
+                }
+            );
+
+
+        $(document)
+            .off(
+                'click.sicHuellasMultiples',
+                '.js-seleccionar-huellas'
+            )
+            .on(
+                'click.sicHuellasMultiples',
+                '.js-seleccionar-huellas',
+                function (evento) {
+
+                    evento.preventDefault();
+
+                    evento.stopPropagation();
+
+
+                    $('#Huellas')
+                        .trigger(
+                            'click'
+                        );
+                }
+            );
+
+
+        $(document)
+            .off(
+                'click.sicHuellasMultiples',
+                '.js-quitar-todas-huellas'
+            )
+            .on(
+                'click.sicHuellasMultiples',
+                '.js-quitar-todas-huellas',
+                function (evento) {
+
+                    evento.preventDefault();
+
+                    evento.stopPropagation();
+
+
+                    limpiarHuellasSeleccionadas();
+                }
+            );
+
+
+        $(document)
+            .off(
+                'click.sicHuellasMultiples',
+                '.js-quitar-huella-consulta'
+            )
+            .on(
+                'click.sicHuellasMultiples',
+                '.js-quitar-huella-consulta',
+                function (evento) {
+
+                    evento.preventDefault();
+
+                    evento.stopPropagation();
+
+
+                    const indice =
+                        parseInt(
+                            $(this).attr(
+                                'data-index'
+                            ),
+                            10
+                        );
+
+
+                    quitarHuellaSeleccionada(
+                        indice
+                    );
+                }
+            );
+
+
+        $('#dropzoneHuellas')
+            .off(
+                '.sicHuellasDrop'
+            )
+            .on(
+                'click.sicHuellasDrop',
+                function () {
+
+                    $('#Huellas')
+                        .trigger(
+                            'click'
+                        );
+                }
+            )
+            .on(
+                'dragenter.sicHuellasDrop ' +
+                'dragover.sicHuellasDrop',
+                function (evento) {
+
+                    evento.preventDefault();
+
+                    evento.stopPropagation();
+
+
+                    $(this)
+                        .addClass(
+                            'sic-dropzone-activa'
+                        );
+                }
+            )
+            .on(
+                'dragleave.sicHuellasDrop ' +
+                'drop.sicHuellasDrop',
+                function (evento) {
+
+                    evento.preventDefault();
+
+                    evento.stopPropagation();
+
+
+                    $(this)
+                        .removeClass(
+                            'sic-dropzone-activa'
+                        );
+                }
+            )
+            .on(
+                'drop.sicHuellasDrop',
+                function (evento) {
+
+                    const original =
+                        evento.originalEvent;
+
+
+                    if (
+                        !original ||
+                        !original.dataTransfer ||
+                        !original.dataTransfer.files
+                    ) {
+                        return;
+                    }
+
+
+                    agregarHuellasSeleccionadas(
+                        original.dataTransfer.files
+                    );
+                }
+            );
+    }
+
+
+    function agregarHuellasSeleccionadas(
+        archivos
+    ) {
+        if (
+            !archivos ||
+            archivos.length === 0
+        ) {
+            return;
+        }
+
+
+        let limiteAlcanzado =
+            false;
+
+
+        Array.from(
+            archivos
+        )
+            .forEach(function (archivo) {
+
+                if (
+                    huellasSeleccionadas.length >=
+                    maximoHuellasConsulta
+                ) {
+                    limiteAlcanzado =
+                        true;
+
+                    return;
+                }
+
+
+                if (
+                    !archivoEsValido(
+                        archivo
+                    )
+                ) {
+                    return;
+                }
+
+
+                if (
+                    huellaYaSeleccionada(
+                        archivo
+                    )
+                ) {
+                    return;
+                }
+
+
+                huellasSeleccionadas.push(
+                    archivo
+                );
+            });
+
+
+        if (limiteAlcanzado) {
+
+            mostrarMensaje(
+                'Puede agregar como máximo ' +
+                maximoHuellasConsulta +
+                ' huellas por búsqueda.',
+                'warning'
+            );
+        }
+
+
+        sincronizarInputHuellas();
+
+        renderizarHuellasSeleccionadas();
+
+        actualizarEstadoBotonBusqueda();
+    }
+
+
+    function huellaYaSeleccionada(
+        archivo
+    ) {
+        if (!archivo) {
+            return false;
+        }
+
+
+        return huellasSeleccionadas
+            .some(function (existente) {
+
+                return (
+                    existente.name ===
+                    archivo.name &&
+                    existente.size ===
+                    archivo.size &&
+                    existente.lastModified ===
+                    archivo.lastModified
+                );
+            });
+    }
+
+
+    function sincronizarInputHuellas() {
+
+        const input =
+            document.getElementById(
+                'Huellas'
+            );
+
+
+        if (!input) {
+            return;
+        }
+
+
+        try {
+
+            const transferencia =
+                new DataTransfer();
+
+
+            huellasSeleccionadas
+                .forEach(function (archivo) {
+
+                    transferencia.items.add(
+                        archivo
+                    );
+                });
+
+
+            input.files =
+                transferencia.files;
+        }
+        catch (error) {
+
+            mostrarMensaje(
+                'No fue posible preparar las huellas seleccionadas.',
+                'error'
+            );
+        }
+    }
+
+
+    function quitarHuellaSeleccionada(
+        indice
+    ) {
+        if (
+            isNaN(indice) ||
+            indice < 0 ||
+            indice >= huellasSeleccionadas.length
+        ) {
+            return;
+        }
+
+
+        huellasSeleccionadas.splice(
+            indice,
+            1
+        );
+
+
+        sincronizarInputHuellas();
+
+        renderizarHuellasSeleccionadas();
+
+        actualizarEstadoBotonBusqueda();
+    }
+
+
+    function limpiarHuellasSeleccionadas() {
+
+        huellasSeleccionadas =
+            [];
+
+
+        const input =
+            document.getElementById(
+                'Huellas'
+            );
+
+
+        if (input) {
+            input.value =
+                '';
+        }
+
+
+        sincronizarInputHuellas();
+
+        renderizarHuellasSeleccionadas();
+
+        actualizarEstadoBotonBusqueda();
+    }
+
+
+    function renderizarHuellasSeleccionadas() {
+
+        const contenedor =
+            $('#contenedorHuellasSeleccionadas');
+
+
+        const total =
+            huellasSeleccionadas.length;
+
+
+        $('#contadorHuellas')
+            .text(
+                total +
+                ' / ' +
+                maximoHuellasConsulta
+            );
+
+
+        $('#btnQuitarTodasHuellas')
+            .prop(
+                'disabled',
+                total === 0
+            );
+
+
+        $('#btnAgregarHuellas')
+            .prop(
+                'disabled',
+                total >= maximoHuellasConsulta
+            );
+
+
+        $('#tileHuellas')
+            .toggleClass(
+                'sic-biometrico-con-archivo',
+                total > 0
+            );
+
+
+        contenedor
+            .empty();
+
+
+        if (total === 0) {
+
+            contenedor
+                .hide();
+
+            actualizarResumenCriteriosBusqueda();
+            actualizarEstadoCarruselHuellas();
+
+            return;
+        }
+
+
+        contenedor
+            .show();
+
+
+        huellasSeleccionadas
+            .forEach(function (
+                archivo,
+                indice
+            ) {
+
+                const tarjeta =
+                    $('<div>')
+                        .addClass(
+                            'sic-huella-consulta-item'
+                        );
+
+
+                const imagenWrap =
+                    $('<div>')
+                        .addClass(
+                            'sic-huella-consulta-imagen-wrap'
+                        );
+
+
+                const imagen =
+                    $('<img>')
+                        .addClass(
+                            'sic-huella-consulta-imagen'
+                        )
+                        .attr(
+                            'alt',
+                            'Huella ' +
+                            (indice + 1)
+                        );
+
+
+                const numero =
+                    $('<span>')
+                        .addClass(
+                            'sic-huella-consulta-numero'
+                        )
+                        .text(
+                            'HUELLA ' +
+                            (indice + 1)
+                        );
+
+
+                const botonQuitar =
+                    $('<button>')
+                        .attr({
+                            type:
+                                'button',
+
+                            title:
+                                'Quitar huella',
+
+                            'data-index':
+                                indice
+                        })
+                        .addClass(
+                            'sic-huella-consulta-quitar ' +
+                            'js-quitar-huella-consulta'
+                        );
+
+
+                botonQuitar
+                    .append(
+                        $('<i>')
+                            .addClass(
+                                'fa fa-times'
+                            )
+                    );
+
+
+                const informacion =
+                    $('<div>')
+                        .addClass(
+                            'sic-huella-consulta-info'
+                        );
+
+
+                const nombre =
+                    $('<strong>')
+                        .text(
+                            archivo.name
+                        );
+
+
+                const tamanio =
+                    $('<span>')
+                        .text(
+                            formatearTamanioArchivo(
+                                archivo.size
+                            )
+                        );
+
+
+                informacion
+                    .append(
+                        nombre
+                    )
+                    .append(
+                        tamanio
+                    );
+
+
+                imagenWrap
+                    .append(
+                        imagen
+                    )
+                    .append(
+                        numero
+                    )
+                    .append(
+                        botonQuitar
+                    );
+
+
+                tarjeta
+                    .append(
+                        imagenWrap
+                    )
+                    .append(
+                        informacion
+                    );
+
+
+                contenedor
+                    .append(
+                        tarjeta
+                    );
+
+
+                const lector =
+                    new FileReader();
+
+
+                lector.onload =
+                    function (evento) {
+
+                        imagen.attr(
+                            'src',
+                            evento.target.result
+                        );
+                    };
+
+
+                lector.readAsDataURL(
+                    archivo
+                );
+            });
+
+
+        actualizarResumenCriteriosBusqueda();
+
+
+        window.requestAnimationFrame(
+            function () {
+
+                actualizarEstadoCarruselHuellas();
+            }
+        );
+    }
+
+
+    function formatearTamanioArchivo(
+        bytes
+    ) {
+        if (
+            !bytes ||
+            bytes <= 0
+        ) {
+            return '0 KB';
+        }
+
+
+        const kb =
+            bytes / 1024;
+
+
+        if (kb < 1024) {
+
+            return (
+                Math.round(
+                    kb
+                ) +
+                ' KB'
+            );
+        }
+
+
+        const mb =
+            kb / 1024;
+
+
+        return (
+            mb.toFixed(
+                1
+            ) +
+            ' MB'
+        );
+    }
     /* ============================================================
        PORCENTAJE Y FILTROS
        ============================================================ */
@@ -1095,7 +2186,7 @@
 
         const tieneHuella =
             inputTieneArchivo(
-                'Huella'
+                'Huellas'
             );
 
         if (
@@ -1385,6 +2476,18 @@
 
                 beforeSend:
                     function () {
+                        actualizarResumenCriteriosBusqueda();
+
+                        $('#sicBusquedaCoincidencias')
+                            .addClass(
+                                'sic-modo-resultados'
+                            );
+
+                        establecerEstadoPanelCriterios(
+                            false,
+                            true
+                        );
+
                         mostrarCargandoResultados();
 
                         $('#btnBuscarCoincidencias')
@@ -1418,6 +2521,16 @@
                         if (estado === 'abort') {
                             return;
                         }
+
+                        $('#sicBusquedaCoincidencias')
+                            .removeClass(
+                                'sic-modo-resultados'
+                            );
+
+                        establecerEstadoPanelCriterios(
+                            true,
+                            true
+                        );
 
                         mostrarErrorResultados(
                             limpiarMensajeErrorServidor(
@@ -1462,7 +2575,7 @@
                             100
                         );
                     }
-                
+
             });
     }
 
@@ -1497,7 +2610,7 @@
 
         const tieneHuella =
             inputTieneArchivo(
-                'Huella'
+                'Huellas'
             );
 
         let descripcion =
@@ -1642,7 +2755,7 @@
                             'sic-modal-abierto'
                         );
                 }
-        );
+            );
         $(document)
             .off(
                 'click.sicCerrarFotoGrande',
@@ -1695,10 +2808,8 @@
                         $(this);
 
                     const fotoConsulta =
-                        $('#previewFotografia').is(':visible')
-                            ? $('#previewFotografia').attr('src')
-                            : '';
-
+                        ($('#previewFotografia').attr('src') || '')
+                            .trim();
                     const fotoCandidato =
                         boton.attr(
                             'data-foto-candidato'
@@ -1907,7 +3018,7 @@
                         tipo
                     );
                 }
-        );
+            );
 
         $(document)
             .off(
@@ -1942,6 +3053,286 @@
             );
 
     }
+
+    /* ============================================================
+   DETALLE EN MODAL PARA TABLET
+   ============================================================ */
+
+    function esVistaTabletDetalle() {
+        return window.matchMedia(
+            '(max-width: 1100px)'
+        ).matches;
+    }
+
+
+    function inicializarModalDetalleTablet() {
+        asegurarModalDetalleTablet();
+
+        $(document)
+            .off(
+                'click.sicModalDetalleTablet',
+                '.js-cerrar-detalle-tablet'
+            )
+            .on(
+                'click.sicModalDetalleTablet',
+                '.js-cerrar-detalle-tablet',
+                function (evento) {
+                    evento.preventDefault();
+                    evento.stopPropagation();
+
+                    cerrarModalDetalleTablet();
+                }
+            );
+
+        $(document)
+            .off(
+                'keydown.sicModalDetalleTablet'
+            )
+            .on(
+                'keydown.sicModalDetalleTablet',
+                function (evento) {
+                    if (evento.key !== 'Escape') {
+                        return;
+                    }
+
+                    if (
+                        $('#sicModalFotoGrande').hasClass('abierto') ||
+                        $('#sicModalComparacionFoto').hasClass('abierto')
+                    ) {
+                        return;
+                    }
+
+                    if (
+                        $('#sicModalDetalleCoincidencia')
+                            .hasClass('abierto')
+                    ) {
+                        cerrarModalDetalleTablet();
+                    }
+                }
+            );
+
+        $(window)
+            .off(
+                'resize.sicModalDetalleTablet'
+            )
+            .on(
+                'resize.sicModalDetalleTablet',
+                function () {
+                    if (
+                        !esVistaTabletDetalle() &&
+                        $('#sicModalDetalleCoincidencia')
+                            .hasClass('abierto')
+                    ) {
+                        cerrarModalDetalleTablet();
+                    }
+                }
+            );
+    }
+
+
+    function asegurarModalDetalleTablet() {
+        if (
+            $('#sicModalDetalleCoincidencia')
+                .length > 0
+        ) {
+            return;
+        }
+
+        const modal =
+            $('<div>')
+                .attr({
+                    id:
+                        'sicModalDetalleCoincidencia',
+
+                    'aria-hidden':
+                        'true'
+                })
+                .addClass(
+                    'sic-modal-detalle-tablet'
+                );
+
+        const fondo =
+            $('<button>')
+                .attr({
+                    type:
+                        'button',
+
+                    tabindex:
+                        '-1',
+
+                    'aria-label':
+                        'Cerrar detalle'
+                })
+                .addClass(
+                    'sic-modal-detalle-fondo js-cerrar-detalle-tablet'
+                );
+
+        const dialogo =
+            $('<section>')
+                .attr({
+                    role:
+                        'dialog',
+
+                    'aria-modal':
+                        'true',
+
+                    'aria-labelledby':
+                        'sicModalDetalleTitulo'
+                })
+                .addClass(
+                    'sic-modal-detalle-dialogo'
+                );
+
+        const encabezado =
+            $('<header>')
+                .addClass(
+                    'sic-modal-detalle-encabezado'
+                )
+                .html(
+                    '<div class="sic-modal-detalle-titulo-wrap">' +
+                    '<span class="sic-modal-detalle-icono">' +
+                    '<i class="fa fa-id-card-o"></i>' +
+                    '</span>' +
+
+                    '<div>' +
+                    '<h2 id="sicModalDetalleTitulo">' +
+                    'Detalle de coincidencia' +
+                    '</h2>' +
+
+                    '<span id="sicModalDetalleSubtitulo">' +
+                    'Información institucional del candidato seleccionado' +
+                    '</span>' +
+                    '</div>' +
+                    '</div>' +
+
+                    '<button type="button" ' +
+                    'class="sic-modal-detalle-cerrar js-cerrar-detalle-tablet" ' +
+                    'aria-label="Cerrar detalle">' +
+
+                    '<i class="fa fa-times"></i>' +
+                    '</button>'
+                );
+
+        const contenido =
+            $('<div>')
+                .attr({
+                    id:
+                        'sicModalDetalleContenido',
+
+                    'aria-live':
+                        'polite',
+
+                    'aria-busy':
+                        'false'
+                })
+                .addClass(
+                    'sic-modal-detalle-contenido'
+                );
+
+        dialogo
+            .append(
+                encabezado
+            )
+            .append(
+                contenido
+            );
+
+        modal
+            .append(
+                fondo
+            )
+            .append(
+                dialogo
+            );
+
+        $('body')
+            .append(
+                modal
+            );
+    }
+
+
+    function abrirModalDetalleTablet(
+        elementoResultado
+    ) {
+        asegurarModalDetalleTablet();
+
+        const nombre =
+            elementoResultado &&
+                elementoResultado.length > 0
+                ? $.trim(
+                    elementoResultado
+                        .find(
+                            '.sic-resultado-nombre'
+                        )
+                        .first()
+                        .text()
+                )
+                : '';
+
+        $('#sicModalDetalleSubtitulo')
+            .text(
+                nombre.length > 0
+                    ? nombre
+                    : 'Información institucional del candidato seleccionado'
+            );
+
+        $('#sicModalDetalleCoincidencia')
+            .addClass(
+                'abierto'
+            )
+            .attr(
+                'aria-hidden',
+                'false'
+            );
+
+        actualizarBloqueoScrollModales();
+
+        window.setTimeout(
+            function () {
+                $('#sicModalDetalleCoincidencia')
+                    .find(
+                        '.sic-modal-detalle-cerrar'
+                    )
+                    .trigger(
+                        'focus'
+                    );
+            },
+            40
+        );
+    }
+
+
+    function cerrarModalDetalleTablet() {
+        $('#sicModalDetalleCoincidencia')
+            .removeClass(
+                'abierto'
+            )
+            .attr(
+                'aria-hidden',
+                'true'
+            );
+
+        actualizarBloqueoScrollModales();
+    }
+
+
+    function actualizarBloqueoScrollModales() {
+        const hayModalAbierto =
+            $('#sicModalDetalleCoincidencia')
+                .hasClass('abierto') ||
+            $('#sicModalFotoGrande')
+                .hasClass('abierto') ||
+            $('#sicModalComparacionFoto')
+                .hasClass('abierto');
+
+        $('body')
+            .toggleClass(
+                'sic-modal-abierto',
+                hayModalAbierto
+            );
+    }
+
 
     function cerrarFotoGrande() {
 
@@ -1999,8 +3390,10 @@
                 'sic-modal-abierto'
             );
     }
+
     function seleccionarResultadoDesdeElemento(
-        elementoResultado
+        elementoResultado,
+        abrirDetalle
     ) {
         if (
             !elementoResultado ||
@@ -2016,14 +3409,15 @@
                 ),
                 10
             ),
-            elementoResultado
+            elementoResultado,
+            abrirDetalle
         );
     }
 
-
     function seleccionarCoincidencia(
         idCoincidencia,
-        elementoResultado
+        elementoResultado,
+        abrirDetalle
     ) {
         if (
             isNaN(idCoincidencia) ||
@@ -2047,10 +3441,31 @@
                 );
         }
 
+        if (
+            esVistaTabletDetalle()
+        ) {
+            if (
+                abrirDetalle !== false
+            ) {
+                abrirModalDetalleTablet(
+                    elementoResultado
+                );
+
+                cargarDetalleCoincidencia(
+                    idCoincidencia,
+                    true
+                );
+            }
+
+            return;
+        }
+
         cargarDetalleCoincidencia(
-            idCoincidencia
+            idCoincidencia,
+            false
         );
     }
+
 
 
     function filtrarResultadosPorTipo(
@@ -2140,7 +3555,8 @@
 
         if (primerResultadoVisible.length > 0) {
             seleccionarResultadoDesdeElemento(
-                primerResultadoVisible
+                primerResultadoVisible,
+                !esVistaTabletDetalle()
             );
 
             return;
@@ -2158,12 +3574,15 @@
 
 
     function cargarDetalleCoincidencia(
-        idCoincidencia
+        idCoincidencia,
+        usarModalTablet
     ) {
         const configuracion =
             window.sicCoincidenciasConfig || {};
 
-        if (!configuracion.urlDetalle) {
+        if (
+            !configuracion.urlDetalle
+        ) {
             mostrarMensaje(
                 'No se configuró la dirección del detalle de coincidencia.',
                 'error'
@@ -2174,8 +3593,26 @@
 
         cancelarSolicitudDetalle();
 
+        const usarModal =
+            usarModalTablet === true &&
+            esVistaTabletDetalle();
+
+        if (
+            usarModal
+        ) {
+            asegurarModalDetalleTablet();
+        }
+
         const panelDetalle =
-            $('#panelDetalleCoincidencia');
+            usarModal
+                ? $('#sicModalDetalleContenido')
+                : $('#panelDetalleCoincidencia');
+
+        if (
+            panelDetalle.length === 0
+        ) {
+            return;
+        }
 
         panelDetalle
             .attr(
@@ -2233,7 +3670,9 @@
                         xhr,
                         estado
                     ) {
-                        if (estado === 'abort') {
+                        if (
+                            estado === 'abort'
+                        ) {
                             return;
                         }
 
@@ -2256,7 +3695,8 @@
 
                 complete:
                     function () {
-                        solicitudDetalleActual = null;
+                        solicitudDetalleActual =
+                            null;
 
                         panelDetalle.attr(
                             'aria-busy',
@@ -2265,7 +3705,6 @@
                     }
             });
     }
-
 
     function cancelarSolicitudDetalle() {
         if (
@@ -2281,9 +3720,8 @@
 
     function sincronizarImagenesConsulta() {
         const fotoConsulta =
-            $('#previewFotografia').is(':visible')
-                ? $('#previewFotografia').attr('src')
-                : '';
+            ($('#previewFotografia').attr('src') || '')
+                .trim();
 
         const huellaConsulta =
             $('#previewHuella').is(':visible')
@@ -2364,9 +3802,7 @@
             'Fotografia'
         );
 
-        limpiarArchivoBiometrico(
-            'Huella'
-        );
+        limpiarHuellasSeleccionadas();
 
         $('#NombreBusqueda')
             .val('');
@@ -2419,6 +3855,18 @@
 
         actualizarConteoFiltrosAvanzados();
         restaurarEstadoInicialResultados();
+
+        $('#sicBusquedaCoincidencias')
+            .removeClass(
+                'sic-modo-resultados'
+            );
+
+        establecerEstadoPanelCriterios(
+            true,
+            true
+        );
+
+        actualizarResumenCriteriosBusqueda();
         actualizarEstadoBotonBusqueda();
     }
 
@@ -2447,7 +3895,7 @@
                 tieneNombreBusquedaValido() ||
                 tieneAliasBusquedaValido() ||
                 inputTieneArchivo('Fotografia') ||
-                inputTieneArchivo('Huella')
+                inputTieneArchivo('Huellas')
             );
 
         $('#btnBuscarCoincidencias')

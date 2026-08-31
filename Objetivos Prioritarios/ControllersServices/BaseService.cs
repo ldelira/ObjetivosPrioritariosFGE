@@ -15,6 +15,8 @@ namespace Objetivos_Prioritarios.ControllersServices
         public Mandamientos_JudicialesEntities dbMand = new Mandamientos_JudicialesEntities();
         public FiliacionEntities dbFili = new FiliacionEntities();
         public Filiacion_MunicipiosEntities dbFiliMuni = new Filiacion_MunicipiosEntities();
+        public Objetivos_PrioritariosEntitiesQA dbqa = new Objetivos_PrioritariosEntitiesQA();
+
 
     }
 }

@@ -1763,6 +1763,13 @@ Model.FechaFiliacion.HasValue ||
                                         </span>
                                     }
 
+                                    @if (!string.IsNullOrWhiteSpace(mandamiento.Delito))
+                                    {
+                                        <span class="sic-fgea-mandamiento-estado">
+                                            @mandamiento.Delito
+                                        </span>
+                                    }
+
                                 </div>
 
 

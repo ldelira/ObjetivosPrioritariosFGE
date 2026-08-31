@@ -90,13 +90,17 @@ namespace Objetivos_Prioritarios.Models
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<SP_ObjPri_getListinfogeneral_Result>("SP_ObjPri_getListinfogeneral", nombreParameter, paternoParameter, maternoParameter);
         }
     
-        public virtual ObjectResult<SP_SIC_getCoincidenciasDetenidos_Result> SP_SIC_getCoincidenciasDetenidos(string ids_nom_perso)
+        public virtual ObjectResult<SP_SIC_getCoincidenciasDetenidos_Result> SP_SIC_getCoincidenciasDetenidos(string ids_nom_perso, string claves_perso)
         {
             var ids_nom_persoParameter = ids_nom_perso != null ?
                 new ObjectParameter("ids_nom_perso", ids_nom_perso) :
                 new ObjectParameter("ids_nom_perso", typeof(string));
     
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<SP_SIC_getCoincidenciasDetenidos_Result>("SP_SIC_getCoincidenciasDetenidos", ids_nom_persoParameter);
+            var claves_persoParameter = claves_perso != null ?
+                new ObjectParameter("claves_perso", claves_perso) :
+                new ObjectParameter("claves_perso", typeof(string));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<SP_SIC_getCoincidenciasDetenidos_Result>("SP_SIC_getCoincidenciasDetenidos", ids_nom_persoParameter, claves_persoParameter);
         }
     }
 }

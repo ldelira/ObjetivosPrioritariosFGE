@@ -85,7 +85,7 @@ namespace Objetivos_Prioritarios.ControllersServices
                         string.Empty,
 
                     PorcentajeMinimo =
-                        70,
+                        50,
 
                     Municipios =
                         ObtenerMunicipios(),
@@ -240,14 +240,80 @@ namespace Objetivos_Prioritarios.ControllersServices
             }
 
             ValidarArchivo(
-                filtros.Fotografia,
-                "fotografía"
-            );
+     filtros.Fotografia,
+     "fotografía"
+ );
 
-            ValidarArchivo(
-                filtros.Huella,
-                "huella"
-            );
+
+            /*
+             * =========================================================
+             * HUELLAS DE CONSULTA
+             * =========================================================
+             *
+             * Nuevo formato:
+             * filtros.Huellas
+             *
+             * Compatibilidad:
+             * filtros.Huella
+             * =========================================================
+             */
+
+            List<HttpPostedFileBase> huellasConsulta =
+                new List<HttpPostedFileBase>();
+
+
+            if (filtros.Huellas != null)
+            {
+                huellasConsulta.AddRange(
+                    filtros.Huellas
+                        .Where(x =>
+                            x != null &&
+                            x.ContentLength > 0
+                        )
+                );
+            }
+
+
+            /*
+             * Por compatibilidad con el formato anterior.
+             */
+            if (
+                filtros.Huella != null &&
+                filtros.Huella.ContentLength > 0
+            )
+            {
+                huellasConsulta.Add(
+                    filtros.Huella
+                );
+            }
+
+
+            /*
+             * Máximo 10 huellas.
+             */
+            if (huellasConsulta.Count > 10)
+            {
+                throw new ArgumentException(
+                    "Puede cargar como máximo 10 huellas por búsqueda."
+                );
+            }
+
+
+            /*
+             * Validar cada archivo individualmente.
+             */
+            for (
+                int indiceHuella = 0;
+                indiceHuella < huellasConsulta.Count;
+                indiceHuella++
+            )
+            {
+                ValidarArchivo(
+                    huellasConsulta[indiceHuella],
+                    "huella " +
+                    (indiceHuella + 1)
+                );
+            }
 
             /* =========================================================
                NORMALIZAR MODO DE BÚSQUEDA
@@ -307,7 +373,7 @@ namespace Objetivos_Prioritarios.ControllersServices
                 porcentajeMinimo > 100
             )
             {
-                porcentajeMinimo = 70;
+                porcentajeMinimo = 50;
             }
 
             /* =========================================================
@@ -325,12 +391,12 @@ namespace Objetivos_Prioritarios.ControllersServices
                 );
 
             bool tieneFotografia =
-                filtros.Fotografia != null &&
-                filtros.Fotografia.ContentLength > 0;
+    filtros.Fotografia != null &&
+    filtros.Fotografia.ContentLength > 0;
+
 
             bool tieneHuella =
-                filtros.Huella != null &&
-                filtros.Huella.ContentLength > 0;
+                huellasConsulta.Count > 0;
 
             /*
              * Ahora ya NO obligamos a tener biometría.
@@ -437,24 +503,49 @@ namespace Objetivos_Prioritarios.ControllersServices
                 }
 
                 /* =====================================================
-                   HUELLA
-                   ===================================================== */
+                   HUELLAS
+                   =====================================================
+                 *
+                 * Todas las imágenes se mandan con la misma clave:
+                 *
+                 * Huellas
+                 *
+                 * ASP.NET Core las enlaza en:
+                 *
+                 * List<IFormFile> Huellas
+                 * ===================================================== */
 
                 if (tieneHuella)
                 {
-                    ByteArrayContent contenidoHuella =
-                        CrearContenidoArchivo(
-                            filtros.Huella
-                        );
+                    for (
+                        int indiceHuella = 0;
+                        indiceHuella < huellasConsulta.Count;
+                        indiceHuella++
+                    )
+                    {
+                        HttpPostedFileBase archivoHuella =
+                            huellasConsulta[
+                                indiceHuella
+                            ];
 
-                    formulario.Add(
-                        contenidoHuella,
-                        "Huella",
-                        ObtenerNombreArchivo(
-                            filtros.Huella,
-                            "huella.jpg"
-                        )
-                    );
+
+                        ByteArrayContent contenidoHuella =
+                            CrearContenidoArchivo(
+                                archivoHuella
+                            );
+
+
+                        formulario.Add(
+                            contenidoHuella,
+                            "Huellas",
+                            ObtenerNombreArchivo(
+                                archivoHuella,
+                                "huella_" +
+                                (indiceHuella + 1) +
+                                ".jpg"
+                            )
+                        );
+                    }
                 }
 
                 /* =====================================================
@@ -478,6 +569,27 @@ namespace Objetivos_Prioritarios.ControllersServices
 
                     string contenidoRespuesta =
                         await respuesta.Content.ReadAsStringAsync();
+
+
+                    System.Diagnostics.Debug.WriteLine(
+    "========================================"
+);
+
+                    System.Diagnostics.Debug.WriteLine(
+                        "URL API MVC: " + _urlApi
+                    );
+
+                    System.Diagnostics.Debug.WriteLine(
+                        "RESPUESTA API MVC:"
+                    );
+
+                    System.Diagnostics.Debug.WriteLine(
+                        contenidoRespuesta
+                    );
+
+                    System.Diagnostics.Debug.WriteLine(
+                        "========================================"
+                    );
 
                     if (!respuesta.IsSuccessStatusCode)
                     {
@@ -875,19 +987,21 @@ namespace Objetivos_Prioritarios.ControllersServices
              * agreguemos su enriquecimiento visual.
              */
 
-            List<ApiCoincidenciaBiometricaDto> resultadosApi = resultadoApi.Resultados
-             .Where(x =>
-                 x != null &&
-                 (
-                    x.IdTbFuente == 1 ||
-                    x.IdTbFuente == 2 ||
-                     x.IdTbFuente == 5 ||
-                     x.IdTbFuente == 6 ||
-                     x.IdTbFuente == 7 ||
-                     x.IdTbFuente == 8 
-                 )
-             )
-             .ToList();
+            List<ApiCoincidenciaBiometricaDto> resultadosApi =
+    resultadoApi.Resultados
+        .Where(x =>
+            x != null &&
+            (
+                x.IdTbFuente == 1 ||
+                x.IdTbFuente == 2 ||
+                x.IdTbFuente == 3 ||
+                x.IdTbFuente == 5 ||
+                x.IdTbFuente == 6 ||
+                x.IdTbFuente == 7 ||
+                x.IdTbFuente == 8
+            )
+        )
+        .ToList();
 
             int consecutivo = 1;
 
@@ -1055,13 +1169,53 @@ namespace Objetivos_Prioritarios.ControllersServices
                             DateTime.MinValue,
 
                         TieneAvisoMandamientos =
-                            false,
+    item.TieneAvisoMandamientos,
 
                         TotalMandamientos =
-                            0,
+    item.TotalMandamientos,
 
                         MandamientosJudiciales =
-                            new List<MandamientoJudicialViewModel>()
+    item.MandamientosJudiciales == null
+        ? new List<MandamientoJudicialViewModel>()
+        : item.MandamientosJudiciales
+            .Select(x =>
+                new MandamientoJudicialViewModel
+                {
+                    IdNombreMandamiento =
+                        x.IdNombreMandamiento,
+
+                    IdMandamiento =
+                        x.IdMandamiento,
+
+                    NombreCompleto =
+                        x.NombreCompleto,
+
+                    NumeroControl =
+                        x.NumeroControl,
+
+                    NumeroExpediente =
+                        x.NumeroExpediente,
+
+                    TipoMandamiento =
+                        x.TipoMandamiento,
+
+                    EstadoProceso =
+                        x.EstadoProceso,
+
+                    Delito =
+                        x.Delito,
+
+                    FechaExpedicion =
+                        x.FechaExpedicion,
+
+                    FechaAlta =
+                        x.FechaAlta,
+
+                    PorcentajeNombre =
+                        x.PorcentajeNombre
+                }
+            )
+            .ToList()
                     };
 
                 coincidencias.Add(
@@ -1104,7 +1258,25 @@ namespace Objetivos_Prioritarios.ControllersServices
             );
 
 
+            var mandamientoMvc =
+    coincidencias
+        .Where(x =>
+            x.MandamientosJudiciales != null &&
+            x.MandamientosJudiciales.Count > 0
+        )
+        .SelectMany(x =>
+            x.MandamientosJudiciales
+        )
+        .FirstOrDefault();
 
+            System.Diagnostics.Debug.WriteLine(
+                "DELITO MAPEADO MVC: " +
+                (
+                    mandamientoMvc == null
+                        ? "NO HAY MANDAMIENTO"
+                        : mandamientoMvc.Delito ?? "NULL"
+                )
+            );
 
             /*
              * Completamos los datos reales.
@@ -1113,6 +1285,14 @@ namespace Objetivos_Prioritarios.ControllersServices
              * Detenidos FGEA.
              */
             EnriquecerCoincidenciasPorFuente(
+                coincidencias
+            );
+
+
+            /*
+             * Fuente 3.
+             */
+            await EnriquecerCoincidenciasPersonasInteresAsync(
                 coincidencias
             );
 
@@ -1857,9 +2037,9 @@ namespace Objetivos_Prioritarios.ControllersServices
             /*
              * Mandamientos al final.
              */
-            AgregarAvisosMandamientos(
-                coincidencias
-            );
+            //AgregarAvisosMandamientos(
+            //    coincidencias
+            //);
         }
 
 
@@ -2021,22 +2201,175 @@ namespace Objetivos_Prioritarios.ControllersServices
                     coincidencia.TotalMandamientos > 0;
             }
         }
+        //COMENTADO LEO V2.0
+        //    private List<MandamientoJudicialViewModel>
+        //BuscarMandamientosPorNombre(
+        //    string nombreCompleto,
+        //    double umbral = 85)
+        //    {
+        //        List<MandamientoJudicialViewModel> resultado =
+        //            new List<MandamientoJudicialViewModel>();
 
-        private List<MandamientoJudicialViewModel>
-    BuscarMandamientosPorNombre(
-        string nombreCompleto,
-        double umbral = 85)
+        //        string nombrePrincipal =
+        //            ObtenerNombrePrincipal(
+        //                nombreCompleto
+        //            );
+
+        //        if (
+        //            string.IsNullOrWhiteSpace(nombrePrincipal) ||
+        //            nombrePrincipal.Equals(
+        //                "SIN INFORMACIÓN",
+        //                StringComparison.OrdinalIgnoreCase
+        //            )
+        //        )
+        //        {
+        //            return resultado;
+        //        }
+
+        //        DataTable candidatos =
+        //            _filiacionMunicipalService
+        //                .BuscarMandamientosCandidatosPorNombre(
+        //                    nombrePrincipal
+        //                );
+
+        //        if (
+        //            candidatos == null ||
+        //            candidatos.Rows.Count == 0
+        //        )
+        //        {
+        //            return resultado;
+        //        }
+
+        //        foreach (DataRow fila in candidatos.Rows)
+        //        {
+        //            string nombreCandidato =
+        //                ObtenerTextoMandamiento(
+        //                    fila,
+        //                    "Nombre"
+        //                );
+
+        //            if (string.IsNullOrWhiteSpace(nombreCandidato))
+        //            {
+        //                continue;
+        //            }
+
+        //            double similitud =
+        //                CalcularSimilitudNombreMandamiento(
+        //                    nombrePrincipal,
+        //                    nombreCandidato
+        //                );
+
+        //            if (similitud < umbral)
+        //            {
+        //                continue;
+        //            }
+
+        //            MandamientoJudicialViewModel mandamiento =
+        //                new MandamientoJudicialViewModel
+        //                {
+        //                    IdNombreMandamiento =
+        //                        ObtenerEnteroMandamiento(
+        //                            fila,
+        //                            "IdOrigenAlerta"
+        //                        ),
+
+        //                    IdMandamiento =
+        //                        ObtenerEnteroMandamiento(
+        //                            fila,
+        //                            "IdMandamiento"
+        //                        ),
+
+        //                    NombreCompleto =
+        //                        nombreCandidato,
+
+        //                    NumeroControl =
+        //                        ValorOTextoPredeterminado(
+        //                            ObtenerTextoMandamiento(
+        //                                fila,
+        //                                "numero_control"
+        //                            )
+        //                        ),
+
+        //                    NumeroExpediente =
+        //                        ValorOTextoPredeterminado(
+        //                            ObtenerTextoMandamiento(
+        //                                fila,
+        //                                "numero_expediente"
+        //                            )
+        //                        ),
+
+        //                    TipoMandamiento =
+        //                        ValorOTextoPredeterminado(
+        //                            ObtenerTextoMandamiento(
+        //                                fila,
+        //                                "mandamiento"
+        //                            )
+        //                        ),
+
+        //                    EstadoProceso =
+        //                        ValorOTextoPredeterminado(
+        //                            ObtenerTextoMandamiento(
+        //                                fila,
+        //                                "EstadoProceso"
+        //                            )
+        //                        ),
+
+        //                    FechaExpedicion =
+        //                        ObtenerFechaNullableMandamiento(
+        //                            fila,
+        //                            "fecha_expedicion"
+        //                        ),
+
+        //                    FechaAlta =
+        //                        ObtenerFechaNullableMandamiento(
+        //                            fila,
+        //                            "fecha_alta"
+        //                        ),
+
+        //                    PorcentajeNombre =
+        //                        Convert.ToInt32(
+        //                            Math.Round(similitud)
+        //                        )
+        //                };
+
+        //            resultado.Add(mandamiento);
+        //        }
+
+        //        return resultado
+        //            .GroupBy(x => new
+        //            {
+        //                x.IdNombreMandamiento,
+        //                x.IdMandamiento
+        //            })
+        //            .Select(x =>
+        //                x.OrderByDescending(y =>
+        //                    y.PorcentajeNombre
+        //                )
+        //                .First()
+        //            )
+        //            .OrderByDescending(x =>
+        //                x.FechaExpedicion ??
+        //                x.FechaAlta ??
+        //                DateTime.MinValue
+        //            )
+        //            .ToList();
+        //    }
+        private List<MandamientoJudicialViewModel> BuscarMandamientosPorNombre(string nombreCompleto, double umbral = 85)
         {
             List<MandamientoJudicialViewModel> resultado =
                 new List<MandamientoJudicialViewModel>();
+
 
             string nombrePrincipal =
                 ObtenerNombrePrincipal(
                     nombreCompleto
                 );
 
+
             if (
-                string.IsNullOrWhiteSpace(nombrePrincipal) ||
+                string.IsNullOrWhiteSpace(
+                    nombrePrincipal
+                ) ||
                 nombrePrincipal.Equals(
                     "SIN INFORMACIÓN",
                     StringComparison.OrdinalIgnoreCase
@@ -2046,11 +2379,13 @@ namespace Objetivos_Prioritarios.ControllersServices
                 return resultado;
             }
 
+
             DataTable candidatos =
                 _filiacionMunicipalService
                     .BuscarMandamientosCandidatosPorNombre(
                         nombrePrincipal
                     );
+
 
             if (
                 candidatos == null ||
@@ -2060,6 +2395,15 @@ namespace Objetivos_Prioritarios.ControllersServices
                 return resultado;
             }
 
+
+            /*
+             * Evita consultar varias veces el delito
+             * del mismo mandamiento.
+             */
+            Dictionary<int, string> cacheDelitos =
+                new Dictionary<int, string>();
+
+
             foreach (DataRow fila in candidatos.Rows)
             {
                 string nombreCandidato =
@@ -2068,10 +2412,16 @@ namespace Objetivos_Prioritarios.ControllersServices
                         "Nombre"
                     );
 
-                if (string.IsNullOrWhiteSpace(nombreCandidato))
+
+                if (
+                    string.IsNullOrWhiteSpace(
+                        nombreCandidato
+                    )
+                )
                 {
                     continue;
                 }
+
 
                 double similitud =
                     CalcularSimilitudNombreMandamiento(
@@ -2079,10 +2429,52 @@ namespace Objetivos_Prioritarios.ControllersServices
                         nombreCandidato
                     );
 
+
                 if (similitud < umbral)
                 {
                     continue;
                 }
+
+
+                int idMandamiento =
+                    ObtenerEnteroMandamiento(
+                        fila,
+                        "IdMandamiento"
+                    );
+
+
+                /*
+                 * ============================================================
+                 * DELITO
+                 * ============================================================
+                 */
+
+                string delito =
+                    "";
+
+
+                if (idMandamiento > 0)
+                {
+                    if (
+                        !cacheDelitos.TryGetValue(
+                            idMandamiento,
+                            out delito
+                        )
+                    )
+                    {
+                        delito =
+                            _filiacionMunicipalService
+                                .GetDelitoMandamiento(
+                                    idMandamiento
+                                );
+
+                        cacheDelitos[
+                            idMandamiento
+                        ] =
+                            delito;
+                    }
+                }
+
 
                 MandamientoJudicialViewModel mandamiento =
                     new MandamientoJudicialViewModel
@@ -2094,10 +2486,7 @@ namespace Objetivos_Prioritarios.ControllersServices
                             ),
 
                         IdMandamiento =
-                            ObtenerEnteroMandamiento(
-                                fila,
-                                "IdMandamiento"
-                            ),
+                            idMandamiento,
 
                         NombreCompleto =
                             nombreCandidato,
@@ -2134,6 +2523,11 @@ namespace Objetivos_Prioritarios.ControllersServices
                                 )
                             ),
 
+                        Delito =
+                            ValorOTextoPredeterminado(
+                                delito
+                            ),
+
                         FechaExpedicion =
                             ObtenerFechaNullableMandamiento(
                                 fila,
@@ -2148,12 +2542,18 @@ namespace Objetivos_Prioritarios.ControllersServices
 
                         PorcentajeNombre =
                             Convert.ToInt32(
-                                Math.Round(similitud)
+                                Math.Round(
+                                    similitud
+                                )
                             )
                     };
 
-                resultado.Add(mandamiento);
+
+                resultado.Add(
+                    mandamiento
+                );
             }
+
 
             return resultado
                 .GroupBy(x => new
@@ -2174,7 +2574,6 @@ namespace Objetivos_Prioritarios.ControllersServices
                 )
                 .ToList();
         }
-
 
         private static string ObtenerNombrePrincipal(
     string nombreCompleto)
@@ -3482,7 +3881,18 @@ namespace Objetivos_Prioritarios.ControllersServices
                         "La API regresó un detalle vacío."
                     );
                 }
-
+                if (
+                    detalle.TieneFoto &&
+                    !string.IsNullOrWhiteSpace(
+                        detalle.FotoUrl
+                    )
+                )
+                {
+                    detalle.FotoUrl =
+                        NormalizarFotoFiscaliaWeb(
+                            detalle.FotoUrl
+                        );
+                }
                 return detalle;
             }
         }
@@ -3627,12 +4037,11 @@ namespace Objetivos_Prioritarios.ControllersServices
                      */
 
                     coincidencia.FotoUrl =
-                        detalle.TieneFoto &&
-                        !string.IsNullOrWhiteSpace(
+                    detalle.TieneFoto
+                        ? NormalizarFotoFiscaliaWeb(
                             detalle.FotoUrl
                         )
-                            ? detalle.FotoUrl.Trim()
-                            : "~/Content/imagenes/Nodisponible.jpg";
+                        : "~/Content/imagenes/Nodisponible.jpg";
 
 
                     /*
@@ -3912,6 +4321,304 @@ namespace Objetivos_Prioritarios.ControllersServices
             }
         }
 
+
+        public async Task<DetallePersonaInteresApiDto> ObtenerDetallePersonaInteresAsync(int idPersona)
+        {
+            if (idPersona <= 0)
+            {
+                throw new ArgumentException(
+                    "El ID de la persona de interés no es válido."
+                );
+            }
+
+
+            ValidarConfiguracionApi();
+
+
+            string url =
+                ConstruirUrlRecursoApi(
+                    "personas-interes/" +
+                    idPersona +
+                    "/detalle"
+                );
+
+
+            using (
+                var solicitud =
+                    new HttpRequestMessage(
+                        HttpMethod.Get,
+                        url
+                    )
+            )
+            {
+                solicitud.Headers.Add(
+                    "X-API-TOKEN",
+                    _tokenApi
+                );
+
+
+                HttpResponseMessage respuesta =
+                    await ClienteHttp.SendAsync(
+                        solicitud
+                    );
+
+
+                string contenido =
+                    await respuesta.Content
+                        .ReadAsStringAsync();
+
+
+                if (
+                    respuesta.StatusCode ==
+                    System.Net.HttpStatusCode.NotFound
+                )
+                {
+                    return null;
+                }
+
+
+                if (!respuesta.IsSuccessStatusCode)
+                {
+                    throw new InvalidOperationException(
+                        ObtenerMensajeErrorApi(
+                            contenido,
+                            respuesta.StatusCode
+                        )
+                    );
+                }
+
+
+                DetallePersonaInteresApiDto detalle =
+                    JsonConvert
+                        .DeserializeObject
+                            <DetallePersonaInteresApiDto>(
+                                contenido
+                            );
+
+
+                if (detalle == null)
+                {
+                    throw new InvalidOperationException(
+                        "La API regresó un detalle vacío para la persona de interés."
+                    );
+                }
+
+
+                return detalle;
+            }
+        }
+
+        private async Task EnriquecerCoincidenciasPersonasInteresAsync(List<CoincidenciaResultadoViewModel> coincidencias)
+        {
+            if (
+                coincidencias == null ||
+                coincidencias.Count == 0
+            )
+            {
+                return;
+            }
+
+
+            List<CoincidenciaResultadoViewModel> personasInteres =
+                coincidencias
+                    .Where(x =>
+                        x.IdTbFuente == 3 &&
+                        x.IdPersona > 0
+                    )
+                    .ToList();
+
+
+            if (personasInteres.Count == 0)
+            {
+                return;
+            }
+
+
+            foreach (
+                CoincidenciaResultadoViewModel coincidencia
+                in personasInteres
+            )
+            {
+                try
+                {
+                    DetallePersonaInteresApiDto detalle =
+                        await ObtenerDetallePersonaInteresAsync(
+                            coincidencia.IdPersona
+                        );
+
+
+                    if (detalle == null)
+                    {
+                        continue;
+                    }
+
+
+                    if (
+                        !string.IsNullOrWhiteSpace(
+                            detalle.NombreCompleto
+                        )
+                    )
+                    {
+                        coincidencia.NombreCompleto =
+                            detalle.NombreCompleto.Trim();
+                    }
+
+
+                    coincidencia.Folio =
+                        "ID " +
+                        detalle.IdPersona;
+
+
+                    coincidencia.Expediente =
+                        "SIN INFORMACIÓN";
+
+
+                    coincidencia.Edad =
+                        detalle.Edad.HasValue
+                            ? detalle.Edad.Value
+                            : 0;
+
+
+                    coincidencia.Sexo =
+                        string.IsNullOrWhiteSpace(
+                            detalle.Sexo
+                        )
+                            ? "SIN INFORMACIÓN"
+                            : detalle.Sexo.Trim();
+
+
+                    /*
+                     * Personas de Interés actualmente no maneja
+                     * municipio dentro de tb_Persona.
+                     */
+                    coincidencia.MunicipioClave =
+                        "";
+
+                    coincidencia.Municipio =
+                        "SIN INFORMACIÓN";
+
+
+                    coincidencia.FechaRegistro =
+                        detalle.FechaRegistro
+                        ??
+                        DateTime.MinValue;
+
+
+                    /*
+                     * Ya tienes esta acción funcionando
+                     * en PersonasInteresController.
+                     */
+                    coincidencia.FotoUrl =
+                        "~/PersonasInteres/VerFotoPrincipalPersonaInteres?idPersona=" +
+                        detalle.IdPersona;
+                }
+                catch
+                {
+                    /*
+                     * Si falla el enriquecimiento de una persona,
+                     * no tiramos toda la búsqueda biométrica.
+                     */
+                }
+            }
+        }
+
+
+        private static string NormalizarFotoFiscaliaWeb(string fotoUrl)
+        {
+            if (string.IsNullOrWhiteSpace(fotoUrl))
+            {
+                return "~/Content/imagenes/Nodisponible.jpg";
+            }
+
+            string url =
+                fotoUrl
+                    .Trim()
+                    .Replace("\\", "/");
+
+            const string dominioSinWwwHttps =
+                "https://fiscalia-aguascalientes.gob.mx/";
+
+            const string dominioSinWwwHttp =
+                "http://fiscalia-aguascalientes.gob.mx/";
+
+            const string dominioCorrecto =
+                "https://www.fiscalia-aguascalientes.gob.mx/";
+
+
+            /*
+             * ============================================================
+             * URL HTTPS SIN WWW
+             * ============================================================
+             */
+
+            if (
+                url.StartsWith(
+                    dominioSinWwwHttps,
+                    StringComparison.OrdinalIgnoreCase
+                )
+            )
+            {
+                return
+                    dominioCorrecto +
+                    url.Substring(
+                        dominioSinWwwHttps.Length
+                    );
+            }
+
+
+            /*
+             * ============================================================
+             * URL HTTP SIN WWW
+             * ============================================================
+             */
+
+            if (
+                url.StartsWith(
+                    dominioSinWwwHttp,
+                    StringComparison.OrdinalIgnoreCase
+                )
+            )
+            {
+                return
+                    dominioCorrecto +
+                    url.Substring(
+                        dominioSinWwwHttp.Length
+                    );
+            }
+
+
+            /*
+             * ============================================================
+             * YA ES URL ABSOLUTA
+             * ============================================================
+             */
+
+            if (
+                Uri.IsWellFormedUriString(
+                    url,
+                    UriKind.Absolute
+                )
+            )
+            {
+                return url;
+            }
+
+
+            /*
+             * ============================================================
+             * RUTA RELATIVA
+             * ============================================================
+             *
+             * Ejemplo:
+             *
+             * /images/alerta-amber/alertas/foto.jpeg
+             * ============================================================
+             */
+
+            return
+                dominioCorrecto +
+                url.TrimStart('/');
+        }
 
     }
 }

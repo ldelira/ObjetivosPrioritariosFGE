@@ -14,6 +14,12 @@ namespace Objetivos_Prioritarios.Models
     
     public partial class tb_Usuarios
     {
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
+        public tb_Usuarios()
+        {
+            this.tb_UsuarioPerfil = new HashSet<tb_UsuarioPerfil>();
+        }
+    
         public int int_id_usuario { get; set; }
         public string nvarchar_nombre_usuario { get; set; }
         public string nvarchar_no_interno { get; set; }
@@ -22,5 +28,9 @@ namespace Objetivos_Prioritarios.Models
         public Nullable<bool> bit_status { get; set; }
         public Nullable<System.DateTime> date_fecha_modificacion { get; set; }
         public string nvarchar_usuario_modificacion { get; set; }
+        public Nullable<int> Valor { get; set; }
+    
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<tb_UsuarioPerfil> tb_UsuarioPerfil { get; set; }
     }
 }

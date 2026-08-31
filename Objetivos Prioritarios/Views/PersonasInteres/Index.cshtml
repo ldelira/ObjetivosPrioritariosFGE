@@ -1,5 +1,55 @@
-﻿@{
+﻿@using Objetivos_Prioritarios.Models
+
+@{
     ViewBag.Title = "Personas de Interés";
+
+    tb_Usuarios usuario = Session["User"] as tb_Usuarios;
+
+    string nombreUsuario =
+       usuario != null
+           ? usuario.nvarchar_no_interno.ToUpper()
+           : "";
+}
+
+
+@if (nombreUsuario == "LDELIRA" || nombreUsuario == "ESALAS")
+{
+    <div class="card">
+        <div class="card-body">
+
+            <h5 class="card-title">
+                Tiempo de espera de búsqueda
+            </h5>
+
+            <p>
+                Tiempo actual:
+                <strong id="lblTiempoBusqueda">
+                    @ViewBag.TiempoEsperaBusqueda
+                </strong>
+                segundos
+            </p>
+
+            <div style="display:flex;gap:10px;align-items:center;max-width:400px;">
+
+                <input type="number"
+                       id="txtTiempoBusqueda"
+                       class="form-control"
+                       min="0"
+                       max="300"
+                       value="@ViewBag.TiempoEsperaBusqueda" />
+
+                <button type="button"
+                        id="btnActualizarTiempoBusqueda"
+                        class="btn btn-primary">
+                    Actualizar
+                </button>
+
+            </div>
+
+            @Html.AntiForgeryToken()
+
+        </div>
+    </div>
 }
 
 <div class="op-page">
@@ -15,9 +65,9 @@
 
         <div class="op-section-header" style="text-align:right">
             @*<div>
-                <h3>Registro de personas de interés</h3>
-                <p>Consulta, registra o actualiza personas con información parcial, fotografía o huellas.</p>
-            </div>*@
+                    <h3>Registro de personas de interés</h3>
+                    <p>Consulta, registra o actualiza personas con información parcial, fotografía o huellas.</p>
+                </div>*@
 
             <a class="btn btn-primary" href="@Url.Action("AddEditPersonaInteres", "PersonasInteres")">
                 <i class="fa fa-plus"></i> Registrar persona
@@ -163,4 +213,65 @@
     function abrirPersonaInteres(idPersona) {
         window.location.href = "@Url.Action("AddEditPersonaInteres", "PersonasInteres")?idPersona=" + idPersona;
     }
+
+
+
+
+
+
+    $("#btnActualizarTiempoBusqueda").click(function () {
+
+        var valor =
+            parseInt(
+                $("#txtTiempoBusqueda").val()
+            );
+
+        if (
+            isNaN(valor) ||
+            valor < 0 ||
+            valor > 300
+        ) {
+            Swal.fire(
+                "Valor incorrecto",
+                "Capture un valor entre 0 y 300 segundos.",
+                "warning"
+            );
+
+            return;
+        }
+
+        $.ajax({
+            url: '@Url.Action("ActualizarTiempoEsperaBusqueda", "PersonasInteres")',
+            type: 'POST',
+            data: {
+                valor: valor
+            },
+            success: function (respuesta) {
+
+                if (!respuesta.success) {
+                    alert(respuesta.message);
+                    return;
+                }
+
+                $("#lblTiempoBusqueda")
+                    .text(
+                        respuesta.valor
+                    );
+
+                alert(
+                    "El tiempo de espera ahora es de " +
+                    respuesta.valor +
+                    " segundos."
+                );
+            },
+            error: function () {
+
+                alert(
+                    "No fue posible actualizar el tiempo."
+                );
+            }
+        });
+    });
+
+
 </script>

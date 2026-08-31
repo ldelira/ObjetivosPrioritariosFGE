@@ -14,6 +14,7 @@ namespace Objetivos_Prioritarios.Models.Extends
         public bool TieneFotografiaConsulta { get; set; }
 
         public bool TieneHuellaConsulta { get; set; }
+        public DetallePersonaInteresApiDto PersonaInteres { get; set; }
 
 
     }

@@ -169,7 +169,10 @@ namespace Objetivos_Prioritarios.ControllersServices
         {
             return dbFiliMuni.tb_Fotografia
                 .AsNoTracking()
-                .Where(x => x.idPersona == idPersona)
+                .Where(x =>
+                    x.idPersona == idPersona &&
+                    x.Activo == true
+                )
                 .OrderByDescending(x => x.FechaRegistro)
                 .ToList();
         }
@@ -406,7 +409,8 @@ namespace Objetivos_Prioritarios.ControllersServices
                         RutaArchivo = rutaArchivoFinal,
                         ArchivoB64 = base64,
                         FechaRegistro = DateTime.Now,
-                        UsuarioRegistro = usuarioRegistro
+                        UsuarioRegistro = usuarioRegistro,
+                        Activo=true
                     };
 
                     dbFiliMuni.tb_Fotografia.Add(foto);
@@ -1429,6 +1433,182 @@ namespace Objetivos_Prioritarios.ControllersServices
                 return "Activo";
 
             return "Sin búsqueda";
+        }
+
+
+        public ImagenArchivoResponse GetFotoArchivoPersonaInteres(int idFoto)
+        {
+            try
+            {
+                if (idFoto <= 0)
+                {
+                    return new ImagenArchivoResponse
+                    {
+                        IsSuccess = false,
+                        Message = "Fotografía inválida."
+                    };
+                }
+
+                var foto = dbFiliMuni.tb_Fotografia
+                    .AsNoTracking()
+                    .FirstOrDefault(x => x.idFoto == idFoto);
+
+                if (foto == null)
+                {
+                    return new ImagenArchivoResponse
+                    {
+                        IsSuccess = false,
+                        Message = "No se encontró la fotografía."
+                    };
+                }
+
+                byte[] bytes = null;
+
+                /*
+                 * Primero intentamos obtenerla del Base64.
+                 */
+                if (!string.IsNullOrWhiteSpace(foto.ArchivoB64))
+                {
+                    string base64 =
+                        foto.ArchivoB64
+                            .Trim();
+
+                    if (
+                        base64.StartsWith(
+                            "data:image",
+                            StringComparison.OrdinalIgnoreCase
+                        )
+                    )
+                    {
+                        int posicionComa =
+                            base64.IndexOf(',');
+
+                        if (posicionComa >= 0)
+                        {
+                            base64 =
+                                base64.Substring(
+                                    posicionComa + 1
+                                );
+                        }
+                    }
+
+                    bytes =
+                        Convert.FromBase64String(
+                            base64
+                        );
+                }
+                /*
+                 * Si no tiene Base64, intentamos desde archivo.
+                 */
+                else if (!string.IsNullOrWhiteSpace(foto.RutaArchivo))
+                {
+                    string dominioRed =
+                        ConfigurationManager.AppSettings[
+                            "PersonasInteres.DominioRed"
+                        ];
+
+                    string usuarioRed =
+                        ConfigurationManager.AppSettings[
+                            "PersonasInteres.UsuarioRed"
+                        ];
+
+                    string passwordRed =
+                        ConfigurationManager.AppSettings[
+                            "PersonasInteres.PasswordRed"
+                        ];
+
+                    dominioRed =
+                        (dominioRed ?? "").Trim();
+
+                    usuarioRed =
+                        (usuarioRed ?? "").Trim();
+
+                    var credentials =
+                        new UserCredentials(
+                            dominioRed,
+                            usuarioRed,
+                            passwordRed
+                        );
+
+                    using (
+                        SafeAccessTokenHandle userHandle =
+                            credentials.LogonUser(
+                                LogonType.NewCredentials
+                            )
+                    )
+                    {
+                        WindowsIdentity.RunImpersonated(
+                            userHandle,
+                            () =>
+                            {
+                                if (
+                                    System.IO.File.Exists(
+                                        foto.RutaArchivo
+                                    )
+                                )
+                                {
+                                    bytes =
+                                        System.IO.File.ReadAllBytes(
+                                            foto.RutaArchivo
+                                        );
+                                }
+                            }
+                        );
+                    }
+                }
+
+                if (
+                    bytes == null ||
+                    bytes.Length == 0
+                )
+                {
+                    return new ImagenArchivoResponse
+                    {
+                        IsSuccess = false,
+                        Message = "No fue posible cargar la fotografía."
+                    };
+                }
+
+                string extension =
+                    Path.GetExtension(
+                        foto.RutaArchivo ?? ""
+                    )
+                    .ToLowerInvariant();
+
+                string mimeType =
+                    "image/jpeg";
+
+                if (extension == ".png")
+                    mimeType = "image/png";
+                else if (extension == ".bmp")
+                    mimeType = "image/bmp";
+                else if (extension == ".webp")
+                    mimeType = "image/webp";
+
+                return new ImagenArchivoResponse
+                {
+                    IsSuccess = true,
+                    Bytes = bytes,
+                    MimeType = mimeType,
+                    NombreArchivo =
+                        "foto_" +
+                        foto.idFoto +
+                        extension
+                };
+            }
+            catch (Exception ex)
+            {
+                var errorReal =
+                    ex.GetBaseException();
+
+                return new ImagenArchivoResponse
+                {
+                    IsSuccess = false,
+                    Message =
+                        "Ocurrió un error al cargar la fotografía: "
+                        + errorReal.Message
+                };
+            }
         }
 
     }

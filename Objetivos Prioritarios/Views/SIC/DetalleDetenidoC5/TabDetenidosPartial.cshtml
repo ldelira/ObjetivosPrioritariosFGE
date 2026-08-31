@@ -1,4 +1,6 @@
-﻿@model System.Data.DataTable
+﻿tabdetenidospartial
+
+@model System.Data.DataTable
 
 @using System
 @using System.Collections.Generic
@@ -34,22 +36,21 @@
                 System.Data.DataRow row =
                     detenidos.Rows[i];
 
-
                 /* ==================================================
-                   IDS NOM_PERSO QUE ORIGINARON LA ALERTA
-                   ================================================== */
+   IDS NOM_PERSO DE LA PERSONA CONSOLIDADA
+   ================================================== */
 
                 var idsOrigenDetenidoCoincidencias =
                     new List<int>();
 
                 if (
-                    row.Table.Columns.Contains("IdsNomPersoOrigenAlerta") &&
-                    row["IdsNomPersoOrigenAlerta"] != DBNull.Value
+                    row.Table.Columns.Contains("IdsNomPerso") &&
+                    row["IdsNomPerso"] != DBNull.Value
                 )
                 {
                     string idsTexto =
                         Convert.ToString(
-                            row["IdsNomPersoOrigenAlerta"]
+                            row["IdsNomPerso"]
                         );
 
                     if (!string.IsNullOrWhiteSpace(idsTexto))
@@ -85,14 +86,48 @@
 
 
                 /* ==================================================
-                   COINCIDENCIAS GENERALES DEL DETENIDO
+                   CLAVE_PERSO DE LA PERSONA CONSOLIDADA
+                   ================================================== */
+
+                int clavePersoDetenido = 0;
+
+                if (
+                    row.Table.Columns.Contains("CLAVE_PERSO") &&
+                    row["CLAVE_PERSO"] != DBNull.Value
+                )
+                {
+                    int.TryParse(
+                        Convert.ToString(
+                            row["CLAVE_PERSO"]
+                        ),
+                        out clavePersoDetenido
+                    );
+                }
+
+
+                /* ==================================================
+                   TODAS LAS COINCIDENCIAS DEL DETENIDO
+
+                   Tipo 1 = Nom_perso.id
+                   Tipo 2 = CLAVE_PERSO
+                   Tipo 3 = CLAVE_PERSO
                    ================================================== */
 
                 System.Collections.ArrayList coincidenciasAlertaDetenido =
-                    ViewBag.ObtenerCoincidenciasAlerta(
-                        idsOrigenDetenidoCoincidencias.ToArray(),
-                        new int[] { 6 }
-                    ) as System.Collections.ArrayList;
+                    new System.Collections.ArrayList();
+
+                var obtenerCoincidenciasAlertaDetenido =
+                    ViewBag.ObtenerCoincidenciasAlertaDetenido
+                    as Func<int[], int, System.Collections.ArrayList>;
+
+                if (obtenerCoincidenciasAlertaDetenido != null)
+                {
+                    coincidenciasAlertaDetenido =
+                        obtenerCoincidenciasAlertaDetenido(
+                            idsOrigenDetenidoCoincidencias.ToArray(),
+                            clavePersoDetenido
+                        );
+                }
 
                 if (coincidenciasAlertaDetenido == null)
                 {
@@ -102,8 +137,8 @@
 
 
                 /* ==================================================
-                   COINCIDENCIAS POR NOMBRE / NOM_PERSO
-                   ================================================== */
+   COINCIDENCIAS POR NOMBRE / NOM_PERSO
+   ================================================== */
 
                 var coincidenciasNombrePorId =
                     new Dictionary<int, object[]>();
@@ -127,19 +162,44 @@
                         continue;
                     }
 
-                    object[] datosCoincidencia =
-                        coincidenciaIndividual[0] as object[];
+                    object[] datosCoincidenciaNombre = null;
 
-                    if (
-                        datosCoincidencia == null ||
-                        datosCoincidencia.Length < 5
-                    )
+                    foreach (object elementoCoincidencia in coincidenciaIndividual)
                     {
-                        continue;
+                        object[] datosCoincidencia =
+                            elementoCoincidencia as object[];
+
+                        if (
+                            datosCoincidencia == null ||
+                            datosCoincidencia.Length < 5
+                        )
+                        {
+                            continue;
+                        }
+
+                        int idTipoAlerta = 0;
+
+                        int.TryParse(
+                            Convert.ToString(
+                                datosCoincidencia[3]
+                            ),
+                            out idTipoAlerta
+                        );
+
+                        if (idTipoAlerta == 1)
+                        {
+                            datosCoincidenciaNombre =
+                                datosCoincidencia;
+
+                            break;
+                        }
                     }
 
-                    coincidenciasNombrePorId[idNombre] =
-                        datosCoincidencia;
+                    if (datosCoincidenciaNombre != null)
+                    {
+                        coincidenciasNombrePorId[idNombre] =
+                            datosCoincidenciaNombre;
+                    }
                 }
 
 

@@ -236,317 +236,8 @@ namespace Objetivos_Prioritarios.Controllers
             }
         }
 
-        public ActionResult DetalleDetenidoC5(int idDetenido)
-        {
-            var detenido = _filiacionService.GetInfoDetenido(idDetenido);
-
-            if (detenido == null)
-            {
-                return HttpNotFound("No se encontró información del detenido.");
-            }
-
-            var detencionC5 = _filiacionService.GetInfoDetencionC5(Convert.ToInt32(detenido.IDDETENCION));
-            ViewBag.DetencionC5 = detencionC5;
-
-            var fotosC5 = _filiacionService.GetFotosDetenidoC5(idDetenido);
-            ViewBag.FotosC5 = fotosC5;
-
-            var huellasC5 = _filiacionService.GetHuellasDetenidoC5(idDetenido);
-            ViewBag.HuellasC5 = huellasC5;
-
-            var rasgosC5 = _filiacionService.GetRasgosDetenidoC5(idDetenido);
-            ViewBag.RasgosC5 = rasgosC5;
-
-            var conteoAlertas = _filiacionService.GetConteoAlertasPorEstatus(idDetenido);
-
-            ViewBag.TotalAlertasActivas = conteoAlertas.Item1;
-            ViewBag.TotalAlertasRevisadas = conteoAlertas.Item2;
-            ViewBag.TotalCoincidenciasConfirmadas = conteoAlertas.Item3;
-
-            var tiposAlertas = _filiacionService.GetTiposAlertas(idDetenido);
-            ViewBag.TiposAlertas = tiposAlertas;
-
-            var datosDetenidoC5 = _filiacionService.GetDatosDetenidoC5(idDetenido);
-            ViewBag.DatosDetenidoC5 = datosDetenidoC5;
-
-            var alertasTipo = _filiacionService.GetAlertaTipo(idDetenido);
-            ViewBag.AlertasTipo = alertasTipo;
-
-            bool identidadConfirmada = false;
-            bool esDeInteres = false;
-
-            if (alertasTipo != null && alertasTipo.Count > 0)
-            {
-                identidadConfirmada =
-                                        alertasTipo.Any(x =>
-                                            x.Item3 == 2 ||
-                                            x.Item3 == 3
-                                        );
-
-                esDeInteres =
-                                alertasTipo.Any(x =>
-                                    (x.Item3 == 2 || x.Item3 == 3) &&
-                                    x.Item2 != 6
-                                );
-            }
-
-            ViewBag.IdentidadConfirmada = identidadConfirmada;
-            ViewBag.EsDeInteres = esDeInteres;
-
-            var estadoIdentidad =
-            CalcularEstadoIdentidad(alertasTipo);
-
-            ViewBag.EstadoIdentidadCodigo =
-                estadoIdentidad.Item1;
-
-            ViewBag.EstadoIdentidadNombre =
-                estadoIdentidad.Item2;
-
-            ViewBag.EstadoIdentidadDetalle =
-                estadoIdentidad.Item3;
-
-            /* ============================================================
-   CAPEA, AMBER Y ALBA
-
-   Fuente 2 = CAPEA
-   Fuente 7 = AM ALBA
-
-   FuenteBER
-   Fuente 8 = ALBA
-   ============================================================ */
-
-            var idsCapea = alertasTipo
-                .Where(x => x.Item2 == 2)
-                .Select(x => x.Item1)
-                .Where(x => x > 0)
-                .Distinct()
-                .ToList();
-
-            var idsAmber = alertasTipo
-                .Where(x => x.Item2 == 7)
-                .Select(x => x.Item1)
-                .Where(x => x > 0)
-                .Distinct()
-                .ToList();
-
-            var idsAlba = alertasTipo
-                .Where(x => x.Item2 == 8)
-                .Select(x => x.Item1)
-                .Where(x => x > 0)
-                .Distinct()
-                .ToList();
-
-            var idsPersonaInteres = alertasTipo
-                .Where(x => x.Item2 == 3)
-                .Select(x => x.Item1)
-                .Distinct()
-                .ToList();
-
-            var idsMandamientos = alertasTipo
-                .Where(x => x.Item2 == 4)
-                .Select(x => x.Item1)
-                .Distinct()
-                .ToList();
-
-            var idsNombreObjetivo = alertasTipo
-                .Where(x => x.Item2 == 5)
-                .Select(x => x.Item1)
-                .Distinct()
-                .ToList();
-
-            var idsDetenidos = alertasTipo
-                .Where(x => x.Item2 == 6)
-                .Select(x => x.Item1)
-                .Distinct()
-                .ToList();
-
-            /* ============================================================
-   CAPEA
-   Fuentes relacionadas: 2, 7 y 8
-   CAPEA es una lista tipada, los datos de la alerta se
-   consultarán en la vista mediante ViewBag.ObtenerDatosAlerta.
-   ============================================================ */
-
-            var capeas =
-    _filiacionService.GetInfoCapeas(
-        idsCapea,
-        idsAmber,
-        idsAlba
-    );
-
-            capeas = capeas
-                .OrderByDescending(x =>
-                {
-                    var datosAlerta =
-                        ObtenerDatosAlerta(
-                            alertasTipo,
-                            new int[]
-                            {
-                    x.id_boletin_busqueda
-                            },
-                            new int[]
-                            {
-                    2, 7, 8
-                            }
-                        );
-
-                    // Item3 = porcentaje
-                    return datosAlerta.Item3;
-                })
-                .ToList();
-
-            ViewBag.Capeas =
-                capeas;
-
-
-            /* ============================================================
-   PERSONAS DE INTERÉS
-   Fuente: 3
-
-   Los Item1 de las alertas corresponden a idPersona
-   de Filiacion_Municipios.
-
-   El SP devuelve:
-   - Datos generales
-   - Alias
-   - Fotografía principal
-   - Domicilios
-   - Periodos de búsqueda
-   ============================================================ */
-
-            var personasInteres =
-                _filiacionService.GetInfoPersonasFiliacion(
-                    idsPersonaInteres
-                );
-
-
-            /* ============================================================
-               AGREGAR DATOS DE LA ALERTA
-
-               El SP devuelve una fila por idPersona, por lo tanto
-               utilizamos la columna "idPersona" para relacionarla con
-               Item1 de alertasTipo.
-
-               Fuente 3 = Personas de interés
-               ============================================================ */
-
-            AgregarDatosAlertaADataTable(
-                personasInteres,
-                alertasTipo,
-                new int[] { 3 },
-                "idPersona"
-            );
-
-
-            /* ============================================================
-               ORDENAR POR MAYOR PORCENTAJE DE COINCIDENCIA
-               ============================================================ */
-
-            personasInteres =
-                OrdenarPorPorcentaje(
-                    personasInteres
-                );
-
-
-            /* ============================================================
-               ENVIAR A LA VISTA
-               ============================================================ */
-
-            ViewBag.PersonasInteres =
-                personasInteres;
-
-
-            /* ============================================================
-               MANDAMIENTOS JUDICIALES
-               Fuente: 4
-               ============================================================ */
-
-            var mandamientos =
-     _filiacionService.GetInfoMandamientos(
-         idsMandamientos
-     );
-
-            AgregarDatosAlertaADataTable(
-                mandamientos,
-                alertasTipo,
-                new int[] { 4 },
-                "IdOrigenAlerta"
-            );
-
-            mandamientos =
-                OrdenarPorPorcentaje(
-                    mandamientos
-                );
-
-            ViewBag.Mandamientos =
-                mandamientos;
-
-
-            /* ============================================================
-               DETENIDOS FGEA
-               Fuente: 6
-               ============================================================ */
-
-            var detenidos =
-     _filiacionService.GetInfoDetenidos(
-         idsDetenidos
-     );
-
-            AgregarFotoUrlADetenidos(
-                detenidos
-            );
-
-            AgregarDatosAlertaADataTable(
-                detenidos,
-                alertasTipo,
-                new int[] { 6 },
-                "IdsNomPersoOrigenAlerta"
-            );
-
-            detenidos =
-                OrdenarPorPorcentaje(
-                    detenidos
-                );
-
-            ViewBag.Detenidos =
-                detenidos;
-
-
-            /* ============================================================
-               OBJETIVOS PRIORITARIOS
-               Fuente: 5
-               ============================================================ */
-
-            var objetivosPrioritarios =
-     _filiacionService.GetInfoObjetivosPrioritarios(
-         idsNombreObjetivo
-     );
-
-            AgregarDatosAlertaADataTable(
-                objetivosPrioritarios,
-                alertasTipo,
-                new int[] { 5 },
-                "IdsNombreObjetivoOrigenAlerta"
-            );
-
-            objetivosPrioritarios =
-                OrdenarPorPorcentaje(
-                    objetivosPrioritarios
-                );
-
-            ViewBag.ObjetivosPrioritarios =
-                objetivosPrioritarios;
-
-
-            /* ============================================================
-               FUNCIONES PARA LA VISTA
-               ============================================================ */
-
-
-            PrepararViewBagDetalleDetenido(detencionC5, alertasTipo, tiposAlertas);
-
-            return View(detenido);
-        }
+  
+       
 
 
         private void AgregarDatosAlertaADataTable(
@@ -835,6 +526,453 @@ namespace Objetivos_Prioritarios.Controllers
                 nombreTipoAlerta          // Item5: nombre tipo
             );
         }
+
+
+
+
+        #region Detalle del detenido C5
+
+        public ActionResult DetalleDetenidoC5(int idDetenido)
+        {
+            var detenido = _filiacionService.GetInfoDetenido(idDetenido);
+
+            if (detenido == null)
+                return HttpNotFound("No se encontró información del detenido.");
+            var detencionC5 = _filiacionService.GetInfoDetencionC5(Convert.ToInt32(detenido.IDDETENCION));
+            var fotosC5 = _filiacionService.GetFotosDetenidoC5(idDetenido);
+            var huellasC5 = _filiacionService.GetHuellasDetenidoC5(idDetenido);
+            var rasgosC5 = _filiacionService.GetRasgosDetenidoC5(idDetenido);
+            var conteoAlertas = _filiacionService.GetConteoAlertasPorEstatus(idDetenido);
+            var tiposAlertas = _filiacionService.GetTiposAlertas(idDetenido);
+            var datosDetenidoC5 = _filiacionService.GetDatosDetenidoC5(idDetenido);
+            var alertasTipo = _filiacionService.GetAlertaTipo(idDetenido);
+            ViewBag.DetencionC5 = detencionC5;
+            ViewBag.FotosC5 = fotosC5;
+            ViewBag.HuellasC5 = huellasC5;
+            ViewBag.RasgosC5 = rasgosC5;
+            ViewBag.TotalAlertasActivas = conteoAlertas.Item1;
+            ViewBag.TotalAlertasRevisadas = conteoAlertas.Item2;
+            ViewBag.TotalCoincidenciasConfirmadas = conteoAlertas.Item3;
+            ViewBag.TiposAlertas = tiposAlertas;
+            ViewBag.DatosDetenidoC5 = datosDetenidoC5;
+            ViewBag.AlertasTipo = alertasTipo;
+            bool identidadConfirmada = false;
+            bool esDeInteres = false;
+
+            if (alertasTipo != null && alertasTipo.Count > 0)
+            {
+                identidadConfirmada = alertasTipo.Any(x => x.Item3 == 2 || x.Item3 == 3);
+                esDeInteres = alertasTipo.Any(x => (x.Item3 == 2 || x.Item3 == 3) && x.Item2 != 6);
+            }
+            ViewBag.IdentidadConfirmada = identidadConfirmada;
+            ViewBag.EsDeInteres = esDeInteres;
+            var estadoIdentidad = CalcularEstadoIdentidad(alertasTipo);
+            ViewBag.EstadoIdentidadCodigo = estadoIdentidad.Item1;
+            ViewBag.EstadoIdentidadNombre = estadoIdentidad.Item2;
+            ViewBag.EstadoIdentidadDetalle = estadoIdentidad.Item3;
+
+            // Se separan los IDs por fuente para consultar únicamente los registros relacionados.
+            var idsCapea = alertasTipo.Where(x => x.Item2 == 2)
+                                        .Select(x => x.Item1)
+                                        .Where(x => x > 0).Distinct().ToList();
+            var idsPersonaInteres = alertasTipo.Where(x => x.Item2 == 3)
+                                                .Select(x => x.Item1)
+                                                .Where(x => x > 0).Distinct().ToList();
+            var idsMandamientos = alertasTipo.Where(x => x.Item2 == 4)
+                                               .Select(x => x.Item1)
+                                               .Where(x => x > 0).Distinct().ToList();
+            var idsNombreObjetivo = alertasTipo.Where(x => x.Item2 == 5)
+                                                 .Select(x => x.Item1)
+                                                 .Where(x => x > 0).Distinct().ToList();
+            // Detenidos FGEA - Tipo alerta 1: Item1 corresponde a Nom_perso.id.
+            var idsNomPersoDetenidos = alertasTipo
+                .Where(x => x.Item2 == 6 && x.Item5 == 1)
+                .Select(x => x.Item1)
+                .Where(x => x > 0)
+                .Distinct()
+                .ToList();
+
+            // Detenidos FGEA - Tipo alerta 2 o 3: Item1 corresponde a CLAVE_PERSO.
+            var clavesPersoDetenidos = alertasTipo
+                .Where(x => x.Item2 == 6 && (x.Item5 == 2 || x.Item5 == 3))
+                .Select(x => x.Item1)
+                .Where(x => x > 0)
+                .Distinct()
+                .ToList();
+
+            var idsAmber = alertasTipo.Where(x => x.Item2 == 7)
+                                       .Select(x => x.Item1)
+                                       .Where(x => x > 0).Distinct().ToList();
+            var idsAlba = alertasTipo.Where(x => x.Item2 == 8)
+                                      .Select(x => x.Item1)
+                                      .Where(x => x > 0).Distinct().ToList();
+            var idsDetenidosMunicipiosFusionados = alertasTipo
+    .Where(x => x.Item2 == 1 && x.Item3 == 2)
+    .Select(x => x.Item1)
+    .Where(x => x > 0)
+    .Distinct()
+    .ToList();
+
+
+            // CAPEA / AMBER / ALBA (fuentes 2, 7 y 8).
+            var capeas = _filiacionService.GetInfoCapeas(idsCapea, idsAmber, idsAlba);
+
+            capeas = capeas
+                .Select(x => new
+                {
+                    Registro = x,
+                    DatosAlerta = ObtenerDatosAlerta(
+                        alertasTipo,
+                        new int[] { x.id_boletin_busqueda },
+                        new int[] { 2, 7, 8 }
+                    )
+                })
+                .OrderByDescending(x =>
+                    x.DatosAlerta.Item2 == 2 || x.DatosAlerta.Item2 == 3
+                        ? 3
+                        : x.DatosAlerta.Item2 == 1
+                            ? 2
+                            : x.DatosAlerta.Item2 == 0
+                                ? 1
+                                : 0
+                )
+                .ThenByDescending(x => x.DatosAlerta.Item3)
+                .Select(x => x.Registro)
+                .ToList();
+
+            ViewBag.Capeas = capeas;
+
+            // Personas de interés (fuente 3).
+            var personasInteres = _filiacionService.GetInfoPersonasFiliacion(idsPersonaInteres);
+            AgregarDatosAlertaADataTable(personasInteres, alertasTipo, new int[] { 3 }, "idPersona");
+            personasInteres = OrdenarPorPorcentaje(personasInteres);
+            ViewBag.PersonasInteres = personasInteres;
+
+            // Mandamientos judiciales (fuente 4).
+            var mandamientos = _filiacionService.GetInfoMandamientos(idsMandamientos);
+            AgregarDatosAlertaADataTable(mandamientos, alertasTipo, new int[] { 4 }, "IdOrigenAlerta");
+            mandamientos = OrdenarPorPorcentaje(mandamientos);
+            ViewBag.Mandamientos = mandamientos;
+
+            // Detenidos FGEA (fuente 6).
+            var detenidos = _filiacionService.GetInfoDetenidos(idsNomPersoDetenidos, clavesPersoDetenidos);
+            AgregarFotoUrlADetenidos(detenidos);
+            AgregarDatosAlertaADataTable(
+    detenidos,
+    alertasTipo,
+    new int[] { 6 },
+    "IdsNomPerso",
+    "CLAVE_PERSO"
+);
+            detenidos = OrdenarPorPorcentaje(detenidos);
+            ViewBag.Detenidos = detenidos;
+
+
+            // Objetivos prioritarios (fuente 5).
+            var objetivosPrioritarios = _filiacionService.GetInfoObjetivosPrioritarios(idsNombreObjetivo);
+            AgregarDatosAlertaADataTable(objetivosPrioritarios, alertasTipo, new int[] { 5 }, "IdsNombreObjetivoOrigenAlerta");
+            objetivosPrioritarios = OrdenarPorPorcentaje(objetivosPrioritarios);
+            ViewBag.ObjetivosPrioritarios = objetivosPrioritarios;
+
+            // Se preparan funciones y valores auxiliares para la vista.
+            PrepararViewBagDetalleDetenido(detencionC5, alertasTipo, tiposAlertas);
+            return View(detenido);
+        }
+
+        #endregion
+
+        //#region Procesamiento de alertas y coincidencias
+
+        private void AgregarDatosAlertaADataTable(System.Data.DataTable tabla, List<Tuple<int, int, int, int, int, string>> alertasTipo, int[] idsFuentes, string columnaIdsOrigen, string columnaClavePerso = null)
+        {
+            if (tabla == null)
+            {
+                return;
+            }
+
+            if (alertasTipo == null)
+            {
+                alertasTipo = new List<Tuple<int, int, int, int, int, string>>();
+            }
+
+            if (idsFuentes == null)
+            {
+                idsFuentes = new int[0];
+            }
+
+            if (!tabla.Columns.Contains("IdFuenteAlerta"))
+            {
+                tabla.Columns.Add("IdFuenteAlerta", typeof(int));
+            }
+
+            if (!tabla.Columns.Contains("EstatusAlerta"))
+            {
+                tabla.Columns.Add("EstatusAlerta", typeof(int));
+            }
+
+            if (!tabla.Columns.Contains("PorcentajeCoincidencia"))
+            {
+                tabla.Columns.Add("PorcentajeCoincidencia", typeof(int));
+            }
+
+            if (!tabla.Columns.Contains("PorcentajeCoincidenciaTexto"))
+            {
+                tabla.Columns.Add("PorcentajeCoincidenciaTexto", typeof(string));
+            }
+
+            if (!tabla.Columns.Contains("IdTipoAlerta"))
+            {
+                tabla.Columns.Add("IdTipoAlerta", typeof(int));
+            }
+
+            if (!tabla.Columns.Contains("NombreTipoAlerta"))
+            {
+                tabla.Columns.Add("NombreTipoAlerta", typeof(string));
+            }
+
+            foreach (System.Data.DataRow row in tabla.Rows)
+            {
+                string idsTexto = "";
+
+                if (row.Table.Columns.Contains(columnaIdsOrigen) &&
+                    row[columnaIdsOrigen] != DBNull.Value)
+                {
+                    idsTexto = Convert.ToString(row[columnaIdsOrigen]);
+                }
+
+                var idsOrigen = ConvertirTextoAListaEnteros(idsTexto);
+
+                int clavePerso = 0;
+
+                if (!string.IsNullOrWhiteSpace(columnaClavePerso) &&
+                    row.Table.Columns.Contains(columnaClavePerso) &&
+                    row[columnaClavePerso] != DBNull.Value)
+                {
+                    int.TryParse(
+                        Convert.ToString(row[columnaClavePerso]),
+                        out clavePerso
+                    );
+                }
+
+                var datosAlerta = ObtenerDatosAlerta(
+                    alertasTipo,
+                    idsOrigen,
+                    idsFuentes,
+                    clavePerso
+                );
+
+                int idFuenteAlerta = datosAlerta.Item1;
+                int estatusAlerta = datosAlerta.Item2;
+                int porcentaje = datosAlerta.Item3;
+                int idTipoAlerta = datosAlerta.Item4;
+                string nombreTipoAlerta = datosAlerta.Item5;
+
+                if (idFuenteAlerta <= 0)
+                {
+                    row["IdFuenteAlerta"] = DBNull.Value;
+                    row["EstatusAlerta"] = DBNull.Value;
+                    row["PorcentajeCoincidencia"] = DBNull.Value;
+                    row["PorcentajeCoincidenciaTexto"] = "";
+                    row["IdTipoAlerta"] = DBNull.Value;
+                    row["NombreTipoAlerta"] = "";
+
+                    continue;
+                }
+
+                row["IdFuenteAlerta"] = idFuenteAlerta;
+                row["EstatusAlerta"] = estatusAlerta;
+
+                if (porcentaje > 0)
+                {
+                    row["PorcentajeCoincidencia"] = porcentaje;
+                    row["PorcentajeCoincidenciaTexto"] = FormatearPorcentaje(porcentaje);
+                }
+                else
+                {
+                    row["PorcentajeCoincidencia"] = DBNull.Value;
+                    row["PorcentajeCoincidenciaTexto"] = "";
+                }
+
+                if (idTipoAlerta > 0)
+                {
+                    row["IdTipoAlerta"] = idTipoAlerta;
+                }
+                else
+                {
+                    row["IdTipoAlerta"] = DBNull.Value;
+                }
+
+                row["NombreTipoAlerta"] = string.IsNullOrWhiteSpace(nombreTipoAlerta)
+                    ? "SIN TIPO DE ALERTA"
+                    : nombreTipoAlerta.Trim();
+            }
+        }
+
+        private List<Tuple<int, int, int, int, int, string>> ObtenerAlertasDetenido(List<Tuple<int, int, int, int, int, string>> alertasTipo, IEnumerable<int> idsNomPerso, int clavePerso)
+        {
+            List<int> listaIdsNomPerso = idsNomPerso == null
+                ? new List<int>()
+                : idsNomPerso.Where(x => x > 0).Distinct().ToList();
+
+            if (alertasTipo == null)
+            {
+                return new List<Tuple<int, int, int, int, int, string>>();
+            }
+
+            return alertasTipo
+                .Where(x =>
+                    x.Item2 == 6 &&
+                    (
+                        (x.Item5 == 1 && listaIdsNomPerso.Contains(x.Item1))
+                        ||
+                        ((x.Item5 == 2 || x.Item5 == 3) && clavePerso > 0 && x.Item1 == clavePerso)
+                    )
+                )
+                .ToList();
+        }
+
+        private System.Collections.ArrayList ObtenerCoincidenciasAlertaDetenido(List<Tuple<int, int, int, int, int, string>> alertasTipo, IEnumerable<int> idsNomPerso, int clavePerso)
+        {
+            var resultado = new System.Collections.ArrayList();
+
+            var alertas = ObtenerAlertasDetenido(
+                alertasTipo,
+                idsNomPerso,
+                clavePerso
+            );
+
+            var coincidencias = alertas
+                .GroupBy(x => x.Item5)
+                .Select(grupo =>
+                    grupo
+                        .OrderByDescending(x => x.Item4)
+                        .ThenByDescending(x =>
+                            x.Item3 == 3
+                                ? 4
+                                : x.Item3 == 2
+                                    ? 3
+                                    : x.Item3 == 1
+                                        ? 2
+                                        : 1
+                        )
+                        .First()
+                )
+                .OrderByDescending(x => x.Item4)
+                .ThenBy(x => x.Item5)
+                .ToList();
+
+            foreach (var coincidencia in coincidencias)
+            {
+                string nombreTipoAlerta = string.IsNullOrWhiteSpace(coincidencia.Item6)
+                    ? "SIN TIPO DE ALERTA"
+                    : coincidencia.Item6.Trim();
+
+                resultado.Add(
+                    new object[]
+                    {
+                coincidencia.Item2, // Fuente
+                coincidencia.Item3, // Estatus
+                coincidencia.Item4, // Porcentaje
+                coincidencia.Item5, // Tipo alerta
+                nombreTipoAlerta
+                    }
+                );
+            }
+
+            return resultado;
+        }
+
+        private Tuple<int, int, int, int, string> ObtenerDatosAlerta(List<Tuple<int, int, int, int, int, string>> alertasTipo, IEnumerable<int> idsOrigen, IEnumerable<int> idsFuentes, int clavePerso = 0)
+        {
+            if (alertasTipo == null)
+            {
+                return Tuple.Create(0, 0, 0, 0, "");
+            }
+
+            var listaIdsOrigen = idsOrigen == null
+                ? new List<int>()
+                : idsOrigen
+                    .Where(x => x > 0)
+                    .Distinct()
+                    .ToList();
+
+            var listaFuentes = idsFuentes == null
+                ? new List<int>()
+                : idsFuentes
+                    .Where(x => x > 0)
+                    .Distinct()
+                    .ToList();
+
+            /*
+             * NO validamos listaIdsOrigen.Count.
+             *
+             * Foto y huella pueden llegar únicamente mediante CLAVE_PERSO.
+             */
+            if (listaFuentes.Count == 0)
+            {
+                return Tuple.Create(0, 0, 0, 0, "");
+            }
+
+            var alertaSeleccionada = alertasTipo
+                .Where(x =>
+                    listaFuentes.Contains(x.Item2) &&
+                    (
+                        x.Item2 == 6
+                            ?
+                            (
+                                /*
+                                 * TIPO 1
+                                 * Item1 = Nom_perso.id
+                                 */
+                                (
+                                    x.Item5 == 1 &&
+                                    listaIdsOrigen.Contains(x.Item1)
+                                )
+                                ||
+                                /*
+                                 * TIPOS 2 Y 3
+                                 * Item1 = CLAVE_PERSO
+                                 */
+                                (
+                                    (x.Item5 == 2 || x.Item5 == 3) &&
+                                    clavePerso > 0 &&
+                                    x.Item1 == clavePerso
+                                )
+                            )
+                            :
+                            listaIdsOrigen.Contains(x.Item1)
+                    )
+                )
+                .OrderByDescending(x =>
+                    x.Item3 == 3
+                        ? 4
+                        : x.Item3 == 2
+                            ? 3
+                            : x.Item3 == 1
+                                ? 2
+                                : 1
+                )
+                .ThenByDescending(x => x.Item4)
+                .FirstOrDefault();
+
+            if (alertaSeleccionada == null)
+            {
+                return Tuple.Create(0, 0, 0, 0, "");
+            }
+
+            string nombreTipoAlerta = string.IsNullOrWhiteSpace(alertaSeleccionada.Item6)
+                ? "SIN TIPO DE ALERTA"
+                : alertaSeleccionada.Item6.Trim();
+
+            return Tuple.Create(
+                alertaSeleccionada.Item2,
+                alertaSeleccionada.Item3,
+                alertaSeleccionada.Item4,
+                alertaSeleccionada.Item5,
+                nombreTipoAlerta
+            );
+        }
+
 
         private System.Collections.ArrayList ObtenerCoincidenciasAlerta(
      List<Tuple<int, int, int, int, int, string>> alertasTipo,
@@ -1528,56 +1666,45 @@ namespace Objetivos_Prioritarios.Controllers
             }
         }
 
-        private void PrepararViewBagDetalleDetenido(
-    Objetivos_Prioritarios.Models.tb_DETENCION_C5 detencionC5,
-    List<Tuple<int, int, int, int, int, string>> alertasTipo,
-    List<Tuple<int, int>> tiposAlertas)
+
+        private void PrepararViewBagDetalleDetenido(Objetivos_Prioritarios.Models.tb_DETENCION_C5 detencionC5, List<Tuple<int, int, int, int, int, string>> alertasTipo, List<Tuple<int, int>> tiposAlertas)
         {
             ViewBag.Texto = new Func<object, string>(Texto);
             ViewBag.ParteNombre = new Func<object, string>(ParteNombre);
             ViewBag.Fecha = new Func<object, string>(Fecha);
             ViewBag.TextoDetencion = new Func<object, string>(TextoDetencion);
             ViewBag.FechaHoraDetencion = new Func<object, string>(FechaHoraDetencion);
-
             ViewBag.ObtenerEstatusAlerta = new Func<int, int, int>((idOrigen, idFuente) =>
             {
                 return ObtenerEstatusAlerta(alertasTipo, idOrigen, idFuente);
             });
 
-            ViewBag.ObtenerDatosAlerta = new Func< int, int[], Tuple<int, int, int, int, string> > ( (idOrigen, idsFuentes) =>
-        {
-            return ObtenerDatosAlerta(
-                alertasTipo,
-                new int[] { idOrigen },
-                idsFuentes
-            );
-        }
-    );
+            ViewBag.ObtenerDatosAlerta = new Func<int, int[], Tuple<int, int, int, int, string>>((idOrigen, idsFuentes) =>
+            {
+                return ObtenerDatosAlerta(alertasTipo, new int[] { idOrigen }, idsFuentes);
+            });
 
-            ViewBag.ObtenerCoincidenciasAlerta = new Func< int[], int[], System.Collections.ArrayList >( (idsOrigen, idsFuentes) =>
-         {
-             return ObtenerCoincidenciasAlerta(
-                 alertasTipo,
-                 idsOrigen,
-                 idsFuentes
-             );
-         }
-     );
+            ViewBag.ObtenerCoincidenciasAlerta = new Func<int[], int[], System.Collections.ArrayList>((idsOrigen, idsFuentes) =>
+            {
+                return ObtenerCoincidenciasAlerta(alertasTipo, idsOrigen, idsFuentes);
+            });
 
-            string mapaLatitud = detencionC5 != null
-                ? TextoDetencion(detencionC5.Latitud)
-                : "SIN INFORMACIÓN";
-
-            string mapaLongitud = detencionC5 != null
-                ? TextoDetencion(detencionC5.Longitud)
-                : "SIN INFORMACIÓN";
-
+            ViewBag.ObtenerCoincidenciasAlertaDetenido =
+                new Func<int[], int, System.Collections.ArrayList>(
+                    (idsNomPerso, clavePerso) =>
+                    {
+                        return ObtenerCoincidenciasAlertaDetenido(
+                            alertasTipo,
+                            idsNomPerso,
+                            clavePerso
+                        );
+                    }
+                );
+            string mapaLatitud = detencionC5 != null ? TextoDetencion(detencionC5.Latitud) : "SIN INFORMACIÓN";
+            string mapaLongitud = detencionC5 != null ? TextoDetencion(detencionC5.Longitud) : "SIN INFORMACIÓN";
             ViewBag.MapaLatitud = mapaLatitud;
             ViewBag.MapaLongitud = mapaLongitud;
-            ViewBag.TieneCoordenadasMapa =
-                mapaLatitud != "SIN INFORMACIÓN" &&
-                mapaLongitud != "SIN INFORMACIÓN";
-
+            ViewBag.TieneCoordenadasMapa = mapaLatitud != "SIN INFORMACIÓN" && mapaLongitud != "SIN INFORMACIÓN";
             ViewBag.TotalCoincidenciaNombre = TotalPorTipoAlerta(tiposAlertas, 1);
             ViewBag.TotalCoincidenciaFoto = TotalPorTipoAlerta(tiposAlertas, 2);
             ViewBag.TotalCoincidenciaHuella = TotalPorTipoAlerta(tiposAlertas, 3);
@@ -2366,7 +2493,7 @@ namespace Objetivos_Prioritarios.Controllers
 
                 System.Data.DataTable detenidos =
                     _filiacionService.GetInfoDetenidos(
-                        listaIdsNomPerso
+                        listaIdsNomPerso,null
                     );
 
                 if (detenidos == null ||
@@ -2458,6 +2585,26 @@ namespace Objetivos_Prioritarios.Controllers
         {
             try
             {
+
+                tb_Usuarios usuario = Session["User"] as tb_Usuarios;
+                string nombreUsuario = usuario != null? usuario.nvarchar_no_interno.ToUpper(): "";
+                if (nombreUsuario == ConfiguracionBusquedaService.LoginConfiguracion)
+                  //if (nombreUsuario == "LDELIRA")
+
+                    {
+
+                        int segundosEspera = ConfiguracionBusquedaService.ObtenerTiempoEspera();
+
+                    if (segundosEspera > 0)
+                    {
+                        await Task.Delay(
+                            TimeSpan.FromSeconds(
+                                segundosEspera
+                            )
+                        );
+                    }
+                }
+
                 ResultadosCoincidenciasViewModel resultado =
                     await CoincidenciasBiometricasService
                         .BuscarCoincidenciasAsync(
@@ -2531,16 +2678,267 @@ namespace Objetivos_Prioritarios.Controllers
             }
         }
 
+        //    [HttpGet]
+        //    public async Task<ActionResult> DetalleCoincidenciaPartial(
+        //int idCoincidencia,
+        //bool tieneFotografiaConsulta = false,
+        //bool tieneHuellaConsulta = false)
+        //    {
+        //        ResultadosCoincidenciasViewModel resultados =
+        //            Session[
+        //                SessionResultadosCoincidencias
+        //            ] as ResultadosCoincidenciasViewModel;
+
+        //        if (resultados == null)
+        //        {
+        //            Response.StatusCode = 409;
+
+        //            return Content(
+        //                "La búsqueda ya no está disponible. Realice nuevamente la consulta biométrica.",
+        //                "text/plain"
+        //            );
+        //        }
+
+        //        CoincidenciaResultadoViewModel coincidencia =
+        //            resultados.Coincidencias == null
+        //                ? null
+        //                : resultados.Coincidencias
+        //                    .FirstOrDefault(x =>
+        //                        x.IdCoincidencia ==
+        //                        idCoincidencia
+        //                    );
+
+        //        if (coincidencia == null)
+        //        {
+        //            return HttpNotFound(
+        //                "No se encontró la coincidencia solicitada."
+        //            );
+        //        }
+
+
+        //        /*
+        //         * ============================================================
+        //         * FUENTE 5 - OBJETIVOS PRIORITARIOS
+        //         * ============================================================
+        //         */
+
+        //        if (coincidencia.IdTbFuente == 5)
+        //        {
+        //            DetalleObjetivoApiDto detalleObjetivo =
+        //                await CoincidenciasBiometricasService
+        //                    .ObtenerDetalleObjetivoAsync(
+        //                        coincidencia.IdPersona
+        //                    );
+
+        //            if (detalleObjetivo == null)
+        //            {
+        //                Response.StatusCode = 404;
+
+        //                return Content(
+        //                    "No fue posible obtener el detalle del objetivo prioritario.",
+        //                    "text/plain"
+        //                );
+        //            }
+
+        //            ViewBag.Coincidencia =
+        //                coincidencia;
+
+        //            ViewBag.TieneFotografiaConsulta =
+        //                resultados.TieneFotografiaConsulta;
+
+        //            ViewBag.TieneHuellaConsulta =
+        //                resultados.TieneHuellaConsulta;
+
+        //            return PartialView(
+        //                "Coincidencias/DetalleObjetivoCoincidenciaPartial",
+        //                detalleObjetivo
+        //            );
+        //        }
+
+
+        //        /*
+        //         * ============================================================
+        //         * FUENTES 2, 7 Y 8 - FISCALIA WEB
+        //         * ============================================================
+        //         *
+        //         * 2 = CAPEA / FEMDLP
+        //         * 7 = Alerta Amber
+        //         * 8 = Protocolo Alba
+        //         */
+
+        //        if (
+        //            coincidencia.IdTbFuente == 2 ||
+        //            coincidencia.IdTbFuente == 7 ||
+        //            coincidencia.IdTbFuente == 8
+        //        )
+        //        {
+        //            DetalleFiscaliaWebApiDto detalleFiscaliaWeb =
+        //                await CoincidenciasBiometricasService
+        //                    .ObtenerDetalleFiscaliaWebAsync(
+        //                        coincidencia.IdTbFuente,
+        //                        coincidencia.IdPersona
+        //                    );
+
+        //            if (detalleFiscaliaWeb == null)
+        //            {
+        //                Response.StatusCode = 404;
+
+        //                return Content(
+        //                    "No fue posible obtener el detalle del registro.",
+        //                    "text/plain"
+        //                );
+        //            }
+
+        //            ViewBag.Coincidencia =
+        //                coincidencia;
+
+        //            ViewBag.TieneFotografiaConsulta =
+        //                resultados.TieneFotografiaConsulta;
+
+        //            ViewBag.TieneHuellaConsulta =
+        //                resultados.TieneHuellaConsulta;
+
+        //            return PartialView(
+        //                "Coincidencias/DetalleFiscaliaWebCoincidenciaPartial",
+        //                detalleFiscaliaWeb
+        //            );
+        //        }
+
+
+        //        /*
+        //         * ============================================================
+        //         * FUENTE 1 - C5 DETENIDOS
+        //         * ============================================================
+        //         */
+
+        //        if (coincidencia.IdTbFuente == 1)
+        //        {
+        //            DetalleC5ApiDto detalleC5 =
+        //                await CoincidenciasBiometricasService
+        //                    .ObtenerDetalleC5Async(
+        //                        coincidencia.IdPersona
+        //                    );
+
+        //            if (detalleC5 == null)
+        //            {
+        //                Response.StatusCode = 404;
+
+        //                return Content(
+        //                    "No fue posible obtener el detalle C5.",
+        //                    "text/plain"
+        //                );
+        //            }
+
+        //            ViewBag.Coincidencia =
+        //                coincidencia;
+
+        //            ViewBag.TieneFotografiaConsulta =
+        //                resultados.TieneFotografiaConsulta;
+
+        //            ViewBag.TieneHuellaConsulta =
+        //                resultados.TieneHuellaConsulta;
+
+        //            return PartialView(
+        //                "Coincidencias/DetalleC5CoincidenciaPartial",
+        //                detalleC5
+        //            );
+        //        }
+
+
+        //        /*
+        //         * ============================================================
+        //         * FUENTE 6 - FGEA DETENIDOS
+        //         * ============================================================
+        //         *
+        //         * En Fuente 6:
+        //         *
+        //         * coincidencia.IdPersona =
+        //         * Filiacion.dbo.Persona.CLAVE_PERSO
+        //         */
+
+        //        if (coincidencia.IdTbFuente == 6)
+        //        {
+        //            DetalleFGEADetenidoApiDto detalleFGEA =
+        //                await CoincidenciasBiometricasService
+        //                    .ObtenerDetalleFGEADetenidoAsync(
+        //                        coincidencia.IdPersona
+        //                    );
+
+        //            if (detalleFGEA == null)
+        //            {
+        //                Response.StatusCode = 404;
+
+        //                return Content(
+        //                    "No fue posible obtener el detalle del detenido FGEA.",
+        //                    "text/plain"
+        //                );
+        //            }
+
+        //            ViewBag.Coincidencia =
+        //                coincidencia;
+
+        //            ViewBag.TieneFotografiaConsulta =
+        //                resultados.TieneFotografiaConsulta;
+
+        //            ViewBag.TieneHuellaConsulta =
+        //                resultados.TieneHuellaConsulta;
+
+        //            return PartialView(
+        //                "Coincidencias/DetalleFGEADetenidoCoincidenciaPartial",
+        //                detalleFGEA
+        //            );
+        //        }
+
+
+        //        /*
+        //         * ============================================================
+        //         * DEMÁS FUENTES
+        //         * ============================================================
+        //         *
+        //         * Las fuentes que todavía no tengan detalle especializado
+        //         * continúan utilizando el partial genérico.
+        //         *
+        //         * Actualmente principalmente:
+        //         *
+        //         * Fuente 3 - Personas de interés
+        //         *
+        //         * IMPORTANTE:
+        //         *
+        //         * DetalleCoincidenciaPartial.cshtml espera:
+        //         *
+        //         * DetalleCoincidenciaViewModel
+        //         *
+        //         * NO CoincidenciaResultadoViewModel directamente.
+        //         * ============================================================
+        //         */
+
+        //        DetalleCoincidenciaViewModel modelo =
+        //            new DetalleCoincidenciaViewModel
+        //            {
+        //                Coincidencia =
+        //                    coincidencia,
+
+        //                TieneFotografiaConsulta =
+        //                    resultados.TieneFotografiaConsulta,
+
+        //                TieneHuellaConsulta =
+        //                    resultados.TieneHuellaConsulta
+        //            };
+
+        //        return PartialView(
+        //            "Coincidencias/DetalleCoincidenciaPartial",
+        //            modelo
+        //        );
+        //    }
+
         [HttpGet]
-        public async Task<ActionResult> DetalleCoincidenciaPartial(
-    int idCoincidencia,
-    bool tieneFotografiaConsulta = false,
-    bool tieneHuellaConsulta = false)
+        public async Task<ActionResult> DetalleCoincidenciaPartial(int idCoincidencia, bool tieneFotografiaConsulta = false, bool tieneHuellaConsulta = false)
         {
             ResultadosCoincidenciasViewModel resultados =
                 Session[
                     SessionResultadosCoincidencias
                 ] as ResultadosCoincidenciasViewModel;
+
 
             if (resultados == null)
             {
@@ -2552,6 +2950,7 @@ namespace Objetivos_Prioritarios.Controllers
                 );
             }
 
+
             CoincidenciaResultadoViewModel coincidencia =
                 resultados.Coincidencias == null
                     ? null
@@ -2560,6 +2959,7 @@ namespace Objetivos_Prioritarios.Controllers
                             x.IdCoincidencia ==
                             idCoincidencia
                         );
+
 
             if (coincidencia == null)
             {
@@ -2574,7 +2974,6 @@ namespace Objetivos_Prioritarios.Controllers
              * FUENTE 5 - OBJETIVOS PRIORITARIOS
              * ============================================================
              */
-
             if (coincidencia.IdTbFuente == 5)
             {
                 DetalleObjetivoApiDto detalleObjetivo =
@@ -2582,6 +2981,7 @@ namespace Objetivos_Prioritarios.Controllers
                         .ObtenerDetalleObjetivoAsync(
                             coincidencia.IdPersona
                         );
+
 
                 if (detalleObjetivo == null)
                 {
@@ -2593,6 +2993,7 @@ namespace Objetivos_Prioritarios.Controllers
                     );
                 }
 
+
                 ViewBag.Coincidencia =
                     coincidencia;
 
@@ -2601,6 +3002,7 @@ namespace Objetivos_Prioritarios.Controllers
 
                 ViewBag.TieneHuellaConsulta =
                     resultados.TieneHuellaConsulta;
+
 
                 return PartialView(
                     "Coincidencias/DetalleObjetivoCoincidenciaPartial",
@@ -2617,8 +3019,8 @@ namespace Objetivos_Prioritarios.Controllers
              * 2 = CAPEA / FEMDLP
              * 7 = Alerta Amber
              * 8 = Protocolo Alba
+             * ============================================================
              */
-
             if (
                 coincidencia.IdTbFuente == 2 ||
                 coincidencia.IdTbFuente == 7 ||
@@ -2632,6 +3034,7 @@ namespace Objetivos_Prioritarios.Controllers
                             coincidencia.IdPersona
                         );
 
+
                 if (detalleFiscaliaWeb == null)
                 {
                     Response.StatusCode = 404;
@@ -2642,6 +3045,7 @@ namespace Objetivos_Prioritarios.Controllers
                     );
                 }
 
+
                 ViewBag.Coincidencia =
                     coincidencia;
 
@@ -2650,6 +3054,7 @@ namespace Objetivos_Prioritarios.Controllers
 
                 ViewBag.TieneHuellaConsulta =
                     resultados.TieneHuellaConsulta;
+
 
                 return PartialView(
                     "Coincidencias/DetalleFiscaliaWebCoincidenciaPartial",
@@ -2663,7 +3068,6 @@ namespace Objetivos_Prioritarios.Controllers
              * FUENTE 1 - C5 DETENIDOS
              * ============================================================
              */
-
             if (coincidencia.IdTbFuente == 1)
             {
                 DetalleC5ApiDto detalleC5 =
@@ -2671,6 +3075,7 @@ namespace Objetivos_Prioritarios.Controllers
                         .ObtenerDetalleC5Async(
                             coincidencia.IdPersona
                         );
+
 
                 if (detalleC5 == null)
                 {
@@ -2682,6 +3087,7 @@ namespace Objetivos_Prioritarios.Controllers
                     );
                 }
 
+
                 ViewBag.Coincidencia =
                     coincidencia;
 
@@ -2690,6 +3096,7 @@ namespace Objetivos_Prioritarios.Controllers
 
                 ViewBag.TieneHuellaConsulta =
                     resultados.TieneHuellaConsulta;
+
 
                 return PartialView(
                     "Coincidencias/DetalleC5CoincidenciaPartial",
@@ -2702,13 +3109,7 @@ namespace Objetivos_Prioritarios.Controllers
              * ============================================================
              * FUENTE 6 - FGEA DETENIDOS
              * ============================================================
-             *
-             * En Fuente 6:
-             *
-             * coincidencia.IdPersona =
-             * Filiacion.dbo.Persona.CLAVE_PERSO
              */
-
             if (coincidencia.IdTbFuente == 6)
             {
                 DetalleFGEADetenidoApiDto detalleFGEA =
@@ -2716,6 +3117,7 @@ namespace Objetivos_Prioritarios.Controllers
                         .ObtenerDetalleFGEADetenidoAsync(
                             coincidencia.IdPersona
                         );
+
 
                 if (detalleFGEA == null)
                 {
@@ -2727,6 +3129,7 @@ namespace Objetivos_Prioritarios.Controllers
                     );
                 }
 
+
                 ViewBag.Coincidencia =
                     coincidencia;
 
@@ -2735,6 +3138,7 @@ namespace Objetivos_Prioritarios.Controllers
 
                 ViewBag.TieneHuellaConsulta =
                     resultados.TieneHuellaConsulta;
+
 
                 return PartialView(
                     "Coincidencias/DetalleFGEADetenidoCoincidenciaPartial",
@@ -2745,26 +3149,91 @@ namespace Objetivos_Prioritarios.Controllers
 
             /*
              * ============================================================
-             * DEMÁS FUENTES
+             * FUENTE 3 - PERSONAS DE INTERÉS
              * ============================================================
              *
-             * Las fuentes que todavía no tengan detalle especializado
-             * continúan utilizando el partial genérico.
+             * Esta es la ÚNICA parte nueva.
              *
-             * Actualmente principalmente:
-             *
-             * Fuente 3 - Personas de interés
-             *
-             * IMPORTANTE:
-             *
-             * DetalleCoincidenciaPartial.cshtml espera:
-             *
-             * DetalleCoincidenciaViewModel
-             *
-             * NO CoincidenciaResultadoViewModel directamente.
+             * Conservamos todo lo anterior y solamente agregamos
+             * el detalle especializado de Personas de Interés.
              * ============================================================
              */
+            if (
+                coincidencia.IdTbFuente == 3 &&
+                coincidencia.IdPersona > 0
+            )
+            {
+                DetallePersonaInteresApiDto detallePersonaInteres =
+                    await CoincidenciasBiometricasService
+                        .ObtenerDetallePersonaInteresAsync(
+                            coincidencia.IdPersona
+                        );
 
+
+                if (detallePersonaInteres == null)
+                {
+                    Response.StatusCode = 404;
+
+                    return Content(
+                        "No fue posible obtener el detalle de la persona de interés.",
+                        "text/plain"
+                    );
+                }
+
+
+                /*
+                 * La coincidencia sigue siendo necesaria porque contiene:
+                 *
+                 * - porcentaje fotografía;
+                 * - porcentaje huella;
+                 * - porcentaje nominal;
+                 * - mandamientos judiciales;
+                 * - tipo de coincidencia;
+                 * - etc.
+                 */
+                ViewBag.Coincidencia =
+                    coincidencia;
+
+                ViewBag.TieneFotografiaConsulta =
+                    resultados.TieneFotografiaConsulta;
+
+                ViewBag.TieneHuellaConsulta =
+                    resultados.TieneHuellaConsulta;
+
+
+                DetalleCoincidenciaViewModel modeloPersonaInteres =
+                    new DetalleCoincidenciaViewModel
+                    {
+                        Coincidencia =
+                            coincidencia,
+
+                        TieneFotografiaConsulta =
+                            resultados.TieneFotografiaConsulta,
+
+                        TieneHuellaConsulta =
+                            resultados.TieneHuellaConsulta,
+
+                        PersonaInteres =
+                            detallePersonaInteres
+                    };
+
+
+                return PartialView(
+                    "Coincidencias/DetallePersonaInteresPartial",
+                    modeloPersonaInteres
+                );
+            }
+
+
+            /*
+             * ============================================================
+             * DEMÁS FUENTES SIN DETALLE ESPECIALIZADO
+             * ============================================================
+             *
+             * Solamente llegan aquí fuentes que realmente todavía
+             * no tengan un partial propio.
+             * ============================================================
+             */
             DetalleCoincidenciaViewModel modelo =
                 new DetalleCoincidenciaViewModel
                 {
@@ -2778,12 +3247,12 @@ namespace Objetivos_Prioritarios.Controllers
                         resultados.TieneHuellaConsulta
                 };
 
+
             return PartialView(
                 "Coincidencias/DetalleCoincidenciaPartial",
                 modelo
             );
         }
-
 
         [HttpGet]
         public async Task<ActionResult> FotoObjetivoBiometria(int idObjetivo)
@@ -2926,6 +3395,38 @@ namespace Objetivos_Prioritarios.Controllers
 
             return tablaOrdenada;
         }
+
+
+        [HttpGet]
+        public JsonResult ProbarMisPermisos()
+        {
+            tb_Usuarios usuario =
+                Session["User"] as tb_Usuarios;
+
+            PermisosUsuarioDto permisos2 = Session["PermisosUsuario"] as PermisosUsuarioDto;
+            if (usuario == null)
+            {
+                return Json(
+                    new
+                    {
+                        success = false
+                    },
+                    JsonRequestBehavior.AllowGet
+                );
+            }
+
+            PermisosUsuarioDto permisos =
+                AccesoService
+                    .ObtenerPermisosUsuario(
+                        usuario.nvarchar_no_interno
+                    );
+
+            return Json(
+                permisos,
+                JsonRequestBehavior.AllowGet
+            );
+        }
+
 
     }
 

@@ -1,0 +1,681 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="Objetivos_Prioritarios_Perfil_Model.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="cat_FuenteBusqueda">
+          <Key>
+            <PropertyRef Name="int_id_fuente" />
+          </Key>
+          <Property Name="int_id_fuente" Type="int" Nullable="false" />
+          <Property Name="nvarchar_clave" Type="varchar" MaxLength="100" Nullable="false" />
+          <Property Name="nvarchar_nombre" Type="varchar" MaxLength="200" Nullable="false" />
+          <Property Name="nvarchar_descripcion" Type="varchar" MaxLength="500" />
+          <Property Name="int_orden" Type="int" Nullable="false" />
+          <Property Name="bit_status" Type="bit" Nullable="false" />
+          <Property Name="date_fecha_alta" Type="datetime" Nullable="false" />
+        </EntityType>
+        <EntityType Name="cat_ModuloSistema">
+          <Key>
+            <PropertyRef Name="int_id_modulo" />
+          </Key>
+          <Property Name="int_id_modulo" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="nvarchar_clave" Type="varchar" MaxLength="100" Nullable="false" />
+          <Property Name="nvarchar_nombre" Type="varchar" MaxLength="200" Nullable="false" />
+          <Property Name="nvarchar_descripcion" Type="varchar" MaxLength="500" />
+          <Property Name="int_orden" Type="int" Nullable="false" />
+          <Property Name="bit_status" Type="bit" Nullable="false" />
+          <Property Name="date_fecha_alta" Type="datetime" Nullable="false" />
+          <Property Name="date_fecha_modificacion" Type="datetime" />
+          <Property Name="nvarchar_usuario_modificacion" Type="varchar" MaxLength="100" />
+        </EntityType>
+        <EntityType Name="cat_Perfil">
+          <Key>
+            <PropertyRef Name="int_id_perfil" />
+          </Key>
+          <Property Name="int_id_perfil" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="nvarchar_clave" Type="varchar" MaxLength="100" Nullable="false" />
+          <Property Name="nvarchar_nombre" Type="varchar" MaxLength="200" Nullable="false" />
+          <Property Name="nvarchar_descripcion" Type="varchar" MaxLength="500" />
+          <Property Name="bit_status" Type="bit" Nullable="false" />
+          <Property Name="date_fecha_alta" Type="datetime" Nullable="false" />
+          <Property Name="date_fecha_modificacion" Type="datetime" />
+          <Property Name="nvarchar_usuario_modificacion" Type="varchar" MaxLength="100" />
+        </EntityType>
+        <EntityType Name="cat_PermisoSistema">
+          <Key>
+            <PropertyRef Name="int_id_permiso" />
+          </Key>
+          <Property Name="int_id_permiso" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="nvarchar_clave" Type="varchar" MaxLength="100" Nullable="false" />
+          <Property Name="nvarchar_nombre" Type="varchar" MaxLength="200" Nullable="false" />
+          <Property Name="nvarchar_descripcion" Type="varchar" MaxLength="500" />
+          <Property Name="bit_status" Type="bit" Nullable="false" />
+          <Property Name="date_fecha_alta" Type="datetime" Nullable="false" />
+        </EntityType>
+        <EntityType Name="tb_PerfilFuenteBusqueda">
+          <Key>
+            <PropertyRef Name="int_id_perfil_fuente" />
+          </Key>
+          <Property Name="int_id_perfil_fuente" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="int_id_perfil" Type="int" Nullable="false" />
+          <Property Name="int_id_fuente" Type="int" Nullable="false" />
+          <Property Name="bit_status" Type="bit" Nullable="false" />
+          <Property Name="date_fecha_alta" Type="datetime" Nullable="false" />
+          <Property Name="date_fecha_modificacion" Type="datetime" />
+          <Property Name="nvarchar_usuario_modificacion" Type="varchar" MaxLength="100" />
+        </EntityType>
+        <EntityType Name="tb_PerfilModulo">
+          <Key>
+            <PropertyRef Name="int_id_perfil_modulo" />
+          </Key>
+          <Property Name="int_id_perfil_modulo" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="int_id_perfil" Type="int" Nullable="false" />
+          <Property Name="int_id_modulo" Type="int" Nullable="false" />
+          <Property Name="bit_status" Type="bit" Nullable="false" />
+          <Property Name="date_fecha_alta" Type="datetime" Nullable="false" />
+          <Property Name="date_fecha_modificacion" Type="datetime" />
+          <Property Name="nvarchar_usuario_modificacion" Type="varchar" MaxLength="100" />
+        </EntityType>
+        <EntityType Name="tb_PerfilPermiso">
+          <Key>
+            <PropertyRef Name="int_id_perfil_permiso" />
+          </Key>
+          <Property Name="int_id_perfil_permiso" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="int_id_perfil" Type="int" Nullable="false" />
+          <Property Name="int_id_permiso" Type="int" Nullable="false" />
+          <Property Name="bit_status" Type="bit" Nullable="false" />
+          <Property Name="date_fecha_alta" Type="datetime" Nullable="false" />
+          <Property Name="date_fecha_modificacion" Type="datetime" />
+          <Property Name="nvarchar_usuario_modificacion" Type="varchar" MaxLength="100" />
+        </EntityType>
+        <EntityType Name="tb_UsuarioPerfil">
+          <Key>
+            <PropertyRef Name="int_id_usuario_perfil" />
+          </Key>
+          <Property Name="int_id_usuario_perfil" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="int_id_usuario" Type="int" Nullable="false" />
+          <Property Name="int_id_perfil" Type="int" Nullable="false" />
+          <Property Name="bit_status" Type="bit" Nullable="false" />
+          <Property Name="date_fecha_alta" Type="datetime" Nullable="false" />
+          <Property Name="date_fecha_modificacion" Type="datetime" />
+          <Property Name="nvarchar_usuario_modificacion" Type="varchar" MaxLength="100" />
+        </EntityType>
+        <EntityType Name="tb_Usuarios">
+          <Key>
+            <PropertyRef Name="int_id_usuario" />
+          </Key>
+          <Property Name="int_id_usuario" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="nvarchar_nombre_usuario" Type="nvarchar" MaxLength="300" Nullable="false" />
+          <Property Name="nvarchar_no_interno" Type="nvarchar" MaxLength="100" />
+          <Property Name="nvarchar_puesto" Type="nvarchar" MaxLength="300" />
+          <Property Name="date_fecha_alta" Type="datetime" Nullable="false" />
+          <Property Name="bit_status" Type="bit" />
+          <Property Name="date_fecha_modificacion" Type="datetime" />
+          <Property Name="nvarchar_usuario_modificacion" Type="nvarchar" MaxLength="100" />
+          <Property Name="Valor" Type="int" />
+        </EntityType>
+        <Association Name="FK_tb_PerfilFuenteBusqueda_Fuente">
+          <End Role="cat_FuenteBusqueda" Type="Self.cat_FuenteBusqueda" Multiplicity="1" />
+          <End Role="tb_PerfilFuenteBusqueda" Type="Self.tb_PerfilFuenteBusqueda" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="cat_FuenteBusqueda">
+              <PropertyRef Name="int_id_fuente" />
+            </Principal>
+            <Dependent Role="tb_PerfilFuenteBusqueda">
+              <PropertyRef Name="int_id_fuente" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tb_PerfilFuenteBusqueda_Perfil">
+          <End Role="cat_Perfil" Type="Self.cat_Perfil" Multiplicity="1" />
+          <End Role="tb_PerfilFuenteBusqueda" Type="Self.tb_PerfilFuenteBusqueda" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="cat_Perfil">
+              <PropertyRef Name="int_id_perfil" />
+            </Principal>
+            <Dependent Role="tb_PerfilFuenteBusqueda">
+              <PropertyRef Name="int_id_perfil" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tb_PerfilModulo_Modulo">
+          <End Role="cat_ModuloSistema" Type="Self.cat_ModuloSistema" Multiplicity="1" />
+          <End Role="tb_PerfilModulo" Type="Self.tb_PerfilModulo" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="cat_ModuloSistema">
+              <PropertyRef Name="int_id_modulo" />
+            </Principal>
+            <Dependent Role="tb_PerfilModulo">
+              <PropertyRef Name="int_id_modulo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tb_PerfilModulo_Perfil">
+          <End Role="cat_Perfil" Type="Self.cat_Perfil" Multiplicity="1" />
+          <End Role="tb_PerfilModulo" Type="Self.tb_PerfilModulo" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="cat_Perfil">
+              <PropertyRef Name="int_id_perfil" />
+            </Principal>
+            <Dependent Role="tb_PerfilModulo">
+              <PropertyRef Name="int_id_perfil" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tb_PerfilPermiso_Perfil">
+          <End Role="cat_Perfil" Type="Self.cat_Perfil" Multiplicity="1" />
+          <End Role="tb_PerfilPermiso" Type="Self.tb_PerfilPermiso" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="cat_Perfil">
+              <PropertyRef Name="int_id_perfil" />
+            </Principal>
+            <Dependent Role="tb_PerfilPermiso">
+              <PropertyRef Name="int_id_perfil" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tb_PerfilPermiso_Permiso">
+          <End Role="cat_PermisoSistema" Type="Self.cat_PermisoSistema" Multiplicity="1" />
+          <End Role="tb_PerfilPermiso" Type="Self.tb_PerfilPermiso" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="cat_PermisoSistema">
+              <PropertyRef Name="int_id_permiso" />
+            </Principal>
+            <Dependent Role="tb_PerfilPermiso">
+              <PropertyRef Name="int_id_permiso" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tb_UsuarioPerfil_Perfil">
+          <End Role="cat_Perfil" Type="Self.cat_Perfil" Multiplicity="1" />
+          <End Role="tb_UsuarioPerfil" Type="Self.tb_UsuarioPerfil" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="cat_Perfil">
+              <PropertyRef Name="int_id_perfil" />
+            </Principal>
+            <Dependent Role="tb_UsuarioPerfil">
+              <PropertyRef Name="int_id_perfil" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tb_UsuarioPerfil_Usuario">
+          <End Role="tb_Usuarios" Type="Self.tb_Usuarios" Multiplicity="1" />
+          <End Role="tb_UsuarioPerfil" Type="Self.tb_UsuarioPerfil" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tb_Usuarios">
+              <PropertyRef Name="int_id_usuario" />
+            </Principal>
+            <Dependent Role="tb_UsuarioPerfil">
+              <PropertyRef Name="int_id_usuario" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="Objetivos_Prioritarios_Perfil_ModelStoreContainer">
+          <EntitySet Name="cat_FuenteBusqueda" EntityType="Self.cat_FuenteBusqueda" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="cat_ModuloSistema" EntityType="Self.cat_ModuloSistema" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="cat_Perfil" EntityType="Self.cat_Perfil" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="cat_PermisoSistema" EntityType="Self.cat_PermisoSistema" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tb_PerfilFuenteBusqueda" EntityType="Self.tb_PerfilFuenteBusqueda" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tb_PerfilModulo" EntityType="Self.tb_PerfilModulo" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tb_PerfilPermiso" EntityType="Self.tb_PerfilPermiso" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tb_UsuarioPerfil" EntityType="Self.tb_UsuarioPerfil" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tb_Usuarios" EntityType="Self.tb_Usuarios" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_tb_PerfilFuenteBusqueda_Fuente" Association="Self.FK_tb_PerfilFuenteBusqueda_Fuente">
+            <End Role="cat_FuenteBusqueda" EntitySet="cat_FuenteBusqueda" />
+            <End Role="tb_PerfilFuenteBusqueda" EntitySet="tb_PerfilFuenteBusqueda" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tb_PerfilFuenteBusqueda_Perfil" Association="Self.FK_tb_PerfilFuenteBusqueda_Perfil">
+            <End Role="cat_Perfil" EntitySet="cat_Perfil" />
+            <End Role="tb_PerfilFuenteBusqueda" EntitySet="tb_PerfilFuenteBusqueda" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tb_PerfilModulo_Modulo" Association="Self.FK_tb_PerfilModulo_Modulo">
+            <End Role="cat_ModuloSistema" EntitySet="cat_ModuloSistema" />
+            <End Role="tb_PerfilModulo" EntitySet="tb_PerfilModulo" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tb_PerfilModulo_Perfil" Association="Self.FK_tb_PerfilModulo_Perfil">
+            <End Role="cat_Perfil" EntitySet="cat_Perfil" />
+            <End Role="tb_PerfilModulo" EntitySet="tb_PerfilModulo" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tb_PerfilPermiso_Perfil" Association="Self.FK_tb_PerfilPermiso_Perfil">
+            <End Role="cat_Perfil" EntitySet="cat_Perfil" />
+            <End Role="tb_PerfilPermiso" EntitySet="tb_PerfilPermiso" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tb_PerfilPermiso_Permiso" Association="Self.FK_tb_PerfilPermiso_Permiso">
+            <End Role="cat_PermisoSistema" EntitySet="cat_PermisoSistema" />
+            <End Role="tb_PerfilPermiso" EntitySet="tb_PerfilPermiso" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tb_UsuarioPerfil_Perfil" Association="Self.FK_tb_UsuarioPerfil_Perfil">
+            <End Role="cat_Perfil" EntitySet="cat_Perfil" />
+            <End Role="tb_UsuarioPerfil" EntitySet="tb_UsuarioPerfil" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tb_UsuarioPerfil_Usuario" Association="Self.FK_tb_UsuarioPerfil_Usuario">
+            <End Role="tb_Usuarios" EntitySet="tb_Usuarios" />
+            <End Role="tb_UsuarioPerfil" EntitySet="tb_UsuarioPerfil" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="Objetivos_Prioritarios_Perfil_Model" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="cat_FuenteBusqueda">
+          <Key>
+            <PropertyRef Name="int_id_fuente" />
+          </Key>
+          <Property Name="int_id_fuente" Type="Int32" Nullable="false" />
+          <Property Name="nvarchar_clave" Type="String" MaxLength="100" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="nvarchar_nombre" Type="String" MaxLength="200" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="nvarchar_descripcion" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="int_orden" Type="Int32" Nullable="false" />
+          <Property Name="bit_status" Type="Boolean" Nullable="false" />
+          <Property Name="date_fecha_alta" Type="DateTime" Nullable="false" Precision="3" />
+          <NavigationProperty Name="tb_PerfilFuenteBusqueda" Relationship="Self.FK_tb_PerfilFuenteBusqueda_Fuente" FromRole="cat_FuenteBusqueda" ToRole="tb_PerfilFuenteBusqueda" />
+        </EntityType>
+        <EntityType Name="cat_ModuloSistema">
+          <Key>
+            <PropertyRef Name="int_id_modulo" />
+          </Key>
+          <Property Name="int_id_modulo" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="nvarchar_clave" Type="String" MaxLength="100" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="nvarchar_nombre" Type="String" MaxLength="200" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="nvarchar_descripcion" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="int_orden" Type="Int32" Nullable="false" />
+          <Property Name="bit_status" Type="Boolean" Nullable="false" />
+          <Property Name="date_fecha_alta" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="date_fecha_modificacion" Type="DateTime" Precision="3" />
+          <Property Name="nvarchar_usuario_modificacion" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="tb_PerfilModulo" Relationship="Self.FK_tb_PerfilModulo_Modulo" FromRole="cat_ModuloSistema" ToRole="tb_PerfilModulo" />
+        </EntityType>
+        <EntityType Name="cat_Perfil">
+          <Key>
+            <PropertyRef Name="int_id_perfil" />
+          </Key>
+          <Property Name="int_id_perfil" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="nvarchar_clave" Type="String" MaxLength="100" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="nvarchar_nombre" Type="String" MaxLength="200" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="nvarchar_descripcion" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="bit_status" Type="Boolean" Nullable="false" />
+          <Property Name="date_fecha_alta" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="date_fecha_modificacion" Type="DateTime" Precision="3" />
+          <Property Name="nvarchar_usuario_modificacion" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="tb_PerfilFuenteBusqueda" Relationship="Self.FK_tb_PerfilFuenteBusqueda_Perfil" FromRole="cat_Perfil" ToRole="tb_PerfilFuenteBusqueda" />
+          <NavigationProperty Name="tb_PerfilModulo" Relationship="Self.FK_tb_PerfilModulo_Perfil" FromRole="cat_Perfil" ToRole="tb_PerfilModulo" />
+          <NavigationProperty Name="tb_PerfilPermiso" Relationship="Self.FK_tb_PerfilPermiso_Perfil" FromRole="cat_Perfil" ToRole="tb_PerfilPermiso" />
+          <NavigationProperty Name="tb_UsuarioPerfil" Relationship="Self.FK_tb_UsuarioPerfil_Perfil" FromRole="cat_Perfil" ToRole="tb_UsuarioPerfil" />
+        </EntityType>
+        <EntityType Name="cat_PermisoSistema">
+          <Key>
+            <PropertyRef Name="int_id_permiso" />
+          </Key>
+          <Property Name="int_id_permiso" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="nvarchar_clave" Type="String" MaxLength="100" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="nvarchar_nombre" Type="String" MaxLength="200" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="nvarchar_descripcion" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="bit_status" Type="Boolean" Nullable="false" />
+          <Property Name="date_fecha_alta" Type="DateTime" Nullable="false" Precision="3" />
+          <NavigationProperty Name="tb_PerfilPermiso" Relationship="Self.FK_tb_PerfilPermiso_Permiso" FromRole="cat_PermisoSistema" ToRole="tb_PerfilPermiso" />
+        </EntityType>
+        <EntityType Name="tb_PerfilFuenteBusqueda">
+          <Key>
+            <PropertyRef Name="int_id_perfil_fuente" />
+          </Key>
+          <Property Name="int_id_perfil_fuente" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="int_id_perfil" Type="Int32" Nullable="false" />
+          <Property Name="int_id_fuente" Type="Int32" Nullable="false" />
+          <Property Name="bit_status" Type="Boolean" Nullable="false" />
+          <Property Name="date_fecha_alta" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="date_fecha_modificacion" Type="DateTime" Precision="3" />
+          <Property Name="nvarchar_usuario_modificacion" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="cat_FuenteBusqueda" Relationship="Self.FK_tb_PerfilFuenteBusqueda_Fuente" FromRole="tb_PerfilFuenteBusqueda" ToRole="cat_FuenteBusqueda" />
+          <NavigationProperty Name="cat_Perfil" Relationship="Self.FK_tb_PerfilFuenteBusqueda_Perfil" FromRole="tb_PerfilFuenteBusqueda" ToRole="cat_Perfil" />
+        </EntityType>
+        <EntityType Name="tb_PerfilModulo">
+          <Key>
+            <PropertyRef Name="int_id_perfil_modulo" />
+          </Key>
+          <Property Name="int_id_perfil_modulo" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="int_id_perfil" Type="Int32" Nullable="false" />
+          <Property Name="int_id_modulo" Type="Int32" Nullable="false" />
+          <Property Name="bit_status" Type="Boolean" Nullable="false" />
+          <Property Name="date_fecha_alta" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="date_fecha_modificacion" Type="DateTime" Precision="3" />
+          <Property Name="nvarchar_usuario_modificacion" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="cat_ModuloSistema" Relationship="Self.FK_tb_PerfilModulo_Modulo" FromRole="tb_PerfilModulo" ToRole="cat_ModuloSistema" />
+          <NavigationProperty Name="cat_Perfil" Relationship="Self.FK_tb_PerfilModulo_Perfil" FromRole="tb_PerfilModulo" ToRole="cat_Perfil" />
+        </EntityType>
+        <EntityType Name="tb_PerfilPermiso">
+          <Key>
+            <PropertyRef Name="int_id_perfil_permiso" />
+          </Key>
+          <Property Name="int_id_perfil_permiso" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="int_id_perfil" Type="Int32" Nullable="false" />
+          <Property Name="int_id_permiso" Type="Int32" Nullable="false" />
+          <Property Name="bit_status" Type="Boolean" Nullable="false" />
+          <Property Name="date_fecha_alta" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="date_fecha_modificacion" Type="DateTime" Precision="3" />
+          <Property Name="nvarchar_usuario_modificacion" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="cat_Perfil" Relationship="Self.FK_tb_PerfilPermiso_Perfil" FromRole="tb_PerfilPermiso" ToRole="cat_Perfil" />
+          <NavigationProperty Name="cat_PermisoSistema" Relationship="Self.FK_tb_PerfilPermiso_Permiso" FromRole="tb_PerfilPermiso" ToRole="cat_PermisoSistema" />
+        </EntityType>
+        <EntityType Name="tb_UsuarioPerfil">
+          <Key>
+            <PropertyRef Name="int_id_usuario_perfil" />
+          </Key>
+          <Property Name="int_id_usuario_perfil" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="int_id_usuario" Type="Int32" Nullable="false" />
+          <Property Name="int_id_perfil" Type="Int32" Nullable="false" />
+          <Property Name="bit_status" Type="Boolean" Nullable="false" />
+          <Property Name="date_fecha_alta" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="date_fecha_modificacion" Type="DateTime" Precision="3" />
+          <Property Name="nvarchar_usuario_modificacion" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="cat_Perfil" Relationship="Self.FK_tb_UsuarioPerfil_Perfil" FromRole="tb_UsuarioPerfil" ToRole="cat_Perfil" />
+          <NavigationProperty Name="tb_Usuarios" Relationship="Self.FK_tb_UsuarioPerfil_Usuario" FromRole="tb_UsuarioPerfil" ToRole="tb_Usuarios" />
+        </EntityType>
+        <EntityType Name="tb_Usuarios">
+          <Key>
+            <PropertyRef Name="int_id_usuario" />
+          </Key>
+          <Property Name="int_id_usuario" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="nvarchar_nombre_usuario" Type="String" MaxLength="300" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="nvarchar_no_interno" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="nvarchar_puesto" Type="String" MaxLength="300" FixedLength="false" Unicode="true" />
+          <Property Name="date_fecha_alta" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="bit_status" Type="Boolean" />
+          <Property Name="date_fecha_modificacion" Type="DateTime" Precision="3" />
+          <Property Name="nvarchar_usuario_modificacion" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="Valor" Type="Int32" />
+          <NavigationProperty Name="tb_UsuarioPerfil" Relationship="Self.FK_tb_UsuarioPerfil_Usuario" FromRole="tb_Usuarios" ToRole="tb_UsuarioPerfil" />
+        </EntityType>
+        <Association Name="FK_tb_PerfilFuenteBusqueda_Fuente">
+          <End Role="cat_FuenteBusqueda" Type="Self.cat_FuenteBusqueda" Multiplicity="1" />
+          <End Role="tb_PerfilFuenteBusqueda" Type="Self.tb_PerfilFuenteBusqueda" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="cat_FuenteBusqueda">
+              <PropertyRef Name="int_id_fuente" />
+            </Principal>
+            <Dependent Role="tb_PerfilFuenteBusqueda">
+              <PropertyRef Name="int_id_fuente" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tb_PerfilModulo_Modulo">
+          <End Role="cat_ModuloSistema" Type="Self.cat_ModuloSistema" Multiplicity="1" />
+          <End Role="tb_PerfilModulo" Type="Self.tb_PerfilModulo" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="cat_ModuloSistema">
+              <PropertyRef Name="int_id_modulo" />
+            </Principal>
+            <Dependent Role="tb_PerfilModulo">
+              <PropertyRef Name="int_id_modulo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tb_PerfilFuenteBusqueda_Perfil">
+          <End Role="cat_Perfil" Type="Self.cat_Perfil" Multiplicity="1" />
+          <End Role="tb_PerfilFuenteBusqueda" Type="Self.tb_PerfilFuenteBusqueda" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="cat_Perfil">
+              <PropertyRef Name="int_id_perfil" />
+            </Principal>
+            <Dependent Role="tb_PerfilFuenteBusqueda">
+              <PropertyRef Name="int_id_perfil" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tb_PerfilModulo_Perfil">
+          <End Role="cat_Perfil" Type="Self.cat_Perfil" Multiplicity="1" />
+          <End Role="tb_PerfilModulo" Type="Self.tb_PerfilModulo" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="cat_Perfil">
+              <PropertyRef Name="int_id_perfil" />
+            </Principal>
+            <Dependent Role="tb_PerfilModulo">
+              <PropertyRef Name="int_id_perfil" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tb_PerfilPermiso_Perfil">
+          <End Role="cat_Perfil" Type="Self.cat_Perfil" Multiplicity="1" />
+          <End Role="tb_PerfilPermiso" Type="Self.tb_PerfilPermiso" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="cat_Perfil">
+              <PropertyRef Name="int_id_perfil" />
+            </Principal>
+            <Dependent Role="tb_PerfilPermiso">
+              <PropertyRef Name="int_id_perfil" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tb_UsuarioPerfil_Perfil">
+          <End Role="cat_Perfil" Type="Self.cat_Perfil" Multiplicity="1" />
+          <End Role="tb_UsuarioPerfil" Type="Self.tb_UsuarioPerfil" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="cat_Perfil">
+              <PropertyRef Name="int_id_perfil" />
+            </Principal>
+            <Dependent Role="tb_UsuarioPerfil">
+              <PropertyRef Name="int_id_perfil" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tb_PerfilPermiso_Permiso">
+          <End Role="cat_PermisoSistema" Type="Self.cat_PermisoSistema" Multiplicity="1" />
+          <End Role="tb_PerfilPermiso" Type="Self.tb_PerfilPermiso" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="cat_PermisoSistema">
+              <PropertyRef Name="int_id_permiso" />
+            </Principal>
+            <Dependent Role="tb_PerfilPermiso">
+              <PropertyRef Name="int_id_permiso" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tb_UsuarioPerfil_Usuario">
+          <End Role="tb_Usuarios" Type="Self.tb_Usuarios" Multiplicity="1" />
+          <End Role="tb_UsuarioPerfil" Type="Self.tb_UsuarioPerfil" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tb_Usuarios">
+              <PropertyRef Name="int_id_usuario" />
+            </Principal>
+            <Dependent Role="tb_UsuarioPerfil">
+              <PropertyRef Name="int_id_usuario" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="Objetivos_Prioritarios_Perfiles_Entities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="cat_FuenteBusqueda" EntityType="Self.cat_FuenteBusqueda" />
+          <EntitySet Name="cat_ModuloSistema" EntityType="Self.cat_ModuloSistema" />
+          <EntitySet Name="cat_Perfil" EntityType="Self.cat_Perfil" />
+          <EntitySet Name="cat_PermisoSistema" EntityType="Self.cat_PermisoSistema" />
+          <EntitySet Name="tb_PerfilFuenteBusqueda" EntityType="Self.tb_PerfilFuenteBusqueda" />
+          <EntitySet Name="tb_PerfilModulo" EntityType="Self.tb_PerfilModulo" />
+          <EntitySet Name="tb_PerfilPermiso" EntityType="Self.tb_PerfilPermiso" />
+          <EntitySet Name="tb_UsuarioPerfil" EntityType="Self.tb_UsuarioPerfil" />
+          <EntitySet Name="tb_Usuarios" EntityType="Self.tb_Usuarios" />
+          <AssociationSet Name="FK_tb_PerfilFuenteBusqueda_Fuente" Association="Self.FK_tb_PerfilFuenteBusqueda_Fuente">
+            <End Role="cat_FuenteBusqueda" EntitySet="cat_FuenteBusqueda" />
+            <End Role="tb_PerfilFuenteBusqueda" EntitySet="tb_PerfilFuenteBusqueda" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tb_PerfilModulo_Modulo" Association="Self.FK_tb_PerfilModulo_Modulo">
+            <End Role="cat_ModuloSistema" EntitySet="cat_ModuloSistema" />
+            <End Role="tb_PerfilModulo" EntitySet="tb_PerfilModulo" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tb_PerfilFuenteBusqueda_Perfil" Association="Self.FK_tb_PerfilFuenteBusqueda_Perfil">
+            <End Role="cat_Perfil" EntitySet="cat_Perfil" />
+            <End Role="tb_PerfilFuenteBusqueda" EntitySet="tb_PerfilFuenteBusqueda" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tb_PerfilModulo_Perfil" Association="Self.FK_tb_PerfilModulo_Perfil">
+            <End Role="cat_Perfil" EntitySet="cat_Perfil" />
+            <End Role="tb_PerfilModulo" EntitySet="tb_PerfilModulo" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tb_PerfilPermiso_Perfil" Association="Self.FK_tb_PerfilPermiso_Perfil">
+            <End Role="cat_Perfil" EntitySet="cat_Perfil" />
+            <End Role="tb_PerfilPermiso" EntitySet="tb_PerfilPermiso" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tb_UsuarioPerfil_Perfil" Association="Self.FK_tb_UsuarioPerfil_Perfil">
+            <End Role="cat_Perfil" EntitySet="cat_Perfil" />
+            <End Role="tb_UsuarioPerfil" EntitySet="tb_UsuarioPerfil" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tb_PerfilPermiso_Permiso" Association="Self.FK_tb_PerfilPermiso_Permiso">
+            <End Role="cat_PermisoSistema" EntitySet="cat_PermisoSistema" />
+            <End Role="tb_PerfilPermiso" EntitySet="tb_PerfilPermiso" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tb_UsuarioPerfil_Usuario" Association="Self.FK_tb_UsuarioPerfil_Usuario">
+            <End Role="tb_Usuarios" EntitySet="tb_Usuarios" />
+            <End Role="tb_UsuarioPerfil" EntitySet="tb_UsuarioPerfil" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="Objetivos_Prioritarios_Perfil_ModelStoreContainer" CdmEntityContainer="Objetivos_Prioritarios_Perfiles_Entities">
+          <EntitySetMapping Name="cat_FuenteBusqueda">
+            <EntityTypeMapping TypeName="Objetivos_Prioritarios_Perfil_Model.cat_FuenteBusqueda">
+              <MappingFragment StoreEntitySet="cat_FuenteBusqueda">
+                <ScalarProperty Name="int_id_fuente" ColumnName="int_id_fuente" />
+                <ScalarProperty Name="nvarchar_clave" ColumnName="nvarchar_clave" />
+                <ScalarProperty Name="nvarchar_nombre" ColumnName="nvarchar_nombre" />
+                <ScalarProperty Name="nvarchar_descripcion" ColumnName="nvarchar_descripcion" />
+                <ScalarProperty Name="int_orden" ColumnName="int_orden" />
+                <ScalarProperty Name="bit_status" ColumnName="bit_status" />
+                <ScalarProperty Name="date_fecha_alta" ColumnName="date_fecha_alta" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="cat_ModuloSistema">
+            <EntityTypeMapping TypeName="Objetivos_Prioritarios_Perfil_Model.cat_ModuloSistema">
+              <MappingFragment StoreEntitySet="cat_ModuloSistema">
+                <ScalarProperty Name="int_id_modulo" ColumnName="int_id_modulo" />
+                <ScalarProperty Name="nvarchar_clave" ColumnName="nvarchar_clave" />
+                <ScalarProperty Name="nvarchar_nombre" ColumnName="nvarchar_nombre" />
+                <ScalarProperty Name="nvarchar_descripcion" ColumnName="nvarchar_descripcion" />
+                <ScalarProperty Name="int_orden" ColumnName="int_orden" />
+                <ScalarProperty Name="bit_status" ColumnName="bit_status" />
+                <ScalarProperty Name="date_fecha_alta" ColumnName="date_fecha_alta" />
+                <ScalarProperty Name="date_fecha_modificacion" ColumnName="date_fecha_modificacion" />
+                <ScalarProperty Name="nvarchar_usuario_modificacion" ColumnName="nvarchar_usuario_modificacion" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="cat_Perfil">
+            <EntityTypeMapping TypeName="Objetivos_Prioritarios_Perfil_Model.cat_Perfil">
+              <MappingFragment StoreEntitySet="cat_Perfil">
+                <ScalarProperty Name="int_id_perfil" ColumnName="int_id_perfil" />
+                <ScalarProperty Name="nvarchar_clave" ColumnName="nvarchar_clave" />
+                <ScalarProperty Name="nvarchar_nombre" ColumnName="nvarchar_nombre" />
+                <ScalarProperty Name="nvarchar_descripcion" ColumnName="nvarchar_descripcion" />
+                <ScalarProperty Name="bit_status" ColumnName="bit_status" />
+                <ScalarProperty Name="date_fecha_alta" ColumnName="date_fecha_alta" />
+                <ScalarProperty Name="date_fecha_modificacion" ColumnName="date_fecha_modificacion" />
+                <ScalarProperty Name="nvarchar_usuario_modificacion" ColumnName="nvarchar_usuario_modificacion" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="cat_PermisoSistema">
+            <EntityTypeMapping TypeName="Objetivos_Prioritarios_Perfil_Model.cat_PermisoSistema">
+              <MappingFragment StoreEntitySet="cat_PermisoSistema">
+                <ScalarProperty Name="int_id_permiso" ColumnName="int_id_permiso" />
+                <ScalarProperty Name="nvarchar_clave" ColumnName="nvarchar_clave" />
+                <ScalarProperty Name="nvarchar_nombre" ColumnName="nvarchar_nombre" />
+                <ScalarProperty Name="nvarchar_descripcion" ColumnName="nvarchar_descripcion" />
+                <ScalarProperty Name="bit_status" ColumnName="bit_status" />
+                <ScalarProperty Name="date_fecha_alta" ColumnName="date_fecha_alta" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tb_PerfilFuenteBusqueda">
+            <EntityTypeMapping TypeName="Objetivos_Prioritarios_Perfil_Model.tb_PerfilFuenteBusqueda">
+              <MappingFragment StoreEntitySet="tb_PerfilFuenteBusqueda">
+                <ScalarProperty Name="int_id_perfil_fuente" ColumnName="int_id_perfil_fuente" />
+                <ScalarProperty Name="int_id_perfil" ColumnName="int_id_perfil" />
+                <ScalarProperty Name="int_id_fuente" ColumnName="int_id_fuente" />
+                <ScalarProperty Name="bit_status" ColumnName="bit_status" />
+                <ScalarProperty Name="date_fecha_alta" ColumnName="date_fecha_alta" />
+                <ScalarProperty Name="date_fecha_modificacion" ColumnName="date_fecha_modificacion" />
+                <ScalarProperty Name="nvarchar_usuario_modificacion" ColumnName="nvarchar_usuario_modificacion" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tb_PerfilModulo">
+            <EntityTypeMapping TypeName="Objetivos_Prioritarios_Perfil_Model.tb_PerfilModulo">
+              <MappingFragment StoreEntitySet="tb_PerfilModulo">
+                <ScalarProperty Name="int_id_perfil_modulo" ColumnName="int_id_perfil_modulo" />
+                <ScalarProperty Name="int_id_perfil" ColumnName="int_id_perfil" />
+                <ScalarProperty Name="int_id_modulo" ColumnName="int_id_modulo" />
+                <ScalarProperty Name="bit_status" ColumnName="bit_status" />
+                <ScalarProperty Name="date_fecha_alta" ColumnName="date_fecha_alta" />
+                <ScalarProperty Name="date_fecha_modificacion" ColumnName="date_fecha_modificacion" />
+                <ScalarProperty Name="nvarchar_usuario_modificacion" ColumnName="nvarchar_usuario_modificacion" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tb_PerfilPermiso">
+            <EntityTypeMapping TypeName="Objetivos_Prioritarios_Perfil_Model.tb_PerfilPermiso">
+              <MappingFragment StoreEntitySet="tb_PerfilPermiso">
+                <ScalarProperty Name="int_id_perfil_permiso" ColumnName="int_id_perfil_permiso" />
+                <ScalarProperty Name="int_id_perfil" ColumnName="int_id_perfil" />
+                <ScalarProperty Name="int_id_permiso" ColumnName="int_id_permiso" />
+                <ScalarProperty Name="bit_status" ColumnName="bit_status" />
+                <ScalarProperty Name="date_fecha_alta" ColumnName="date_fecha_alta" />
+                <ScalarProperty Name="date_fecha_modificacion" ColumnName="date_fecha_modificacion" />
+                <ScalarProperty Name="nvarchar_usuario_modificacion" ColumnName="nvarchar_usuario_modificacion" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tb_UsuarioPerfil">
+            <EntityTypeMapping TypeName="Objetivos_Prioritarios_Perfil_Model.tb_UsuarioPerfil">
+              <MappingFragment StoreEntitySet="tb_UsuarioPerfil">
+                <ScalarProperty Name="int_id_usuario_perfil" ColumnName="int_id_usuario_perfil" />
+                <ScalarProperty Name="int_id_usuario" ColumnName="int_id_usuario" />
+                <ScalarProperty Name="int_id_perfil" ColumnName="int_id_perfil" />
+                <ScalarProperty Name="bit_status" ColumnName="bit_status" />
+                <ScalarProperty Name="date_fecha_alta" ColumnName="date_fecha_alta" />
+                <ScalarProperty Name="date_fecha_modificacion" ColumnName="date_fecha_modificacion" />
+                <ScalarProperty Name="nvarchar_usuario_modificacion" ColumnName="nvarchar_usuario_modificacion" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tb_Usuarios">
+            <EntityTypeMapping TypeName="Objetivos_Prioritarios_Perfil_Model.tb_Usuarios">
+              <MappingFragment StoreEntitySet="tb_Usuarios">
+                <ScalarProperty Name="int_id_usuario" ColumnName="int_id_usuario" />
+                <ScalarProperty Name="nvarchar_nombre_usuario" ColumnName="nvarchar_nombre_usuario" />
+                <ScalarProperty Name="nvarchar_no_interno" ColumnName="nvarchar_no_interno" />
+                <ScalarProperty Name="nvarchar_puesto" ColumnName="nvarchar_puesto" />
+                <ScalarProperty Name="date_fecha_alta" ColumnName="date_fecha_alta" />
+                <ScalarProperty Name="bit_status" ColumnName="bit_status" />
+                <ScalarProperty Name="date_fecha_modificacion" ColumnName="date_fecha_modificacion" />
+                <ScalarProperty Name="nvarchar_usuario_modificacion" ColumnName="nvarchar_usuario_modificacion" />
+                <ScalarProperty Name="Valor" ColumnName="Valor" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="false" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="Ninguno" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

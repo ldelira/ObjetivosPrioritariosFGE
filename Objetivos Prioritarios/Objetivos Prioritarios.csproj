@@ -268,6 +268,8 @@
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="ControllersServices\AccesoService.cs" />
+    <Compile Include="ControllersServices\ConfiguracionBusquedaService.cs" />
     <Compile Include="ControllersServices\PersonaInteresService.cs" />
     <Compile Include="ControllersServices\FiliacionMunicipalService.cs" />
     <Compile Include="ControllersServices\MapaRelacionesService.cs" />
@@ -343,8 +345,20 @@
     <Compile Include="Models\cat_EstatusProceso.cs">
       <DependentUpon>ObjetivosPrioritarios.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\cat_FuenteBusqueda.cs">
+      <DependentUpon>Objetivos_Perfiles.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\cat_ModuloSistema.cs">
+      <DependentUpon>Objetivos_Perfiles.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\cat_Nivel_Organizacion.cs">
       <DependentUpon>ObjetivosPrioritarios.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\cat_Perfil.cs">
+      <DependentUpon>Objetivos_Perfiles.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\cat_PermisoSistema.cs">
+      <DependentUpon>Objetivos_Perfiles.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\cat_RolParticipacionAsunto.cs">
       <DependentUpon>ObjetivosPrioritarios.tt</DependentUpon>
@@ -407,7 +421,9 @@
     <Compile Include="Models\Extends\DetalleFGEADetenidoApiDto.cs" />
     <Compile Include="Models\Extends\DetalleFiscaliaWebApiDto.cs" />
     <Compile Include="Models\Extends\DetalleObjetivoApiDto.cs" />
+    <Compile Include="Models\Extends\DetallePersonaInteresApiDto.cs" />
     <Compile Include="Models\Extends\MandamientoJudicialViewModel.cs" />
+    <Compile Include="Models\Extends\PermisosUsuarioDto.cs" />
     <Compile Include="Models\Extends\ResultadosCoincidenciasViewModel.cs" />
     <Compile Include="Models\Extends\tb_NombreObjetivo.cs" />
     <Compile Include="Models\Extends\tb_Victimas.cs" />
@@ -508,6 +524,21 @@
     <Compile Include="Models\mandamiento_judicial.cs">
       <DependentUpon>Mandamientos.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\ModelObjetivoQA.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ModelObjetivoQA.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ModelObjetivoQA.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ModelObjetivoQA.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ModelObjetivoQA.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ModelObjetivoQA.edmx</DependentUpon>
+    </Compile>
     <Compile Include="Models\Modulos.cs">
       <DependentUpon>SIC.tt</DependentUpon>
     </Compile>
@@ -534,6 +565,21 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>ObjetivosPrioritarios.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Objetivos_Perfiles.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Objetivos_Perfiles.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Objetivos_Perfiles.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Objetivos_Perfiles.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Objetivos_Perfiles.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Objetivos_Perfiles.edmx</DependentUpon>
     </Compile>
     <Compile Include="Models\Persona.cs">
       <DependentUpon>Filiacion.tt</DependentUpon>
@@ -676,6 +722,15 @@
     <Compile Include="Models\tb_OrdenAprehension.cs">
       <DependentUpon>ObjetivosPrioritarios.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\tb_PerfilFuenteBusqueda.cs">
+      <DependentUpon>Objetivos_Perfiles.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\tb_PerfilModulo.cs">
+      <DependentUpon>Objetivos_Perfiles.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\tb_PerfilPermiso.cs">
+      <DependentUpon>Objetivos_Perfiles.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\tb_Persona.cs">
       <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
     </Compile>
@@ -697,8 +752,11 @@
     <Compile Include="Models\tb_SenasParticulares.cs">
       <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\tb_UsuarioPerfil.cs">
+      <DependentUpon>Objetivos_Perfiles.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\tb_Usuarios.cs">
-      <DependentUpon>ObjetivosPrioritarios.tt</DependentUpon>
+      <DependentUpon>Objetivos_Perfiles.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\tb_Victimas.cs">
       <DependentUpon>ObjetivosPrioritarios.tt</DependentUpon>
@@ -2920,7 +2978,31 @@
     <Content Include="Content\Selectize\js\standalone\selectize.js" />
     <Content Include="Content\Selectize\js\standalone\selectize.min.js" />
     <Content Include="Content\SIC\busqueda-coincidencias.css" />
+    <Content Include="Content\SIC\busqueda-coincidenciasBACKUP.css" />
+    <Content Include="Content\SIC\busqueda-coincidencias2.css" />
+    <Content Include="Models\ModelObjetivoQA.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>ModelObjetivoQA.edmx</DependentUpon>
+      <LastGenOutput>ModelObjetivoQA.Context.cs</LastGenOutput>
+    </Content>
+    <Content Include="Models\ModelObjetivoQA.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>ModelObjetivoQA.edmx</DependentUpon>
+      <LastGenOutput>ModelObjetivoQA.cs</LastGenOutput>
+    </Content>
+    <Content Include="Models\Objetivos_Perfiles.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>Objetivos_Perfiles.edmx</DependentUpon>
+      <LastGenOutput>Objetivos_Perfiles.Context.cs</LastGenOutput>
+    </Content>
+    <Content Include="Models\Objetivos_Perfiles.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>Objetivos_Perfiles.edmx</DependentUpon>
+      <LastGenOutput>Objetivos_Perfiles.cs</LastGenOutput>
+    </Content>
     <Content Include="Scripts\SIC\busqueda-coincidencias.js" />
+    <Content Include="Scripts\SIC\busqueda-coincidenciasBACKUP.js" />
+    <Content Include="Scripts\SIC\busqueda-coincidencias2.js" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
@@ -3390,6 +3472,20 @@
     <Content Include="Models\SIC.edmx.diagram">
       <DependentUpon>SIC.edmx</DependentUpon>
     </Content>
+    <EntityDeploy Include="Models\ModelObjetivoQA.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>ModelObjetivoQA.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <Content Include="Models\ModelObjetivoQA.edmx.diagram">
+      <DependentUpon>ModelObjetivoQA.edmx</DependentUpon>
+    </Content>
+    <EntityDeploy Include="Models\Objetivos_Perfiles.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>Objetivos_Perfiles.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <Content Include="Models\Objetivos_Perfiles.edmx.diagram">
+      <DependentUpon>Objetivos_Perfiles.edmx</DependentUpon>
+    </Content>
     <None Include="Scripts\jquery-3.4.1.intellisense.js" />
     <Content Include="Scripts\DataTables\autoFill.bootstrap.js" />
     <Content Include="Scripts\DataTables\autoFill.bootstrap.min.js" />
@@ -3665,6 +3761,9 @@
     <Content Include="Views\SIC\Coincidencias\DetalleFiscaliaWebCoincidenciaPartial.cshtml" />
     <Content Include="Views\SIC\Coincidencias\DetalleC5CoincidenciaPartial.cshtml" />
     <Content Include="Views\SIC\Coincidencias\DetalleFGEADetenidoCoincidenciaPartial.cshtml" />
+    <Content Include="Views\SIC\Coincidencias\DetallePersonaInteresPartial.cshtml" />
+    <Content Include="Views\Shared\_Layout - BACKUP2.cshtml" />
+    <Content Include="Views\SIC\BusquedaCoincidenciasBACKUP.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

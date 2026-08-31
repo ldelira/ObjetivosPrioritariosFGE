@@ -14,8 +14,66 @@ namespace Objetivos_Prioritarios.Controllers
  
         public ActionResult Index()
         {
+            ViewBag.TiempoEsperaBusqueda =ConfiguracionBusquedaService.ObtenerTiempoEspera();
             ViewBag.Title = "Personas de Interés";
             return View();
+        }
+
+        [HttpPost]
+        public JsonResult ActualizarTiempoEsperaBusqueda(int valor)
+        {
+            try
+            {
+                if (
+                    valor < 0 ||
+                    valor > 300
+                )
+                {
+                    return Json(
+                        new
+                        {
+                            success = false,
+                            message = "El valor debe estar entre 0 y 300 segundos."
+                        }
+                    );
+                }
+
+                bool actualizado =
+                    ConfiguracionBusquedaService
+                        .ActualizarTiempoEspera(
+                            valor
+                        );
+
+                if (!actualizado)
+                {
+                    return Json(
+                        new
+                        {
+                            success = false,
+                            message = "No fue posible actualizar el valor de JCerdan."
+                        }
+                    );
+                }
+
+                return Json(
+                    new
+                    {
+                        success = true,
+                        valor = valor,
+                        message = "Tiempo actualizado correctamente."
+                    }
+                );
+            }
+            catch (Exception ex)
+            {
+                return Json(
+                    new
+                    {
+                        success = false,
+                        message = ex.Message
+                    }
+                );
+            }
         }
 
         public ActionResult AddEditPersonaInteres(int? idPersona)
@@ -110,28 +168,86 @@ namespace Objetivos_Prioritarios.Controllers
         }
 
 
+        // [HttpPost]
+        //public JsonResult FillFotografiasPersonaInteres(int idPersona)
+        //{
+        //    var lista = PersonaInteresService.GetFotografiasPersonaInteres(idPersona);
+
+        //    var result = lista.Select(x => new
+        //    {
+        //        idFoto = x.idFoto,
+        //        idPersona = x.idPersona,
+        //        idTipoFoto = x.idTipoFoto,
+        //        tipoFoto = PersonaInteresService.GetTipoFotoTexto(x.idTipoFoto),
+        //        rutaArchivo = x.RutaArchivo,
+        //        archivoB64 = string.IsNullOrWhiteSpace(x.ArchivoB64)
+        //            ? ""
+        //            : "data:image/jpeg;base64," + x.ArchivoB64,
+        //        fechaRegistro = x.FechaRegistro.HasValue
+        //            ? x.FechaRegistro.Value.ToString("dd-MM-yyyy HH:mm")
+        //            : ""
+        //    }).ToList();
+
+        //    return Json(result, JsonRequestBehavior.AllowGet);
+        //}
+
         [HttpPost]
         public JsonResult FillFotografiasPersonaInteres(int idPersona)
         {
-            var lista = PersonaInteresService.GetFotografiasPersonaInteres(idPersona);
+            var lista =
+                PersonaInteresService
+                    .GetFotografiasPersonaInteres(
+                        idPersona
+                    );
 
-            var result = lista.Select(x => new
-            {
-                idFoto = x.idFoto,
-                idPersona = x.idPersona,
-                idTipoFoto = x.idTipoFoto,
-                tipoFoto = PersonaInteresService.GetTipoFotoTexto(x.idTipoFoto),
-                rutaArchivo = x.RutaArchivo,
-                archivoB64 = string.IsNullOrWhiteSpace(x.ArchivoB64)
-                    ? ""
-                    : "data:image/jpeg;base64," + x.ArchivoB64,
-                fechaRegistro = x.FechaRegistro.HasValue
-                    ? x.FechaRegistro.Value.ToString("dd-MM-yyyy HH:mm")
-                    : ""
-            }).ToList();
+            var result =
+                lista
+                    .Select(x => new
+                    {
+                        idFoto =
+                            x.idFoto,
 
-            return Json(result, JsonRequestBehavior.AllowGet);
+                        idPersona =
+                            x.idPersona,
+
+                        idTipoFoto =
+                            x.idTipoFoto,
+
+                        tipoFoto =
+                            PersonaInteresService
+                                .GetTipoFotoTexto(
+                                    x.idTipoFoto
+                                ),
+
+                        fotoUrl =
+                            Url.Action(
+                                "VerFotoPersonaInteres",
+                                "PersonasInteres",
+                                new
+                                {
+                                    idFoto = x.idFoto,
+                                    v = x.FechaRegistro.HasValue
+                                        ? x.FechaRegistro.Value.Ticks
+                                        : DateTime.Now.Ticks
+                                }
+                            ),
+
+                        fechaRegistro =
+                            x.FechaRegistro.HasValue
+                                ? x.FechaRegistro.Value
+                                    .ToString(
+                                        "dd-MM-yyyy HH:mm"
+                                    )
+                                : ""
+                    })
+                    .ToList();
+
+            return Json(
+                result,
+                JsonRequestBehavior.AllowGet
+            );
         }
+
 
         [HttpPost]
         public JsonResult SaveFotografiaPersonaInteres()
@@ -369,6 +485,44 @@ namespace Objetivos_Prioritarios.Controllers
 
             return Json(resp, JsonRequestBehavior.AllowGet);
         }
+
+        [HttpGet]
+        public ActionResult VerFotoPersonaInteres(int idFoto)
+        {
+            var resp =
+                PersonaInteresService
+                    .GetFotoArchivoPersonaInteres(
+                        idFoto
+                    );
+
+            if (
+                resp == null ||
+                !resp.IsSuccess ||
+                resp.Bytes == null ||
+                resp.Bytes.Length == 0
+            )
+            {
+                return HttpNotFound(
+                    resp == null
+                        ? "No se encontró la fotografía."
+                        : resp.Message
+                );
+            }
+
+            Response.Cache.SetCacheability(
+                HttpCacheability.NoCache
+            );
+
+            Response.Cache.SetNoStore();
+
+            return File(
+                resp.Bytes,
+                resp.MimeType
+            );
+        }
+
+
+
 
     }
 }

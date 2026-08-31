@@ -674,20 +674,26 @@ namespace Objetivos_Prioritarios.ControllersServices
         }
 
 
-        public DataTable GetInfoDetenidos(List<int> idsDetenidos)
+
+        public DataTable GetInfoDetenidos(List<int> idsNomPerso, List<int> clavesPerso)
         {
             DataTable tabla = new DataTable();
 
-            if (idsDetenidos == null || idsDetenidos.Count == 0)
+            idsNomPerso = idsNomPerso == null
+                ? new List<int>()
+                : idsNomPerso.Where(x => x > 0).Distinct().ToList();
+
+            clavesPerso = clavesPerso == null
+                ? new List<int>()
+                : clavesPerso.Where(x => x > 0).Distinct().ToList();
+
+            if (idsNomPerso.Count == 0 && clavesPerso.Count == 0)
             {
                 return tabla;
             }
 
-            idsDetenidos = idsDetenidos
-                .Distinct()
-                .ToList();
-
-            string clavesTexto = ConvertirIdsATexto(idsDetenidos);
+            string idsNomPersoTexto = ConvertirIdsATexto(idsNomPerso);
+            string clavesPersoTexto = ConvertirIdsATexto(clavesPerso);
 
             using (var db = new FiliacionEntities())
             {
@@ -706,10 +712,17 @@ namespace Objetivos_Prioritarios.ControllersServices
                     using (SqlCommand cmd = new SqlCommand("dbo.SP_SIC_getCoincidenciasDetenidos", cn))
                     {
                         cmd.CommandType = CommandType.StoredProcedure;
-
                         cmd.CommandTimeout = 300;
 
-                        cmd.Parameters.Add("@ids_nom_perso", SqlDbType.NVarChar).Value = clavesTexto;
+                        cmd.Parameters.Add("@ids_nom_perso", SqlDbType.NVarChar).Value =
+                            idsNomPerso.Count > 0
+                                ? (object)idsNomPersoTexto
+                                : DBNull.Value;
+
+                        cmd.Parameters.Add("@claves_perso", SqlDbType.NVarChar).Value =
+                            clavesPerso.Count > 0
+                                ? (object)clavesPersoTexto
+                                : DBNull.Value;
 
                         using (SqlDataAdapter da = new SqlDataAdapter(cmd))
                         {
@@ -722,6 +735,8 @@ namespace Objetivos_Prioritarios.ControllersServices
             return tabla;
         }
 
+
+     
 
         public List<SP_SIC_getCoincidenciasDetenidos_Result>
     getCoincidenciasDetenidos_Results(
@@ -755,7 +770,7 @@ namespace Objetivos_Prioritarios.ControllersServices
             {
                 return db
                     .SP_SIC_getCoincidenciasDetenidos(
-                        clavesTexto
+                        null,clavesTexto
                     )
                     .ToList();
             }
@@ -1881,6 +1896,67 @@ WHERE
             }
 
             return tabla;
+        }
+
+
+        public string GetDelitoMandamiento(int idMandamiento)
+        {
+            try
+            {
+                if (idMandamiento <= 0)
+                {
+                    return "";
+                }
+
+                var datos =
+                    dbMand.sp_ObjPri_getObjetivoInfo(
+                        3,
+                        "",
+                        "",
+                        "",
+                        "",
+                        idMandamiento
+                    )
+                    .ToList();
+
+                if (
+                    datos == null ||
+                    datos.Count == 0
+                )
+                {
+                    return "";
+                }
+
+                List<string> delitos =
+                    datos
+                        .Where(x =>
+                            x != null &&
+                            !string.IsNullOrWhiteSpace(
+                                x.delito
+                            )
+                        )
+                        .Select(x =>
+                            x.delito.Trim()
+                        )
+                        .Distinct(
+                            StringComparer.OrdinalIgnoreCase
+                        )
+                        .ToList();
+
+                if (delitos.Count == 0)
+                {
+                    return "";
+                }
+
+                return string.Join(
+                    ", ",
+                    delitos
+                );
+            }
+            catch
+            {
+                return "";
+            }
         }
 
     }

@@ -1,4 +1,6 @@
-﻿using Objetivos_Prioritarios.Models;
+﻿using Objetivos_Prioritarios.ControllersServices;
+using Objetivos_Prioritarios.Models;
+using Objetivos_Prioritarios.Models.Extends;
 using Objetivos_Prioritarios.Utils;
 using System;
 using System.Collections.Generic;
@@ -8,7 +10,7 @@ using System.Web.Mvc;
 
 namespace Objetivos_Prioritarios.Controllers
 {
-    public class LoginController : ABaseController
+    public class LoginController : Controller
     {
         public ActionResult Index()
         {
@@ -52,33 +54,108 @@ namespace Objetivos_Prioritarios.Controllers
         //  [HttpPost]
         public ActionResult LogOut()
         {
-            Session["User"] = null;
-            return RedirectToAction("index", "Login");
+            Session.Clear();
+            Session.Abandon();
+
+            return RedirectToAction(
+                "Index",
+                "Login"
+            );
         }
+
+        //[HttpPost]
+        //public JsonResult ValidateCredentials(LoginUser user)
+        //{
+        //    LoginService LoginService = new LoginService();
+        //    var data = LoginService.validateCredentialsToaccesss(user.UserName, user.Password);
+        //    if (data.IsSuccess == true)
+        //    {
+        //        data.user.UnidadId = data.Id;
+
+        //        Session["User"] = data.user;
+        //        data.user = null;
+        //        return Json(data, JsonRequestBehavior.AllowGet);
+        //    }
+        //    else
+        //    {
+        //        return Json(data, JsonRequestBehavior.AllowGet);
+
+        //    }
+
+
+        //}
+
+
+        private readonly AccesoService _accesoService = new AccesoService();
 
         [HttpPost]
         public JsonResult ValidateCredentials(LoginUser user)
         {
+            LoginService loginService = new LoginService();
 
-            var data = LoginService.validateCredentialsToaccesss(user.UserName, user.Password);
-            if (data.IsSuccess == true)
+            var data =
+                loginService.validateCredentialsToaccesss(
+                    user.UserName,
+                    user.Password
+                );
+
+            if (!data.IsSuccess)
             {
-                data.user.UnidadId = data.Id;
-
-                Session["User"] = data.user;
-                data.user = null;
-                return Json(data, JsonRequestBehavior.AllowGet);
+                return Json(
+                    data,
+                    JsonRequestBehavior.AllowGet
+                );
             }
-            else
+
+            data.user.UnidadId =
+                data.Id;
+
+            string login =
+                data.user.nvarchar_no_interno;
+
+            PermisosUsuarioDto permisos =
+                _accesoService.ObtenerPermisosUsuario(
+                    login
+                );
+
+            if (permisos == null)
             {
-                return Json(data, JsonRequestBehavior.AllowGet);
-
+                return Json(
+                    new
+                    {
+                        IsSuccess = false,
+                        Message = "Usuario autenticado correctamente, pero no tiene permisos asignados para ingresar al sistema."
+                    },
+                    JsonRequestBehavior.AllowGet
+                );
             }
 
+            Session["User"] =
+                data.user;
 
+            Session["PermisosUsuario"] =
+                permisos;
+
+            data.user =
+                null;
+
+            return Json(
+                data,
+                JsonRequestBehavior.AllowGet
+            );
         }
 
-      
+        public ActionResult CerrarSesion()
+        {
+            Session.Clear();
+            Session.Abandon();
+
+            return RedirectToAction(
+                "Index",
+                "Login"
+            );
+        }
+
 
 
     }

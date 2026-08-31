@@ -44,11 +44,11 @@
             }
 
             string claseEstatus =
-                estatus == 2
-                    ? "sic-coincidencia-confirmada"
-                    : estatus == 0
-                        ? "sic-coincidencia-descartada"
-                        : "sic-coincidencia-pendiente";
+ estatus == 2 || estatus == 3
+     ? "sic-coincidencia-confirmada"
+     : estatus == 0
+         ? "sic-coincidencia-descartada"
+         : "sic-coincidencia-pendiente";
 
             <span class="sic-porcentaje-coincidencia @claseEstatus"
                   data-id-tipo-alerta="@idTipoAlerta"

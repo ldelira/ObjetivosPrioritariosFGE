@@ -1,4 +1,5 @@
 ﻿@using Objetivos_Prioritarios.Models.Extends
+@using Objetivos_Prioritarios.Models
 @using System
 @using System.Collections.Generic
 @using System.Linq
@@ -12,16 +13,85 @@
         (ViewContext.RouteData.Values["action"] ?? "")
             .ToString();
 
+    tb_Usuarios usuarioSesion = Session["User"] as tb_Usuarios;
+
     var nombreUsuario =
-        (Session["NombreUsuario"] ?? "FGEA")
-            .ToString();
+        usuarioSesion != null &&
+        !string.IsNullOrWhiteSpace(usuarioSesion.nvarchar_nombre_usuario)
+            ? usuarioSesion.nvarchar_nombre_usuario.Trim()
+            : "FGEA";
 
     var pageTitle =
-        ((ViewBag.Title ?? ViewBag.title) ?? "")
-            .ToString();
+((ViewBag.Title ?? ViewBag.title) ?? "")
+    .ToString();
 
 
+    /* =========================================================
+       PERMISOS DEL USUARIO
+       ========================================================= */
 
+    PermisosUsuarioDto permisosUsuario =
+        Session["PermisosUsuario"] as PermisosUsuarioDto;
+
+    bool esAdministrador =
+        permisosUsuario != null &&
+        permisosUsuario.EsAdministrador;
+
+    List<string> modulosPermitidos =
+        permisosUsuario != null &&
+        permisosUsuario.Modulos != null
+            ? permisosUsuario.Modulos
+            : new List<string>();
+
+    bool puedeObjetivos =
+        esAdministrador ||
+        modulosPermitidos.Any(x =>
+            string.Equals(
+                x,
+                "OBJETIVOS",
+                StringComparison.OrdinalIgnoreCase
+            )
+        );
+
+    bool puedeSIC =
+        esAdministrador ||
+        modulosPermitidos.Any(x =>
+            string.Equals(
+                x,
+                "SIC",
+                StringComparison.OrdinalIgnoreCase
+            )
+        );
+
+    bool puedeBusquedaIntencionada =
+        esAdministrador ||
+        modulosPermitidos.Any(x =>
+            string.Equals(
+                x,
+                "BUSQUEDA_INTENCIONADA",
+                StringComparison.OrdinalIgnoreCase
+            )
+        );
+
+    bool puedePersonasInteres =
+        esAdministrador ||
+        modulosPermitidos.Any(x =>
+            string.Equals(
+                x,
+                "PERSONAS_INTERES",
+                StringComparison.OrdinalIgnoreCase
+            )
+        );
+
+    bool puedeAdministrarAccesos =
+        esAdministrador ||
+        modulosPermitidos.Any(x =>
+            string.Equals(
+                x,
+                "ADMIN_ACCESOS",
+                StringComparison.OrdinalIgnoreCase
+            )
+        );
 
 
     /* =========================================================
@@ -183,6 +253,50 @@
 
         moduloActivoSubtitulo =
             "Registros parciales, fotos y huellas";
+    }
+
+
+    /* =========================================================
+       RUTA DE INICIO SEGÚN PERMISOS
+       ========================================================= */
+
+    string urlInicio =
+        Url.Action(
+            "Index",
+            "Login"
+        );
+
+    if (puedeObjetivos)
+    {
+        urlInicio =
+            Url.Action(
+                "Index",
+                "Objetivo"
+            );
+    }
+    else if (puedeSIC)
+    {
+        urlInicio =
+            Url.Action(
+                "Index",
+                "SIC"
+            );
+    }
+    else if (puedeBusquedaIntencionada)
+    {
+        urlInicio =
+            Url.Action(
+                "BusquedaCoincidencias",
+                "SIC"
+            );
+    }
+    else if (puedePersonasInteres)
+    {
+        urlInicio =
+            Url.Action(
+                "Index",
+                "PersonasInteres"
+            );
     }
 }
 
@@ -1728,7 +1842,7 @@
         <div class="op-header-left">
             <i class="bi bi-list toggle-sidebar-btn"></i>
 
-            <a href="@Url.Action("Index", "Objetivo")" class="op-brand op-brand-modern">
+            <a href="@urlInicio" class="op-brand op-brand-modern">
                 <span class="op-brand-logo-wrap">
                     <img src="@Url.Content("~/assets/images/logoIcono.png")" alt="Logo" />
                 </span>
@@ -1758,7 +1872,7 @@
                         </li>
 
                         <li>
-                            <a class="dropdown-item d-flex align-items-center" href="@Url.Action("Index", "Login")">
+                            <a class="dropdown-item d-flex align-items-center" href="@Url.Action("CerrarSesion", "Login")">
                                 <i class="bi bi-box-arrow-right"></i>
                                 <span>Cerrar sesión</span>
                             </a>
@@ -1809,273 +1923,164 @@
 
 
             <!-- ==================================================
-             OBJETIVOS PRIORITARIOS
-             ================================================== -->
+            OBJETIVOS PRIORITARIOS
+            ================================================== -->
 
-            <li class="nav-item op-module-item">
+            @if (puedeObjetivos)
+            {
+                <li class="nav-item op-module-item">
 
-                <a class="nav-link op-module-toggle @(isModuloObjetivos ? "" : "collapsed")"
-                   data-bs-target="#menuObjetivosPrioritarios"
-                   data-bs-toggle="collapse"
-                   href="#"
-                   aria-expanded="@(isModuloObjetivos ? "true" : "false")">
+                    <a class="nav-link op-module-toggle @(isModuloObjetivos ? "" : "collapsed")"
+                       data-bs-target="#menuObjetivosPrioritarios"
+                       data-bs-toggle="collapse"
+                       href="#"
+                       aria-expanded="@(isModuloObjetivos ? "true" : "false")">
 
-                    <i class="fa fa-shield"></i>
+                        <i class="fa fa-shield"></i>
 
-                    <span>
-                        Objetivos Prioritarios
-                    </span>
+                        <span>
+                            Objetivos Prioritarios
+                        </span>
 
-                    <i class="fa fa-chevron-down op-module-chevron"></i>
+                        <i class="fa fa-chevron-down op-module-chevron"></i>
 
-                </a>
+                    </a>
 
 
-                <ul id="menuObjetivosPrioritarios"
-                    class="nav-content collapse @(isModuloObjetivos ? "show" : "")"
-                    data-bs-parent="#sidebar-nav">
+                    <ul id="menuObjetivosPrioritarios"
+                        class="nav-content collapse @(isModuloObjetivos ? "show" : "")"
+                        data-bs-parent="#sidebar-nav">
 
 
-                    <li>
-
-                        <a class="@(isMapa ? "active" : "")"
-                           href="@Url.Action("Index", "MapaRelaciones")">
-
-                            <i class="fa fa-sitemap"></i>
-
-                            <span>
-                                Red de inteligencia
-                            </span>
-
-                        </a>
-
-                    </li>
-
-
-                    <li>
-
-                        <a class="@(isObjetivos ? "active" : "")"
-                           href="@Url.Action("Index", "Objetivo")">
-
-                            <i class="fa fa-user"></i>
-
-                            <span>
-                                Objetivos
-                            </span>
-
-                        </a>
-
-                    </li>
-
-
-                    <li>
-
-                        <a class="@(isAsuntos ? "active" : "")"
-                           href="@Url.Action("Index", "Asuntos")">
-
-                            <i class="fa fa-link"></i>
-
-                            <span>
-                                Asuntos relacionados
-                            </span>
-
-                        </a>
-
-                    </li>
-
-
-                    <li>
-
-                        <a class="@(isAlbum ? "active" : "")"
-                           href="@Url.Action("IndexAlbum", "FichaObjetivo")">
-
-                            <i class="fa fa-folder-open"></i>
-
-                            <span>
-                                Álbum de fichas
-                            </span>
-
-                        </a>
-
-                    </li>
-
-
-                    <li>
-
-                        <a class="disabled"
-                           href="javascript:void(0);"
-                           title="Pendiente de enlazar a la ruta de catálogos">
-
-                            <i class="fa fa-list"></i>
-
-                            <span>
-                                Catálogos
-                            </span>
-
-                            <em>
-                                Próximo
-                            </em>
-
-                        </a>
-
-                    </li>
-
-                </ul>
-
-            </li>
-
-
-            <!-- ==================================================
-             SIC
-             ================================================== -->
-
-            <li class="nav-item op-module-item">
-
-                <a class="nav-link op-module-toggle @(isModuloSic ? "" : "collapsed")"
-                   data-bs-target="#menuSic"
-                   data-bs-toggle="collapse"
-                   href="#"
-                   aria-expanded="@(isModuloSic ? "true" : "false")">
-
-                    <i class="fa fa-user-secret"></i>
-
-                    <span>
-                        SIC
-                    </span>
-
-                    <i class="fa fa-chevron-down op-module-chevron"></i>
-
-                </a>
-
-
-                <ul id="menuSic"
-                    class="nav-content collapse @(isModuloSic ? "show" : "")"
-                    data-bs-parent="#sidebar-nav">
-
-
-                    <li>
-
-                        <a class="@(isConsultaSic ? "active" : "")"
-                           href="@Url.Action("Index", "SIC")">
-
-                            <i class="fa fa-id-card-o"></i>
-
-                            <span>
-                                Consulta SIC
-                            </span>
-
-                        </a>
-
-                    </li>
-
-
-                    <li>
-
-                        <a class="disabled"
-                           href="javascript:void(0);">
-
-                            <i class="fa fa-tags"></i>
-
-                            <span>
-                                Catálogos SIC
-                            </span>
-
-                            <em>
-                                Próximo
-                            </em>
-
-                        </a>
-
-                    </li>
-
-                </ul>
-
-            </li>
-
-
-            <!-- ==================================================
-             BÚSQUEDA DE COINCIDENCIAS
-             OPCIÓN PRINCIPAL INDEPENDIENTE
-             ================================================== -->
-
-            <li class="nav-item op-module-item">
-
-                <a class="nav-link op-module-toggle @(isBusquedaCoincidencias ? "active" : "collapsed")"
-                   href="@Url.Action("BusquedaCoincidencias", "SIC")">
-
-                    <i class="fa fa-search"></i>
-
-                    <span>
-                        Búsqueda Intencionada
-                    </span>
-
-                </a>
-
-            </li>
-
-
-            <!-- ==================================================
-             PERSONAS DE INTERÉS
-             ================================================== -->
-
-            <li class="nav-item op-module-item">
-
-                <a class="nav-link op-module-toggle @(isModuloPersonasInteres ? "" : "collapsed")"
-                   data-bs-target="#menuPersonasInteres"
-                   data-bs-toggle="collapse"
-                   href="#"
-                   aria-expanded="@(isModuloPersonasInteres ? "true" : "false")">
-
-
-                    <span class="op-module-custom-icon">
-
-                        <img src="@Url.Content("~/images/icons8-target-audience-24.png")"
-                             alt="Personas de Interés" />
-
-                    </span>
-
-
-                    <span class="op-module-label">
-                        Personas de Interés
-                    </span>
-
-
-                    <i class="fa fa-chevron-down op-module-chevron"></i>
-
-                </a>
-
-
-                <ul id="menuPersonasInteres"
-                    class="nav-content collapse @(isModuloPersonasInteres ? "show" : "")"
-                    data-bs-parent="#sidebar-nav">
-
-
-                    <li>
-
-                        <a class="@(isPersonasInteres && actionName.Equals("Index", StringComparison.OrdinalIgnoreCase) ? "active" : "")"
-                           href="@Url.Action("Index", "PersonasInteres")">
-
-                            <i class="fa fa-users"></i>
-
-                            <span>
-                                Personas
-                            </span>
-
-                        </a>
-
-                    </li>
-
-
-                    @*
                         <li>
 
-                            <a class="@(isPersonasInteres && actionName.Equals("AddEditPersonaInteres", StringComparison.OrdinalIgnoreCase) ? "active" : "")"
-                               href="@Url.Action("AddEditPersonaInteres", "PersonasInteres")">
+                            <a class="@(isMapa ? "active" : "")"
+                               href="@Url.Action("Index", "MapaRelaciones")">
 
-                                <i class="fa fa-plus"></i>
+                                <i class="fa fa-sitemap"></i>
 
                                 <span>
-                                    Registrar persona
+                                    Red de inteligencia
+                                </span>
+
+                            </a>
+
+                        </li>
+
+
+                        <li>
+
+                            <a class="@(isObjetivos ? "active" : "")"
+                               href="@Url.Action("Index", "Objetivo")">
+
+                                <i class="fa fa-user"></i>
+
+                                <span>
+                                    Objetivos
+                                </span>
+
+                            </a>
+
+                        </li>
+
+
+                        <li>
+
+                            <a class="@(isAsuntos ? "active" : "")"
+                               href="@Url.Action("Index", "Asuntos")">
+
+                                <i class="fa fa-link"></i>
+
+                                <span>
+                                    Asuntos relacionados
+                                </span>
+
+                            </a>
+
+                        </li>
+
+
+                        <li>
+
+                            <a class="@(isAlbum ? "active" : "")"
+                               href="@Url.Action("IndexAlbum", "FichaObjetivo")">
+
+                                <i class="fa fa-folder-open"></i>
+
+                                <span>
+                                    Álbum de fichas
+                                </span>
+
+                            </a>
+
+                        </li>
+
+
+                        <li>
+
+                            <a class="disabled"
+                               href="javascript:void(0);"
+                               title="Pendiente de enlazar a la ruta de catálogos">
+
+                                <i class="fa fa-list"></i>
+
+                                <span>
+                                    Catálogos
+                                </span>
+
+                                <em>
+                                    Próximo
+                                </em>
+
+                            </a>
+
+                        </li>
+
+                    </ul>
+
+                </li>
+            }
+
+
+            <!-- ==================================================
+            SIC
+            ================================================== -->
+
+            @if (puedeSIC)
+            {
+                <li class="nav-item op-module-item">
+
+                    <a class="nav-link op-module-toggle @(isModuloSic ? "" : "collapsed")"
+                       data-bs-target="#menuSic"
+                       data-bs-toggle="collapse"
+                       href="#"
+                       aria-expanded="@(isModuloSic ? "true" : "false")">
+
+                        <i class="fa fa-user-secret"></i>
+
+                        <span>
+                            SIC
+                        </span>
+
+                        <i class="fa fa-chevron-down op-module-chevron"></i>
+
+                    </a>
+
+
+                    <ul id="menuSic"
+                        class="nav-content collapse @(isModuloSic ? "show" : "")"
+                        data-bs-parent="#sidebar-nav">
+
+
+                        <li>
+
+                            <a class="@(isConsultaSic ? "active" : "")"
+                               href="@Url.Action("Index", "SIC")">
+
+                                <i class="fa fa-id-card-o"></i>
+
+                                <span>
+                                    Consulta SIC
                                 </span>
 
                             </a>
@@ -2088,10 +2093,10 @@
                             <a class="disabled"
                                href="javascript:void(0);">
 
-                                <i class="fa fa-camera"></i>
+                                <i class="fa fa-tags"></i>
 
                                 <span>
-                                    Fotografías
+                                    Catálogos SIC
                                 </span>
 
                                 <em>
@@ -2101,31 +2106,171 @@
                             </a>
 
                         </li>
+
+                    </ul>
+
+                </li>
+            }
+
+
+            <!-- ==================================================
+            BÚSQUEDA DE COINCIDENCIAS
+            OPCIÓN PRINCIPAL INDEPENDIENTE
+            ================================================== -->
+
+            @if (puedeBusquedaIntencionada)
+            {
+                <li class="nav-item op-module-item">
+
+                    <a class="nav-link op-module-toggle @(isBusquedaCoincidencias ? "active" : "collapsed")"
+                       href="@Url.Action("BusquedaCoincidencias", "SIC")">
+
+                        <i class="fa fa-search"></i>
+
+                        <span>
+                            Búsqueda Intencionada
+                        </span>
+
+                    </a>
+
+                </li>
+            }
+
+
+            <!-- ==================================================
+            PERSONAS DE INTERÉS
+            ================================================== -->
+
+            @if (puedePersonasInteres)
+            {
+                <li class="nav-item op-module-item">
+
+                    <a class="nav-link op-module-toggle @(isModuloPersonasInteres ? "" : "collapsed")"
+                       data-bs-target="#menuPersonasInteres"
+                       data-bs-toggle="collapse"
+                       href="#"
+                       aria-expanded="@(isModuloPersonasInteres ? "true" : "false")">
+
+
+                        <span class="op-module-custom-icon">
+
+                            <img src="@Url.Content("~/images/icons8-target-audience-24.png")"
+                                 alt="Personas de Interés" />
+
+                        </span>
+
+
+                        <span class="op-module-label">
+                            Personas de Interés
+                        </span>
+
+
+                        <i class="fa fa-chevron-down op-module-chevron"></i>
+
+                    </a>
+
+
+                    <ul id="menuPersonasInteres"
+                        class="nav-content collapse @(isModuloPersonasInteres ? "show" : "")"
+                        data-bs-parent="#sidebar-nav">
 
 
                         <li>
 
-                            <a class="disabled"
-                               href="javascript:void(0);">
+                            <a class="@(isPersonasInteres && actionName.Equals("Index", StringComparison.OrdinalIgnoreCase) ? "active" : "")"
+                               href="@Url.Action("Index", "PersonasInteres")">
 
-                                <i class="fa fa-hand-paper-o"></i>
+                                <i class="fa fa-users"></i>
 
                                 <span>
-                                    Huellas
+                                    Personas
                                 </span>
-
-                                <em>
-                                    Próximo
-                                </em>
 
                             </a>
 
                         </li>
-                    *@
 
-                </ul>
 
-            </li>
+                        @*
+                            <li>
+
+                                <a class="@(isPersonasInteres && actionName.Equals("AddEditPersonaInteres", StringComparison.OrdinalIgnoreCase) ? "active" : "")"
+                                   href="@Url.Action("AddEditPersonaInteres", "PersonasInteres")">
+
+                                    <i class="fa fa-plus"></i>
+
+                                    <span>
+                                        Registrar persona
+                                    </span>
+
+                                </a>
+
+                            </li>
+
+
+                            <li>
+
+                                <a class="disabled"
+                                   href="javascript:void(0);">
+
+                                    <i class="fa fa-camera"></i>
+
+                                    <span>
+                                        Fotografías
+                                    </span>
+
+                                    <em>
+                                        Próximo
+                                    </em>
+
+                                </a>
+
+                            </li>
+
+
+                            <li>
+
+                                <a class="disabled"
+                                   href="javascript:void(0);">
+
+                                    <i class="fa fa-hand-paper-o"></i>
+
+                                    <span>
+                                        Huellas
+                                    </span>
+
+                                    <em>
+                                        Próximo
+                                    </em>
+
+                                </a>
+
+                            </li>
+                        *@
+
+                    </ul>
+
+                </li>
+            }
+
+            @if (puedeAdministrarAccesos)
+            {
+                <li class="nav-item op-module-item">
+
+                    <a class="nav-link op-module-toggle @(controllerName.Equals("Accesos", StringComparison.OrdinalIgnoreCase) ? "active" : "collapsed")"
+                       href="@Url.Action("Index", "Accesos")">
+
+                        <i class="fa fa-lock"></i>
+
+                        <span>
+                            Administración de accesos
+                        </span>
+
+                    </a>
+
+                </li>
+            }
+
 
         </ul>
 

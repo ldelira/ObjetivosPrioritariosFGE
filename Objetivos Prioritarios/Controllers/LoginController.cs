@@ -91,13 +91,15 @@ namespace Objetivos_Prioritarios.Controllers
         [HttpPost]
         public JsonResult ValidateCredentials(LoginUser user)
         {
-            LoginService loginService = new LoginService();
+            LoginService loginService =
+                new LoginService();
 
             var data =
-                loginService.validateCredentialsToaccesss(
-                    user.UserName,
-                    user.Password
-                );
+                loginService
+                    .validateCredentialsToaccesss(
+                        user.UserName,
+                        user.Password
+                    );
 
             if (!data.IsSuccess)
             {
@@ -107,16 +109,21 @@ namespace Objetivos_Prioritarios.Controllers
                 );
             }
 
+
             data.user.UnidadId =
                 data.Id;
+
 
             string login =
                 data.user.nvarchar_no_interno;
 
+
             PermisosUsuarioDto permisos =
-                _accesoService.ObtenerPermisosUsuario(
-                    login
-                );
+                _accesoService
+                    .ObtenerPermisosUsuario(
+                        login
+                    );
+
 
             if (permisos == null)
             {
@@ -124,11 +131,12 @@ namespace Objetivos_Prioritarios.Controllers
                     new
                     {
                         IsSuccess = false,
-                        Message = "Usuario autenticado correctamente, pero no tiene permisos asignados para ingresar al sistema."
+                        Message = "El usuario está autenticado correctamente, pero no tiene permisos asignados para ingresar al sistema."
                     },
                     JsonRequestBehavior.AllowGet
                 );
             }
+
 
             Session["User"] =
                 data.user;
@@ -136,14 +144,80 @@ namespace Objetivos_Prioritarios.Controllers
             Session["PermisosUsuario"] =
                 permisos;
 
-            data.user =
-                null;
+
+            string urlInicio =
+                ObtenerUrlInicio(
+                    permisos
+                );
+
 
             return Json(
-                data,
+                new
+                {
+                    IsSuccess = true,
+                    Message = data.Message,
+                    UrlInicio = urlInicio
+                },
                 JsonRequestBehavior.AllowGet
             );
         }
+
+        //[HttpPost]
+        //public JsonResult ValidateCredentials(LoginUser user)
+        //{
+        //    LoginService loginService = new LoginService();
+
+        //    var data =
+        //        loginService.validateCredentialsToaccesss(
+        //            user.UserName,
+        //            user.Password
+        //        );
+
+        //    if (!data.IsSuccess)
+        //    {
+        //        return Json(
+        //            data,
+        //            JsonRequestBehavior.AllowGet
+        //        );
+        //    }
+
+        //    data.user.UnidadId =
+        //        data.Id;
+
+        //    string login =
+        //        data.user.nvarchar_no_interno;
+
+        //    PermisosUsuarioDto permisos =
+        //        _accesoService.ObtenerPermisosUsuario(
+        //            login
+        //        );
+
+        //    if (permisos == null)
+        //    {
+        //        return Json(
+        //            new
+        //            {
+        //                IsSuccess = false,
+        //                Message = "Usuario autenticado correctamente, pero no tiene permisos asignados para ingresar al sistema."
+        //            },
+        //            JsonRequestBehavior.AllowGet
+        //        );
+        //    }
+
+        //    Session["User"] =
+        //        data.user;
+
+        //    Session["PermisosUsuario"] =
+        //        permisos;
+
+        //    data.user =
+        //        null;
+
+        //    return Json(
+        //        data,
+        //        JsonRequestBehavior.AllowGet
+        //    );
+        //}
 
         public ActionResult CerrarSesion()
         {
@@ -155,6 +229,102 @@ namespace Objetivos_Prioritarios.Controllers
                 "Login"
             );
         }
+
+
+        private string ObtenerUrlInicio(PermisosUsuarioDto permisos)
+        {
+            if (permisos == null)
+            {
+                return Url.Action("Index", "Login");
+            }
+
+            if (
+                permisos.EsAdministrador ||
+                permisos.Modulos.Any(x =>
+                    string.Equals(
+                        x,
+                        "OBJETIVOS",
+                        StringComparison.OrdinalIgnoreCase
+                    )
+                )
+            )
+            {
+                return Url.Action(
+                    "Index",
+                    "Objetivo"
+                );
+            }
+
+            if (
+                permisos.Modulos.Any(x =>
+                    string.Equals(
+                        x,
+                        "SIC",
+                        StringComparison.OrdinalIgnoreCase
+                    )
+                )
+            )
+            {
+                return Url.Action(
+                    "Index",
+                    "SIC"
+                );
+            }
+
+            if (
+                permisos.Modulos.Any(x =>
+                    string.Equals(
+                        x,
+                        "BUSQUEDA_INTENCIONADA",
+                        StringComparison.OrdinalIgnoreCase
+                    )
+                )
+            )
+            {
+                return Url.Action(
+                    "BusquedaCoincidencias",
+                    "SIC"
+                );
+            }
+
+            if (
+                permisos.Modulos.Any(x =>
+                    string.Equals(
+                        x,
+                        "PERSONAS_INTERES",
+                        StringComparison.OrdinalIgnoreCase
+                    )
+                )
+            )
+            {
+                return Url.Action(
+                    "Index",
+                    "PersonasInteres"
+                );
+            }
+
+            if (
+                permisos.Modulos.Any(x =>
+                    string.Equals(
+                        x,
+                        "ADMIN_ACCESOS",
+                        StringComparison.OrdinalIgnoreCase
+                    )
+                )
+            )
+            {
+                return Url.Action(
+                    "Index",
+                    "Accesos"
+                );
+            }
+
+            return Url.Action(
+                "CerrarSesion",
+                "Login"
+            );
+        }
+
 
 
 

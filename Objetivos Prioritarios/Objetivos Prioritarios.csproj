@@ -282,6 +282,7 @@
     <Compile Include="ControllersServices\CoincidenciasBiometricasService.cs" />
     <Compile Include="ControllersServices\ReporteService.cs" />
     <Compile Include="Controllers\ABaseController.cs" />
+    <Compile Include="Controllers\AccesosController.cs" />
     <Compile Include="Controllers\PersonasInteresController.cs" />
     <Compile Include="Controllers\AsuntosController.cs" />
     <Compile Include="Controllers\CatalogoController.cs" />
@@ -296,6 +297,24 @@
     </Compile>
     <Compile Include="Helpers\BiometriaApiHelper.cs" />
     <Compile Include="Helpers\NetworkConnection.cs" />
+    <Compile Include="Models\Accesos.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Accesos.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Accesos.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Accesos.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Accesos.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Accesos.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Agencias.cs">
+      <DependentUpon>Accesos.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\Alias.cs">
       <DependentUpon>Filiacion.tt</DependentUpon>
     </Compile>
@@ -390,6 +409,9 @@
     <Compile Include="Models\Colonia.cs">
       <DependentUpon>Catalogos.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\CT_UnidadesInvestigacion.cs">
+      <DependentUpon>Catalogos.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\delitos_mandamiento.cs">
       <DependentUpon>Mandamientos.tt</DependentUpon>
     </Compile>
@@ -411,6 +433,7 @@
     <Compile Include="Models\Estado.cs">
       <DependentUpon>Catalogos.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\Extends\AdministracionUsuarioViewModel.cs" />
     <Compile Include="Models\Extends\ApiBusquedaBiometricaResponse.cs" />
     <Compile Include="Models\Extends\ApiErrorBiometrico.cs" />
     <Compile Include="Models\Extends\BusquedaCoincidenciasViewModel.cs" />
@@ -423,11 +446,13 @@
     <Compile Include="Models\Extends\DetalleObjetivoApiDto.cs" />
     <Compile Include="Models\Extends\DetallePersonaInteresApiDto.cs" />
     <Compile Include="Models\Extends\MandamientoJudicialViewModel.cs" />
+    <Compile Include="Models\Extends\PerfilUsuarioViewModel.cs" />
     <Compile Include="Models\Extends\PermisosUsuarioDto.cs" />
     <Compile Include="Models\Extends\ResultadosCoincidenciasViewModel.cs" />
     <Compile Include="Models\Extends\tb_NombreObjetivo.cs" />
     <Compile Include="Models\Extends\tb_Victimas.cs" />
     <Compile Include="Models\Extends\tb_Usuarios.cs" />
+    <Compile Include="Models\Extends\UsuarioInstitucionalDto.cs" />
     <Compile Include="Models\Filiacion.Context.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -523,6 +548,9 @@
     </Compile>
     <Compile Include="Models\mandamiento_judicial.cs">
       <DependentUpon>Mandamientos.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Ministerios.cs">
+      <DependentUpon>Accesos.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\ModelObjetivoQA.Context.cs">
       <AutoGen>True</AutoGen>
@@ -763,6 +791,9 @@
     </Compile>
     <Compile Include="Models\Usuario.cs">
       <DependentUpon>SIC.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Usuarios.cs">
+      <DependentUpon>Accesos.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Usuario_Modulos.cs">
       <DependentUpon>SIC.tt</DependentUpon>
@@ -2980,6 +3011,16 @@
     <Content Include="Content\SIC\busqueda-coincidencias.css" />
     <Content Include="Content\SIC\busqueda-coincidenciasBACKUP.css" />
     <Content Include="Content\SIC\busqueda-coincidencias2.css" />
+    <Content Include="Models\Accesos.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>Accesos.edmx</DependentUpon>
+      <LastGenOutput>Accesos.Context.cs</LastGenOutput>
+    </Content>
+    <Content Include="Models\Accesos.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>Accesos.edmx</DependentUpon>
+      <LastGenOutput>Accesos.cs</LastGenOutput>
+    </Content>
     <Content Include="Models\ModelObjetivoQA.Context.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <DependentUpon>ModelObjetivoQA.edmx</DependentUpon>
@@ -3486,6 +3527,13 @@
     <Content Include="Models\Objetivos_Perfiles.edmx.diagram">
       <DependentUpon>Objetivos_Perfiles.edmx</DependentUpon>
     </Content>
+    <EntityDeploy Include="Models\Accesos.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>Accesos.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <Content Include="Models\Accesos.edmx.diagram">
+      <DependentUpon>Accesos.edmx</DependentUpon>
+    </Content>
     <None Include="Scripts\jquery-3.4.1.intellisense.js" />
     <Content Include="Scripts\DataTables\autoFill.bootstrap.js" />
     <Content Include="Scripts\DataTables\autoFill.bootstrap.min.js" />
@@ -3764,6 +3812,7 @@
     <Content Include="Views\SIC\Coincidencias\DetallePersonaInteresPartial.cshtml" />
     <Content Include="Views\Shared\_Layout - BACKUP2.cshtml" />
     <Content Include="Views\SIC\BusquedaCoincidenciasBACKUP.cshtml" />
+    <Content Include="Views\Accesos\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

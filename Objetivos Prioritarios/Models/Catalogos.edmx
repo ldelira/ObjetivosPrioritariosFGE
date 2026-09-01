@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-      <Schema Namespace="CatalogosModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+    <Schema Namespace="CatalogosModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="Calles">
           <Key>
             <PropertyRef Name="Cve_Calle" />
@@ -29,6 +29,22 @@
           <Property Name="Colonia_Doctos" Type="nvarchar" MaxLength="100" />
           <Property Name="Sector" Type="int" Nullable="false" />
           <Property Name="rowguid" Type="uniqueidentifier" Nullable="false" />
+        </EntityType>
+        <!--Errores durante la generación:
+advertencia 6002: La tabla o vista 'Catalogos.dbo.CT_UnidadesInvestigacion' no tiene definida ninguna clave principal. Se ha inferido la clave y la definición se creado como una vista o tabla de solo lectura.-->
+        <EntityType Name="CT_UnidadesInvestigacion">
+          <Key>
+            <PropertyRef Name="ID" />
+            <PropertyRef Name="Unidad" />
+            <PropertyRef Name="Activa" />
+          </Key>
+          <Property Name="ID" Type="int" Nullable="false" />
+          <Property Name="Unidad" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="Activa" Type="bit" Nullable="false" />
+          <Property Name="AreaID" Type="int" />
+          <Property Name="Visible" Type="bit" />
+          <Property Name="DomicilioUnidad" Type="nvarchar" MaxLength="250" />
+          <Property Name="Titular" Type="nvarchar" MaxLength="50" />
         </EntityType>
         <!--Errores durante la generación:
 advertencia 6002: La tabla o vista 'Catalogos.dbo.Estado' no tiene definida ninguna clave principal. Se ha inferido la clave y la definición se creado como una vista o tabla de solo lectura.-->
@@ -73,6 +89,17 @@ advertencia 6002: La tabla o vista 'Catalogos.dbo.Estado' no tiene definida ning
           <EntitySet Name="Calles" EntityType="Self.Calles" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Colonia" EntityType="Self.Colonia" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Municipio" EntityType="Self.Municipio" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="CT_UnidadesInvestigacion" EntityType="Self.CT_UnidadesInvestigacion" store:Type="Tables" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [CT_UnidadesInvestigacion].[ID] AS [ID], 
+    [CT_UnidadesInvestigacion].[Unidad] AS [Unidad], 
+    [CT_UnidadesInvestigacion].[Activa] AS [Activa], 
+    [CT_UnidadesInvestigacion].[AreaID] AS [AreaID], 
+    [CT_UnidadesInvestigacion].[Visible] AS [Visible], 
+    [CT_UnidadesInvestigacion].[DomicilioUnidad] AS [DomicilioUnidad], 
+    [CT_UnidadesInvestigacion].[Titular] AS [Titular]
+    FROM [dbo].[CT_UnidadesInvestigacion] AS [CT_UnidadesInvestigacion]</DefiningQuery>
+          </EntitySet>
           <EntitySet Name="Estado" EntityType="Self.Estado" store:Type="Tables" store:Schema="dbo">
             <DefiningQuery>SELECT 
     [Estado].[Cve_Edo] AS [Cve_Edo], 
@@ -89,8 +116,7 @@ advertencia 6002: La tabla o vista 'Catalogos.dbo.Estado' no tiene definida ning
             <End Role="Calles" EntitySet="Calles" />
           </AssociationSet>
         </EntityContainer>
-      </Schema>
-    </edmx:StorageModels>
+      </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="CatalogosModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
@@ -167,7 +193,22 @@ advertencia 6002: La tabla o vista 'Catalogos.dbo.Estado' no tiene definida ning
             <End Role="Colonia" EntitySet="Colonia" />
             <End Role="Calles" EntitySet="Calles" />
           </AssociationSet>
+          <EntitySet Name="CT_UnidadesInvestigacion" EntityType="CatalogosModel.CT_UnidadesInvestigacion" />
         </EntityContainer>
+        <EntityType Name="CT_UnidadesInvestigacion">
+          <Key>
+            <PropertyRef Name="ID" />
+            <PropertyRef Name="Unidad" />
+            <PropertyRef Name="Activa" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" />
+          <Property Name="Unidad" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="Activa" Type="Boolean" Nullable="false" />
+          <Property Name="AreaID" Type="Int32" />
+          <Property Name="Visible" Type="Boolean" />
+          <Property Name="DomicilioUnidad" Type="String" MaxLength="250" FixedLength="false" Unicode="true" />
+          <Property Name="Titular" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+        </EntityType>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -223,6 +264,19 @@ advertencia 6002: La tabla o vista 'Catalogos.dbo.Estado' no tiene definida ning
                 <ScalarProperty Name="rowguid" ColumnName="rowguid" />
                 <ScalarProperty Name="Cve_Edo_Exhorto" ColumnName="Cve_Edo_Exhorto" />
                 <ScalarProperty Name="ID_Estado" ColumnName="ID_Estado" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="CT_UnidadesInvestigacion">
+            <EntityTypeMapping TypeName="CatalogosModel.CT_UnidadesInvestigacion">
+              <MappingFragment StoreEntitySet="CT_UnidadesInvestigacion">
+                <ScalarProperty Name="Titular" ColumnName="Titular" />
+                <ScalarProperty Name="DomicilioUnidad" ColumnName="DomicilioUnidad" />
+                <ScalarProperty Name="Visible" ColumnName="Visible" />
+                <ScalarProperty Name="AreaID" ColumnName="AreaID" />
+                <ScalarProperty Name="Activa" ColumnName="Activa" />
+                <ScalarProperty Name="Unidad" ColumnName="Unidad" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

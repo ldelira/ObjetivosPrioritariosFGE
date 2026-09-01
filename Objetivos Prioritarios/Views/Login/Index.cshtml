@@ -81,40 +81,47 @@
     });
 
     function inicioSesion() {
-         var data = {
-     UserName: $("#UserName").val(),
-     Password: $("#Password").val()
- }
- 
- $.ajax({
-     type: 'POST',
-     url: '@Url.Action("ValidateCredentials", "Login")',
-     data: data,
-     success: function (data) {
-         
-         if (data.IsSuccess) {
-              window.location.href = '@Url.Action("index", "Objetivo")';
+        var data = {
+            UserName: $("#UserName").val(),
+            Password: $("#Password").val()
+        }
 
-         } else {
-             swal({
-                 title: "",
-                 text: data.Message,
-                 type: 'error',
-                 showCancelButton: false,
-                 confirmButtonText: "Continuar",
-                 closeOnConfirm: true,
-             },
-                 function (isConfirm) {
-                     if (isConfirm) {
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("ValidateCredentials", "Login")',
+            data: data,
+            success: function (respuesta) {
+
+                if (!respuesta.IsSuccess) {
+
+                    swal(
+                        "Acceso",
+                        respuesta.Message,
+                        "warning"
+                    );
+
+                    return;
+                }
 
 
-                     }
-                 });
-         }
-     },
-     complete: function () {
-     }
- });
+                if (
+                    respuesta.UrlInicio &&
+                    respuesta.UrlInicio.length > 0
+                ) {
+
+                    window.location.href =
+                        respuesta.UrlInicio;
+
+                    return;
+                }
+
+
+                window.location.href =
+                    '@Url.Action("Index", "Login")';
+            },
+            complete: function () {
+            }
+        });
     }
 
 </script>

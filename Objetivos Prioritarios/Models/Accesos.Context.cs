@@ -13,10 +13,10 @@ namespace Objetivos_Prioritarios.Models
     using System.Data.Entity;
     using System.Data.Entity.Infrastructure;
     
-    public partial class CatalogosEntities : DbContext
+    public partial class AccesosEntities : DbContext
     {
-        public CatalogosEntities()
-            : base("name=CatalogosEntities")
+        public AccesosEntities()
+            : base("name=AccesosEntities")
         {
         }
     
@@ -25,10 +25,8 @@ namespace Objetivos_Prioritarios.Models
             throw new UnintentionalCodeFirstException();
         }
     
-        public virtual DbSet<Calles> Calles { get; set; }
-        public virtual DbSet<Colonia> Colonia { get; set; }
-        public virtual DbSet<Municipio> Municipio { get; set; }
-        public virtual DbSet<Estado> Estado { get; set; }
-        public virtual DbSet<CT_UnidadesInvestigacion> CT_UnidadesInvestigacion { get; set; }
+        public virtual DbSet<Agencias> Agencias { get; set; }
+        public virtual DbSet<Ministerios> Ministerios { get; set; }
+        public virtual DbSet<Usuarios> Usuarios { get; set; }
     }
 }

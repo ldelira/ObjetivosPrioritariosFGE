@@ -1,0 +1,1447 @@
+﻿@model Objetivos_Prioritarios.Models.Extends.DetalleCoincidenciaViewModel
+
+@using System
+@using System.Linq
+
+@{
+    var coincidencia =
+        Model == null
+            ? null
+            : Model.Coincidencia;
+
+    var persona =
+        Model == null
+            ? null
+            : Model.PersonaInteres;
+
+
+    bool tieneMandamientos =
+        coincidencia != null &&
+        coincidencia.TieneAvisoMandamientos &&
+        coincidencia.MandamientosJudiciales != null &&
+        coincidencia.MandamientosJudiciales.Any();
+
+
+    int totalMandamientos =
+        tieneMandamientos
+            ? coincidencia.MandamientosJudiciales.Count
+            : 0;
+
+
+    string imagenNoDisponible =
+        Url.Content(
+            "~/Content/imagenes/Nodisponible.jpg"
+        );
+
+
+    string fotoUrl =
+        persona == null
+            ? imagenNoDisponible
+            : Url.Action(
+                "VerFotoPrincipalPersonaInteres",
+                "PersonasInteres",
+                new
+                {
+                    idPersona = persona.IdPersona
+                }
+            );
+
+
+    /*
+     * ============================================================
+     * DATOS PRINCIPALES
+     * ============================================================
+     */
+
+    string nombre =
+        persona == null ||
+        string.IsNullOrWhiteSpace(persona.NombreCompleto)
+            ? "SIN INFORMACIÓN"
+            : persona.NombreCompleto.Trim();
+
+
+    string sexo =
+        persona == null ||
+        string.IsNullOrWhiteSpace(persona.Sexo)
+            ? "SIN INFORMACIÓN"
+            : persona.Sexo.Trim();
+
+
+    string edad =
+        persona != null &&
+        persona.Edad.HasValue &&
+        persona.Edad.Value > 0
+            ? persona.Edad.Value + " años"
+            : "SIN INFORMACIÓN";
+
+
+    string estatura =
+        persona == null ||
+        string.IsNullOrWhiteSpace(persona.Estatura)
+            ? "SIN INFORMACIÓN"
+            : persona.Estatura.Trim();
+
+
+    string estadoBusqueda =
+        persona == null ||
+        string.IsNullOrWhiteSpace(persona.EstadoBusqueda)
+            ? "SIN INFORMACIÓN"
+            : persona.EstadoBusqueda.Trim();
+
+
+    string fechaRegistro =
+        persona != null &&
+        persona.FechaRegistro.HasValue
+            ? persona.FechaRegistro.Value.ToString("dd/MM/yyyy")
+            : "SIN INFORMACIÓN";
+
+
+    string fechaNacimiento =
+        persona != null &&
+        persona.FechaNacimiento.HasValue
+            ? persona.FechaNacimiento.Value.ToString("dd/MM/yyyy")
+            : "SIN INFORMACIÓN";
+
+
+    string observaciones =
+        persona == null ||
+        string.IsNullOrWhiteSpace(persona.Observaciones)
+            ? "SIN INFORMACIÓN"
+            : persona.Observaciones.Trim();
+
+    string sexoResumen =
+    sexo.Equals(
+        "SIN INFORMACIÓN",
+        StringComparison.OrdinalIgnoreCase
+    )
+        ? "N/A"
+        : sexo;
+
+
+    string edadResumen =
+        edad.Equals(
+            "SIN INFORMACIÓN",
+            StringComparison.OrdinalIgnoreCase
+        )
+            ? "N/A"
+            : edad;
+
+
+
+    /*
+     * ============================================================
+     * EVIDENCIA PRINCIPAL
+     * ============================================================
+     *
+     * Prioridad en empate:
+     *
+     * HUELLAS
+     * FOTO
+     * ALIAS
+     * NOMBRE
+     * ============================================================
+     */
+
+    decimal porcentajeEvidenciaPrincipal =
+0;
+
+    string evidenciaTexto =
+        "Coincidencia encontrada";
+
+    string evidenciaIcono =
+        "fa-check-circle";
+
+
+    if (coincidencia != null)
+    {
+        decimal porcentajeNombre =
+            coincidencia.PorcentajeNombre;
+
+        decimal porcentajeAlias =
+            coincidencia.PorcentajeAlias;
+
+        decimal porcentajeFoto =
+            coincidencia.PorcentajeFoto;
+
+        decimal porcentajeHuella =
+            coincidencia.PorcentajeHuella;
+
+
+        if (porcentajeNombre > 0)
+        {
+            porcentajeEvidenciaPrincipal =
+                porcentajeNombre;
+
+            evidenciaTexto =
+                "Coincidencia por nombre";
+
+            evidenciaIcono =
+                "fa-user";
+        }
+
+
+        if (
+            porcentajeAlias > 0 &&
+            porcentajeAlias > porcentajeEvidenciaPrincipal
+        )
+        {
+            porcentajeEvidenciaPrincipal =
+                porcentajeAlias;
+
+            evidenciaTexto =
+                "Coincidencia por alias";
+
+            evidenciaIcono =
+                "fa-user-secret";
+        }
+
+
+        if (
+            porcentajeEvidenciaPrincipal <= 0 &&
+            coincidencia.PorcentajeTexto > 0
+        )
+        {
+            porcentajeEvidenciaPrincipal =
+                coincidencia.PorcentajeTexto;
+
+            evidenciaTexto =
+                "Coincidencia textual";
+
+            evidenciaIcono =
+                "fa-font";
+        }
+
+
+        if (
+            porcentajeFoto > 0 &&
+            porcentajeFoto >= porcentajeEvidenciaPrincipal
+        )
+        {
+            porcentajeEvidenciaPrincipal =
+                porcentajeFoto;
+
+            evidenciaTexto =
+                "Comparación de fotografía";
+
+            evidenciaIcono =
+                "fa-camera";
+        }
+
+
+        if (
+            porcentajeHuella > 0 &&
+            porcentajeHuella >= porcentajeEvidenciaPrincipal
+        )
+        {
+            porcentajeEvidenciaPrincipal =
+                porcentajeHuella;
+
+            evidenciaTexto =
+                "Comparación de huella";
+
+            evidenciaIcono =
+                "fa-hand-pointer-o";
+        }
+    }
+
+
+    /*
+     * ============================================================
+     * SECCIONES
+     * ============================================================
+     */
+
+    bool tieneFotografias =
+        persona != null &&
+        persona.Fotografias != null &&
+        persona.Fotografias.Any();
+
+
+    bool tieneHuellas =
+        persona != null &&
+        persona.Huellas != null &&
+        persona.Huellas.Any();
+
+
+    bool tienePeriodos =
+        persona != null &&
+        persona.PeriodosBusqueda != null &&
+        persona.PeriodosBusqueda.Any();
+
+
+    bool tienePeriodoActivo =
+        persona != null &&
+        persona.PeriodoActivo != null;
+}
+
+
+@if (
+    coincidencia == null ||
+    persona == null
+)
+{
+    <div class="sic-fgea-detalle">
+
+        <div class="sic-fgea-registro">
+
+            <div class="sic-fgea-registro-principal">
+                No fue posible cargar la información de la persona de interés.
+            </div>
+
+        </div>
+
+    </div>
+}
+else
+{
+    <div class="sic-fgea-detalle sic-pi-detalle">
+
+
+        <!-- ============================================================
+             CABECERA
+             ============================================================ -->
+
+        <div class="sic-fgea-cabecera">
+
+
+            <div class="sic-fgea-foto-wrap">
+
+
+                <button type="button"
+                        class="sic-fgea-btn-foto js-ampliar-foto"
+                        data-foto="@fotoUrl"
+                        data-nombre="@nombre"
+                        data-fuente="FGEA - PERSONAS DE INTERÉS"
+                        title="Ver fotografía en grande">
+
+                    <img src="@fotoUrl"
+                         alt="@nombre"
+                         class="sic-fgea-foto"
+                         onerror="this.onerror=null;this.src='@imagenNoDisponible';" />
+
+
+                    <span class="sic-fgea-foto-zoom">
+
+                        <i class="fa fa-search-plus"></i>
+
+                    </span>
+
+                </button>
+
+
+            </div>
+
+
+            <div class="sic-fgea-identidad">
+
+
+                <div class="sic-fgea-fuente sic-pi-fuente">
+
+                    <i class="fa fa-database"></i>
+
+                    FGEA - PERSONAS DE INTERÉS
+
+                </div>
+
+
+                <h2 class="sic-fgea-nombre">
+                    @nombre
+                </h2>
+
+
+                <div class="sic-fgea-alias">
+
+                    Estado de búsqueda:
+
+                    <strong class="sic-pi-estado-texto">
+                        @estadoBusqueda
+                    </strong>
+
+                </div>
+
+
+                <div class="sic-fgea-resumen">
+
+
+                    <div class="sic-fgea-resumen-item">
+
+                        <span>
+                            Sexo
+                        </span>
+
+                        <strong>
+                            @sexoResumen
+                        </strong>
+
+                    </div>
+
+
+                    <div class="sic-fgea-resumen-item">
+
+                        <span>
+                            Edad
+                        </span>
+
+                        <strong>
+                            @edadResumen
+                        </strong>
+
+                    </div>
+
+
+                    <div class="sic-fgea-resumen-item">
+
+                        <span>
+                            ID Persona
+                        </span>
+
+                        <strong>
+                            @persona.IdPersona
+                        </strong>
+
+                    </div>
+
+
+                    <div class="sic-fgea-resumen-item">
+
+                        <span>
+                            Fecha registro
+                        </span>
+
+                        <strong>
+                            @fechaRegistro
+                        </strong>
+
+                    </div>
+
+
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+
+
+        <!-- ============================================================
+             EVIDENCIA PRINCIPAL
+             ============================================================ -->
+
+        <div class="sic-fgea-evidencia">
+
+
+            <div class="sic-fgea-evidencia-icono">
+
+                <i class="fa @evidenciaIcono"></i>
+
+            </div>
+
+
+            <div class="sic-fgea-evidencia-texto">
+
+                <span>
+                    Evidencia principal
+                </span>
+
+                <strong>
+                    @evidenciaTexto
+                </strong>
+
+            </div>
+
+
+            <strong class="sic-fgea-evidencia-porcentaje">
+
+                @porcentajeEvidenciaPrincipal.ToString("0")%
+
+            </strong>
+
+
+        </div>
+
+
+
+        <!-- ============================================================
+             DESGLOSE DE EVIDENCIAS
+             ============================================================ -->
+
+        @if (
+            coincidencia.PorcentajeNombre > 0 ||
+            coincidencia.PorcentajeAlias > 0 ||
+            coincidencia.PorcentajeFoto > 0 ||
+            coincidencia.PorcentajeHuella > 0
+        )
+        {
+            <div class="sic-fgea-evidencia-desglose">
+
+
+                @if (coincidencia.PorcentajeNombre > 0)
+                {
+                    <div class="sic-fgea-evidencia-item">
+
+                        <div class="sic-fgea-evidencia-item-icono">
+                            <i class="fa fa-user"></i>
+                        </div>
+
+                        <div>
+
+                            <span>
+                                Nombre
+                            </span>
+
+                            <strong>
+                                @coincidencia.PorcentajeNombre.ToString("0")%
+                            </strong>
+
+                        </div>
+
+                    </div>
+                }
+
+
+                @if (coincidencia.PorcentajeAlias > 0)
+                {
+                    <div class="sic-fgea-evidencia-item">
+
+                        <div class="sic-fgea-evidencia-item-icono">
+                            <i class="fa fa-user-secret"></i>
+                        </div>
+
+                        <div>
+
+                            <span>
+                                Alias
+                            </span>
+
+                            <strong>
+                                @coincidencia.PorcentajeAlias.ToString("0")%
+                            </strong>
+
+                        </div>
+
+                    </div>
+                }
+
+
+                @if (coincidencia.PorcentajeFoto > 0)
+                {
+                    <div class="sic-fgea-evidencia-item">
+
+                        <div class="sic-fgea-evidencia-item-icono">
+                            <i class="fa fa-camera"></i>
+                        </div>
+
+                        <div>
+
+                            <span>
+                                Fotografía
+                            </span>
+
+                            <strong>
+                                @coincidencia.PorcentajeFoto.ToString("0")%
+                            </strong>
+
+                        </div>
+
+                    </div>
+                }
+
+
+                @if (coincidencia.PorcentajeHuella > 0)
+                {
+                    <div class="sic-fgea-evidencia-item">
+
+                        <div class="sic-fgea-evidencia-item-icono">
+                            <i class="fa fa-hand-pointer-o"></i>
+                        </div>
+
+                        <div>
+
+                            <span>
+                                Huella
+                            </span>
+
+                            <strong>
+                                @coincidencia.PorcentajeHuella.ToString("0")%
+                            </strong>
+
+                        </div>
+
+                    </div>
+                }
+
+
+            </div>
+        }
+
+
+
+        <!-- ============================================================
+             INFORMACIÓN GENERAL
+             ============================================================ -->
+
+        <details class="sic-fgea-seccion" open>
+
+            <summary>
+
+                <i class="fa fa-id-card-o"></i>
+
+                Información de la persona
+
+            </summary>
+
+
+            <div class="sic-fgea-seccion-contenido">
+
+
+                <div class="sic-fgea-grid">
+
+
+                    <div class="sic-fgea-campo">
+
+                        <span>
+                            ID Persona
+                        </span>
+
+                        <strong>
+                            @persona.IdPersona
+                        </strong>
+
+                    </div>
+
+
+                    <div class="sic-fgea-campo">
+
+                        <span>
+                            Fecha de nacimiento
+                        </span>
+
+                        <strong>
+                            @fechaNacimiento
+                        </strong>
+
+                    </div>
+
+
+                    <div class="sic-fgea-campo">
+
+                        <span>
+                            Sexo
+                        </span>
+
+                        <strong>
+                            @sexo
+                        </strong>
+
+                    </div>
+
+
+                    <div class="sic-fgea-campo">
+
+                        <span>
+                            Edad
+                        </span>
+
+                        <strong>
+                            @edad
+                        </strong>
+
+                    </div>
+
+
+                    <div class="sic-fgea-campo">
+
+                        <span>
+                            Estatura
+                        </span>
+
+                        <strong>
+                            @estatura
+                        </strong>
+
+                    </div>
+
+
+                    <div class="sic-fgea-campo">
+
+                        <span>
+                            Fecha de registro
+                        </span>
+
+                        <strong>
+                            @fechaRegistro
+                        </strong>
+
+                    </div>
+
+
+                    @if (
+                        !string.IsNullOrWhiteSpace(observaciones) &&
+                        !observaciones.Equals(
+                            "SIN INFORMACIÓN",
+                            StringComparison.OrdinalIgnoreCase
+                        )
+                    )
+                    {
+                        <div class="sic-fgea-campo sic-fgea-campo-completo">
+
+                            <span>
+                                Observaciones
+                            </span>
+
+                            <strong class="sic-fgea-texto-largo">
+                                @observaciones
+                            </strong>
+
+                        </div>
+                    }
+
+
+                </div>
+
+
+            </div>
+
+
+        </details>
+
+
+
+        <!-- ============================================================
+             PERIODO VIGENTE
+             ============================================================ -->
+
+        @if (tienePeriodoActivo)
+        {
+            var periodo =
+                persona.PeriodoActivo;
+
+
+            <details class="sic-fgea-seccion" open>
+
+
+                <summary>
+
+                    <i class="fa fa-calendar-check-o"></i>
+
+                    Periodo de búsqueda vigente
+
+                    <span class="sic-fgea-contador sic-pi-contador-activo">
+                        @estadoBusqueda
+                    </span>
+
+                </summary>
+
+
+                <div class="sic-fgea-seccion-contenido">
+
+
+                    <div class="sic-fgea-grid">
+
+
+                        <div class="sic-fgea-campo">
+
+                            <span>
+                                Estado
+                            </span>
+
+                            <strong class="sic-pi-texto-activo">
+                                @estadoBusqueda
+                            </strong>
+
+                        </div>
+
+
+                        <div class="sic-fgea-campo">
+
+                            <span>
+                                Fecha de inicio
+                            </span>
+
+                            <strong>
+                                @periodo.FechaInicioBusqueda.ToString("dd/MM/yyyy")
+                            </strong>
+
+                        </div>
+
+
+                        <div class="sic-fgea-campo">
+
+                            <span>
+                                Fecha de fin
+                            </span>
+
+                            <strong>
+                                @(periodo.FechaFinBusqueda.HasValue
+                                    ? periodo.FechaFinBusqueda.Value.ToString("dd/MM/yyyy")
+                                    : "SIN INFORMACIÓN")
+                            </strong>
+
+                        </div>
+
+
+                        <div class="sic-fgea-campo">
+
+                            <span>
+                                Días restantes
+                            </span>
+
+                            <strong class="sic-pi-dias">
+                                @periodo.DiasRestantes
+                            </strong>
+
+                        </div>
+
+
+                        @if (periodo.DiasTotales > 0)
+                        {
+                            <div class="sic-fgea-campo">
+
+                                <span>
+                                    Duración total
+                                </span>
+
+                                <strong>
+                                    @periodo.DiasTotales días
+                                </strong>
+
+                            </div>
+                        }
+
+
+                        @if (
+                            !string.IsNullOrWhiteSpace(
+                                periodo.Estatus
+                            )
+                        )
+                        {
+                            <div class="sic-fgea-campo">
+
+                                <span>
+                                    Estatus
+                                </span>
+
+                                <strong>
+                                    @periodo.Estatus
+                                </strong>
+
+                            </div>
+                        }
+
+
+                        @if (
+                            !string.IsNullOrWhiteSpace(
+                                periodo.Observaciones
+                            )
+                        )
+                        {
+                            <div class="sic-fgea-campo sic-fgea-campo-completo">
+
+                                <span>
+                                    Observaciones del periodo
+                                </span>
+
+                                <strong class="sic-fgea-texto-largo">
+                                    @periodo.Observaciones
+                                </strong>
+
+                            </div>
+                        }
+
+
+                    </div>
+
+
+                </div>
+
+
+            </details>
+        }
+
+
+
+        <!-- ============================================================
+             HISTORIAL DE PERIODOS
+             ============================================================ -->
+
+        @if (tienePeriodos)
+        {
+            <details class="sic-fgea-seccion">
+
+
+                <summary>
+
+                    <i class="fa fa-history"></i>
+
+                    Historial de periodos de búsqueda
+
+                    <span class="sic-fgea-contador">
+                        @persona.PeriodosBusqueda.Count
+                    </span>
+
+                </summary>
+
+
+                <div class="sic-fgea-seccion-contenido">
+
+
+                    <div class="sic-fgea-lista">
+
+
+                        @foreach (
+                            var periodo
+                            in persona.PeriodosBusqueda
+                        )
+                        {
+                            <div class="sic-fgea-registro">
+
+
+                                <div class="sic-fgea-registro-titulo">
+
+
+                                    <div>
+
+
+                                        <strong class="sic-fgea-registro-principal">
+
+                                            @periodo.FechaInicioBusqueda.ToString("dd/MM/yyyy")
+
+                                            -
+
+                                            @(periodo.FechaFinBusqueda.HasValue
+                                                ? periodo.FechaFinBusqueda.Value.ToString("dd/MM/yyyy")
+                                                : "SIN FECHA")
+
+                                        </strong>
+
+
+                                        @if (periodo.Activo)
+                                        {
+                                            <span class="sic-fgea-badge-actual">
+                                                ACTIVO
+                                            </span>
+                                        }
+
+
+                                    </div>
+
+
+                                </div>
+
+
+                                <div class="sic-fgea-registro-meta">
+
+
+                                    @if (
+                                        !string.IsNullOrWhiteSpace(
+                                            periodo.Estatus
+                                        )
+                                    )
+                                    {
+                                        <span>
+
+                                            Estatus:
+
+                                            <strong>
+                                                @periodo.Estatus
+                                            </strong>
+
+                                        </span>
+                                    }
+
+
+                                    <span>
+
+                                        Días totales:
+
+                                        <strong>
+                                            @periodo.DiasTotales
+                                        </strong>
+
+                                    </span>
+
+
+                                    <span>
+
+                                        Días restantes:
+
+                                        <strong>
+                                            @periodo.DiasRestantes
+                                        </strong>
+
+                                    </span>
+
+
+                                    @if (
+                                        periodo.FechaCancelacion.HasValue
+                                    )
+                                    {
+                                        <span>
+
+                                            Cancelación:
+
+                                            <strong>
+                                                @periodo.FechaCancelacion.Value.ToString("dd/MM/yyyy")
+                                            </strong>
+
+                                        </span>
+                                    }
+
+
+                                </div>
+
+
+                                @if (
+                                    !string.IsNullOrWhiteSpace(
+                                        periodo.MotivoCancelacion
+                                    )
+                                )
+                                {
+                                    <div class="sic-pi-periodo-observacion">
+
+                                        <strong>
+                                            Motivo:
+                                        </strong>
+
+                                        @periodo.MotivoCancelacion
+
+                                    </div>
+                                }
+
+
+                            </div>
+                        }
+
+
+                    </div>
+
+
+                </div>
+
+
+            </details>
+        }
+
+
+
+        <!-- ============================================================
+             FOTOGRAFÍAS
+             ============================================================ -->
+
+        @if (tieneFotografias)
+        {
+            <details class="sic-fgea-seccion">
+
+
+                <summary>
+
+                    <i class="fa fa-picture-o"></i>
+
+                    Fotografías registradas
+
+                    <span class="sic-fgea-contador">
+                        @persona.Fotografias.Count
+                    </span>
+
+                </summary>
+
+
+                <div class="sic-fgea-seccion-contenido">
+
+
+                    <div class="sic-pi-galeria">
+
+
+                        @foreach (
+                            var foto
+                            in persona.Fotografias
+                        )
+                        {
+                            string urlFoto =
+                                Url.Action(
+                                    "VerFotoPersonaInteres",
+                                    "PersonasInteres",
+                                    new
+                                    {
+                                        idFoto = foto.IdFoto
+                                    }
+                                );
+
+
+                            <button type="button"
+                                    class="sic-pi-foto-card js-ampliar-foto"
+                                    data-foto="@urlFoto"
+                                    data-nombre="@nombre"
+                                    data-fuente="@foto.TipoFoto"
+                                    title="Ver fotografía">
+
+
+                                <img src="@urlFoto"
+                                     alt="@foto.TipoFoto"
+                                     class="sic-pi-foto-thumb"
+                                     onerror="this.onerror=null;this.src='@imagenNoDisponible';" />
+
+
+                                <div class="sic-pi-foto-info">
+
+
+                                    <strong>
+                                        @foto.TipoFoto
+                                    </strong>
+
+
+                                    @if (foto.FechaRegistro.HasValue)
+                                    {
+                                        <span>
+                                            @foto.FechaRegistro.Value.ToString("dd/MM/yyyy")
+                                        </span>
+                                    }
+
+
+                                </div>
+
+
+                            </button>
+                        }
+
+
+                    </div>
+
+
+                </div>
+
+
+            </details>
+        }
+
+
+
+        <!-- ============================================================
+             HUELLAS
+             ============================================================ -->
+
+        @if (tieneHuellas)
+        {
+            <details class="sic-fgea-seccion">
+
+
+                <summary>
+
+                    <i class="fa fa-hand-paper-o"></i>
+
+                    Huellas registradas
+
+                    <span class="sic-fgea-contador">
+                        @persona.Huellas.Count
+                    </span>
+
+                </summary>
+
+
+                <div class="sic-fgea-seccion-contenido">
+
+
+                    <div class="sic-pi-galeria">
+
+
+                        @foreach (
+                            var huella
+                            in persona.Huellas
+                        )
+                        {
+                            string urlHuella =
+                                Url.Action(
+                                    "VerHuellaPersonaInteres",
+                                    "PersonasInteres",
+                                    new
+                                    {
+                                        idFicha = huella.IdFicha
+                                    }
+                                );
+
+
+                            <a href="@urlHuella"
+                               target="_blank"
+                               class="sic-pi-foto-card sic-pi-huella-card"
+                               title="Ver huella">
+
+
+                                <img src="@urlHuella"
+                                     alt="Huella"
+                                     class="sic-pi-foto-thumb sic-pi-huella-thumb"
+                                     onerror="this.style.display='none';" />
+
+
+                                <div class="sic-pi-foto-info">
+
+
+                                    <strong>
+                                        Ficha @huella.IdFicha
+                                    </strong>
+
+
+                                    @if (huella.FechaRegistro.HasValue)
+                                    {
+                                        <span>
+                                            @huella.FechaRegistro.Value.ToString("dd/MM/yyyy")
+                                        </span>
+                                    }
+
+
+                                </div>
+
+
+                            </a>
+                        }
+
+
+                    </div>
+
+
+                </div>
+
+
+            </details>
+        }
+
+
+
+        <!-- ============================================================
+             MANDAMIENTOS
+             ============================================================ -->
+
+        @if (tieneMandamientos)
+        {
+            <details class="sic-fgea-seccion sic-fgea-mandamientos">
+
+
+                <summary>
+
+                    <i class="fa fa-gavel"></i>
+
+                    Posibles mandamientos judiciales
+
+                    <span class="sic-fgea-contador sic-fgea-contador-mandamientos">
+                        @totalMandamientos
+                    </span>
+
+                </summary>
+
+
+                <div class="sic-fgea-seccion-contenido">
+
+
+                    <div class="sic-fgea-mandamientos-aviso">
+
+
+                        <i class="fa fa-exclamation-triangle"></i>
+
+
+                        <div>
+
+                            <strong>
+                                Coincidencias nominales
+                            </strong>
+
+                            <span>
+                                Los siguientes registros fueron encontrados por
+                                similitud de nombre y no representan por sí solos
+                                una vinculación confirmada con esta persona.
+                            </span>
+
+                        </div>
+
+
+                    </div>
+
+
+                    <div class="sic-fgea-lista">
+
+
+                        @foreach (
+                            var mandamiento
+                            in coincidencia.MandamientosJudiciales
+                        )
+                        {
+                            <div class="sic-fgea-registro sic-fgea-mandamiento-registro">
+
+
+                                <div class="sic-fgea-mandamiento-header">
+
+
+                                    <div>
+
+
+                                        <span class="sic-fgea-mandamiento-tipo">
+
+                                            @(string.IsNullOrWhiteSpace(
+                                                mandamiento.TipoMandamiento
+                                            )
+                                                ? "MANDAMIENTO JUDICIAL"
+                                                : mandamiento.TipoMandamiento)
+
+                                        </span>
+
+
+                                        @if (
+                                            !string.IsNullOrWhiteSpace(
+                                                mandamiento.EstadoProceso
+                                            )
+                                        )
+                                        {
+                                            <span class="sic-fgea-mandamiento-estado">
+                                                @mandamiento.EstadoProceso
+                                            </span>
+                                        }
+
+
+                                    </div>
+
+
+                                    @if (
+                                        mandamiento.PorcentajeNombre > 0
+                                    )
+                                    {
+                                        <strong class="sic-fgea-mandamiento-porcentaje">
+                                            @mandamiento.PorcentajeNombre%
+                                        </strong>
+                                    }
+
+
+                                </div>
+
+
+                                <div class="sic-fgea-grid sic-fgea-mandamiento-grid">
+
+
+                                    @if (
+                                        !string.IsNullOrWhiteSpace(
+                                            mandamiento.NombreCompleto
+                                        )
+                                    )
+                                    {
+                                        <div class="sic-fgea-campo sic-fgea-campo-completo">
+
+                                            <span>
+                                                Nombre encontrado
+                                            </span>
+
+                                            <strong>
+                                                @mandamiento.NombreCompleto
+                                            </strong>
+
+                                        </div>
+                                    }
+
+
+                                    <div class="sic-fgea-campo">
+
+                                        <span>
+                                            Número de control
+                                        </span>
+
+                                        <strong>
+                                            @(string.IsNullOrWhiteSpace(mandamiento.NumeroControl)
+                                                ? "SIN INFORMACIÓN"
+                                                : mandamiento.NumeroControl)
+                                        </strong>
+
+                                    </div>
+
+
+                                    <div class="sic-fgea-campo">
+
+                                        <span>
+                                            Expediente
+                                        </span>
+
+                                        <strong>
+                                            @(string.IsNullOrWhiteSpace(mandamiento.NumeroExpediente)
+                                                ? "SIN INFORMACIÓN"
+                                                : mandamiento.NumeroExpediente)
+                                        </strong>
+
+                                    </div>
+
+
+                                    <div class="sic-fgea-campo">
+
+                                        <span>
+                                            Delito
+                                        </span>
+
+                                        <strong>
+                                            @(string.IsNullOrWhiteSpace(mandamiento.Delito)
+                                                ? "SIN INFORMACIÓN"
+                                                : mandamiento.Delito)
+                                        </strong>
+
+                                    </div>
+
+
+                                    <div class="sic-fgea-campo">
+
+                                        <span>
+                                            Estado del proceso
+                                        </span>
+
+                                        <strong>
+                                            @(string.IsNullOrWhiteSpace(mandamiento.EstadoProceso)
+                                                ? "SIN INFORMACIÓN"
+                                                : mandamiento.EstadoProceso)
+                                        </strong>
+
+                                    </div>
+
+
+                                    <div class="sic-fgea-campo">
+
+                                        <span>
+                                            Fecha de expedición
+                                        </span>
+
+                                        <strong>
+                                            @(mandamiento.FechaExpedicion.HasValue
+                                                ? mandamiento.FechaExpedicion.Value.ToString("dd/MM/yyyy")
+                                                : "SIN INFORMACIÓN")
+                                        </strong>
+
+                                    </div>
+
+
+                                    <div class="sic-fgea-campo">
+
+                                        <span>
+                                            Fecha de alta
+                                        </span>
+
+                                        <strong>
+                                            @(mandamiento.FechaAlta.HasValue
+                                                ? mandamiento.FechaAlta.Value.ToString("dd/MM/yyyy")
+                                                : "SIN INFORMACIÓN")
+                                        </strong>
+
+                                    </div>
+
+
+                                </div>
+
+
+                            </div>
+                        }
+
+
+                    </div>
+
+
+                </div>
+
+
+            </details>
+        }
+
+
+    </div>
+}

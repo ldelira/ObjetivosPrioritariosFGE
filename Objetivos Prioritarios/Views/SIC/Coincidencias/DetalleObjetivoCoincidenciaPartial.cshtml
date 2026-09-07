@@ -1,0 +1,1678 @@
+﻿@model Objetivos_Prioritarios.Models.Extends.DetalleObjetivoApiDto
+
+@using System
+@using System.Linq
+
+@{
+    var coincidencia =
+        ViewBag.Coincidencia
+        as Objetivos_Prioritarios.Models.Extends.CoincidenciaResultadoViewModel;
+
+    string fotoUrl =
+        Url.Action(
+            "FotoObjetivoBiometria",
+            "SIC",
+            new
+            {
+                idObjetivo = Model.IdObjetivo
+            }
+        );
+
+    int edad = 0;
+
+    if (Model.FechaNacimiento.HasValue)
+    {
+        DateTime nacimiento =
+            Model.FechaNacimiento.Value.Date;
+
+        DateTime hoy =
+            DateTime.Today;
+
+        edad =
+            hoy.Year -
+            nacimiento.Year;
+
+        if (nacimiento >
+            hoy.AddYears(-edad))
+        {
+            edad--;
+        }
+    }
+
+    string estatusProceso =
+        string.IsNullOrWhiteSpace(Model.EstatusProceso)
+            ? "SIN ESTATUS"
+            : Model.EstatusProceso;
+
+    int totalNombres =
+        1 +
+        (
+            Model.OtrosNombres == null
+                ? 0
+                : Model.OtrosNombres.Count
+        );
+
+    int totalAlias =
+        Model.Alias == null
+            ? 0
+            : Model.Alias.Count;
+
+    int totalDomicilios =
+        Model.Domicilios == null
+            ? 0
+            : Model.Domicilios.Count;
+
+    int totalGrupos =
+        Model.Grupos == null
+            ? 0
+            : Model.Grupos.Count;
+
+    int totalCarpetas =
+        Model.Carpetas == null
+            ? 0
+            : Model.Carpetas.Count;
+
+    int totalDetenciones =
+        Model.Detenciones == null
+            ? 0
+            : Model.Detenciones.Count;
+
+    int totalMandamientosVinculados =
+        Model.MandamientosVinculados == null
+            ? 0
+            : Model.MandamientosVinculados.Count;
+
+    int totalAsuntos =
+        Model.AsuntosRelacionados == null
+            ? 0
+            : Model.AsuntosRelacionados.Count;
+
+
+    string imagenNoDisponible =
+    Url.Content(
+        "~/Content/imagenes/Nodisponible.jpg"
+    );
+
+    string nombrePrincipal =
+        string.IsNullOrWhiteSpace(Model.NombrePrincipal)
+            ? "SIN INFORMACIÓN"
+            : Model.NombrePrincipal.Trim();
+
+    string aliasPrincipal =
+        Model.Alias != null &&
+        Model.Alias.Count > 0
+            ? Model.Alias.FirstOrDefault()
+            : "";
+
+    string fechaNacimientoTexto =
+        Model.FechaNacimiento.HasValue
+            ? Model.FechaNacimiento.Value.ToString("dd/MM/yyyy")
+            : "SIN INFORMACIÓN";
+
+    string clavePersonaTexto =
+        Model.ClavesPersoRelacionadas != null &&
+        Model.ClavesPersoRelacionadas.Count > 0
+            ? string.Join(
+                ", ",
+                Model.ClavesPersoRelacionadas
+            )
+            : "SIN INFORMACIÓN";
+
+
+
+    /*
+ * ============================================================
+ * EVIDENCIA PRINCIPAL
+ * ============================================================
+ *
+ * Se muestra la evidencia individual con mayor porcentaje.
+ *
+ * En caso de empate:
+ *
+ * Huella > Fotografía > Alias > Nombre
+ * ============================================================
+ */
+
+    decimal porcentajeEvidenciaPrincipal = 0;
+
+    string evidenciaTexto =
+        "Coincidencia encontrada";
+
+    string evidenciaIcono =
+        "fa-check-circle";
+
+
+    if (coincidencia != null)
+    {
+        decimal porcentajeNombre =
+            coincidencia.PorcentajeNombre;
+
+        decimal porcentajeAlias =
+            coincidencia.PorcentajeAlias;
+
+        decimal porcentajeFoto =
+            coincidencia.PorcentajeFoto;
+
+        decimal porcentajeHuella =
+            coincidencia.PorcentajeHuella;
+
+
+        /*
+         * NOMBRE
+         */
+        if (porcentajeNombre > 0)
+        {
+            porcentajeEvidenciaPrincipal =
+                porcentajeNombre;
+
+            evidenciaTexto =
+                "Coincidencia por nombre";
+
+            evidenciaIcono =
+                "fa-user";
+        }
+
+
+        /*
+         * ALIAS
+         */
+        if (
+            porcentajeAlias > 0 &&
+            porcentajeAlias > porcentajeEvidenciaPrincipal
+        )
+        {
+            porcentajeEvidenciaPrincipal =
+                porcentajeAlias;
+
+            evidenciaTexto =
+                "Coincidencia por alias";
+
+            evidenciaIcono =
+                "fa-user-secret";
+        }
+
+
+        /*
+         * TEXTO
+         *
+         * Respaldo por si la API trae PorcentajeTexto
+         * pero no separó Nombre / Alias.
+         */
+        if (
+            porcentajeEvidenciaPrincipal <= 0 &&
+            coincidencia.PorcentajeTexto > 0
+        )
+        {
+            porcentajeEvidenciaPrincipal =
+                coincidencia.PorcentajeTexto;
+
+            evidenciaTexto =
+                "Coincidencia textual";
+
+            evidenciaIcono =
+                "fa-font";
+        }
+
+
+        /*
+         * FOTOGRAFÍA
+         *
+         * >= para que biometría gane en caso de empate.
+         */
+        if (
+            porcentajeFoto > 0 &&
+            porcentajeFoto >= porcentajeEvidenciaPrincipal
+        )
+        {
+            porcentajeEvidenciaPrincipal =
+                porcentajeFoto;
+
+            evidenciaTexto =
+                "Comparación de fotografía";
+
+            evidenciaIcono =
+                "fa-camera";
+        }
+
+
+        /*
+         * HUELLA
+         *
+         * >= para que huella gane también un empate
+         * contra fotografía.
+         */
+        if (
+            porcentajeHuella > 0 &&
+            porcentajeHuella >= porcentajeEvidenciaPrincipal
+        )
+        {
+            porcentajeEvidenciaPrincipal =
+                porcentajeHuella;
+
+            evidenciaTexto =
+                "Comparación de huella";
+
+            evidenciaIcono =
+                "fa-hand-pointer-o";
+        }
+    }
+
+
+
+
+}
+
+
+<style>
+
+    /* =========================================================
+       CONTENEDOR GENERAL
+       ========================================================= */
+
+    .sic-obj-detalle {
+        padding: 28px;
+        color: #111a3b;
+        box-sizing: border-box;
+        font-family: inherit;
+    }
+
+
+    /* =========================================================
+       CABECERA
+       ========================================================= */
+
+    .sic-obj-header {
+        padding-bottom: 20px;
+        margin-bottom: 14px;
+        border-bottom: 1px solid #e3e8f1;
+    }
+
+    .sic-obj-header-grid {
+        display: grid;
+        grid-template-columns: 112px minmax(0, 1fr);
+        gap: 18px;
+        align-items: start;
+    }
+
+    .sic-obj-foto {
+        width: 112px;
+        height: 135px;
+        overflow: hidden;
+        border: 1px solid #d8dfec;
+        border-radius: 10px;
+        background: #f5f7fb;
+    }
+
+        .sic-obj-foto img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+
+    /* =========================================================
+       FUENTE
+       ========================================================= */
+
+    .sic-obj-fuente {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin-bottom: 10px;
+        padding: 7px 11px;
+        border: 1px solid #efb8c0;
+        border-radius: 18px;
+        background: #fff0f2;
+        color: #a22638;
+        font-size: 11px;
+        line-height: 1.3;
+        font-weight: 800;
+        text-transform: uppercase;
+    }
+
+
+    /* =========================================================
+       IDENTIDAD PRINCIPAL
+       ========================================================= */
+
+    .sic-obj-nombre {
+        margin: 0;
+        color: #0d1743;
+        font-size: 23px;
+        line-height: 1.2;
+        font-weight: 900;
+        text-transform: uppercase;
+    }
+
+    .sic-obj-id {
+        margin-top: 7px;
+        margin-bottom: 0;
+        color: #626d84;
+        font-size: 13px;
+        line-height: 1.4;
+    }
+
+        .sic-obj-id strong {
+            color: #121b39;
+        }
+
+
+    /* =========================================================
+       RESUMEN SUPERIOR
+       ========================================================= */
+
+    .sic-obj-info-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 9px;
+        margin-top: 17px;
+    }
+
+    .sic-obj-info {
+        min-height: 75px;
+        padding: 12px;
+        border: 1px solid #e0e6f0;
+        border-radius: 8px;
+        background: #fafbfe;
+        box-sizing: border-box;
+    }
+
+    .sic-obj-label {
+        display: block;
+        margin-bottom: 10px;
+        color: #7e879c;
+        font-size: 11px;
+        line-height: 1.3;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    .sic-obj-value {
+        color: #0d1738;
+        font-size: 14px;
+        line-height: 1.4;
+        font-weight: 800;
+        overflow-wrap: anywhere;
+    }
+
+
+    /* =========================================================
+       EVIDENCIA PRINCIPAL
+       ========================================================= */
+
+    .sic-obj-evidencia {
+        margin-bottom: 14px;
+        padding: 0;
+        border: 1px solid #b9e1c4;
+        border-radius: 9px;
+        background: #f0fbf3;
+        overflow: hidden;
+    }
+
+    .sic-obj-evidencia-principal {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px;
+    }
+
+    .sic-obj-evidencia-icono {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        min-width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: #daf3e1;
+        color: #30964d;
+        font-size: 14px;
+    }
+
+    .sic-obj-evidencia-info {
+        flex: 1;
+    }
+
+        .sic-obj-evidencia-info small {
+            display: block;
+            margin-bottom: 5px;
+            color: #52745b;
+            font-size: 10px;
+            line-height: 1.3;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .sic-obj-evidencia-info span {
+            color: #142319;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+    .sic-obj-evidencia-porcentaje {
+        color: #247438;
+        font-size: 20px;
+        line-height: 1.2;
+        font-weight: 900;
+    }
+
+
+    /* =========================================================
+       DESGLOSE DE EVIDENCIAS
+       ========================================================= */
+
+    .sic-obj-evidencia-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        padding: 11px 14px;
+        border-top: 1px solid #d7eadc;
+        background: rgba(255,255,255,.45);
+    }
+
+    .sic-obj-evidencia-item {
+        min-width: 100px;
+        padding: 7px 10px;
+        border: 1px solid #c9ead8;
+        border-radius: 7px;
+        background: #fff;
+    }
+
+        .sic-obj-evidencia-item span {
+            display: block;
+            margin-bottom: 4px;
+            color: #738079;
+            font-size: 10px;
+            line-height: 1.3;
+        }
+
+        .sic-obj-evidencia-item strong {
+            display: block;
+            color: #15804c;
+            font-size: 14px;
+            line-height: 1.3;
+            font-weight: 900;
+        }
+
+
+    /* =========================================================
+       SECCIONES
+       ========================================================= */
+
+    .sic-obj-seccion {
+        margin-bottom: 9px;
+        overflow: hidden;
+        border: 1px solid #dce3ef;
+        border-radius: 8px;
+        background: #fff;
+    }
+
+        .sic-obj-seccion summary {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 12px 14px;
+            background: #f7f9fd;
+            cursor: pointer;
+            list-style: none;
+            user-select: none;
+        }
+
+            .sic-obj-seccion summary::-webkit-details-marker {
+                display: none;
+            }
+
+        .sic-obj-seccion[open] summary {
+            border-bottom: 1px solid #e4e9f2;
+        }
+
+    .sic-obj-seccion-titulo {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 0;
+        color: #101a42;
+        font-size: 14px;
+        line-height: 1.4;
+        font-weight: 800;
+    }
+
+        .sic-obj-seccion-titulo i {
+            width: 18px;
+            color: #5158ff;
+            text-align: center;
+        }
+
+        .sic-obj-seccion-titulo > span {
+            color: #7c879e !important;
+            font-size: 11px !important;
+            font-weight: 500 !important;
+        }
+
+
+    /* =========================================================
+       CONTADORES
+       ========================================================= */
+
+    .sic-obj-contador {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 auto;
+        min-width: 23px;
+        height: 23px;
+        padding: 0 6px;
+        border-radius: 12px;
+        background: #e9edff;
+        color: #4b52e8;
+        font-size: 11px;
+        font-weight: 900;
+        box-sizing: border-box;
+    }
+
+
+    /* =========================================================
+       CONTENIDO
+       ========================================================= */
+
+    .sic-obj-contenido {
+        padding: 13px;
+    }
+
+
+    /* =========================================================
+       REGISTROS
+       ========================================================= */
+
+    .sic-obj-registro {
+        margin-bottom: 9px;
+        padding: 13px 14px;
+        border: 1px solid #e3e7ef;
+        border-radius: 8px;
+        background: #fbfcfe;
+    }
+
+        .sic-obj-registro:last-child {
+            margin-bottom: 0;
+        }
+
+    .sic-obj-registro-titulo {
+        margin-bottom: 7px;
+        color: #10185c;
+        font-size: 14px;
+        line-height: 1.4;
+        font-weight: 900;
+    }
+
+    .sic-obj-registro-sub {
+        color: #58647d;
+        font-size: 12px;
+        line-height: 1.65;
+    }
+
+        .sic-obj-registro-sub strong {
+            color: #222d4d;
+            font-weight: 800;
+        }
+
+
+    /* =========================================================
+       TAGS
+       ========================================================= */
+
+    .sic-obj-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: 9px;
+    }
+
+    .sic-obj-tag {
+        padding: 5px 9px;
+        border-radius: 12px;
+        background: #eef0ff;
+        color: #434ae0;
+        font-size: 11px;
+        line-height: 1.3;
+        font-weight: 800;
+    }
+
+    .sic-obj-tag-verde {
+        background: #e9f9ef;
+        color: #218150;
+    }
+
+    .sic-obj-tag-rojo {
+        background: #fff0f1;
+        color: #b52839;
+    }
+
+
+    /* =========================================================
+       OBSERVACIONES
+       ========================================================= */
+
+    .sic-obj-observacion {
+        margin-top: 9px;
+        padding: 10px 12px;
+        border-left: 3px solid #b7bfce;
+        border-radius: 4px;
+        background: #f8f9fc;
+        color: #535e75;
+        font-size: 12px;
+        line-height: 1.65;
+    }
+
+        .sic-obj-observacion strong {
+            color: #303a54;
+            font-weight: 800;
+        }
+
+
+    /* =========================================================
+       VACÍOS
+       ========================================================= */
+
+    .sic-obj-vacio {
+        padding: 7px 0;
+        color: #8791a6;
+        font-size: 12px;
+        line-height: 1.5;
+    }
+
+
+    /* =========================================================
+       MANDAMIENTOS
+       ========================================================= */
+
+    .sic-obj-alerta-mandamientos {
+        margin-top: 10px;
+        padding: 12px;
+        border: 1px solid #efd27c;
+        border-radius: 8px;
+        background: #fff9e7;
+        color: #705500;
+        font-size: 12px;
+        line-height: 1.55;
+    }
+
+
+    /* =========================================================
+       RESPONSIVE
+       ========================================================= */
+
+    @@media (max-width: 1100px) {
+
+        .sic-obj-detalle {
+            padding: 18px;
+        }
+
+        .sic-obj-info-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+
+    @@media (max-width: 750px) {
+
+        .sic-obj-header-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .sic-obj-info-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+
+<div class="sic-obj-detalle">
+
+    @* ============================================================
+        CABECERA
+        ============================================================ *@
+
+    <div class="sic-obj-header">
+
+        <div class="sic-obj-header-grid">
+
+            <div class="sic-obj-foto">
+
+                <button type="button"
+                        class="sic-obj-btn-foto js-ampliar-foto"
+                        data-foto="@fotoUrl"
+                        data-nombre="@nombrePrincipal"
+                        data-fuente="FGEA - OBJETIVOS PRIORITARIOS"
+                        title="Ver fotografía en grande">
+
+                    <img src="@fotoUrl"
+                         alt="@nombrePrincipal"
+                         onerror="this.onerror=null;this.src='@imagenNoDisponible';" />
+
+                    <span class="sic-obj-foto-zoom">
+                        <i class="fa fa-search-plus"></i>
+                    </span>
+
+                </button>
+
+            </div>
+
+
+            <div>
+
+                <div class="sic-obj-fuente">
+
+                    <i class="fa fa-database"></i>
+
+                    FGEA - OBJETIVOS PRIORITARIOS
+
+                </div>
+
+
+                <h2 class="sic-obj-nombre">
+                    @nombrePrincipal
+                </h2>
+
+
+                <div class="sic-obj-id">
+
+                    Objetivo:
+
+                    <strong>
+                        #@Model.IdObjetivo
+                    </strong>
+
+                    @if (!string.IsNullOrWhiteSpace(aliasPrincipal))
+                    {
+                        <text>
+                            &nbsp; · &nbsp; Alias:
+                            <strong>@aliasPrincipal</strong>
+                        </text>
+                    }
+
+                </div>
+
+
+                <div class="sic-obj-info-grid">
+
+
+                    <div class="sic-obj-info">
+
+                        <span class="sic-obj-label">
+                            Edad
+                        </span>
+
+                        <div class="sic-obj-value">
+
+                            @(edad > 0
+                            ? edad + " años"
+                            : "SIN INFORMACIÓN")
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="sic-obj-info">
+
+                        <span class="sic-obj-label">
+                            Fecha nacimiento
+                        </span>
+
+                        <div class="sic-obj-value">
+                            @fechaNacimientoTexto
+                        </div>
+
+                    </div>
+
+
+                    <div class="sic-obj-info">
+
+                        <span class="sic-obj-label">
+                            Estatus del proceso
+                        </span>
+
+                        <div class="sic-obj-value">
+                            @estatusProceso
+                        </div>
+
+                    </div>
+
+
+                    <div class="sic-obj-info">
+
+                        <span class="sic-obj-label">
+                            Clave persona
+                        </span>
+
+                        <div class="sic-obj-value">
+                            @clavePersonaTexto
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        @if (!string.IsNullOrWhiteSpace(Model.DescripcionEstatusProceso))
+        {
+            <div class="sic-obj-observacion">
+
+                <strong>
+                    Descripción del estatus:
+                </strong>
+
+                @Model.DescripcionEstatusProceso
+
+            </div>
+        }
+
+
+        @if (!string.IsNullOrWhiteSpace(Model.ObservacionesFicha))
+        {
+            <div class="sic-obj-observacion">
+
+                <strong>
+                    Observaciones:
+                </strong>
+
+                @Model.ObservacionesFicha
+
+            </div>
+        }
+
+    </div>
+
+
+    @* ============================================================
+        EVIDENCIA DE COINCIDENCIA
+        ============================================================ *@
+
+    @if (coincidencia != null)
+    {
+        <div class="sic-obj-evidencia">
+
+            <div class="sic-obj-evidencia-principal">
+
+                <div class="sic-obj-evidencia-icono">
+
+                    <i class="fa @evidenciaIcono"></i>
+
+                </div>
+
+
+                <div class="sic-obj-evidencia-info">
+
+                    <small>
+                        Evidencia principal
+                    </small>
+
+                    <span>
+                        @evidenciaTexto
+                    </span>
+
+                </div>
+
+
+                <div class="sic-obj-evidencia-porcentaje">
+
+                    @porcentajeEvidenciaPrincipal.ToString("0")%
+
+                </div>
+
+            </div>
+
+
+            <div class="sic-obj-evidencia-grid">
+
+                @if (coincidencia.PorcentajeNombre > 0)
+                {
+                    <div class="sic-obj-evidencia-item">
+
+                        <span>
+                            Nombre
+                        </span>
+
+                        <strong>
+                            @coincidencia.PorcentajeNombre.ToString("0")%
+                        </strong>
+
+                    </div>
+                }
+
+
+                @if (coincidencia.PorcentajeAlias > 0)
+                {
+                    <div class="sic-obj-evidencia-item">
+
+                        <span>
+                            Alias
+                        </span>
+
+                        <strong>
+                            @coincidencia.PorcentajeAlias.ToString("0")%
+                        </strong>
+
+                    </div>
+                }
+
+
+                @if (coincidencia.PorcentajeFoto > 0)
+                {
+                    <div class="sic-obj-evidencia-item">
+
+                        <span>
+                            Fotografía
+                        </span>
+
+                        <strong>
+                            @coincidencia.PorcentajeFoto.ToString("0")%
+                        </strong>
+
+                    </div>
+                }
+
+
+                @if (coincidencia.PorcentajeHuella > 0)
+                {
+                    <div class="sic-obj-evidencia-item">
+
+                        <span>
+                            Huella
+                        </span>
+
+                        <strong>
+                            @coincidencia.PorcentajeHuella.ToString("0")%
+                        </strong>
+
+                    </div>
+                }
+
+            </div>
+
+
+            @if (!string.IsNullOrWhiteSpace(coincidencia.TextoCoincidente))
+            {
+                <div class="sic-obj-observacion"
+                     style="margin:0 14px 14px 14px;">
+
+                    Coincidió con:
+
+                    <strong>
+                        @coincidencia.TextoCoincidente
+                    </strong>
+
+                </div>
+            }
+
+        </div>
+    }
+
+
+    @* ============================================================
+        IDENTIDAD
+        ============================================================ *@
+
+    <details class="sic-obj-seccion">
+
+        <summary>
+
+            <div class="sic-obj-seccion-titulo">
+                <i class="fa fa-user"></i>
+
+                Identidad
+
+                <span style="font-weight:400;color:#7c879e;">
+                    @totalNombres nombre(s) · @totalAlias alias
+                </span>
+            </div>
+
+            <span class="sic-obj-contador">
+                @(totalNombres + totalAlias)
+            </span>
+
+        </summary>
+
+
+        <div class="sic-obj-contenido">
+
+            <div class="sic-obj-registro">
+
+                <div class="sic-obj-registro-titulo">
+                    Nombre principal
+                </div>
+
+                <div class="sic-obj-registro-sub">
+                    @Model.NombrePrincipal
+                </div>
+
+            </div>
+
+
+            @if (Model.OtrosNombres != null &&
+                 Model.OtrosNombres.Count > 0)
+            {
+                <div class="sic-obj-registro">
+
+                    <div class="sic-obj-registro-titulo">
+                        Otros nombres registrados
+                    </div>
+
+                    <div class="sic-obj-tags">
+
+                        @foreach (string nombre in Model.OtrosNombres)
+                        {
+                            <span class="sic-obj-tag">
+                                @nombre
+                            </span>
+                        }
+
+                    </div>
+
+                </div>
+            }
+
+
+            @if (Model.Alias != null &&
+                 Model.Alias.Count > 0)
+            {
+                <div class="sic-obj-registro">
+
+                    <div class="sic-obj-registro-titulo">
+                        Alias registrados
+                    </div>
+
+                    <div class="sic-obj-tags">
+
+                        @foreach (string alias in Model.Alias)
+                        {
+                            <span class="sic-obj-tag sic-obj-tag-verde">
+                                @alias
+                            </span>
+                        }
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
+
+    </details>
+
+
+    @* ============================================================
+        ORGANIZACIÓN DELICTIVA
+        ============================================================ *@
+
+    <details class="sic-obj-seccion">
+
+        <summary>
+
+            <div class="sic-obj-seccion-titulo">
+                <i class="fa fa-users"></i>
+                Organización delictiva
+            </div>
+
+            <span class="sic-obj-contador">
+                @totalGrupos
+            </span>
+
+        </summary>
+
+
+        <div class="sic-obj-contenido">
+
+            @if (Model.Grupos != null &&
+                 Model.Grupos.Count > 0)
+            {
+                foreach (var grupo in Model.Grupos)
+                {
+                    <div class="sic-obj-registro">
+
+                        <div class="sic-obj-registro-titulo">
+                            @(string.IsNullOrWhiteSpace(grupo.AliasGrupo)
+                                ? grupo.Grupo
+                                : grupo.AliasGrupo)
+                        </div>
+
+
+                        <div class="sic-obj-registro-sub">
+
+                            @if (!string.IsNullOrWhiteSpace(grupo.Grupo))
+                            {
+                                <div>
+                                    <strong>Grupo:</strong>
+                                    @grupo.Grupo
+                                </div>
+                            }
+
+                            @if (!string.IsNullOrWhiteSpace(grupo.Puesto))
+                            {
+                                <div>
+                                    <strong>Puesto / nivel:</strong>
+                                    @grupo.Puesto
+                                </div>
+                            }
+
+                            @if (!string.IsNullOrWhiteSpace(grupo.Funcion))
+                            {
+                                <div>
+                                    <strong>Función:</strong>
+                                    @grupo.Funcion
+                                </div>
+                            }
+
+                            @if (grupo.FechaIngreso.HasValue)
+                            {
+                                <div>
+                                    <strong>Fecha ingreso:</strong>
+                                    @grupo.FechaIngreso.Value.ToString("dd/MM/yyyy")
+                                </div>
+                            }
+
+                            @if (grupo.FechaSalida.HasValue)
+                            {
+                                <div>
+                                    <strong>Fecha salida:</strong>
+                                    @grupo.FechaSalida.Value.ToString("dd/MM/yyyy")
+                                </div>
+                            }
+
+                        </div>
+
+
+                        @if (!string.IsNullOrWhiteSpace(grupo.Observaciones))
+                        {
+                            <div class="sic-obj-observacion">
+                                @grupo.Observaciones
+                            </div>
+                        }
+
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="sic-obj-vacio">
+                    No existen grupos relacionados.
+                </div>
+            }
+
+        </div>
+
+    </details>
+
+
+    @* ============================================================
+        DOMICILIOS
+        ============================================================ *@
+
+    <details class="sic-obj-seccion">
+
+        <summary>
+
+            <div class="sic-obj-seccion-titulo">
+                <i class="fa fa-map-marker"></i>
+                Domicilios
+            </div>
+
+            <span class="sic-obj-contador">
+                @totalDomicilios
+            </span>
+
+        </summary>
+
+
+        <div class="sic-obj-contenido">
+
+            @if (Model.Domicilios != null &&
+                 Model.Domicilios.Count > 0)
+            {
+                foreach (var domicilio in Model.Domicilios)
+                {
+                    <div class="sic-obj-registro">
+
+                        <div class="sic-obj-registro-titulo">
+                            @domicilio.Calle
+                            @domicilio.Numero
+                        </div>
+
+
+                        <div class="sic-obj-registro-sub">
+
+                            <div>
+                                @domicilio.Colonia
+                            </div>
+
+                            <div>
+                                @domicilio.Municipio,
+                                @domicilio.Estado
+                            </div>
+
+                            @if (!string.IsNullOrWhiteSpace(domicilio.CP))
+                            {
+                                <div>
+                                    <strong>CP:</strong>
+                                    @domicilio.CP
+                                </div>
+                            }
+
+                        </div>
+
+
+                        @if (!string.IsNullOrWhiteSpace(domicilio.Observaciones))
+                        {
+                            <div class="sic-obj-observacion">
+                                @domicilio.Observaciones
+                            </div>
+                        }
+
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="sic-obj-vacio">
+                    No existen domicilios registrados.
+                </div>
+            }
+
+        </div>
+
+    </details>
+
+
+    @* ============================================================
+        CARPETAS
+        ============================================================ *@
+
+    <details class="sic-obj-seccion">
+
+        <summary>
+
+            <div class="sic-obj-seccion-titulo">
+                <i class="fa fa-folder-open"></i>
+                Carpetas de investigación
+            </div>
+
+            <span class="sic-obj-contador">
+                @totalCarpetas
+            </span>
+
+        </summary>
+
+
+        <div class="sic-obj-contenido">
+
+            @if (Model.Carpetas != null &&
+                 Model.Carpetas.Count > 0)
+            {
+                foreach (var carpeta in Model.Carpetas)
+                {
+                    <div class="sic-obj-registro">
+
+                        <div class="sic-obj-registro-titulo">
+                            @(string.IsNullOrWhiteSpace(carpeta.NumeroCarpeta)
+                                ? "SIN NÚMERO DE CARPETA"
+                                : carpeta.NumeroCarpeta)
+                        </div>
+
+
+                        <div class="sic-obj-tags">
+
+                            @if (!string.IsNullOrWhiteSpace(carpeta.Delito))
+                            {
+                                <span class="sic-obj-tag sic-obj-tag-rojo">
+                                    @carpeta.Delito
+                                </span>
+                            }
+
+                        </div>
+
+
+                        @if (carpeta.FechaAlta.HasValue)
+                        {
+                            <div class="sic-obj-registro-sub"
+                                 style="margin-top:6px;">
+                                <strong>Fecha:</strong>
+                                @carpeta.FechaAlta.Value.ToString("dd/MM/yyyy")
+                            </div>
+                        }
+
+
+                        @if (!string.IsNullOrWhiteSpace(carpeta.Observaciones))
+                        {
+                            <div class="sic-obj-observacion">
+                                @carpeta.Observaciones
+                            </div>
+                        }
+
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="sic-obj-vacio">
+                    No existen carpetas relacionadas.
+                </div>
+            }
+
+        </div>
+
+    </details>
+
+
+    @* ============================================================
+        DETENCIONES
+        ============================================================ *@
+
+    <details class="sic-obj-seccion">
+
+        <summary>
+
+            <div class="sic-obj-seccion-titulo">
+                <i class="fa fa-link"></i>
+                Detenidos / Filiación
+            </div>
+
+            <span class="sic-obj-contador">
+                @totalDetenciones
+            </span>
+
+        </summary>
+
+
+        <div class="sic-obj-contenido">
+
+            @if (Model.Detenciones != null &&
+                 Model.Detenciones.Count > 0)
+            {
+                foreach (var detencion in Model.Detenciones)
+                {
+                    <div class="sic-obj-registro">
+
+                        <div class="sic-obj-registro-titulo">
+                            @(string.IsNullOrWhiteSpace(detencion.NumeroCarpeta)
+                                ? "SIN NÚMERO DE CARPETA"
+                                : detencion.NumeroCarpeta)
+                        </div>
+
+
+                        <div class="sic-obj-registro-sub">
+
+                            @if (detencion.FechaDetencion.HasValue)
+                            {
+                                <div>
+                                    <strong>Fecha detención:</strong>
+                                    @detencion.FechaDetencion.Value.ToString("dd/MM/yyyy")
+
+                                    @if (detencion.HoraDetencion.HasValue)
+                                    {
+                                        <text>
+                                            ·
+                                            @detencion.HoraDetencion.Value.ToString(@"hh\:mm")
+                                        </text>
+                                    }
+                                </div>
+                            }
+
+                            @if (detencion.ClavePersona.HasValue)
+                            {
+                                <div>
+                                    <strong>CLAVE_PERSO:</strong>
+                                    @detencion.ClavePersona.Value
+                                </div>
+                            }
+
+                        </div>
+
+
+                        @if (detencion.Delitos != null &&
+                             detencion.Delitos.Count > 0)
+                        {
+                            <div class="sic-obj-tags">
+
+                                @foreach (var delito in detencion.Delitos)
+                                {
+                                    <span class="sic-obj-tag sic-obj-tag-rojo">
+                                        @delito.Delito
+                                    </span>
+                                }
+
+                            </div>
+                        }
+
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="sic-obj-vacio">
+                    No existen detenciones relacionadas.
+                </div>
+            }
+
+        </div>
+
+    </details>
+
+
+    @* ============================================================
+        MANDAMIENTOS VINCULADOS
+        ============================================================ *@
+
+    <details class="sic-obj-seccion">
+
+        <summary>
+
+            <div class="sic-obj-seccion-titulo">
+                <i class="fa fa-gavel"></i>
+                Mandamientos vinculados
+            </div>
+
+            <span class="sic-obj-contador">
+                @totalMandamientosVinculados
+            </span>
+
+        </summary>
+
+
+        <div class="sic-obj-contenido">
+
+            @if (Model.MandamientosVinculados != null &&
+                 Model.MandamientosVinculados.Count > 0)
+            {
+                foreach (var mandamiento in Model.MandamientosVinculados)
+                {
+                    <div class="sic-obj-registro">
+
+                        <div class="sic-obj-registro-titulo">
+                            @(string.IsNullOrWhiteSpace(mandamiento.Delito)
+                                ? "MANDAMIENTO JUDICIAL"
+                                : mandamiento.Delito)
+                        </div>
+
+
+                        <div class="sic-obj-registro-sub">
+
+                            <div>
+                                <strong>ID Mandamiento:</strong>
+                                @mandamiento.IdMandamientoJudicial
+                            </div>
+
+                            @if (!string.IsNullOrWhiteSpace(mandamiento.Tipo))
+                            {
+                                <div>
+                                    <strong>Estado / tipo:</strong>
+                                    @mandamiento.Tipo
+                                </div>
+                            }
+
+                            @if (mandamiento.FechaEstatus.HasValue)
+                            {
+                                <div>
+                                    <strong>Fecha estatus:</strong>
+                                    @mandamiento.FechaEstatus.Value.ToString("dd/MM/yyyy")
+                                </div>
+                            }
+
+                        </div>
+
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="sic-obj-vacio">
+                    No existen mandamientos vinculados directamente al objetivo.
+                </div>
+            }
+
+
+            @*
+                * Esto es APARTE de los vinculados.
+                *
+                * Son las coincidencias nominales encontradas
+                * durante la búsqueda.
+            *@
+
+            @if (coincidencia != null &&
+                 coincidencia.TieneAvisoMandamientos &&
+                 coincidencia.TotalMandamientos > 0)
+            {
+                <div class="sic-obj-alerta-mandamientos">
+
+                    <strong>
+                        <i class="fa fa-exclamation-triangle"></i>
+                        Coincidencias nominales adicionales:
+                        @coincidencia.TotalMandamientos
+                    </strong>
+
+                    <div style="margin-top:4px;">
+                        Estos registros fueron encontrados por coincidencia
+                        nominal y no representan necesariamente una relación
+                        directa con el objetivo.
+                    </div>
+
+                </div>
+            }
+
+        </div>
+
+    </details>
+
+
+    @* ============================================================
+        ASUNTOS
+        ============================================================ *@
+
+    <details class="sic-obj-seccion">
+
+        <summary>
+
+            <div class="sic-obj-seccion-titulo">
+                <i class="fa fa-sitemap"></i>
+                Asuntos relacionados
+            </div>
+
+            <span class="sic-obj-contador">
+                @totalAsuntos
+            </span>
+
+        </summary>
+
+
+        <div class="sic-obj-contenido">
+
+            @if (Model.AsuntosRelacionados != null &&
+                 Model.AsuntosRelacionados.Count > 0)
+            {
+                foreach (var asunto in Model.AsuntosRelacionados)
+                {
+                    <div class="sic-obj-registro">
+
+                        <div class="sic-obj-registro-titulo">
+                            @(string.IsNullOrWhiteSpace(asunto.Alias)
+                                ? "ASUNTO RELACIONADO"
+                                : asunto.Alias)
+                        </div>
+
+
+                        <div class="sic-obj-registro-sub">
+
+                            @if (!string.IsNullOrWhiteSpace(asunto.NumeroCarpeta))
+                            {
+                                <div>
+                                    <strong>CI:</strong>
+                                    @asunto.NumeroCarpeta
+                                </div>
+                            }
+
+                            @if (asunto.FechaAsunto.HasValue)
+                            {
+                                <div>
+                                    <strong>Fecha:</strong>
+                                    @asunto.FechaAsunto.Value.ToString("dd/MM/yyyy")
+                                </div>
+                            }
+
+                            @if (!string.IsNullOrWhiteSpace(asunto.RolParticipacion))
+                            {
+                                <div>
+                                    <strong>Rol:</strong>
+                                    @asunto.RolParticipacion
+                                </div>
+                            }
+
+                        </div>
+
+
+                        @if (!string.IsNullOrWhiteSpace(asunto.Descripcion))
+                        {
+                            <div class="sic-obj-observacion">
+                                <strong>Descripción:</strong>
+                                @asunto.Descripcion
+                            </div>
+                        }
+
+
+                        @if (!string.IsNullOrWhiteSpace(asunto.DescripcionParticipacion))
+                        {
+                            <div class="sic-obj-observacion">
+                                <strong>Participación:</strong>
+                                @asunto.DescripcionParticipacion
+                            </div>
+                        }
+
+
+                        @if (!string.IsNullOrWhiteSpace(asunto.ObservacionesRelacion))
+                        {
+                            <div class="sic-obj-observacion">
+                                <strong>Observaciones de la relación:</strong>
+                                @asunto.ObservacionesRelacion
+                            </div>
+                        }
+
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="sic-obj-vacio">
+                    No existen asuntos relacionados.
+                </div>
+            }
+
+        </div>
+
+    </details>
+
+</div>

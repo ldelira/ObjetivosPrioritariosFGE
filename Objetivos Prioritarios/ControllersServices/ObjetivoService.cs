@@ -1,4 +1,5 @@
-﻿using Objetivos_Prioritarios.Models;
+﻿using Objetivos_Prioritarios.Helpers;
+using Objetivos_Prioritarios.Models;
 using Objetivos_Prioritarios.Utils;
 using System;
 using System.Collections.Generic;
@@ -115,72 +116,259 @@ namespace Objetivos_Prioritarios.ControllersServices
             }
         }
 
-        public BasicOperationResponse addEditPhoto(HttpPostedFileBase foto, DateTime? fechaNacimiento, int int_id_objetivo)
+
+        public BasicOperationResponse addEditPhoto(
+    HttpPostedFileBase foto,
+    DateTime? fechaNacimiento,
+    int int_id_objetivo)
         {
             try
             {
-                string base64String = null;
+                var busqueda =
+                    db.tb_Objetivo
+                        .FirstOrDefault(
+                            x =>
+                                x.int_id_objetivo
+                                == int_id_objetivo
+                        );
 
-                if (foto != null && foto.ContentLength > 0)
+
+                if (busqueda == null)
                 {
-                    using (var ms = new MemoryStream())
+                    return new BasicOperationResponse
                     {
-                        foto.InputStream.CopyTo(ms);
-                        byte[] fileBytes = ms.ToArray();
-
-                        // Convertir a Base64
-                        base64String = Convert.ToBase64String(fileBytes);
-                    }
-                }
-                var busqueda = db.tb_Objetivo.FirstOrDefault(x => x.int_id_objetivo == int_id_objetivo);
-
-                    bool cambioFecha = false;
-                    bool cambioFoto = false;
-
-                    if (busqueda != null)
-                    {
-                        if (fechaNacimiento.HasValue && busqueda.date_fecha_nacimiento != fechaNacimiento.Value)
-                        {
-                            busqueda.date_fecha_nacimiento = fechaNacimiento.Value;
-                            cambioFecha = true;
-                        }
-
-                        if (base64String != null && busqueda.nvarchar_foto != base64String && foto.FileName != "Nodisponible.png")
-                        {
-                            busqueda.nvarchar_foto = base64String;
-                            cambioFoto = true;
-                        }
-                    }
-
-                    db.SaveChanges();
-
-                    // Crear mensaje dinámico
-                    string mensaje = "";
-
-                    if (cambioFecha && cambioFoto)
-                        mensaje = "Se guardaron la foto y la fecha de nacimiento correctamente.";
-                    else if (cambioFecha)
-                        mensaje = "Se actualizó la fecha de nacimiento correctamente.";
-                    else if (cambioFoto)
-                        mensaje = "Se actualizó la foto correctamente.";
-                    else
-                        mensaje = "No hubo cambios para guardar.";
-
-                    return new BasicOperationResponse()
-                    {
-                        IsSuccess = true,
-                        Message = mensaje
+                        IsSuccess = false,
+                        Message = "No se encontró el objetivo."
                     };
                 }
+
+
+                string base64String = null;
+                byte[] fileBytes = null;
+
+
+                if (
+                    foto != null &&
+                    foto.ContentLength > 0
+                )
+                {
+                    using (
+                        var ms =
+                            new MemoryStream()
+                    )
+                    {
+                        foto.InputStream.CopyTo(ms);
+
+                        fileBytes =
+                            ms.ToArray();
+
+                        base64String =
+                            Convert.ToBase64String(
+                                fileBytes
+                            );
+                    }
+                }
+
+
+                bool cambioFecha =
+                    fechaNacimiento.HasValue &&
+                    busqueda.date_fecha_nacimiento
+                        != fechaNacimiento.Value;
+
+
+                bool cambioFoto =
+                    base64String != null &&
+                    busqueda.nvarchar_foto
+                        != base64String &&
+                    !string.Equals(
+                        foto.FileName,
+                        "Nodisponible.png",
+                        StringComparison.OrdinalIgnoreCase
+                    );
+
+
+                /*
+                 * ============================================================
+                 * SI CAMBIÓ LA FOTO, GENERAR / ACTUALIZAR EMBEDDING
+                 * ============================================================
+                 *
+                 * Fuente 5 = Objetivos Prioritarios
+                 *
+                 * IMPORTANTE:
+                 * idPersona = int_id_objetivo
+                 * ============================================================
+                 */
+                if (cambioFoto)
+                {
+                    ResultadoEmbeddingApi resultadoEmbedding =
+                        BiometriaApiHelper
+                            .GuardarOActualizarEmbedding(
+                                int_id_objetivo,
+                                5,
+                                fileBytes,
+                                foto.FileName,
+                                foto.ContentType
+                            );
+
+
+                    if (!resultadoEmbedding.Success)
+                    {
+                        return new BasicOperationResponse
+                        {
+                            IsSuccess = false,
+
+                            Message =
+                                "No se actualizó la fotografía porque no fue posible "
+                                + "generar el embedding facial. "
+                                + resultadoEmbedding.Message
+                        };
+                    }
+                }
+
+
+                /*
+                 * ============================================================
+                 * ACTUALIZAR OBJETIVO
+                 * ============================================================
+                 */
+
+                if (cambioFecha)
+                {
+                    busqueda.date_fecha_nacimiento =
+                        fechaNacimiento.Value;
+                }
+
+
+                if (cambioFoto)
+                {
+                    busqueda.nvarchar_foto =
+                        base64String;
+                }
+
+
+                if (
+                    cambioFecha ||
+                    cambioFoto
+                )
+                {
+                    db.SaveChanges();
+                }
+
+
+                string mensaje;
+
+
+                if (
+                    cambioFecha &&
+                    cambioFoto
+                )
+                {
+                    mensaje =
+                        "Se guardaron la foto y la fecha de nacimiento correctamente.";
+                }
+                else if (cambioFecha)
+                {
+                    mensaje =
+                        "Se actualizó la fecha de nacimiento correctamente.";
+                }
+                else if (cambioFoto)
+                {
+                    mensaje =
+                        "Se actualizó la foto y el embedding facial correctamente.";
+                }
+                else
+                {
+                    mensaje =
+                        "No hubo cambios para guardar.";
+                }
+
+
+                return new BasicOperationResponse
+                {
+                    IsSuccess = true,
+                    Message = mensaje
+                };
+            }
             catch (Exception e)
             {
-                return new BasicOperationResponse()
+                return new BasicOperationResponse
                 {
                     IsSuccess = false,
-                    Message = "Ha ocurrido un error al guardar la foto y fecha de nacimiento (" + e.Message + ")"
+
+                    Message =
+                        "Ha ocurrido un error al guardar la foto y fecha de nacimiento ("
+                        + e.GetBaseException().Message
+                        + ")"
                 };
             }
         }
+
+        //public BasicOperationResponse addEditPhoto(HttpPostedFileBase foto, DateTime? fechaNacimiento, int int_id_objetivo)
+        //{
+        //    try
+        //    {
+        //        string base64String = null;
+
+        //        if (foto != null && foto.ContentLength > 0)
+        //        {
+        //            using (var ms = new MemoryStream())
+        //            {
+        //                foto.InputStream.CopyTo(ms);
+        //                byte[] fileBytes = ms.ToArray();
+
+        //                // Convertir a Base64
+        //                base64String = Convert.ToBase64String(fileBytes);
+        //            }
+        //        }
+        //        var busqueda = db.tb_Objetivo.FirstOrDefault(x => x.int_id_objetivo == int_id_objetivo);
+
+        //            bool cambioFecha = false;
+        //            bool cambioFoto = false;
+
+        //            if (busqueda != null)
+        //            {
+        //                if (fechaNacimiento.HasValue && busqueda.date_fecha_nacimiento != fechaNacimiento.Value)
+        //                {
+        //                    busqueda.date_fecha_nacimiento = fechaNacimiento.Value;
+        //                    cambioFecha = true;
+        //                }
+
+        //                if (base64String != null && busqueda.nvarchar_foto != base64String && foto.FileName != "Nodisponible.png")
+        //                {
+        //                    busqueda.nvarchar_foto = base64String;
+        //                    cambioFoto = true;
+        //                }
+        //            }
+
+        //            db.SaveChanges();
+
+        //            // Crear mensaje dinámico
+        //            string mensaje = "";
+
+        //            if (cambioFecha && cambioFoto)
+        //                mensaje = "Se guardaron la foto y la fecha de nacimiento correctamente.";
+        //            else if (cambioFecha)
+        //                mensaje = "Se actualizó la fecha de nacimiento correctamente.";
+        //            else if (cambioFoto)
+        //                mensaje = "Se actualizó la foto correctamente.";
+        //            else
+        //                mensaje = "No hubo cambios para guardar.";
+
+        //            return new BasicOperationResponse()
+        //            {
+        //                IsSuccess = true,
+        //                Message = mensaje
+        //            };
+        //        }
+        //    catch (Exception e)
+        //    {
+        //        return new BasicOperationResponse()
+        //        {
+        //            IsSuccess = false,
+        //            Message = "Ha ocurrido un error al guardar la foto y fecha de nacimiento (" + e.Message + ")"
+        //        };
+        //    }
+        //}
 
 
 
@@ -751,23 +939,110 @@ namespace Objetivos_Prioritarios.ControllersServices
                 };
             }
         }
-
-        public BasicOperationResponse GuardarNuevaFoto(int IdObjetivo, string Foto)
+        public BasicOperationResponse GuardarNuevaFoto(
+    int IdObjetivo,
+    string Foto)
         {
             try
             {
-                // Buscar el objetivo por ID
-                var objetivo = db.tb_Objetivo.FirstOrDefault(x => x.int_id_objetivo == IdObjetivo);
+                var objetivo =
+                    db.tb_Objetivo
+                        .FirstOrDefault(
+                            x =>
+                                x.int_id_objetivo
+                                == IdObjetivo
+                        );
 
-                // Guardar la cadena Base64 en el campo correspondiente
-                objetivo.nvarchar_foto = Foto; // Asegúrate de que este campo exista en la entidad y en la BD
+
+                if (objetivo == null)
+                {
+                    return new BasicOperationResponse
+                    {
+                        IsSuccess = false,
+                        Message = "No se encontró el objetivo."
+                    };
+                }
+
+
+                if (
+                    string.IsNullOrWhiteSpace(
+                        Foto
+                    )
+                )
+                {
+                    return new BasicOperationResponse
+                    {
+                        IsSuccess = false,
+                        Message = "La fotografía está vacía."
+                    };
+                }
+
+
+                /*
+                 * Si es exactamente la misma foto,
+                 * no hacemos nada.
+                 */
+                if (
+                    objetivo.nvarchar_foto
+                    == Foto
+                )
+                {
+                    return new BasicOperationResponse
+                    {
+                        IsSuccess = true,
+                        Message = "La fotografía no presentó cambios."
+                    };
+                }
+
+
+                /*
+                 * ============================================================
+                 * EMBEDDING
+                 * Fuente 5 = Objetivos Prioritarios
+                 * ============================================================
+                 */
+
+                ResultadoEmbeddingApi resultadoEmbedding =
+                    BiometriaApiHelper
+                        .GuardarOActualizarEmbeddingDesdeBase64(
+                            IdObjetivo,
+                            5,
+                            Foto
+                        );
+
+
+                if (!resultadoEmbedding.Success)
+                {
+                    return new BasicOperationResponse
+                    {
+                        IsSuccess = false,
+
+                        Message =
+                            "No se guardó la fotografía porque no fue posible "
+                            + "generar el embedding facial. "
+                            + resultadoEmbedding.Message
+                    };
+                }
+
+
+                /*
+                 * El embedding ya fue validado/generado.
+                 * Ahora guardamos la nueva fotografía.
+                 */
+
+                objetivo.nvarchar_foto =
+                    Foto;
+
 
                 db.SaveChanges();
+
 
                 return new BasicOperationResponse
                 {
                     IsSuccess = true,
-                    Message = "La foto fue guardada correctamente en el objetivo."
+
+                    Message =
+                        "La foto y el embedding facial fueron guardados correctamente."
                 };
             }
             catch (Exception e)
@@ -775,10 +1050,41 @@ namespace Objetivos_Prioritarios.ControllersServices
                 return new BasicOperationResponse
                 {
                     IsSuccess = false,
-                    Message = "Error al guardar la foto (" + e.Message + ")"
+
+                    Message =
+                        "Error al guardar la foto ("
+                        + e.GetBaseException().Message
+                        + ")"
                 };
             }
         }
+        //public BasicOperationResponse GuardarNuevaFoto(int IdObjetivo, string Foto)
+        //{
+        //    try
+        //    {
+        //        // Buscar el objetivo por ID
+        //        var objetivo = db.tb_Objetivo.FirstOrDefault(x => x.int_id_objetivo == IdObjetivo);
+
+        //        // Guardar la cadena Base64 en el campo correspondiente
+        //        objetivo.nvarchar_foto = Foto; // Asegúrate de que este campo exista en la entidad y en la BD
+
+        //        db.SaveChanges();
+
+        //        return new BasicOperationResponse
+        //        {
+        //            IsSuccess = true,
+        //            Message = "La foto fue guardada correctamente en el objetivo."
+        //        };
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        return new BasicOperationResponse
+        //        {
+        //            IsSuccess = false,
+        //            Message = "Error al guardar la foto (" + e.Message + ")"
+        //        };
+        //    }
+        //}
 
         public string ObtenerNombreCompletoPrincipal(int? idObjetivo)
         {

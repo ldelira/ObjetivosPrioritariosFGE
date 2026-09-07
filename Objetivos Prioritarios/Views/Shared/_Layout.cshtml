@@ -1,4 +1,10 @@
-﻿@{
+﻿@using Objetivos_Prioritarios.Models.Extends
+@using Objetivos_Prioritarios.Models
+@using System
+@using System.Collections.Generic
+@using System.Linq
+
+@{
     var controllerName =
         (ViewContext.RouteData.Values["controller"] ?? "")
             .ToString();
@@ -7,13 +13,85 @@
         (ViewContext.RouteData.Values["action"] ?? "")
             .ToString();
 
+    tb_Usuarios usuarioSesion = Session["User"] as tb_Usuarios;
+
     var nombreUsuario =
-        (Session["NombreUsuario"] ?? "FGEA")
-            .ToString();
+        usuarioSesion != null &&
+        !string.IsNullOrWhiteSpace(usuarioSesion.nvarchar_nombre_usuario)
+            ? usuarioSesion.nvarchar_nombre_usuario.Trim()
+            : "FGEA";
 
     var pageTitle =
-        ((ViewBag.Title ?? ViewBag.title) ?? "")
-            .ToString();
+((ViewBag.Title ?? ViewBag.title) ?? "")
+    .ToString();
+
+
+    /* =========================================================
+       PERMISOS DEL USUARIO
+       ========================================================= */
+
+    PermisosUsuarioDto permisosUsuario =
+        Session["PermisosUsuario"] as PermisosUsuarioDto;
+
+    bool esAdministrador =
+        permisosUsuario != null &&
+        permisosUsuario.EsAdministrador;
+
+    List<string> modulosPermitidos =
+        permisosUsuario != null &&
+        permisosUsuario.Modulos != null
+            ? permisosUsuario.Modulos
+            : new List<string>();
+
+    bool puedeObjetivos =
+        esAdministrador ||
+        modulosPermitidos.Any(x =>
+            string.Equals(
+                x,
+                "OBJETIVOS",
+                StringComparison.OrdinalIgnoreCase
+            )
+        );
+
+    bool puedeSIC =
+        esAdministrador ||
+        modulosPermitidos.Any(x =>
+            string.Equals(
+                x,
+                "SIC",
+                StringComparison.OrdinalIgnoreCase
+            )
+        );
+
+    bool puedeBusquedaIntencionada =
+        esAdministrador ||
+        modulosPermitidos.Any(x =>
+            string.Equals(
+                x,
+                "BUSQUEDA_INTENCIONADA",
+                StringComparison.OrdinalIgnoreCase
+            )
+        );
+
+    bool puedePersonasInteres =
+        esAdministrador ||
+        modulosPermitidos.Any(x =>
+            string.Equals(
+                x,
+                "PERSONAS_INTERES",
+                StringComparison.OrdinalIgnoreCase
+            )
+        );
+
+    bool puedeAdministrarAccesos =
+        esAdministrador ||
+        modulosPermitidos.Any(x =>
+            string.Equals(
+                x,
+                "ADMIN_ACCESOS",
+                StringComparison.OrdinalIgnoreCase
+            )
+        );
 
 
     /* =========================================================
@@ -175,6 +253,50 @@
 
         moduloActivoSubtitulo =
             "Registros parciales, fotos y huellas";
+    }
+
+
+    /* =========================================================
+       RUTA DE INICIO SEGÚN PERMISOS
+       ========================================================= */
+
+    string urlInicio =
+        Url.Action(
+            "Index",
+            "Login"
+        );
+
+    if (puedeObjetivos)
+    {
+        urlInicio =
+            Url.Action(
+                "Index",
+                "Objetivo"
+            );
+    }
+    else if (puedeSIC)
+    {
+        urlInicio =
+            Url.Action(
+                "Index",
+                "SIC"
+            );
+    }
+    else if (puedeBusquedaIntencionada)
+    {
+        urlInicio =
+            Url.Action(
+                "BusquedaCoincidencias",
+                "SIC"
+            );
+    }
+    else if (puedePersonasInteres)
+    {
+        urlInicio =
+            Url.Action(
+                "Index",
+                "PersonasInteres"
+            );
     }
 }
 
@@ -1438,12 +1560,289 @@
     }
 </style>
 
-<body>
+<style>
+    /* ==========================================================================
+       BÚSQUEDA INTENCIONADA - MODO TABLET / ESPACIO COMPACTO
+       --------------------------------------------------------------------------
+       Estos estilos SOLO afectan la pantalla SIC/BusquedaCoincidencias.
+       Escritorio grande conserva el menú completo.
+       Tablet horizontal utiliza una barra lateral compacta de iconos.
+       Tablet vertical / móvil conserva el comportamiento off-canvas original.
+       ========================================================================== */
+
+    .op-busqueda-page {
+        --op-busqueda-sidebar-compact: 72px;
+        --op-busqueda-header-tablet: 54px;
+    }
+
+        /* Mejor transición al abrir/cerrar el menú en la búsqueda. */
+        .op-busqueda-page .sidebar,
+        .op-busqueda-page #main.main,
+        .op-busqueda-page #footer.footer,
+        .op-busqueda-page .header {
+            transition: width .18s ease, left .18s ease, margin-left .18s ease, height .18s ease, top .18s ease, padding .18s ease;
+        }
+
+    /* --------------------------------------------------------------------------
+       TABLET HORIZONTAL / LAPTOP PEQUEÑA
+       769px - 1399px
+       -------------------------------------------------------------------------- */
+    @@media (min-width: 769px) and (max-width: 1399px) {
+        /* HEADER MÁS BAJO */
+        .op-busqueda-page .header {
+            height: var(--op-busqueda-header-tablet) !important;
+            min-height: var(--op-busqueda-header-tablet) !important;
+            padding: 0 10px !important;
+        }
+
+        .op-busqueda-page .op-header-left {
+            gap: 8px !important;
+        }
+
+        .op-busqueda-page .toggle-sidebar-btn {
+            width: 36px !important;
+            height: 36px !important;
+            min-width: 36px !important;
+            border-radius: 11px !important;
+            font-size: 20px !important;
+        }
+
+        .op-busqueda-page .op-brand-modern {
+            padding: 4px 9px 4px 5px !important;
+            border-radius: 13px !important;
+            gap: 7px !important;
+        }
+
+        .op-busqueda-page .op-brand-logo-wrap {
+            width: 34px !important;
+            height: 34px !important;
+            min-width: 34px !important;
+            border-radius: 10px !important;
+        }
+
+            .op-busqueda-page .op-brand-logo-wrap img {
+                width: 28px !important;
+                height: 28px !important;
+            }
+
+        .op-busqueda-page .op-brand-title strong {
+            font-size: 14px !important;
+        }
+
+        .op-busqueda-page .op-brand-title small {
+            display: none !important;
+        }
+
+        .op-busqueda-page .header-nav .nav-profile img {
+            width: 30px !important;
+            height: 30px !important;
+        }
+
+        .op-busqueda-page .header-nav .nav-profile span {
+            font-size: 13px !important;
+        }
+        /* SIDEBAR COMPACTO */
+        .op-busqueda-page .sidebar {
+            top: var(--op-busqueda-header-tablet) !important;
+            left: 0 !important;
+            width: var(--op-busqueda-sidebar-compact) !important;
+            padding: 10px 8px !important;
+            overflow-x: visible !important;
+            overflow-y: auto !important;
+        }
+        /* En compacto no necesitamos la tarjeta grande de módulo activo. */
+        .op-busqueda-page:not(.toggle-sidebar) .op-sidebar-title-modern,
+        .op-busqueda-page:not(.toggle-sidebar) .op-sidebar-nav-modern .nav-heading {
+            display: none !important;
+        }
+
+        .op-busqueda-page:not(.toggle-sidebar) .op-sidebar-nav-modern {
+            padding-top: 2px !important;
+        }
+
+        .op-busqueda-page:not(.toggle-sidebar) .op-module-item {
+            margin: 0 0 9px 0 !important;
+        }
+
+        .op-busqueda-page:not(.toggle-sidebar) .op-module-toggle {
+            width: 54px !important;
+            height: 54px !important;
+            min-height: 54px !important;
+            padding: 0 !important;
+            margin: 0 auto !important;
+            justify-content: center !important;
+            border-radius: 15px !important;
+            gap: 0 !important;
+        }
+
+            .op-busqueda-page:not(.toggle-sidebar) .op-module-toggle > span:not(.op-module-custom-icon),
+            .op-busqueda-page:not(.toggle-sidebar) .op-module-toggle .op-module-label,
+            .op-busqueda-page:not(.toggle-sidebar) .op-module-toggle .op-module-chevron {
+                display: none !important;
+            }
+
+            .op-busqueda-page:not(.toggle-sidebar) .op-module-toggle i:first-child,
+            .op-busqueda-page:not(.toggle-sidebar) .op-module-toggle .op-module-custom-icon {
+                width: 34px !important;
+                height: 34px !important;
+                min-width: 34px !important;
+                max-width: 34px !important;
+                flex: 0 0 34px !important;
+                margin: 0 !important;
+                border-radius: 11px !important;
+                font-size: 16px !important;
+            }
+
+                .op-busqueda-page:not(.toggle-sidebar) .op-module-toggle .op-module-custom-icon img {
+                    width: 20px !important;
+                    height: 20px !important;
+                }
+        /* Los submenús se muestran cuando el usuario expande el lateral. */
+        .op-busqueda-page:not(.toggle-sidebar) .op-sidebar-nav-modern .nav-content {
+            display: none !important;
+        }
+        /* CONTENIDO: siempre aprovecha el espacio dejado por los 72px. */
+        .op-busqueda-page #main.main,
+        .op-busqueda-page #footer.footer {
+            margin-left: var(--op-busqueda-sidebar-compact) !important;
+        }
+
+        .op-busqueda-page #main.main {
+            margin-top: var(--op-busqueda-header-tablet) !important;
+            min-height: calc(100vh - var(--op-busqueda-header-tablet)) !important;
+            padding: 14px 16px !important;
+        }
+        /* Al pulsar hamburguesa el menú se expande por ENCIMA del contenido. */
+        .op-busqueda-page.toggle-sidebar .sidebar {
+            width: var(--op-sidebar-width) !important;
+            left: 0 !important;
+            padding: 16px 14px !important;
+            box-shadow: 12px 0 34px rgba(5, 18, 45, .28) !important;
+            z-index: 1002 !important;
+        }
+
+        .op-busqueda-page.toggle-sidebar .op-sidebar-title-modern {
+            display: block !important;
+        }
+
+        .op-busqueda-page.toggle-sidebar .op-sidebar-nav-modern .nav-heading {
+            display: block !important;
+        }
+
+        .op-busqueda-page.toggle-sidebar .op-module-toggle > span,
+        .op-busqueda-page.toggle-sidebar .op-module-toggle .op-module-label,
+        .op-busqueda-page.toggle-sidebar .op-module-toggle .op-module-chevron {
+            display: flex !important;
+        }
+
+        .op-busqueda-page.toggle-sidebar .op-module-toggle .op-module-chevron {
+            display: inline-flex !important;
+        }
+
+        .op-busqueda-page.toggle-sidebar .op-sidebar-nav-modern .nav-content.show {
+            display: block !important;
+        }
+        /* El contenido NO salta cuando se expande el menú. */
+        .op-busqueda-page.toggle-sidebar #main.main,
+        .op-busqueda-page.toggle-sidebar #footer.footer {
+            margin-left: var(--op-busqueda-sidebar-compact) !important;
+        }
+
+        .op-busqueda-page .pagetitle {
+            margin-bottom: 10px !important;
+        }
+
+            .op-busqueda-page .pagetitle h1 {
+                font-size: 22px !important;
+            }
+    }
+
+    /* --------------------------------------------------------------------------
+       TABLET VERTICAL / MÓVIL
+       Conservamos el off-canvas de la plantilla.
+       -------------------------------------------------------------------------- */
+    @@media (max-width: 768px) {
+        .op-busqueda-page .header {
+            height: 54px !important;
+            min-height: 54px !important;
+            padding: 0 8px !important;
+        }
+
+        .op-busqueda-page .sidebar {
+            top: 54px !important;
+        }
+
+        .op-busqueda-page #main.main {
+            margin-top: 54px !important;
+            margin-left: 0 !important;
+            padding: 12px 10px !important;
+        }
+
+        .op-busqueda-page .toggle-sidebar-btn {
+            width: 36px !important;
+            height: 36px !important;
+            min-width: 36px !important;
+        }
+
+        .op-busqueda-page .op-brand-modern {
+            padding: 3px 7px 3px 4px !important;
+        }
+
+        .op-busqueda-page .op-brand-logo-wrap {
+            width: 34px !important;
+            height: 34px !important;
+            min-width: 34px !important;
+        }
+
+            .op-busqueda-page .op-brand-logo-wrap img {
+                width: 28px !important;
+                height: 28px !important;
+            }
+
+        .op-busqueda-page .op-brand-title strong {
+            font-size: 13px !important;
+        }
+    }
+
+    /* --------------------------------------------------------------------------
+       ESCRITORIO GRANDE
+       Mantiene el diseño original completo.
+       -------------------------------------------------------------------------- */
+    @@media (min-width: 1400px) {
+        /* =========================================================
+       SIDEBAR ABIERTO
+       ========================================================= */
+
+        .op-busqueda-page:not(.toggle-sidebar) .sidebar {
+            width: var(--op-sidebar-width) !important;
+            left: 0 !important;
+        }
+
+        .op-busqueda-page:not(.toggle-sidebar) #main.main,
+        .op-busqueda-page:not(.toggle-sidebar) #footer.footer {
+            margin-left: var(--op-sidebar-width) !important;
+        }
+        /* =========================================================
+       SIDEBAR CERRADO
+       ========================================================= */
+
+        .op-busqueda-page.toggle-sidebar .sidebar {
+            left: calc(var(--op-sidebar-width) * -1) !important;
+        }
+
+        .op-busqueda-page.toggle-sidebar #main.main,
+        .op-busqueda-page.toggle-sidebar #footer.footer {
+            margin-left: 0 !important;
+        }
+    }
+</style>
+
+<body class="@(isBusquedaCoincidencias ? "op-busqueda-page" : "")">
     <header id="header" class="header fixed-top d-flex align-items-center">
         <div class="op-header-left">
             <i class="bi bi-list toggle-sidebar-btn"></i>
 
-            <a href="@Url.Action("Index", "Objetivo")" class="op-brand op-brand-modern">
+            <a href="@urlInicio" class="op-brand op-brand-modern">
                 <span class="op-brand-logo-wrap">
                     <img src="@Url.Content("~/assets/images/logoIcono.png")" alt="Logo" />
                 </span>
@@ -1473,7 +1872,7 @@
                         </li>
 
                         <li>
-                            <a class="dropdown-item d-flex align-items-center" href="@Url.Action("Index", "Login")">
+                            <a class="dropdown-item d-flex align-items-center" href="@Url.Action("CerrarSesion", "Login")">
                                 <i class="bi bi-box-arrow-right"></i>
                                 <span>Cerrar sesión</span>
                             </a>
@@ -1524,323 +1923,354 @@
 
 
             <!-- ==================================================
-             OBJETIVOS PRIORITARIOS
-             ================================================== -->
+            OBJETIVOS PRIORITARIOS
+            ================================================== -->
 
-            <li class="nav-item op-module-item">
+            @if (puedeObjetivos)
+            {
+                <li class="nav-item op-module-item">
 
-                <a class="nav-link op-module-toggle @(isModuloObjetivos ? "" : "collapsed")"
-                   data-bs-target="#menuObjetivosPrioritarios"
-                   data-bs-toggle="collapse"
-                   href="#"
-                   aria-expanded="@(isModuloObjetivos ? "true" : "false")">
+                    <a class="nav-link op-module-toggle @(isModuloObjetivos ? "" : "collapsed")"
+                       data-bs-target="#menuObjetivosPrioritarios"
+                       data-bs-toggle="collapse"
+                       href="#"
+                       aria-expanded="@(isModuloObjetivos ? "true" : "false")">
 
-                    <i class="fa fa-shield"></i>
+                        <i class="fa fa-shield"></i>
 
-                    <span>
-                        Objetivos Prioritarios
-                    </span>
+                        <span>
+                            Objetivos Prioritarios
+                        </span>
 
-                    <i class="fa fa-chevron-down op-module-chevron"></i>
+                        <i class="fa fa-chevron-down op-module-chevron"></i>
 
-                </a>
-
-
-                <ul id="menuObjetivosPrioritarios"
-                    class="nav-content collapse @(isModuloObjetivos ? "show" : "")"
-                    data-bs-parent="#sidebar-nav">
+                    </a>
 
 
-                    <li>
-
-                        <a class="@(isMapa ? "active" : "")"
-                           href="@Url.Action("Index", "MapaRelaciones")">
-
-                            <i class="fa fa-sitemap"></i>
-
-                            <span>
-                                Red de inteligencia
-                            </span>
-
-                        </a>
-
-                    </li>
+                    <ul id="menuObjetivosPrioritarios"
+                        class="nav-content collapse @(isModuloObjetivos ? "show" : "")"
+                        data-bs-parent="#sidebar-nav">
 
 
-                    <li>
+                        <li>
 
-                        <a class="@(isObjetivos ? "active" : "")"
-                           href="@Url.Action("Index", "Objetivo")">
+                            <a class="@(isMapa ? "active" : "")"
+                               href="@Url.Action("Index", "MapaRelaciones")">
 
-                            <i class="fa fa-user"></i>
+                                <i class="fa fa-sitemap"></i>
 
-                            <span>
-                                Objetivos
-                            </span>
+                                <span>
+                                    Red de inteligencia
+                                </span>
 
-                        </a>
+                            </a>
 
-                    </li>
-
-
-                    <li>
-
-                        <a class="@(isAsuntos ? "active" : "")"
-                           href="@Url.Action("Index", "Asuntos")">
-
-                            <i class="fa fa-link"></i>
-
-                            <span>
-                                Asuntos relacionados
-                            </span>
-
-                        </a>
-
-                    </li>
+                        </li>
 
 
-                    <li>
+                        <li>
 
-                        <a class="@(isAlbum ? "active" : "")"
-                           href="@Url.Action("IndexAlbum", "FichaObjetivo")">
+                            <a class="@(isObjetivos ? "active" : "")"
+                               href="@Url.Action("Index", "Objetivo")">
 
-                            <i class="fa fa-folder-open"></i>
+                                <i class="fa fa-user"></i>
 
-                            <span>
-                                Álbum de fichas
-                            </span>
+                                <span>
+                                    Objetivos
+                                </span>
 
-                        </a>
+                            </a>
 
-                    </li>
+                        </li>
 
 
-                    <li>
+                        <li>
 
-                        <a class="disabled"
-                           href="javascript:void(0);"
-                           title="Pendiente de enlazar a la ruta de catálogos">
+                            <a class="@(isAsuntos ? "active" : "")"
+                               href="@Url.Action("Index", "Asuntos")">
 
-                            <i class="fa fa-list"></i>
+                                <i class="fa fa-link"></i>
 
-                            <span>
-                                Catálogos
-                            </span>
+                                <span>
+                                    Asuntos relacionados
+                                </span>
 
-                            <em>
-                                Próximo
-                            </em>
+                            </a>
 
-                        </a>
+                        </li>
 
-                    </li>
 
-                </ul>
+                        <li>
 
-            </li>
+                            <a class="@(isAlbum ? "active" : "")"
+                               href="@Url.Action("IndexAlbum", "FichaObjetivo")">
+
+                                <i class="fa fa-folder-open"></i>
+
+                                <span>
+                                    Álbum de fichas
+                                </span>
+
+                            </a>
+
+                        </li>
+
+
+                        <li>
+
+                            <a class="disabled"
+                               href="javascript:void(0);"
+                               title="Pendiente de enlazar a la ruta de catálogos">
+
+                                <i class="fa fa-list"></i>
+
+                                <span>
+                                    Catálogos
+                                </span>
+
+                                <em>
+                                    Próximo
+                                </em>
+
+                            </a>
+
+                        </li>
+
+                    </ul>
+
+                </li>
+            }
 
 
             <!-- ==================================================
-             SIC
-             ================================================== -->
+            SIC
+            ================================================== -->
 
-            <li class="nav-item op-module-item">
+            @if (puedeSIC)
+            {
+                <li class="nav-item op-module-item">
 
-                <a class="nav-link op-module-toggle @(isModuloSic ? "" : "collapsed")"
-                   data-bs-target="#menuSic"
-                   data-bs-toggle="collapse"
-                   href="#"
-                   aria-expanded="@(isModuloSic ? "true" : "false")">
+                    <a class="nav-link op-module-toggle @(isModuloSic ? "" : "collapsed")"
+                       data-bs-target="#menuSic"
+                       data-bs-toggle="collapse"
+                       href="#"
+                       aria-expanded="@(isModuloSic ? "true" : "false")">
 
-                    <i class="fa fa-user-secret"></i>
+                        <i class="fa fa-user-secret"></i>
 
-                    <span>
-                        SIC
-                    </span>
+                        <span>
+                            SIC
+                        </span>
 
-                    <i class="fa fa-chevron-down op-module-chevron"></i>
+                        <i class="fa fa-chevron-down op-module-chevron"></i>
 
-                </a>
-
-
-                <ul id="menuSic"
-                    class="nav-content collapse @(isModuloSic ? "show" : "")"
-                    data-bs-parent="#sidebar-nav">
+                    </a>
 
 
-                    <li>
-
-                        <a class="@(isConsultaSic ? "active" : "")"
-                           href="@Url.Action("Index", "SIC")">
-
-                            <i class="fa fa-id-card-o"></i>
-
-                            <span>
-                                Consulta SIC
-                            </span>
-
-                        </a>
-
-                    </li>
+                    <ul id="menuSic"
+                        class="nav-content collapse @(isModuloSic ? "show" : "")"
+                        data-bs-parent="#sidebar-nav">
 
 
-                    <li>
+                        <li>
 
-                        <a class="disabled"
-                           href="javascript:void(0);">
+                            <a class="@(isConsultaSic ? "active" : "")"
+                               href="@Url.Action("Index", "SIC")">
 
-                            <i class="fa fa-tags"></i>
+                                <i class="fa fa-id-card-o"></i>
 
-                            <span>
-                                Catálogos SIC
-                            </span>
+                                <span>
+                                    Consulta SIC
+                                </span>
 
-                            <em>
-                                Próximo
-                            </em>
+                            </a>
 
-                        </a>
-
-                    </li>
-
-                </ul>
-
-            </li>
+                        </li>
 
 
-            <!-- ==================================================
-             BÚSQUEDA DE COINCIDENCIAS
-             OPCIÓN PRINCIPAL INDEPENDIENTE
-             ================================================== -->
+                        <li>
 
-            <li class="nav-item op-module-item">
+                            <a class="disabled"
+                               href="javascript:void(0);">
 
-                <a class="nav-link op-module-toggle @(isBusquedaCoincidencias ? "active" : "collapsed")"
-                   href="@Url.Action("BusquedaCoincidencias", "SIC")">
+                                <i class="fa fa-tags"></i>
 
-                    <i class="fa fa-search"></i>
+                                <span>
+                                    Catálogos SIC
+                                </span>
 
-                    <span>
-                        Búsqueda Intencionada
-                    </span>
+                                <em>
+                                    Próximo
+                                </em>
 
-                </a>
+                            </a>
 
-            </li>
+                        </li>
+
+                    </ul>
+
+                </li>
+            }
 
 
             <!-- ==================================================
-             PERSONAS DE INTERÉS
-             ================================================== -->
+            BÚSQUEDA DE COINCIDENCIAS
+            OPCIÓN PRINCIPAL INDEPENDIENTE
+            ================================================== -->
 
-            <li class="nav-item op-module-item">
+            @if (puedeBusquedaIntencionada)
+            {
+                <li class="nav-item op-module-item">
 
-                <a class="nav-link op-module-toggle @(isModuloPersonasInteres ? "" : "collapsed")"
-                   data-bs-target="#menuPersonasInteres"
-                   data-bs-toggle="collapse"
-                   href="#"
-                   aria-expanded="@(isModuloPersonasInteres ? "true" : "false")">
+                    <a class="nav-link op-module-toggle @(isBusquedaCoincidencias ? "active" : "collapsed")"
+                       href="@Url.Action("BusquedaCoincidencias", "SIC")">
 
+                        <i class="fa fa-search"></i>
 
-                    <span class="op-module-custom-icon">
+                        <span>
+                            Búsqueda Intencionada
+                        </span>
 
-                        <img src="@Url.Content("~/images/icons8-target-audience-24.png")"
-                             alt="Personas de Interés" />
+                    </a>
 
-                    </span>
-
-
-                    <span class="op-module-label">
-                        Personas de Interés
-                    </span>
+                </li>
+            }
 
 
-                    <i class="fa fa-chevron-down op-module-chevron"></i>
+            <!-- ==================================================
+            PERSONAS DE INTERÉS
+            ================================================== -->
 
-                </a>
+            @if (puedePersonasInteres)
+            {
+                <li class="nav-item op-module-item">
 
-
-                <ul id="menuPersonasInteres"
-                    class="nav-content collapse @(isModuloPersonasInteres ? "show" : "")"
-                    data-bs-parent="#sidebar-nav">
-
-
-                    <li>
-
-                        <a class="@(isPersonasInteres && actionName.Equals("Index", StringComparison.OrdinalIgnoreCase) ? "active" : "")"
-                           href="@Url.Action("Index", "PersonasInteres")">
-
-                            <i class="fa fa-users"></i>
-
-                            <span>
-                                Personas
-                            </span>
-
-                        </a>
-
-                    </li>
+                    <a class="nav-link op-module-toggle @(isModuloPersonasInteres ? "" : "collapsed")"
+                       data-bs-target="#menuPersonasInteres"
+                       data-bs-toggle="collapse"
+                       href="#"
+                       aria-expanded="@(isModuloPersonasInteres ? "true" : "false")">
 
 
-                    @*
-                    <li>
+                        <span class="op-module-custom-icon">
 
-                        <a class="@(isPersonasInteres && actionName.Equals("AddEditPersonaInteres", StringComparison.OrdinalIgnoreCase) ? "active" : "")"
-                           href="@Url.Action("AddEditPersonaInteres", "PersonasInteres")">
+                            <img src="@Url.Content("~/images/icons8-target-audience-24.png")"
+                                 alt="Personas de Interés" />
 
-                            <i class="fa fa-plus"></i>
-
-                            <span>
-                                Registrar persona
-                            </span>
-
-                        </a>
-
-                    </li>
+                        </span>
 
 
-                    <li>
-
-                        <a class="disabled"
-                           href="javascript:void(0);">
-
-                            <i class="fa fa-camera"></i>
-
-                            <span>
-                                Fotografías
-                            </span>
-
-                            <em>
-                                Próximo
-                            </em>
-
-                        </a>
-
-                    </li>
+                        <span class="op-module-label">
+                            Personas de Interés
+                        </span>
 
 
-                    <li>
+                        <i class="fa fa-chevron-down op-module-chevron"></i>
 
-                        <a class="disabled"
-                           href="javascript:void(0);">
+                    </a>
 
-                            <i class="fa fa-hand-paper-o"></i>
 
-                            <span>
-                                Huellas
-                            </span>
+                    <ul id="menuPersonasInteres"
+                        class="nav-content collapse @(isModuloPersonasInteres ? "show" : "")"
+                        data-bs-parent="#sidebar-nav">
 
-                            <em>
-                                Próximo
-                            </em>
 
-                        </a>
+                        <li>
 
-                    </li>
-                    *@
+                            <a class="@(isPersonasInteres && actionName.Equals("Index", StringComparison.OrdinalIgnoreCase) ? "active" : "")"
+                               href="@Url.Action("Index", "PersonasInteres")">
 
-                </ul>
+                                <i class="fa fa-users"></i>
 
-            </li>
+                                <span>
+                                    Personas
+                                </span>
+
+                            </a>
+
+                        </li>
+
+
+                        @*
+                            <li>
+
+                                <a class="@(isPersonasInteres && actionName.Equals("AddEditPersonaInteres", StringComparison.OrdinalIgnoreCase) ? "active" : "")"
+                                   href="@Url.Action("AddEditPersonaInteres", "PersonasInteres")">
+
+                                    <i class="fa fa-plus"></i>
+
+                                    <span>
+                                        Registrar persona
+                                    </span>
+
+                                </a>
+
+                            </li>
+
+
+                            <li>
+
+                                <a class="disabled"
+                                   href="javascript:void(0);">
+
+                                    <i class="fa fa-camera"></i>
+
+                                    <span>
+                                        Fotografías
+                                    </span>
+
+                                    <em>
+                                        Próximo
+                                    </em>
+
+                                </a>
+
+                            </li>
+
+
+                            <li>
+
+                                <a class="disabled"
+                                   href="javascript:void(0);">
+
+                                    <i class="fa fa-hand-paper-o"></i>
+
+                                    <span>
+                                        Huellas
+                                    </span>
+
+                                    <em>
+                                        Próximo
+                                    </em>
+
+                                </a>
+
+                            </li>
+                        *@
+
+                    </ul>
+
+                </li>
+            }
+
+            @if (puedeAdministrarAccesos)
+            {
+                <li class="nav-item op-module-item">
+
+                    <a class="nav-link op-module-toggle @(controllerName.Equals("Accesos", StringComparison.OrdinalIgnoreCase) ? "active" : "collapsed")"
+                       href="@Url.Action("Index", "Accesos")">
+
+                        <i class="fa fa-lock"></i>
+
+                        <span>
+                            Administración de accesos
+                        </span>
+
+                    </a>
+
+                </li>
+            }
+
 
         </ul>
 
@@ -1860,11 +2290,11 @@
         </section>
     </main>
 
-    <footer id="footer" class="footer">
-        <div class="credits">
-            2023 - Fiscalía General del Estado de Aguascalientes. Un desarrollo por el área de TI
-        </div>
-    </footer>
+    @*<footer id="footer" class="footer">
+            <div class="credits">
+                2023 - Fiscalía General del Estado de Aguascalientes. Un desarrollo por el área de TI
+            </div>
+        </footer>*@
 
     <a href="#" class="back-to-top d-flex align-items-center justify-content-center">
         <i class="bi bi-arrow-up-short"></i>
@@ -1900,7 +2330,79 @@
     <script src="@Url.Content("~/Content/assets/vendor/php-email-form/validate.js")"></script>
     <script src="@Url.Content("~/Content/assets/js/main.js")"></script>
 
+    <script>
+        (function () {
+            function esPaginaBusqueda() {
+                return document.body && document.body.classList.contains('op-busqueda-page');
+            }
+
+            function estaEnModoTablet() {
+                var ancho = window.innerWidth || document.documentElement.clientWidth;
+                return ancho >= 769 && ancho <= 1399;
+            }
+
+            function normalizarSidebarBusqueda() {
+                if (!esPaginaBusqueda()) {
+                    return;
+                }
+
+                var ancho = window.innerWidth || document.documentElement.clientWidth;
+
+                /*
+                 * Al entrar a escritorio grande, quitamos el estado especial
+                 * que pudo haberse usado para expandir el menú en tablet.
+                 */
+                if (ancho >= 1400) {
+                    document.body.classList.remove('toggle-sidebar');
+                }
+
+                /*
+                 * En móvil queremos iniciar con el off-canvas cerrado.
+                 * No se toca mientras el usuario lo abre mediante hamburguesa.
+                 */
+            }
+
+            document.addEventListener('DOMContentLoaded', function () {
+                if (!esPaginaBusqueda()) {
+                    return;
+                }
+
+                normalizarSidebarBusqueda();
+
+                /*
+                 * Si el lateral está compacto y se pulsa un módulo con submenú,
+                 * primero expandimos el lateral para que el usuario vea las opciones.
+                 */
+                document.querySelectorAll('.op-module-toggle[data-bs-toggle="collapse"]').forEach(function (elemento) {
+                    elemento.addEventListener('click', function () {
+                        if (estaEnModoTablet() && !document.body.classList.contains('toggle-sidebar')) {
+                            document.body.classList.add('toggle-sidebar');
+                        }
+                    });
+                });
+            });
+
+            window.addEventListener('resize', function () {
+                normalizarSidebarBusqueda();
+            });
+        })();
+
+        $(document).ajaxError(function (event, xhr) {
+
+        if (xhr.status === 440) {
+
+            window.location.href =
+                '@Url.Action("Index", "Login")';
+
+        }
+
+    });
+
+    </script>
+
     @RenderSection("scripts", required: false)
 </body>
 
 </html>
+
+

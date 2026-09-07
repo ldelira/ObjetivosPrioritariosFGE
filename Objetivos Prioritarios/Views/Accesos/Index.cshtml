@@ -1,0 +1,708 @@
+﻿@{
+    ViewBag.Title = "Administración de accesos";
+}
+
+<div class="container-fluid">
+
+    <div class="card mb-3">
+        <div class="card-body">
+
+            <h5 class="card-title">
+                <i class="fa fa-user-plus"></i>
+                Administración de usuarios
+            </h5>
+
+            <p class="text-muted">
+                Busque al usuario mediante su login institucional.
+            </p>
+
+            <div class="row">
+                <div class="col-md-8 col-lg-6">
+
+                    <div class="input-group">
+
+                        <input type="text"
+                               id="txtLoginUsuario"
+                               class="form-control"
+                               placeholder=""
+                               autocomplete="off" />
+
+                        <button type="button"
+                                id="btnBuscarUsuario"
+                                class="btn btn-primary">
+
+                            <i class="fa fa-search"></i>
+                            Buscar
+
+                        </button>
+
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+    <div id="contenedorUsuario"
+         style="display:none;">
+
+        <div class="card mb-3">
+
+            <div class="card-body">
+
+                <div class="d-flex justify-content-between align-items-start mb-3">
+
+                    <div>
+
+                        <h4 id="lblNombreUsuario"
+                            class="mb-1">
+                        </h4>
+
+                        <span id="lblEstadoUsuario"
+                              class="badge bg-secondary">
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="row g-3">
+
+                    <div class="col-md-4">
+
+                        <label class="form-label text-muted">
+                            Login
+                        </label>
+
+                        <div id="lblLogin"
+                             class="fw-bold">
+                        </div>
+
+                    </div>
+
+
+                    <div class="col-md-4">
+
+                        <label class="form-label text-muted">
+                            Puesto
+                        </label>
+
+                        <div id="lblPuesto"
+                             class="fw-bold">
+                        </div>
+
+                    </div>
+
+
+                    <div class="col-md-4">
+
+                        <label class="form-label text-muted">
+                            Área
+                        </label>
+
+                        <div id="lblArea"
+                             class="fw-bold">
+                        </div>
+
+                    </div>
+
+
+                    <div class="col-md-6">
+
+                        <label class="form-label text-muted">
+                            Agencia
+                        </label>
+
+                        <div id="lblAgencia"
+                             class="fw-bold">
+                        </div>
+
+                    </div>
+
+
+                    <div class="col-md-6">
+
+                        <label class="form-label text-muted">
+                            Unidad
+                        </label>
+
+                        <div id="lblUnidad"
+                             class="fw-bold">
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="card-body">
+
+                <h5 class="card-title">
+                    Perfiles de acceso
+                </h5>
+
+                <p class="text-muted">
+                    Seleccione uno o varios perfiles para el usuario.
+                </p>
+
+
+                <div id="contenedorPerfiles"
+                     class="row g-3">
+                </div>
+
+
+                <hr />
+
+
+                <div class="d-flex gap-2">
+
+                    <button type="button"
+                            id="btnGuardarUsuario"
+                            class="btn btn-primary">
+
+                        <i class="fa fa-save"></i>
+                        Guardar cambios
+
+                    </button>
+
+
+                    <button type="button"
+                            id="btnCambiarEstatus"
+                            class="btn btn-danger">
+
+                        <i class="fa fa-ban"></i>
+                        Dar de baja
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+    var usuarioActual = null;
+
+
+    $("#btnBuscarUsuario").click(function () {
+
+        buscarUsuario();
+
+    });
+
+
+    $("#txtLoginUsuario").keypress(function (e) {
+
+        if (e.which === 13) {
+
+            buscarUsuario();
+
+        }
+
+    });
+
+
+    function buscarUsuario() {
+
+        var login =
+            $("#txtLoginUsuario")
+                .val()
+                .trim();
+
+
+        if (!login) {
+
+            swal(
+                "Aviso",
+                "Capture el login del usuario.",
+                "warning"
+            );
+
+            return;
+
+        }
+
+
+        $("#contenedorUsuario").hide();
+
+
+        $.ajax({
+
+            url:
+                '@Url.Action("BuscarUsuario", "Accesos")',
+
+            type:
+                "GET",
+
+            data:
+                {
+                    login: login
+                },
+
+            success: function (respuesta) {
+
+                if (!respuesta.success) {
+
+                    swal(
+                        "Usuario no encontrado",
+                        respuesta.message,
+                        "warning"
+                    );
+
+                    return;
+
+                }
+
+
+                usuarioActual =
+                    respuesta.usuario;
+
+
+                $("#lblNombreUsuario")
+                    .text(
+                        respuesta.usuario.nombre
+                    );
+
+
+                $("#lblLogin")
+                    .text(
+                        respuesta.usuario.login || "SIN INFORMACIÓN"
+                    );
+
+
+                $("#lblPuesto")
+                    .text(
+                        respuesta.usuario.puesto || "SIN INFORMACIÓN"
+                    );
+
+
+                $("#lblArea")
+                    .text(
+                        respuesta.usuario.area || "SIN INFORMACIÓN"
+                    );
+
+
+                $("#lblAgencia")
+                    .text(
+                        respuesta.usuario.agencia || "SIN INFORMACIÓN"
+                    );
+
+
+                $("#lblUnidad")
+                    .text(
+                        respuesta.usuario.unidad || "SIN INFORMACIÓN"
+                    );
+
+
+                actualizarEstadoUsuario();
+
+
+                cargarPerfiles(
+                    respuesta.perfiles
+                );
+
+
+                $("#contenedorUsuario")
+                    .fadeIn(150);
+
+            },
+
+            error: function () {
+
+                swal(
+                    "Error",
+                    "No fue posible consultar al usuario.",
+                    "error"
+                );
+
+            }
+
+        });
+
+    }
+
+
+    function cargarPerfiles(perfiles) {
+
+        var html =
+            "";
+
+
+        $.each(
+            perfiles,
+            function (index, perfil) {
+
+                var checked =
+                    perfil.Seleccionado
+                        ? "checked"
+                        : "";
+
+
+                html +=
+                    '<div class="col-md-6 col-lg-4">' +
+
+                        '<div class="border rounded p-3 h-100">' +
+
+                            '<div class="form-check">' +
+
+                                '<input class="form-check-input chkPerfil" ' +
+                                       'type="checkbox" ' +
+                                       'value="' + perfil.IdPerfil + '" ' +
+                                       'id="perfil_' + perfil.IdPerfil + '" ' +
+                                       checked + ' />' +
+
+                                '<label class="form-check-label fw-bold" ' +
+                                       'for="perfil_' + perfil.IdPerfil + '">' +
+
+                                    perfil.Nombre +
+
+                                '</label>' +
+
+                            '</div>' +
+
+                            '<div class="small text-muted mt-2">' +
+                                (perfil.Descripcion || "") +
+                            '</div>' +
+
+                        '</div>' +
+
+                    '</div>';
+
+            }
+        );
+
+
+        $("#contenedorPerfiles")
+            .html(
+                html
+            );
+
+    }
+
+
+    function actualizarEstadoUsuario() {
+
+        if (!usuarioActual) {
+
+            return;
+
+        }
+
+
+        if (!usuarioActual.existeEnObjetivos) {
+
+            $("#lblEstadoUsuario")
+                .removeClass(
+                    "bg-success bg-danger"
+                )
+                .addClass(
+                    "bg-secondary"
+                )
+                .text(
+                    "SIN ACCESO AL SISTEMA"
+                );
+
+
+            $("#btnCambiarEstatus")
+                .hide();
+
+
+            $("#btnGuardarUsuario")
+                .html(
+                    '<i class="fa fa-user-plus"></i> Dar de alta'
+                );
+
+
+            return;
+
+        }
+
+
+        $("#btnCambiarEstatus")
+            .show();
+
+
+        $("#btnGuardarUsuario")
+            .html(
+                '<i class="fa fa-save"></i> Guardar cambios'
+            );
+
+
+        if (usuarioActual.activoEnObjetivos) {
+
+            $("#lblEstadoUsuario")
+                .removeClass(
+                    "bg-danger bg-secondary"
+                )
+                .addClass(
+                    "bg-success"
+                )
+                .text(
+                    "ACTIVO"
+                );
+
+
+            $("#btnCambiarEstatus")
+                .removeClass(
+                    "btn-success"
+                )
+                .addClass(
+                    "btn-danger"
+                )
+                .html(
+                    '<i class="fa fa-ban"></i> Dar de baja'
+                );
+
+        }
+        else {
+
+            $("#lblEstadoUsuario")
+                .removeClass(
+                    "bg-success bg-secondary"
+                )
+                .addClass(
+                    "bg-danger"
+                )
+                .text(
+                    "INACTIVO"
+                );
+
+
+            $("#btnCambiarEstatus")
+                .removeClass(
+                    "btn-danger"
+                )
+                .addClass(
+                    "btn-success"
+                )
+                .html(
+                    '<i class="fa fa-check"></i> Reactivar'
+                );
+
+        }
+
+    }
+
+
+    $("#btnGuardarUsuario").click(function () {
+
+        if (!usuarioActual) {
+
+            return;
+
+        }
+
+
+        var perfiles =
+            [];
+
+
+        $(".chkPerfil:checked")
+            .each(function () {
+
+                perfiles.push(
+                    parseInt(
+                        $(this).val()
+                    )
+                );
+
+            });
+
+
+        if (perfiles.length === 0) {
+
+            swal(
+                "Aviso",
+                "Seleccione al menos un perfil.",
+                "warning"
+            );
+
+            return;
+
+        }
+
+
+        $.ajax({
+
+            url:
+                '@Url.Action("GuardarUsuario", "Accesos")',
+
+            type:
+                "POST",
+
+            traditional:
+                true,
+
+            data:
+                {
+                    login:
+                        usuarioActual.login,
+
+                    idsPerfiles:
+                        perfiles
+                },
+
+            success: function (respuesta) {
+
+                if (!respuesta.success) {
+
+                    swal(
+                        "Error",
+                        respuesta.message,
+                        "error"
+                    );
+
+                    return;
+
+                }
+
+
+                swal(
+                    "Correcto",
+                    respuesta.message,
+                    "success"
+                );
+
+
+                buscarUsuario();
+
+            },
+
+            error: function () {
+
+                swal(
+                    "Error",
+                    "No fue posible guardar el usuario.",
+                    "error"
+                );
+
+            }
+
+        });
+
+    });
+
+
+    $("#btnCambiarEstatus").click(function () {
+
+        if (!usuarioActual) {
+
+            return;
+
+        }
+
+
+        var activar =
+            !usuarioActual.activoEnObjetivos;
+
+
+        var mensaje =
+            activar
+                ? "¿Desea reactivar este usuario?"
+                : "¿Desea dar de baja este usuario?";
+
+
+        swal(
+            {
+                title:
+                    "Confirmar",
+
+                text:
+                    mensaje,
+
+                type:
+                    "warning",
+
+                showCancelButton:
+                    true,
+
+                confirmButtonText:
+                    activar
+                        ? "Sí, reactivar"
+                        : "Sí, dar de baja",
+
+                cancelButtonText:
+                    "Cancelar",
+
+                closeOnConfirm:
+                    false
+            },
+            function () {
+
+                $.ajax({
+
+                    url:
+                        '@Url.Action("CambiarEstatus", "Accesos")',
+
+                    type:
+                        "POST",
+
+                    data:
+                        {
+                            login:
+                                usuarioActual.login,
+
+                            activo:
+                                activar
+                        },
+
+                    success: function (respuesta) {
+
+                        if (!respuesta.success) {
+
+                            swal(
+                                "Error",
+                                respuesta.message,
+                                "error"
+                            );
+
+                            return;
+
+                        }
+
+
+                        swal(
+                            "Correcto",
+                            respuesta.message,
+                            "success"
+                        );
+
+
+                        buscarUsuario();
+
+                    },
+
+                    error: function () {
+
+                        swal(
+                            "Error",
+                            "No fue posible modificar el usuario.",
+                            "error"
+                        );
+
+                    }
+
+                });
+
+            }
+        );
+
+    });
+
+</script>

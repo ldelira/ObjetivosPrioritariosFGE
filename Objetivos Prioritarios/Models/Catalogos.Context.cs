@@ -29,5 +29,6 @@ namespace Objetivos_Prioritarios.Models
         public virtual DbSet<Colonia> Colonia { get; set; }
         public virtual DbSet<Municipio> Municipio { get; set; }
         public virtual DbSet<Estado> Estado { get; set; }
+        public virtual DbSet<CT_UnidadesInvestigacion> CT_UnidadesInvestigacion { get; set; }
     }
 }

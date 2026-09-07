@@ -2,6 +2,7 @@
    VARIABLES Y BASE
    ================================================================ */
 
+@import url('busqueda-coincidencias.css');
 .sic-busqueda-page {
     --sic-azul: #1746b5;
     --sic-azul-medio: #3557d4;
@@ -6613,6 +6614,2834 @@
     height: 125px !important;
     min-height: 125px !important;
     max-height: 125px !important;
+}
+
+/* =========================================================
+   LEGIBILIDAD FINAL - RESULTADOS DE COINCIDENCIAS
+   ========================================================= */
+
+
+/* =========================================================
+   TARJETAS DE RESUMEN SUPERIOR
+   ========================================================= */
+
+.sic-resumen-item span {
+    font-size: 11px !important;
+    line-height: 1.3 !important;
+}
+
+.sic-resumen-item strong {
+    font-size: 22px !important;
+    line-height: 1.2 !important;
+}
+
+.sic-resumen-item > i {
+    font-size: 23px !important;
+}
+
+
+/* =========================================================
+   ENCABEZADO DEL LISTADO
+   ========================================================= */
+
+.sic-listado-header h3 {
+    font-size: 17px !important;
+    line-height: 1.3 !important;
+}
+
+.sic-listado-header > div > span {
+    font-size: 11px !important;
+    line-height: 1.45 !important;
+}
+
+.sic-listado-total {
+    font-size: 13px !important;
+}
+
+
+/* =========================================================
+   TABS
+   ========================================================= */
+
+.sic-tab-resultado {
+    font-size: 12px !important;
+    line-height: 1.3 !important;
+}
+
+    .sic-tab-resultado i {
+        font-size: 12px !important;
+    }
+
+
+/* =========================================================
+   NOMBRE DE LA PERSONA
+   ========================================================= */
+
+.sic-resultado-nombre {
+    font-size: 16px !important;
+    line-height: 1.3 !important;
+}
+
+
+/* =========================================================
+   FUENTE
+   ========================================================= */
+
+.sic-resultado-fuente {
+    font-size: 10px !important;
+    line-height: 1.3 !important;
+}
+
+    .sic-resultado-fuente i {
+        font-size: 10px !important;
+    }
+
+.sic-resultado-fuente-icono {
+    font-size: 11px !important;
+}
+
+
+/* =========================================================
+   ALIAS
+   ========================================================= */
+
+.sic-resultado-alias {
+    font-size: 12px !important;
+    line-height: 1.4 !important;
+}
+
+    .sic-resultado-alias span {
+        font-size: 12px !important;
+    }
+
+    .sic-resultado-alias strong {
+        font-size: 12px !important;
+    }
+
+    .sic-resultado-alias i {
+        font-size: 12px !important;
+    }
+
+
+/* =========================================================
+   EVIDENCIAS
+   Foto 97% / Huella / Nombre
+   ========================================================= */
+
+.sic-evidencia-badge {
+    font-size: 11px !important;
+    line-height: 1.35 !important;
+}
+
+    .sic-evidencia-badge strong {
+        font-size: 12px !important;
+    }
+
+    .sic-evidencia-badge i {
+        font-size: 11px !important;
+    }
+
+
+/* =========================================================
+   TEXTO QUE COINCIDIÓ
+   ========================================================= */
+
+.sic-texto-coincidente {
+    font-size: 11px !important;
+    line-height: 1.45 !important;
+}
+
+    .sic-texto-coincidente span {
+        font-size: 11px !important;
+    }
+
+    .sic-texto-coincidente strong {
+        font-size: 12px !important;
+    }
+
+
+/* =========================================================
+   AVISO DE MANDAMIENTOS
+   ========================================================= */
+
+.sic-aviso-mandamiento-listado {
+    font-size: 11px !important;
+    line-height: 1.4 !important;
+}
+
+    .sic-aviso-mandamiento-listado span {
+        font-size: 11px !important;
+    }
+
+    .sic-aviso-mandamiento-listado strong {
+        font-size: 12px !important;
+    }
+
+
+/* =========================================================
+   DATOS INFERIORES
+   Folio / Municipio / Edad / Sexo
+   ========================================================= */
+
+.sic-resultado-datos {
+    font-size: 12px !important;
+    line-height: 1.5 !important;
+}
+
+    .sic-resultado-datos span {
+        font-size: 12px !important;
+    }
+
+    .sic-resultado-datos b {
+        font-size: 12px !important;
+        font-weight: 700 !important;
+    }
+
+
+/* =========================================================
+   PORCENTAJE DE COINCIDENCIA
+   ========================================================= */
+
+.sic-resultado-puntaje small {
+    font-size: 10px !important;
+    line-height: 1.3 !important;
+}
+
+.sic-resultado-puntaje > strong {
+    font-size: 24px !important;
+    line-height: 1.15 !important;
+}
+
+.sic-resultado-tipo {
+    font-size: 10px !important;
+    line-height: 1.3 !important;
+}
+
+
+/* =========================================================
+   BOTÓN VER DETALLE
+   ========================================================= */
+
+.sic-resultado-puntaje .js-ver-coincidencia {
+    font-size: 11px !important;
+    font-weight: 700 !important;
+}
+
+    .sic-resultado-puntaje .js-ver-coincidencia i {
+        font-size: 11px !important;
+    }
+
+
+/* =========================================================
+   SIN RESULTADOS
+   ========================================================= */
+
+.sic-sin-resultados > strong {
+    font-size: 16px !important;
+}
+
+.sic-sin-resultados > span {
+    font-size: 12px !important;
+    line-height: 1.5 !important;
+}
+
+
+/* =========================================================
+   LOADER DEL DETALLE
+   ========================================================= */
+
+.sic-detalle-loader {
+    font-size: 13px !important;
+}
+
+    .sic-detalle-loader span {
+        font-size: 13px !important;
+    }
+
+/* ============================================================
+   COMPARADOR FOTOGRÁFICO - RESULTADOS
+   ============================================================ */
+
+.sic-resultado-comparador-foto {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px;
+    border: 1px solid #d9e2f0;
+    border-radius: 10px;
+    background: #f8faff;
+    cursor: pointer;
+    transition: .18s ease;
+}
+
+    .sic-resultado-comparador-foto:hover {
+        border-color: #7ca5ff;
+        background: #eef4ff;
+        box-shadow: 0 3px 10px rgba(37, 99, 235, .10);
+    }
+
+.sic-resultado-mini-foto {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+}
+
+    .sic-resultado-mini-foto span {
+        color: #748099;
+        font-size: 7px;
+        line-height: 1;
+        font-weight: 800;
+        text-transform: uppercase;
+    }
+
+    .sic-resultado-mini-foto img {
+        display: block;
+        width: 52px;
+        height: 66px;
+        object-fit: cover;
+        border-radius: 7px;
+        background: #eef1f6;
+    }
+
+.sic-resultado-comparacion-separador {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 17px;
+    min-width: 17px;
+    height: 17px;
+    border-radius: 50%;
+    background: #e9efff;
+    color: #4564d9;
+    font-size: 8px;
+}
+
+/* ============================================================
+   MODAL - COMPARACIÓN FOTOGRÁFICA
+   ============================================================ */
+
+.sic-modal-comparacion {
+    position: fixed;
+    inset: 0;
+    z-index: 10050;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 25px;
+}
+
+    .sic-modal-comparacion.abierto {
+        display: flex;
+    }
+
+.sic-modal-comparacion-fondo {
+    position: absolute;
+    inset: 0;
+    background: rgba(9, 18, 45, .82);
+    backdrop-filter: blur(2px);
+}
+
+.sic-modal-comparacion-dialogo {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    width: min(1180px, 94vw);
+    max-height: 92vh;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,.14);
+    border-radius: 16px;
+    background: #111a35;
+    box-shadow: 0 22px 65px rgba(0, 0, 0, .45);
+}
+
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+
+.sic-modal-comparacion-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 16px 20px;
+    border-bottom: 1px solid rgba(255,255,255,.12);
+}
+
+    .sic-modal-comparacion-header small {
+        display: block;
+        margin-bottom: 3px;
+        color: #92a4ca;
+        font-size: 9px;
+        font-weight: 800;
+        text-transform: uppercase;
+    }
+
+    .sic-modal-comparacion-header h3 {
+        margin: 0;
+        color: #fff;
+        font-size: 18px;
+        line-height: 1.3;
+        font-weight: 900;
+    }
+
+.sic-modal-comparacion-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 5px;
+    color: #bcc8df;
+    font-size: 11px;
+    line-height: 1.4;
+}
+
+.sic-modal-comparacion-cerrar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    min-width: 38px;
+    height: 38px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: #fff;
+    color: #152042;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+
+/* ============================================================
+   EVIDENCIA
+   ============================================================ */
+
+.sic-modal-comparacion-evidencia {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 10px 20px;
+    background: rgba(44, 135, 76, .16);
+    border-bottom: 1px solid rgba(77, 190, 114, .25);
+}
+
+    .sic-modal-comparacion-evidencia > div {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #bce8c8;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .sic-modal-comparacion-evidencia strong {
+        color: #68d887;
+        font-size: 20px;
+        font-weight: 900;
+    }
+
+
+/* ============================================================
+   CUERPO
+   ============================================================ */
+
+.sic-modal-comparacion-body {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    min-height: 0;
+    padding: 14px;
+    overflow: auto;
+}
+
+.sic-modal-comparacion-columna {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    padding: 10px;
+    border: 1px solid rgba(255,255,255,.13);
+    border-radius: 12px;
+    background: #17213d;
+}
+
+.sic-modal-comparacion-titulo-foto {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    min-height: 34px;
+    margin-bottom: 9px;
+    padding: 7px 10px;
+    border-radius: 8px;
+    background: #0e1731;
+    color: #e1e8f7;
+    font-size: 11px;
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+.sic-modal-comparacion-imagen-contenedor {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    min-height: 360px;
+    overflow: hidden;
+    border-radius: 9px;
+    background: #0b1228;
+}
+
+    .sic-modal-comparacion-imagen-contenedor img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        max-height: 65vh;
+        object-fit: contain;
+    }
+
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 850px) {
+
+    .sic-modal-comparacion {
+        padding: 10px;
+    }
+
+    .sic-modal-comparacion-body {
+        grid-template-columns: 1fr;
+    }
+
+    .sic-modal-comparacion-imagen-contenedor {
+        min-height: 280px;
+    }
+}
+
+body.sic-modal-abierto {
+    overflow: hidden;
+}
+
+/* ============================================================
+   RESULTADO CON COMPARACIÓN FOTOGRÁFICA
+   ============================================================ */
+
+.sic-resultado-persona.sic-resultado-con-comparacion {
+    grid-template-columns: 130px minmax(0, 1fr) 110px;
+    gap: 10px;
+}
+
+.sic-resultado-con-comparacion
+.sic-resultado-foto-contenedor {
+    width: 130px;
+    min-width: 130px;
+}
+
+.sic-resultado-con-comparacion
+.sic-resultado-informacion {
+    min-width: 0;
+}
+
+/* ============================================================
+   FUENTE + MUNICIPIO EN RESULTADOS
+   ============================================================ */
+
+.sic-resultado-origen {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 5px;
+    min-width: 0;
+}
+
+    .sic-resultado-origen .sic-resultado-fuente {
+        flex: 0 0 auto;
+        max-width: 100%;
+    }
+
+.sic-resultado-municipio {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    max-width: 145px;
+    padding: 4px 7px;
+    border: 1px solid #d9e1ed;
+    border-radius: 999px;
+    background: #f8fafc;
+    color: #53627c;
+    font-size: 9px;
+    line-height: 1.2;
+    font-weight: 800;
+    text-transform: uppercase;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+    .sic-resultado-municipio i {
+        flex: 0 0 auto;
+        color: #6c7ba0;
+        font-size: 9px;
+    }
+
+.sic-resultado-con-comparacion
+.sic-resultado-origen {
+    gap: 4px;
+}
+
+.sic-resultado-con-comparacion
+.sic-resultado-municipio {
+    max-width: 120px;
+}
+
+
+/* ============================================================
+   FOTO AMPLIABLE - RESULTADOS
+   ============================================================ */
+
+.sic-btn-ampliar-foto {
+    position: relative;
+    display: block;
+    width: 78px;
+    height: 92px;
+    padding: 0;
+    overflow: hidden;
+    border: 0;
+    border-radius: 9px;
+    background: transparent;
+    cursor: zoom-in;
+}
+
+    .sic-btn-ampliar-foto .sic-resultado-foto {
+        display: block;
+        width: 100%;
+        height: 100%;
+    }
+
+.sic-ampliar-foto-icono {
+    position: absolute;
+    right: 5px;
+    bottom: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: rgba(7, 29, 85, .82);
+    color: #fff;
+    font-size: 9px;
+    opacity: 0;
+    transform: scale(.85);
+    transition: .15s ease;
+}
+
+.sic-btn-ampliar-foto:hover
+.sic-ampliar-foto-icono {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.sic-btn-ampliar-foto:hover
+.sic-resultado-foto {
+    transform: scale(1.04);
+}
+
+.sic-btn-ampliar-foto
+.sic-resultado-foto {
+    transition: transform .18s ease;
+}
+
+/* ============================================================
+   MODAL - FOTOGRAFÍA AMPLIADA
+   ============================================================ */
+
+.sic-modal-foto-grande {
+    position: fixed;
+    inset: 0;
+    z-index: 10060;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+}
+
+    .sic-modal-foto-grande.abierto {
+        display: flex;
+    }
+
+.sic-modal-foto-grande-fondo {
+    position: absolute;
+    inset: 0;
+    background: rgba(7, 16, 39, .84);
+    backdrop-filter: blur(2px);
+}
+
+.sic-modal-foto-grande-dialogo {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    width: min(720px, 92vw);
+    max-height: 92vh;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,.15);
+    border-radius: 16px;
+    background: #111a35;
+    box-shadow: 0 25px 70px rgba(0,0,0,.5);
+}
+
+.sic-modal-foto-grande-header {
+    padding: 15px 60px 13px 18px;
+    border-bottom: 1px solid rgba(255,255,255,.11);
+}
+
+    .sic-modal-foto-grande-header small {
+        display: block;
+        margin-bottom: 4px;
+        color: #8fa0c4;
+        font-size: 9px;
+        font-weight: 800;
+        text-transform: uppercase;
+    }
+
+    .sic-modal-foto-grande-header strong {
+        display: block;
+        color: #fff;
+        font-size: 17px;
+        line-height: 1.3;
+        font-weight: 900;
+    }
+
+    .sic-modal-foto-grande-header span {
+        display: block;
+        margin-top: 4px;
+        color: #aebbd3;
+        font-size: 11px;
+    }
+
+.sic-modal-foto-grande-cerrar {
+    position: absolute;
+    z-index: 2;
+    top: 13px;
+    right: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: #fff;
+    color: #142044;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.sic-modal-foto-grande-contenedor {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 450px;
+    padding: 14px;
+    overflow: auto;
+    background: #0b1228;
+}
+
+    .sic-modal-foto-grande-contenedor img {
+        display: block;
+        width: auto;
+        max-width: 100%;
+        height: auto;
+        max-height: 72vh;
+        object-fit: contain;
+        border-radius: 8px;
+    }
+
+@media (max-width: 700px) {
+
+    .sic-modal-foto-grande {
+        padding: 10px;
+    }
+
+    .sic-modal-foto-grande-contenedor {
+        min-height: 300px;
+    }
+}
+
+/* =========================================================
+   FOTO AMPLIABLE
+   ========================================================= */
+
+.sic-fgea-btn-foto {
+    position: relative;
+    display: block;
+    width: 100%;
+    padding: 0;
+    overflow: hidden;
+    border: 0;
+    border-radius: 10px;
+    background: transparent;
+    cursor: zoom-in;
+}
+
+    .sic-fgea-btn-foto .sic-fgea-foto {
+        display: block;
+        transition: transform .18s ease, filter .18s ease;
+    }
+
+    .sic-fgea-btn-foto:hover .sic-fgea-foto {
+        transform: scale(1.035);
+        filter: brightness(1.04);
+    }
+
+.sic-fgea-foto-zoom {
+    position: absolute;
+    right: 7px;
+    bottom: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 27px;
+    height: 27px;
+    border: 2px solid rgba(255,255,255,.9);
+    border-radius: 50%;
+    background: rgba(7,29,85,.82);
+    color: #fff;
+    font-size: 10px;
+    opacity: 0;
+    transform: scale(.85);
+    transition: .15s ease;
+}
+
+.sic-fgea-btn-foto:hover .sic-fgea-foto-zoom {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.sic-fgea-btn-foto:focus {
+    outline: none;
+}
+
+.sic-fgea-btn-foto:focus-visible {
+    box-shadow: 0 0 0 3px rgba(53,87,212,.20);
+}
+
+/* =========================================================
+   FOTO AMPLIABLE - C5
+   ========================================================= */
+
+.sic-c5-foto-wrap {
+    width: 125px;
+}
+
+.sic-c5-btn-foto {
+    position: relative;
+    display: block;
+    width: 125px;
+    height: 145px;
+    padding: 0;
+    overflow: hidden;
+    border: 0;
+    border-radius: 12px;
+    background: transparent;
+    cursor: zoom-in;
+}
+
+    .sic-c5-btn-foto .sic-c5-foto {
+        display: block;
+        width: 125px;
+        height: 145px;
+        transition: transform .18s ease, filter .18s ease;
+    }
+
+    .sic-c5-btn-foto:hover .sic-c5-foto {
+        transform: scale(1.035);
+        filter: brightness(1.04);
+    }
+
+.sic-c5-foto-zoom {
+    position: absolute;
+    right: 7px;
+    bottom: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 27px;
+    height: 27px;
+    border: 2px solid rgba(255,255,255,.9);
+    border-radius: 50%;
+    background: rgba(7,29,85,.82);
+    color: #fff;
+    font-size: 10px;
+    opacity: 0;
+    transform: scale(.85);
+    transition: .15s ease;
+}
+
+.sic-c5-btn-foto:hover .sic-c5-foto-zoom {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.sic-c5-btn-foto:focus {
+    outline: none;
+}
+
+.sic-c5-btn-foto:focus-visible {
+    box-shadow: 0 0 0 3px rgba(53,87,212,.20);
+}
+
+/* =========================================================
+   FOTO AMPLIABLE - OBJETIVOS PRIORITARIOS
+   ========================================================= */
+
+.sic-obj-btn-foto {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    overflow: hidden;
+    border: 0;
+    border-radius: 10px;
+    background: transparent;
+    cursor: zoom-in;
+}
+
+    .sic-obj-btn-foto img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform .18s ease, filter .18s ease;
+    }
+
+    .sic-obj-btn-foto:hover img {
+        transform: scale(1.035);
+        filter: brightness(1.04);
+    }
+
+.sic-obj-foto-zoom {
+    position: absolute;
+    right: 7px;
+    bottom: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 27px;
+    height: 27px;
+    border: 2px solid rgba(255,255,255,.9);
+    border-radius: 50%;
+    background: rgba(7,29,85,.82);
+    color: #fff;
+    font-size: 10px;
+    opacity: 0;
+    transform: scale(.85);
+    transition: .15s ease;
+}
+
+.sic-obj-btn-foto:hover .sic-obj-foto-zoom {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.sic-obj-btn-foto:focus {
+    outline: none;
+}
+
+.sic-obj-btn-foto:focus-visible {
+    box-shadow: 0 0 0 3px rgba(53,87,212,.20);
+}
+
+/* =========================================================
+   FOTO AMPLIABLE - AMBER / ALBA / CAPEA
+   ========================================================= */
+
+.sic-fw-btn-foto {
+    position: relative;
+    display: block;
+    width: 100%;
+    padding: 0;
+    overflow: hidden;
+    border: 0;
+    border-radius: 10px;
+    background: transparent;
+    cursor: zoom-in;
+}
+
+    .sic-fw-btn-foto .sic-fw-foto {
+        display: block;
+        transition: transform .18s ease, filter .18s ease;
+    }
+
+    .sic-fw-btn-foto:hover .sic-fw-foto {
+        transform: scale(1.035);
+        filter: brightness(1.04);
+    }
+
+.sic-fw-foto-zoom {
+    position: absolute;
+    right: 7px;
+    bottom: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 27px;
+    height: 27px;
+    border: 2px solid rgba(255,255,255,.9);
+    border-radius: 50%;
+    background: rgba(7,29,85,.82);
+    color: #fff;
+    font-size: 10px;
+    opacity: 0;
+    transform: scale(.85);
+    transition: .15s ease;
+}
+
+.sic-fw-btn-foto:hover .sic-fw-foto-zoom {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.sic-fw-btn-foto:focus {
+    outline: none;
+}
+
+.sic-fw-btn-foto:focus-visible {
+    box-shadow: 0 0 0 3px rgba(53,87,212,.20);
+}
+
+
+
+
+/* ================================================================
+   DETALLE INSTITUCIONAL COMPARTIDO
+   FGEA DETENIDOS / PERSONAS DE INTERÉS
+   ================================================================ */
+
+.sic-fgea-detalle {
+    padding: 28px;
+    color: #121b39;
+    box-sizing: border-box;
+}
+
+
+/* ================================================================
+   CABECERA
+   ================================================================ */
+
+.sic-fgea-cabecera {
+    display: flex;
+    align-items: flex-start;
+    gap: 18px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #e4e9f3;
+}
+
+
+.sic-fgea-foto-wrap {
+    width: 112px;
+    min-width: 112px;
+}
+
+
+.sic-fgea-foto {
+    display: block;
+    width: 112px;
+    height: 130px;
+    object-fit: cover;
+    border: 1px solid #d8dfec;
+    border-radius: 10px;
+    background: #f5f7fb;
+}
+
+
+.sic-fgea-identidad {
+    flex: 1;
+    min-width: 0;
+}
+
+
+.sic-fgea-fuente {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 10px;
+    padding: 6px 10px;
+    border: 1px solid #e7c35c;
+    border-radius: 18px;
+    background: #fff6d9;
+    color: #785800;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+
+.sic-fgea-nombre {
+    margin: 0;
+    color: #0c1742;
+    font-size: 23px;
+    line-height: 1.15;
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+
+.sic-fgea-alias {
+    margin-top: 7px;
+    color: #626d84;
+    font-size: 14px;
+}
+
+
+    .sic-fgea-alias strong {
+        color: #121b39;
+    }
+
+
+/* ================================================================
+   RESUMEN SUPERIOR
+   ================================================================ */
+
+.sic-fgea-resumen {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 9px;
+    margin-top: 17px;
+}
+
+
+.sic-fgea-resumen-item {
+    min-height: 72px;
+    padding: 11px 12px;
+    border: 1px solid #e0e6f0;
+    border-radius: 8px;
+    background: #fafbfe;
+}
+
+
+    .sic-fgea-resumen-item span {
+        display: block;
+        margin-bottom: 8px;
+        color: #7e879c;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+
+    .sic-fgea-resumen-item strong {
+        color: #0d1738;
+        font-size: 14px;
+        line-height: 1.35;
+        font-weight: 800;
+    }
+
+
+/* ================================================================
+   EVIDENCIA PRINCIPAL
+   ================================================================ */
+
+.sic-fgea-evidencia {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 14px 0;
+    padding: 13px;
+    border: 1px solid #b9e1c4;
+    border-radius: 9px;
+    background: #f0fbf3;
+}
+
+
+.sic-fgea-evidencia-icono {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    min-width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: #daf3e1;
+    color: #30964d;
+    font-size: 14px;
+}
+
+
+.sic-fgea-evidencia-texto {
+    flex: 1;
+    min-width: 0;
+}
+
+
+    .sic-fgea-evidencia-texto span {
+        display: block;
+        margin-bottom: 3px;
+        color: #52745b;
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+
+    .sic-fgea-evidencia-texto strong {
+        color: #142319;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+
+.sic-fgea-evidencia-porcentaje {
+    color: #247438;
+    font-size: 19px;
+    font-weight: 900;
+}
+
+
+/* ================================================================
+   DESGLOSE DE EVIDENCIAS
+   ================================================================ */
+
+.sic-fgea-evidencia-desglose {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+    margin-top: -5px;
+    margin-bottom: 14px;
+}
+
+
+.sic-fgea-evidencia-item {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    min-height: 58px;
+    padding: 9px 11px;
+    border: 1px solid #dce6df;
+    border-radius: 8px;
+    background: #fbfefc;
+}
+
+
+.sic-fgea-evidencia-item-icono {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 31px;
+    min-width: 31px;
+    height: 31px;
+    border-radius: 50%;
+    background: #e7f6eb;
+    color: #368a4d;
+    font-size: 12px;
+}
+
+
+.sic-fgea-evidencia-item span {
+    display: block;
+    margin-bottom: 3px;
+    color: #6e7b72;
+    font-size: 10px;
+    line-height: 1.2;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+
+.sic-fgea-evidencia-item strong {
+    display: block;
+    color: #176b31;
+    font-size: 15px;
+    font-weight: 900;
+}
+
+
+/* ================================================================
+   ACORDEONES / SECCIONES
+   ================================================================ */
+
+.sic-fgea-seccion {
+    margin-bottom: 9px;
+    overflow: hidden;
+    border: 1px solid #dce3ef;
+    border-radius: 8px;
+    background: #fff;
+}
+
+
+    .sic-fgea-seccion > summary {
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        padding: 12px 14px;
+        background: #f7f9fd;
+        color: #101a42;
+        font-size: 14px;
+        line-height: 1.35;
+        font-weight: 800;
+        cursor: pointer;
+        list-style: none;
+        user-select: none;
+    }
+
+
+        .sic-fgea-seccion > summary::-webkit-details-marker {
+            display: none;
+        }
+
+
+        .sic-fgea-seccion > summary::after {
+            content: "\f107";
+            position: absolute;
+            right: 13px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-family: FontAwesome;
+            color: #74809b;
+            font-size: 11px;
+        }
+
+
+    .sic-fgea-seccion[open] > summary::after {
+        content: "\f106";
+    }
+
+
+.sic-fgea-seccion-contenido {
+    padding: 13px;
+}
+
+
+.sic-fgea-contador {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 23px;
+    height: 23px;
+    margin-left: 4px;
+    padding: 0 7px;
+    border-radius: 12px;
+    background: #e9eefb;
+    color: #445b9f;
+    font-size: 11px;
+    font-weight: 800;
+}
+
+
+/* ================================================================
+   GRID Y CAMPOS
+   ================================================================ */
+
+.sic-fgea-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 9px;
+}
+
+
+.sic-fgea-campo {
+    min-height: 78px;
+    padding: 13px 14px;
+    border: 1px solid #e4e8f0;
+    border-radius: 7px;
+    background: #fbfcfe;
+}
+
+
+.sic-fgea-campo-completo {
+    grid-column: 1 / -1;
+}
+
+
+.sic-fgea-campo span {
+    display: block;
+    margin-bottom: 10px;
+    color: #7c859b;
+    font-size: 11px;
+    line-height: 1.3;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+
+.sic-fgea-campo strong {
+    color: #0f1737;
+    font-size: 14px;
+    line-height: 1.45;
+    font-weight: 800;
+    word-break: break-word;
+}
+
+
+.sic-fgea-texto-largo {
+    font-size: 13px !important;
+    line-height: 1.65 !important;
+    font-weight: 500 !important;
+}
+
+
+/* ================================================================
+   LISTADOS
+   ================================================================ */
+
+.sic-fgea-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+
+.sic-fgea-registro {
+    padding: 11px 12px;
+    border: 1px solid #e2e7f0;
+    border-radius: 8px;
+    background: #fbfcfe;
+}
+
+
+.sic-fgea-registro-titulo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+
+.sic-fgea-registro-principal {
+    color: #111a3b;
+    font-size: 14px;
+    font-weight: 800;
+}
+
+
+.sic-fgea-registro-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 16px;
+    margin-top: 7px;
+    color: #747e94;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+
+    .sic-fgea-registro-meta strong {
+        color: #3c465f;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+
+.sic-fgea-badge-actual {
+    display: inline-block;
+    margin-left: 7px;
+    padding: 3px 7px;
+    border-radius: 10px;
+    background: #e5f5e9;
+    color: #28763b;
+    font-size: 9px;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+
+/* ================================================================
+   MANDAMIENTOS
+   ================================================================ */
+
+.sic-fgea-mandamientos > summary {
+    color: #735700;
+}
+
+
+    .sic-fgea-mandamientos > summary i {
+        color: #b88700;
+    }
+
+
+.sic-fgea-contador-mandamientos {
+    background: #fff2c2 !important;
+    color: #886500 !important;
+}
+
+
+.sic-fgea-mandamientos-aviso {
+    display: flex;
+    align-items: flex-start;
+    gap: 11px;
+    margin-bottom: 12px;
+    padding: 12px 14px;
+    border: 1px solid #efd27c;
+    border-radius: 8px;
+    background: #fff9e7;
+    color: #705500;
+}
+
+
+    .sic-fgea-mandamientos-aviso > i {
+        margin-top: 2px;
+        color: #c28c00;
+        font-size: 16px;
+    }
+
+
+    .sic-fgea-mandamientos-aviso > div {
+        flex: 1;
+    }
+
+
+    .sic-fgea-mandamientos-aviso strong {
+        display: block;
+        margin-bottom: 4px;
+        font-size: 13px;
+        font-weight: 800;
+    }
+
+
+    .sic-fgea-mandamientos-aviso span {
+        display: block;
+        font-size: 12px;
+        line-height: 1.55;
+    }
+
+
+.sic-fgea-mandamiento-registro {
+    border-color: #eadcae;
+}
+
+
+.sic-fgea-mandamiento-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+
+    .sic-fgea-mandamiento-header > div {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 7px;
+    }
+
+
+.sic-fgea-mandamiento-tipo {
+    color: #172044;
+    font-size: 14px;
+    line-height: 1.4;
+    font-weight: 900;
+}
+
+
+.sic-fgea-mandamiento-estado {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 8px;
+    border-radius: 12px;
+    background: #fff2c2;
+    color: #7c5c00;
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+
+.sic-fgea-mandamiento-porcentaje {
+    color: #a17300;
+    font-size: 18px;
+    font-weight: 900;
+}
+
+
+.sic-fgea-mandamiento-grid {
+    margin-top: 0;
+}
+
+
+/* ================================================================
+   PERSONAS DE INTERÉS
+   ================================================================ */
+
+.sic-pi-fuente {
+    border-color: #9ed8c8 !important;
+    background: #eaf8f4 !important;
+    color: #14745f !important;
+}
+
+
+.sic-pi-estado-texto,
+.sic-pi-texto-activo {
+    color: #187a43 !important;
+}
+
+
+.sic-pi-contador-activo {
+    background: #e4f7e9 !important;
+    color: #237942 !important;
+}
+
+
+.sic-pi-dias {
+    color: #187a43 !important;
+    font-size: 18px !important;
+}
+
+
+/* ================================================================
+   GALERÍA DE PERSONAS DE INTERÉS
+   ================================================================ */
+
+.sic-pi-galeria {
+    display: grid;
+    grid-template-columns: repeat( auto-fill, minmax(125px, 1fr) );
+    gap: 12px;
+}
+
+
+.sic-pi-foto-card {
+    display: block;
+    overflow: hidden;
+    padding: 0;
+    border: 1px solid #e0e6ef;
+    border-radius: 9px;
+    background: #fff;
+    color: #121b39;
+    text-align: left;
+    text-decoration: none !important;
+    cursor: pointer;
+    transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+}
+
+
+    .sic-pi-foto-card:hover {
+        transform: translateY(-2px);
+        border-color: #9ed8c8;
+        box-shadow: 0 5px 15px rgba(18, 27, 57, .08);
+        color: #121b39;
+    }
+
+
+.sic-pi-foto-thumb {
+    display: block;
+    width: 100%;
+    height: 145px;
+    object-fit: cover;
+    background: #f4f7fa;
+}
+
+
+.sic-pi-huella-thumb {
+    object-fit: contain;
+    padding: 8px;
+    background: #fff;
+}
+
+
+.sic-pi-foto-info {
+    padding: 9px 10px;
+}
+
+
+    .sic-pi-foto-info strong {
+        display: block;
+        color: #101a3c;
+        font-size: 12px;
+        font-weight: 800;
+    }
+
+
+    .sic-pi-foto-info span {
+        display: block;
+        margin-top: 4px;
+        color: #7d8799;
+        font-size: 10px;
+    }
+
+
+/* ================================================================
+   PERIODOS
+   ================================================================ */
+
+.sic-pi-periodo-observacion {
+    margin-top: 10px;
+    padding-top: 9px;
+    border-top: 1px solid #edf0f4;
+    color: #5f687c;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+
+/* ================================================================
+   RESPONSIVE
+   ================================================================ */
+
+@media (max-width: 1100px) {
+
+    .sic-fgea-evidencia-desglose {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+
+@media (max-width: 900px) {
+
+    .sic-fgea-detalle {
+        padding: 18px;
+    }
+
+
+    .sic-fgea-cabecera {
+        flex-direction: column;
+    }
+
+
+    .sic-fgea-resumen {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+
+    .sic-fgea-grid {
+        grid-template-columns: 1fr;
+    }
+
+
+    .sic-fgea-campo-completo {
+        grid-column: auto;
+    }
+
+
+    .sic-pi-galeria {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+
+@media (max-width: 550px) {
+
+    .sic-fgea-resumen {
+        grid-template-columns: 1fr;
+    }
+
+
+    .sic-fgea-evidencia-desglose {
+        grid-template-columns: 1fr;
+    }
+
+
+    .sic-pi-galeria {
+        grid-template-columns: 1fr;
+    }
+}
+
+.sic-pi-detalle .sic-fgea-resumen {
+    grid-template-columns: minmax(125px, 1fr) minmax(125px, 1fr) minmax(95px, .8fr) minmax(115px, 1fr);
+}
+
+.sic-pi-detalle .sic-fgea-resumen-item {
+    min-width: 0;
+}
+
+    .sic-pi-detalle .sic-fgea-resumen-item strong {
+        font-size: 12px;
+        white-space: nowrap;
+    }
+
+/* ================================================================
+   HUELLAS MÚLTIPLES
+   ================================================================ */
+
+.sic-biometrico-tile-huellas {
+    position: relative;
+}
+
+
+/* ================================================================
+   DROPZONE HUELLAS
+   ================================================================ */
+
+.sic-huellas-dropzone {
+    align-items: center;
+    background: #ffffff;
+    border: 1px dashed #bdcce0;
+    border-radius: 9px;
+    cursor: pointer;
+    display: flex;
+    height: 116px;
+    justify-content: center;
+    margin: 0;
+    overflow: hidden;
+    padding: 5px;
+    position: relative;
+    transition: .18s ease;
+    width: 118px;
+}
+
+
+    .sic-huellas-dropzone:hover,
+    .sic-huellas-dropzone.sic-dropzone-activa {
+        background: var(--sic-azul-suave);
+        border-color: #5f80df;
+    }
+
+
+/* ================================================================
+   CONTADOR
+   ================================================================ */
+
+.sic-huellas-info-linea {
+    align-items: center;
+    display: flex;
+    gap: 10px;
+    justify-content: space-between;
+    margin-top: 5px;
+}
+
+
+.sic-huellas-contador {
+    background: #eef3ff;
+    border: 1px solid #cdd9f5;
+    border-radius: 14px;
+    color: #3557a7;
+    display: inline-flex;
+    flex-shrink: 0;
+    font-size: 11px;
+    font-weight: 900;
+    padding: 4px 9px;
+}
+
+
+/* ================================================================
+   GALERÍA
+   ================================================================ */
+
+.sic-huellas-seleccionadas {
+    display: grid;
+    gap: 8px;
+    grid-column: 1 / -1;
+    grid-template-columns: repeat( auto-fill, minmax(105px, 1fr) );
+    margin-top: 3px;
+}
+
+
+.sic-huella-consulta-item {
+    background: #ffffff;
+    border: 1px solid #dce4ef;
+    border-radius: 9px;
+    min-width: 0;
+    overflow: hidden;
+    position: relative;
+}
+
+
+.sic-huella-consulta-imagen-wrap {
+    align-items: center;
+    background: #f7f9fc;
+    display: flex;
+    height: 105px;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+}
+
+
+.sic-huella-consulta-imagen {
+    display: block;
+    height: 100%;
+    object-fit: contain;
+    padding: 5px;
+    width: 100%;
+}
+
+
+.sic-huella-consulta-numero {
+    background: rgba(15, 28, 61, .82);
+    border-radius: 11px;
+    color: #ffffff;
+    font-size: 9px;
+    font-weight: 900;
+    left: 6px;
+    padding: 3px 7px;
+    position: absolute;
+    top: 6px;
+}
+
+
+.sic-huella-consulta-quitar {
+    align-items: center;
+    background: rgba(181, 46, 46, .92);
+    border: 0;
+    border-radius: 50%;
+    color: #ffffff;
+    cursor: pointer;
+    display: flex;
+    height: 25px;
+    justify-content: center;
+    padding: 0;
+    position: absolute;
+    right: 6px;
+    top: 6px;
+    transition: .15s ease;
+    width: 25px;
+}
+
+
+    .sic-huella-consulta-quitar:hover {
+        background: #a11f1f;
+        transform: scale(1.06);
+    }
+
+
+.sic-huella-consulta-info {
+    padding: 7px 8px;
+}
+
+
+    .sic-huella-consulta-info strong {
+        color: #1b2940;
+        display: block;
+        font-size: 10px;
+        font-weight: 800;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+
+    .sic-huella-consulta-info span {
+        color: #7b8799;
+        display: block;
+        font-size: 9px;
+        margin-top: 3px;
+    }
+
+
+@media (max-width: 800px) {
+
+    .sic-huellas-seleccionadas {
+        grid-template-columns: repeat( 2, minmax(0, 1fr) );
+    }
+}
+
+
+/* =====================================================================
+   REDISEÑO TABLET / MODO RESULTADOS
+   2026-08-21
+   ===================================================================== */
+
+/* ---------------------------------------------------------------------
+   ACORDEÓN DE CRITERIOS
+   --------------------------------------------------------------------- */
+
+.sic-criterios-busqueda {
+    margin-bottom: 14px;
+}
+
+.sic-criterios-toggle {
+    align-items: center;
+    background: #ffffff;
+    border: 1px solid var(--sic-borde);
+    border-radius: 14px;
+    box-shadow: 0 5px 17px rgba(15, 23, 42, .06);
+    color: var(--sic-texto);
+    cursor: pointer;
+    display: grid;
+    gap: 11px;
+    grid-template-columns: 42px minmax(0, 1fr) auto;
+    min-height: 58px;
+    outline: none;
+    padding: 9px 13px;
+    text-align: left;
+    transition: .18s ease;
+    width: 100%;
+}
+
+    .sic-criterios-toggle:hover,
+    .sic-criterios-toggle:focus {
+        border-color: #9db2ea;
+        box-shadow: 0 7px 19px rgba(15, 23, 42, .08);
+    }
+
+.sic-criterios-toggle-icono {
+    align-items: center;
+    background: var(--sic-azul-suave);
+    border-radius: 11px;
+    color: var(--sic-azul);
+    display: flex;
+    font-size: 16px;
+    height: 40px;
+    justify-content: center;
+    width: 40px;
+}
+
+.sic-criterios-toggle-texto {
+    min-width: 0;
+}
+
+    .sic-criterios-toggle-texto strong {
+        color: var(--sic-azul-oscuro);
+        display: block;
+        font-size: 15px;
+        font-weight: 900;
+        line-height: 1.2;
+    }
+
+    .sic-criterios-toggle-texto small {
+        color: var(--sic-secundario);
+        display: block;
+        font-size: 11px;
+        line-height: 1.35;
+        margin-top: 3px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+.sic-criterios-toggle-accion {
+    align-items: center;
+    color: var(--sic-azul);
+    display: inline-flex;
+    font-size: 10px;
+    font-weight: 900;
+    gap: 8px;
+    text-transform: uppercase;
+}
+
+.sic-criterios-toggle-flecha {
+    transition: transform .18s ease;
+}
+
+.sic-criterios-cerrados .sic-criterios-toggle-flecha {
+    transform: rotate(180deg);
+}
+
+.sic-criterios-contenido {
+    padding-top: 12px;
+}
+
+    /* El contenido ya está dentro del acordeón. Evita margen doble. */
+    .sic-criterios-contenido .sic-filtros-card {
+        margin-bottom: 0;
+    }
+
+/* ---------------------------------------------------------------------
+   CARRUSEL DE HUELLAS
+   --------------------------------------------------------------------- */
+
+.sic-huellas-carrusel-shell {
+    align-items: stretch;
+    display: grid;
+    gap: 7px;
+    grid-column: 1 / -1;
+    grid-template-columns: 34px minmax(0, 1fr) 34px;
+    margin-top: 4px;
+    min-width: 0;
+}
+
+.sic-huellas-seleccionadas {
+    display: flex !important;
+    gap: 8px !important;
+    grid-column: auto !important;
+    grid-template-columns: none !important;
+    margin-top: 0 !important;
+    min-width: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    padding: 1px 0 4px;
+    scroll-behavior: smooth;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+}
+
+    .sic-huellas-seleccionadas::-webkit-scrollbar {
+        display: none;
+    }
+
+.sic-huella-consulta-item {
+    flex: 0 0 128px;
+    scroll-snap-align: start;
+}
+
+.sic-huella-consulta-imagen-wrap {
+    height: 94px;
+}
+
+.sic-huellas-carrusel-btn {
+    align-items: center;
+    align-self: stretch;
+    background: #ffffff;
+    border: 1px solid #cdd9ec;
+    border-radius: 9px;
+    color: var(--sic-azul);
+    cursor: pointer;
+    display: flex;
+    font-size: 13px;
+    justify-content: center;
+    min-height: 100%;
+    padding: 0;
+    transition: .15s ease;
+}
+
+    .sic-huellas-carrusel-btn:hover:not(:disabled) {
+        background: var(--sic-azul-suave);
+        border-color: #7898e7;
+    }
+
+    .sic-huellas-carrusel-btn:disabled {
+        color: #a9b4c5;
+        cursor: default;
+        opacity: .45;
+    }
+
+/* ---------------------------------------------------------------------
+   MODO RESULTADOS
+   --------------------------------------------------------------------- */
+
+.sic-modo-resultados .sic-busqueda-encabezado {
+    margin-bottom: 8px;
+}
+
+.sic-modo-resultados .sic-busqueda-subtitulo {
+    display: none;
+}
+
+.sic-modo-resultados .sic-criterios-busqueda {
+    margin-bottom: 9px;
+}
+
+.sic-modo-resultados .sic-criterios-toggle {
+    min-height: 52px;
+    padding-bottom: 7px;
+    padding-top: 7px;
+}
+
+.sic-modo-resultados .sic-criterios-toggle-icono {
+    height: 36px;
+    width: 36px;
+}
+
+.sic-modo-resultados .sic-resumen-coincidencias {
+    margin-bottom: 9px;
+}
+
+/* ---------------------------------------------------------------------
+   MEJOR LEGIBILIDAD
+   --------------------------------------------------------------------- */
+
+.sic-card-encabezado h2 {
+    font-size: 19px;
+}
+
+.sic-card-encabezado p {
+    font-size: 13px;
+}
+
+.sic-modo-busqueda {
+    font-size: 13px;
+}
+
+.sic-campo-textual-label,
+.sic-modo-combinacion-header strong {
+    font-size: 13px;
+}
+
+.sic-campo-textual-input {
+    font-size: 15px;
+}
+
+.sic-opcion-combinacion-texto strong {
+    font-size: 12px;
+}
+
+.sic-opcion-combinacion-texto small {
+    font-size: 10.5px;
+}
+
+.sic-listado-header h3 {
+    font-size: 17px;
+}
+
+.sic-listado-header span {
+    font-size: 12px;
+}
+
+.sic-resultado-nombre {
+    font-size: 16px;
+}
+
+.sic-resultado-alias {
+    font-size: 12px;
+}
+
+.sic-resultado-datos span {
+    font-size: 11px;
+}
+
+/* ---------------------------------------------------------------------
+   TABLET HORIZONTAL / LAYOUT COMPACTO
+   El body recibe op-sidebar-compact desde el Layout.
+   --------------------------------------------------------------------- */
+
+@media (min-width: 769px) and (max-width: 1399px) {
+
+    .op-sidebar-compact .sic-busqueda-encabezado {
+        margin-bottom: 10px;
+    }
+
+    .op-sidebar-compact .sic-busqueda-superior-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .op-sidebar-compact .sic-busqueda-texto-card,
+    .op-sidebar-compact .sic-biometria-card {
+        min-height: 0 !important;
+        padding: 15px;
+    }
+
+    .op-sidebar-compact .sic-biometria-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .op-sidebar-compact .sic-biometrico-tile {
+        grid-template-columns: 105px minmax(0, 1fr);
+        min-height: 126px;
+    }
+
+    .op-sidebar-compact .sic-biometrico-preview-zona,
+    .op-sidebar-compact .sic-dropzone,
+    .op-sidebar-compact .sic-huellas-dropzone {
+        height: 106px;
+        width: 105px;
+    }
+
+    .op-sidebar-compact .sic-filtros-principales {
+        grid-template-columns: minmax(220px, .8fr) minmax(300px, 1fr) auto !important;
+    }
+
+    .op-sidebar-compact .sic-filtros-acciones {
+        grid-column: auto !important;
+    }
+
+    .op-sidebar-compact .sic-btn-buscar {
+        min-width: 154px;
+    }
+
+    .op-sidebar-compact .sic-resumen-item {
+        min-height: 68px;
+        padding: 11px 12px;
+    }
+
+        .op-sidebar-compact .sic-resumen-item strong {
+            font-size: 23px;
+        }
+
+    .op-sidebar-compact .sic-resultados-layout {
+        grid-template-columns: minmax(390px, .82fr) minmax(470px, 1.18fr) !important;
+    }
+
+    .op-sidebar-compact .sic-lista-resultados {
+        max-height: calc(100vh - 285px);
+    }
+}
+
+/* Tablet más angosta: biometría en una sola fila vertical. */
+@media (min-width: 769px) and (max-width: 1050px) {
+
+    .op-sidebar-compact .sic-biometria-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .op-sidebar-compact .sic-filtros-principales {
+        grid-template-columns: 1fr 1fr !important;
+    }
+
+    .op-sidebar-compact .sic-filtros-acciones {
+        grid-column: 1 / -1 !important;
+    }
+
+    .op-sidebar-compact .sic-resultados-layout {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+/* ---------------------------------------------------------------------
+   MÓVIL
+   --------------------------------------------------------------------- */
+
+@media (max-width: 700px) {
+
+    .sic-criterios-toggle {
+        grid-template-columns: 38px minmax(0, 1fr) auto;
+        padding: 8px 10px;
+    }
+
+    .sic-criterios-toggle-icono {
+        height: 36px;
+        width: 36px;
+    }
+
+    .sic-criterios-toggle-etiqueta {
+        display: none;
+    }
+
+    .sic-criterios-toggle-texto small {
+        white-space: normal;
+    }
+
+    .sic-huellas-carrusel-shell {
+        grid-template-columns: 30px minmax(0, 1fr) 30px;
+    }
+
+    .sic-huella-consulta-item {
+        flex-basis: 118px;
+    }
+}
+
+
+/* =====================================================================
+   AJUSTE 2 - BIOMETRIA COMPACTA PARA TABLET
+   2026-08-21
+   ===================================================================== */
+
+@media (min-width: 769px) and (max-width: 1399px) {
+
+    /* Evita que la tarjeta de fotografía se estire a la altura de huellas. */
+    .op-sidebar-compact .sic-biometria-grid {
+        align-items: start;
+        gap: 12px;
+        grid-template-columns: minmax(255px, .72fr) minmax(0, 1.28fr);
+    }
+
+    .op-sidebar-compact .sic-biometria-card {
+        padding: 13px !important;
+    }
+
+    .op-sidebar-compact .sic-biometria-encabezado {
+        margin-bottom: 10px;
+        min-height: 42px;
+        padding-right: 82px;
+    }
+
+        .op-sidebar-compact .sic-biometria-encabezado h2 {
+            font-size: 18px;
+            line-height: 1.15;
+        }
+
+        .op-sidebar-compact .sic-biometria-encabezado p {
+            font-size: 12px;
+            line-height: 1.3;
+            margin-top: 2px;
+        }
+
+    .op-sidebar-compact .sic-opcional-badge {
+        font-size: 8.5px;
+        padding: 5px 8px;
+        top: 1px;
+    }
+
+    /* -------------------------------------------------------------
+       TARJETAS BIOMETRICAS
+       ------------------------------------------------------------- */
+
+    .op-sidebar-compact .sic-biometrico-tile {
+        align-items: start;
+        gap: 9px;
+        grid-template-columns: 92px minmax(0, 1fr);
+        min-height: 0 !important;
+        padding: 9px;
+    }
+
+    .op-sidebar-compact .sic-biometrico-preview-zona,
+    .op-sidebar-compact .sic-dropzone,
+    .op-sidebar-compact .sic-huellas-dropzone {
+        height: 106px !important;
+        width: 92px !important;
+    }
+
+    .op-sidebar-compact .sic-biometrico-preview {
+        height: 96px;
+        width: 82px;
+    }
+
+    .op-sidebar-compact .sic-biometrico-vacio i {
+        font-size: 24px;
+        margin-bottom: 5px;
+    }
+
+    .op-sidebar-compact .sic-biometrico-vacio strong {
+        font-size: 11px;
+    }
+
+    .op-sidebar-compact .sic-biometrico-vacio span {
+        font-size: 9px;
+    }
+
+    .op-sidebar-compact .sic-biometrico-titulo-fila strong {
+        font-size: 14px;
+        line-height: 1.15;
+    }
+
+    .op-sidebar-compact .sic-biometrico-titulo-fila span:not(.sic-biometrico-tipo) {
+        font-size: 10px;
+        line-height: 1.25;
+        margin-top: 2px;
+    }
+
+    .op-sidebar-compact .sic-biometrico-tipo {
+        font-size: 8px;
+        padding: 4px 6px;
+    }
+
+    .op-sidebar-compact .sic-biometrico-informacion > small {
+        font-size: 8.5px;
+        padding-top: 5px;
+    }
+
+    .op-sidebar-compact .sic-biometrico-acciones {
+        gap: 6px;
+        margin-top: 6px;
+    }
+
+    .op-sidebar-compact .sic-btn-biometrico {
+        font-size: 9px;
+        min-height: 36px;
+        padding: 6px 5px;
+    }
+
+    /* -------------------------------------------------------------
+       FOTOGRAFIA
+       La foto deja de crecer a la altura de la tarjeta de huellas.
+       ------------------------------------------------------------- */
+
+    .op-sidebar-compact .sic-biometrico-tile[data-tipo-biometrico="fotografia"] {
+        min-height: 124px !important;
+    }
+
+        .op-sidebar-compact .sic-biometrico-tile[data-tipo-biometrico="fotografia"] .sic-biometrico-informacion {
+            min-height: 106px;
+        }
+
+    /* -------------------------------------------------------------
+       HUELLAS
+       El carrusel vive debajo de la información, únicamente en la
+       columna derecha. Así ya no aumenta innecesariamente toda la card.
+       ------------------------------------------------------------- */
+
+    .op-sidebar-compact .sic-biometrico-tile-huellas {
+        align-content: start;
+        grid-template-columns: 92px minmax(0, 1fr);
+    }
+
+        .op-sidebar-compact .sic-biometrico-tile-huellas .sic-huellas-info-linea {
+            gap: 7px;
+            margin-top: 3px;
+        }
+
+        .op-sidebar-compact .sic-biometrico-tile-huellas .sic-huellas-contador {
+            font-size: 10px;
+            padding: 4px 8px;
+        }
+
+        .op-sidebar-compact .sic-biometrico-tile-huellas .sic-huellas-carrusel-shell {
+            gap: 6px;
+            grid-column: 2;
+            grid-template-columns: 40px minmax(0, 1fr) 40px;
+            margin-top: 0;
+            min-height: 108px;
+        }
+
+    .op-sidebar-compact .sic-huellas-carrusel-btn {
+        border-radius: 10px;
+        font-size: 18px;
+        min-height: 108px;
+        touch-action: manipulation;
+    }
+
+    .op-sidebar-compact .sic-huella-consulta-item {
+        flex: 0 0 112px;
+    }
+
+    .op-sidebar-compact .sic-huella-consulta-imagen-wrap {
+        height: 76px;
+    }
+
+    .op-sidebar-compact .sic-huella-consulta-numero {
+        font-size: 8px;
+        left: 5px;
+        padding: 3px 6px;
+        top: 5px;
+    }
+
+    .op-sidebar-compact .sic-huella-consulta-quitar {
+        height: 24px;
+        right: 5px;
+        top: 5px;
+        width: 24px;
+    }
+
+    .op-sidebar-compact .sic-huella-consulta-info {
+        padding: 5px 7px 6px;
+    }
+
+        .op-sidebar-compact .sic-huella-consulta-info strong {
+            font-size: 9.5px;
+        }
+
+        .op-sidebar-compact .sic-huella-consulta-info span {
+            font-size: 8.5px;
+            margin-top: 2px;
+        }
+}
+
+/* En tablets realmente angostas sí apilamos Foto y Huellas. */
+@media (min-width: 769px) and (max-width: 920px) {
+
+    .op-sidebar-compact .sic-biometria-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .op-sidebar-compact .sic-biometrico-tile[data-tipo-biometrico="fotografia"],
+    .op-sidebar-compact .sic-biometrico-tile-huellas {
+        grid-template-columns: 92px minmax(0, 1fr);
+    }
+
+        .op-sidebar-compact .sic-biometrico-tile-huellas .sic-huellas-carrusel-shell {
+            grid-column: 2;
+        }
+}
+
+
+@media (max-width: 920px) {
+
+    .op-sidebar-compact .sic-biometrico-tile-huellas {
+        grid-template-columns: 76px minmax(0, 1fr) !important;
+    }
+
+        .op-sidebar-compact .sic-biometrico-tile-huellas .sic-huellas-dropzone {
+            width: 76px !important;
+            height: 96px !important;
+        }
+
+        .op-sidebar-compact .sic-biometrico-tile-huellas .sic-biometrico-vacio i {
+            font-size: 22px;
+            margin-bottom: 4px;
+        }
+
+        .op-sidebar-compact .sic-biometrico-tile-huellas .sic-biometrico-vacio strong {
+            font-size: 10px;
+            line-height: 1.05;
+        }
+
+        .op-sidebar-compact .sic-biometrico-tile-huellas .sic-biometrico-vacio span {
+            font-size: 8px;
+            line-height: 1.05;
+        }
+}
+
+
+/* =========================================================
+   TABLET - COMPACTAR ZONA IZQUIERDA DE HUELLAS
+   ========================================================= */
+
+@media (max-width: 1050px) {
+
+    #tileHuellas {
+        grid-template-columns: 78px minmax(0, 1fr) !important;
+        gap: 8px !important;
+    }
+
+    #dropzoneHuellas {
+        width: 78px !important;
+        min-width: 78px !important;
+        max-width: 78px !important;
+        height: 96px !important;
+        padding: 4px !important;
+    }
+
+        #dropzoneHuellas .sic-biometrico-vacio {
+            width: 100%;
+        }
+
+            #dropzoneHuellas .sic-biometrico-vacio i {
+                font-size: 21px !important;
+                margin-bottom: 3px !important;
+            }
+
+            #dropzoneHuellas .sic-biometrico-vacio strong {
+                font-size: 10px !important;
+                line-height: 1.05 !important;
+            }
+
+            #dropzoneHuellas .sic-biometrico-vacio span {
+                font-size: 8px !important;
+                line-height: 1.05 !important;
+                margin-top: 3px !important;
+            }
+
+    #tileHuellas .sic-biometrico-informacion {
+        min-width: 0;
+        padding-left: 2px;
+    }
+
+    #tileHuellas .sic-biometrico-titulo-fila {
+        padding-left: 0;
+    }
+}
+
+
+/* ================================================================
+   DETALLE DE COINCIDENCIA EN MODAL - TABLET
+   ================================================================ */
+
+.sic-modal-detalle-tablet {
+    align-items: center;
+    display: none;
+    inset: 0;
+    justify-content: center;
+    padding: 18px;
+    position: fixed;
+    z-index: 120000;
+}
+
+    .sic-modal-detalle-tablet.abierto {
+        display: flex;
+    }
+
+.sic-modal-detalle-fondo {
+    background: rgba(10, 22, 48, .64);
+    border: 0;
+    cursor: pointer;
+    inset: 0;
+    padding: 0;
+    position: absolute;
+    width: 100%;
+}
+
+.sic-modal-detalle-dialogo {
+    background: #ffffff;
+    border: 1px solid #dbe5f3;
+    border-radius: 18px;
+    box-shadow: 0 28px 80px rgba(10, 22, 48, .28);
+    display: flex;
+    flex-direction: column;
+    height: min(90vh, 900px);
+    max-height: 90vh;
+    max-width: 1120px;
+    overflow: hidden;
+    position: relative;
+    width: min(94vw, 1120px);
+    z-index: 1;
+}
+
+.sic-modal-detalle-encabezado {
+    align-items: center;
+    background: #ffffff;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    flex: 0 0 auto;
+    gap: 14px;
+    justify-content: space-between;
+    min-height: 68px;
+    padding: 11px 14px 11px 16px;
+}
+
+.sic-modal-detalle-titulo-wrap {
+    align-items: center;
+    display: flex;
+    gap: 11px;
+    min-width: 0;
+}
+
+.sic-modal-detalle-icono {
+    align-items: center;
+    background: #eef3ff;
+    border-radius: 12px;
+    color: #3557d4;
+    display: inline-flex;
+    flex: 0 0 42px;
+    font-size: 19px;
+    height: 42px;
+    justify-content: center;
+    width: 42px;
+}
+
+.sic-modal-detalle-titulo-wrap > div {
+    min-width: 0;
+}
+
+.sic-modal-detalle-titulo-wrap h2 {
+    color: var(--sic-azul-oscuro);
+    font-size: 18px;
+    font-weight: 900;
+    line-height: 1.15;
+    margin: 0 0 3px;
+}
+
+#sicModalDetalleSubtitulo {
+    color: #617086;
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    max-width: 720px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.sic-modal-detalle-cerrar {
+    align-items: center;
+    background: #f8fafc;
+    border: 1px solid #d9e2ef;
+    border-radius: 12px;
+    color: #334155;
+    cursor: pointer;
+    display: inline-flex;
+    flex: 0 0 44px;
+    font-size: 18px;
+    height: 44px;
+    justify-content: center;
+    transition: .18s ease;
+    width: 44px;
+}
+
+    .sic-modal-detalle-cerrar:hover,
+    .sic-modal-detalle-cerrar:focus {
+        background: #eef3ff;
+        border-color: #a9bdf6;
+        color: #2848bd;
+        outline: none;
+    }
+
+.sic-modal-detalle-contenido {
+    -webkit-overflow-scrolling: touch;
+    background: #ffffff;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding: 18px;
+}
+
+    .sic-modal-detalle-contenido > *:first-child {
+        margin-top: 0 !important;
+    }
+
+    .sic-modal-detalle-contenido .sic-detalle-principal {
+        width: 100%;
+    }
+
+    .sic-modal-detalle-contenido .sic-detalle-loader,
+    .sic-modal-detalle-contenido .sic-detalle-vacio {
+        min-height: 340px;
+    }
+
+
+/* TABLET */
+@media (max-width: 1100px) {
+
+    #sicResultadosContexto.sic-resultados-layout,
+    .op-sidebar-compact #sicResultadosContexto.sic-resultados-layout {
+        grid-template-columns: 1fr !important;
+    }
+
+    #panelDetalleCoincidencia {
+        display: none !important;
+    }
+
+    .sic-listado-coincidencias {
+        width: 100%;
+    }
+
+    .sic-lista-resultados,
+    .op-sidebar-compact .sic-lista-resultados {
+        max-height: none !important;
+        overflow-y: visible !important;
+    }
+
+    .js-ver-coincidencia {
+        min-height: 42px;
+        padding-left: 12px !important;
+        padding-right: 12px !important;
+        touch-action: manipulation;
+    }
+}
+
+
+@media (max-width: 700px) {
+
+    .sic-modal-detalle-tablet {
+        padding: 8px;
+    }
+
+    .sic-modal-detalle-dialogo {
+        border-radius: 14px;
+        height: 94vh;
+        max-height: 94vh;
+        width: 98vw;
+    }
+
+    .sic-modal-detalle-encabezado {
+        min-height: 60px;
+        padding: 9px 10px 9px 12px;
+    }
+
+    .sic-modal-detalle-icono {
+        flex-basis: 36px;
+        font-size: 16px;
+        height: 36px;
+        width: 36px;
+    }
+
+    .sic-modal-detalle-titulo-wrap h2 {
+        font-size: 16px;
+    }
+
+    #sicModalDetalleSubtitulo {
+        font-size: 10px;
+        max-width: 220px;
+    }
+
+    .sic-modal-detalle-cerrar {
+        flex-basis: 40px;
+        height: 40px;
+        width: 40px;
+    }
+
+    .sic-modal-detalle-contenido {
+        padding: 11px;
+    }
+}
+
+
+@media (min-width: 1101px) {
+
+    .sic-modal-detalle-tablet {
+        display: none !important;
+    }
+}
+
+/* =========================================================
+   ESCRITORIO - DISTRIBUCION DE RESULTADOS
+   ========================================================= */
+
+@media (min-width: 1400px) {
+
+    .sic-resultados-layout {
+        grid-template-columns: minmax(430px, .78fr) minmax(650px, 1.22fr) !important;
+    }
+}
 }
 
 

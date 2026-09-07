@@ -53,7 +53,7 @@
 }
 
 
-<link href="@Url.Content("~/Content/SIC/busqueda-coincidencias.css")?v=20260806-4" rel="stylesheet" type="text/css" />
+<link href="@Url.Content("~/Content/SIC/busqueda-coincidencias.css")?v=20260821-tablet-1" rel="stylesheet" type="text/css" />
 
 
 <div id="sicBusquedaCoincidencias"
@@ -114,448 +114,486 @@
                        )
 
 
-        <div class="sic-busqueda-superior-grid">
-
-
-            <!-- ====================================================
-                 BÚSQUEDA TEXTUAL
-                 ==================================================== -->
-
-            <section class="sic-busqueda-texto-card">
-
-                <div class="sic-card-encabezado">
-
-                    <div class="sic-card-icono sic-card-icono-busqueda">
-
-                        <i class="fa fa-search"></i>
-
-                    </div>
-
-
-                    <div>
-
-                        <h2>
-                            Buscar persona
-                        </h2>
-
-                        <p>
-                            Capture el nombre conocido, el alias
-                            o ambos criterios.
-                        </p>
-
-                    </div>
-
-                </div>
-
-
-                <!-- ================================================
-                     MODO DE BÚSQUEDA
-                     ================================================ -->
-
-                @Html.HiddenFor(
-                                   model => model.ModoBusquedaTexto,
-                                   new
-                                   {
-                                       id = "ModoBusquedaTexto"
-                                   }
-                               )
-
-
-                <div class="sic-modos-busqueda"
-                     role="group"
-                     aria-label="Modo de búsqueda textual">
-
-
-                    <button type="button"
-                            class="sic-modo-busqueda @(modoBusquedaTexto == "NOMBRE" ? "active" : "")"
-                            data-modo="NOMBRE"
-                            aria-pressed="@(modoBusquedaTexto == "NOMBRE" ? "true" : "false")">
-
-                        <i class="fa fa-user"></i>
-
-                        <span>
-                            Nombre
-                        </span>
-
-                    </button>
-
-
-                    <button type="button"
-                            class="sic-modo-busqueda @(modoBusquedaTexto == "ALIAS" ? "active" : "")"
-                            data-modo="ALIAS"
-                            aria-pressed="@(modoBusquedaTexto == "ALIAS" ? "true" : "false")">
-
-                        <i class="fa fa-user-secret"></i>
-
-                        <span>
-                            Alias
-                        </span>
-
-                    </button>
-
-
-                    <button type="button"
-                            class="sic-modo-busqueda @(modoBusquedaTexto == "AMBOS" ? "active" : "")"
-                            data-modo="AMBOS"
-                            aria-pressed="@(modoBusquedaTexto == "AMBOS" ? "true" : "false")">
-
-                        <i class="fa fa-users"></i>
-
-                        <span>
-                            Nombre y alias
-                        </span>
-
-                    </button>
-
-                </div>
-
-
-                <!-- ================================================
-                     CAMPOS INDEPENDIENTES
-                     ================================================ -->
-
-                <div id="contenedorCamposTextuales"
-                     class="sic-campos-textuales-grid @(modoBusquedaTexto == "AMBOS" ? "sic-campos-dobles" : "sic-campos-sencillos")">
-
-
-                    <!-- ============================================
-                         NOMBRE
-                         ============================================ -->
-
-                    <div id="grupoNombreBusqueda"
-                         class="sic-campo-textual"
-                         style="@(mostrarNombre ? "" : "display:none;")">
-
-                        <label for="NombreBusqueda"
-                               class="sic-campo-textual-label">
-
-                            <i class="fa fa-user"></i>
-
-                            Nombre conocido
-
-                        </label>
-
-
-                        <div class="sic-campo-textual-control">
-
-                            <i class="fa fa-search sic-campo-textual-icono"></i>
-
-
-                            @Html.TextBoxFor(
-                                               model => model.NombreBusqueda,
-                                               new
-                                               {
-                                                   id = "NombreBusqueda",
-
-                                                   @class =
-                                                       "sic-campo-textual-input",
-
-                                                   placeholder =
-                                                       "Ejemplo: BENJAMIN",
-
-                                                   maxlength =
-                                                       "150",
-
-                                                   autocomplete =
-                                                       "off",
-
-                                                   aria_label =
-                                                       "Nombre conocido de la persona"
-                                               }
-                                           )
-
-
-                            <button type="button"
-                                    id="btnLimpiarNombreBusqueda"
-                                    class="sic-limpiar-campo-texto js-limpiar-campo-texto"
-                                    data-target="NombreBusqueda"
-                                    title="Limpiar nombre"
-                                    aria-label="Limpiar nombre">
-
-                                <i class="fa fa-times"></i>
-
-                            </button>
-
-                        </div>
-
-
-                        <small class="sic-campo-textual-ayuda">
-
-                            Puede capturar uno o varios nombres conocidos.
-
-                        </small>
-
-                    </div>
-
-
-                    <!-- ============================================
-                         ALIAS
-                         ============================================ -->
-
-                    <div id="grupoAliasBusqueda"
-                         class="sic-campo-textual"
-                         style="@(mostrarAlias ? "" : "display:none;")">
-
-                        <label for="AliasBusqueda"
-                               class="sic-campo-textual-label">
-
-                            <i class="fa fa-user-secret"></i>
-
-                            Alias conocido
-
-                        </label>
-
-
-                        <div class="sic-campo-textual-control">
-
-                            <i class="fa fa-search sic-campo-textual-icono"></i>
-
-
-                            @Html.TextBoxFor(
-                                               model => model.AliasBusqueda,
-                                               new
-                                               {
-                                                   id = "AliasBusqueda",
-
-                                                   @class =
-                                                       "sic-campo-textual-input",
-
-                                                   placeholder =
-                                                       "Ejemplo: EL BENJAS",
-
-                                                   maxlength =
-                                                       "150",
-
-                                                   autocomplete =
-                                                       "off",
-
-                                                   aria_label =
-                                                       "Alias conocido de la persona"
-                                               }
-                                           )
-
-
-                            <button type="button"
-                                    id="btnLimpiarAliasBusqueda"
-                                    class="sic-limpiar-campo-texto js-limpiar-campo-texto"
-                                    data-target="AliasBusqueda"
-                                    title="Limpiar alias"
-                                    aria-label="Limpiar alias">
-
-                                <i class="fa fa-times"></i>
-
-                            </button>
-
-                        </div>
-
-
-                        <small class="sic-campo-textual-ayuda">
-
-                            Capture el sobrenombre o alias con el que
-                            se conoce a la persona.
-
-                        </small>
-
-                    </div>
-
-                </div>
-
-
-                <!-- ================================================
-                     EXPLICACIÓN DEL MODO SELECCIONADO
-                     ================================================ -->
-
-                <div id="descripcionModoBusqueda"
-                     class="sic-descripcion-modo-busqueda">
-
-                    <i class="fa fa-info-circle"></i>
-
-
-                    <span id="textoDescripcionModoBusqueda">
-
-                        @if (modoBusquedaTexto == "NOMBRE")
-                        {
-                            <text>
-                                Se buscarán personas que coincidan
-                                con el nombre capturado.
-                            </text>
-                        }
-                        else if (modoBusquedaTexto == "ALIAS")
-                        {
-                            <text>
-                                Se buscarán personas que coincidan
-                                con el alias capturado.
-                            </text>
-                        }
-                        else
-                        {
-                            <text>
-                                El nombre y el alias se evaluarán
-                                como criterios independientes.
-                            </text>
-                        }
-
+        <section id="panelCriteriosBusqueda"
+                 class="sic-criterios-busqueda sic-criterios-abiertos">
+
+            <button type="button"
+                    id="btnToggleCriteriosBusqueda"
+                    class="sic-criterios-toggle"
+                    aria-expanded="true"
+                    aria-controls="contenidoCriteriosBusqueda">
+
+                <span class="sic-criterios-toggle-icono">
+                    <i class="fa fa-sliders"></i>
+                </span>
+
+                <span class="sic-criterios-toggle-texto">
+                    <strong>Criterios de búsqueda</strong>
+
+                    <small id="resumenCriteriosBusqueda">
+                        Configure nombre, alias, fotografía o huellas.
+                    </small>
+                </span>
+
+                <span class="sic-criterios-toggle-accion">
+                    <span class="sic-criterios-toggle-etiqueta">
+                        Ocultar
                     </span>
 
-                </div>
+                    <i class="fa fa-chevron-up sic-criterios-toggle-flecha"></i>
+                </span>
+
+            </button>
+
+            <div id="contenidoCriteriosBusqueda"
+                 class="sic-criterios-contenido">
+
+                <div class="sic-busqueda-superior-grid">
 
 
-                <!-- ================================================
-                     MODO DE COMBINACIÓN
-                     ================================================ -->
+                    <!-- ====================================================
+                         BÚSQUEDA TEXTUAL
+                         ==================================================== -->
 
-                <div class="sic-modo-combinacion">
+                    <section class="sic-busqueda-texto-card">
 
-                    <div class="sic-modo-combinacion-header">
+                        <div class="sic-card-encabezado">
 
-                        <div>
+                            <div class="sic-card-icono sic-card-icono-busqueda">
 
-                            <strong>
-                                ¿Cómo combinar los criterios?
-                            </strong>
+                                <i class="fa fa-search"></i>
 
-                            <span>
-                                También se considera la fotografía
-                                y la huella cuando sean agregadas.
+                            </div>
+
+
+                            <div>
+
+                                <h2>
+                                    Buscar persona
+                                </h2>
+
+                                <p>
+                                    Capture el nombre conocido, el alias
+                                    o ambos criterios.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- ================================================
+                             MODO DE BÚSQUEDA
+                             ================================================ -->
+
+                        @Html.HiddenFor(
+                                           model => model.ModoBusquedaTexto,
+                                           new
+                                           {
+                                               id = "ModoBusquedaTexto"
+                                           }
+                                       )
+
+
+                        <div class="sic-modos-busqueda"
+                             role="group"
+                             aria-label="Modo de búsqueda textual">
+
+
+                            <button type="button"
+                                    class="sic-modo-busqueda @(modoBusquedaTexto == "NOMBRE" ? "active" : "")"
+                                    data-modo="NOMBRE"
+                                    aria-pressed="@(modoBusquedaTexto == "NOMBRE" ? "true" : "false")">
+
+                                <i class="fa fa-user"></i>
+
+                                <span>
+                                    Nombre
+                                </span>
+
+                            </button>
+
+
+                            <button type="button"
+                                    class="sic-modo-busqueda @(modoBusquedaTexto == "ALIAS" ? "active" : "")"
+                                    data-modo="ALIAS"
+                                    aria-pressed="@(modoBusquedaTexto == "ALIAS" ? "true" : "false")">
+
+                                <i class="fa fa-user-secret"></i>
+
+                                <span>
+                                    Alias
+                                </span>
+
+                            </button>
+
+
+                            <button type="button"
+                                    class="sic-modo-busqueda @(modoBusquedaTexto == "AMBOS" ? "active" : "")"
+                                    data-modo="AMBOS"
+                                    aria-pressed="@(modoBusquedaTexto == "AMBOS" ? "true" : "false")">
+
+                                <i class="fa fa-users"></i>
+
+                                <span>
+                                    Nombre y alias
+                                </span>
+
+                            </button>
+
+                        </div>
+
+
+                        <!-- ================================================
+                             CAMPOS INDEPENDIENTES
+                             ================================================ -->
+
+                        <div id="contenedorCamposTextuales"
+                             class="sic-campos-textuales-grid @(modoBusquedaTexto == "AMBOS" ? "sic-campos-dobles" : "sic-campos-sencillos")">
+
+
+                            <!-- ============================================
+                                 NOMBRE
+                                 ============================================ -->
+
+                            <div id="grupoNombreBusqueda"
+                                 class="sic-campo-textual"
+                                 style="@(mostrarNombre ? "" : "display:none;")">
+
+                                <label for="NombreBusqueda"
+                                       class="sic-campo-textual-label">
+
+                                    <i class="fa fa-user"></i>
+
+                                    Nombre conocido
+
+                                </label>
+
+
+                                <div class="sic-campo-textual-control">
+
+                                    <i class="fa fa-search sic-campo-textual-icono"></i>
+
+
+                                    @Html.TextBoxFor(
+                                                       model => model.NombreBusqueda,
+                                                       new
+                                                       {
+                                                           id = "NombreBusqueda",
+
+                                                           @class =
+                                                               "sic-campo-textual-input",
+
+                                                           placeholder =
+                                                               "Ejemplo: BENJAMIN",
+
+                                                           maxlength =
+                                                               "150",
+
+                                                           autocomplete =
+                                                               "off",
+
+                                                           aria_label =
+                                                               "Nombre conocido de la persona"
+                                                       }
+                                                   )
+
+
+                                    <button type="button"
+                                            id="btnLimpiarNombreBusqueda"
+                                            class="sic-limpiar-campo-texto js-limpiar-campo-texto"
+                                            data-target="NombreBusqueda"
+                                            title="Limpiar nombre"
+                                            aria-label="Limpiar nombre">
+
+                                        <i class="fa fa-times"></i>
+
+                                    </button>
+
+                                </div>
+
+
+                                <small class="sic-campo-textual-ayuda">
+
+                                    Puede capturar uno o varios nombres conocidos.
+
+                                </small>
+
+                            </div>
+
+
+                            <!-- ============================================
+                                 ALIAS
+                                 ============================================ -->
+
+                            <div id="grupoAliasBusqueda"
+                                 class="sic-campo-textual"
+                                 style="@(mostrarAlias ? "" : "display:none;")">
+
+                                <label for="AliasBusqueda"
+                                       class="sic-campo-textual-label">
+
+                                    <i class="fa fa-user-secret"></i>
+
+                                    Alias conocido
+
+                                </label>
+
+
+                                <div class="sic-campo-textual-control">
+
+                                    <i class="fa fa-search sic-campo-textual-icono"></i>
+
+
+                                    @Html.TextBoxFor(
+                                                       model => model.AliasBusqueda,
+                                                       new
+                                                       {
+                                                           id = "AliasBusqueda",
+
+                                                           @class =
+                                                               "sic-campo-textual-input",
+
+                                                           placeholder =
+                                                               "Ejemplo: EL BENJAS",
+
+                                                           maxlength =
+                                                               "150",
+
+                                                           autocomplete =
+                                                               "off",
+
+                                                           aria_label =
+                                                               "Alias conocido de la persona"
+                                                       }
+                                                   )
+
+
+                                    <button type="button"
+                                            id="btnLimpiarAliasBusqueda"
+                                            class="sic-limpiar-campo-texto js-limpiar-campo-texto"
+                                            data-target="AliasBusqueda"
+                                            title="Limpiar alias"
+                                            aria-label="Limpiar alias">
+
+                                        <i class="fa fa-times"></i>
+
+                                    </button>
+
+                                </div>
+
+
+                                <small class="sic-campo-textual-ayuda">
+
+                                    Capture el sobrenombre o alias con el que
+                                    se conoce a la persona.
+
+                                </small>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- ================================================
+                             EXPLICACIÓN DEL MODO SELECCIONADO
+                             ================================================ -->
+
+                        <div id="descripcionModoBusqueda"
+                             class="sic-descripcion-modo-busqueda">
+
+                            <i class="fa fa-info-circle"></i>
+
+
+                            <span id="textoDescripcionModoBusqueda">
+
+                                @if (modoBusquedaTexto == "NOMBRE")
+                                {
+                                    <text>
+                                        Se buscarán personas que coincidan
+                                        con el nombre capturado.
+                                    </text>
+                                }
+                                else if (modoBusquedaTexto == "ALIAS")
+                                {
+                                    <text>
+                                        Se buscarán personas que coincidan
+                                        con el alias capturado.
+                                    </text>
+                                }
+                                else
+                                {
+                                    <text>
+                                        El nombre y el alias se evaluarán
+                                        como criterios independientes.
+                                    </text>
+                                }
+
                             </span>
 
                         </div>
 
-                    </div>
+
+                        <!-- ================================================
+                             MODO DE COMBINACIÓN
+                             ================================================ -->
+
+                        <div class="sic-modo-combinacion">
+
+                            <div class="sic-modo-combinacion-header">
+
+                                <div>
+
+                                    <strong>
+                                        ¿Cómo combinar los criterios?
+                                    </strong>
+
+                                    <span>
+                                        También se considera la fotografía
+                                        y la huella cuando sean agregadas.
+                                    </span>
+
+                                </div>
+
+                            </div>
 
 
-                    <div class="sic-opciones-combinacion">
+                            <div class="sic-opciones-combinacion">
 
 
-                        <!-- ========================================
-                             PRIORIZAR
-                             ======================================== -->
+                                <!-- ========================================
+                                     PRIORIZAR
+                                     ======================================== -->
 
-                        <label class="sic-opcion-combinacion @(modoCombinacion == "PRIORIZAR" ? "active" : "")"
-                               for="ModoCombinacionPriorizar">
+                                <label class="sic-opcion-combinacion @(modoCombinacion == "PRIORIZAR" ? "active" : "")"
+                                       for="ModoCombinacionPriorizar">
 
-                            @Html.RadioButtonFor(
-                                               model => model.ModoCombinacion,
-                                               "PRIORIZAR",
-                                               new
-                                               {
-                                                   id =
-                                                       "ModoCombinacionPriorizar",
+                                    @Html.RadioButtonFor(
+                                                       model => model.ModoCombinacion,
+                                                       "PRIORIZAR",
+                                                       new
+                                                       {
+                                                           id =
+                                                               "ModoCombinacionPriorizar",
 
-                                                   @class =
-                                                       "js-modo-combinacion"
-                                               }
-                                           )
-
-
-                            <span class="sic-opcion-combinacion-selector">
-
-                                <i class="fa fa-check"></i>
-
-                            </span>
+                                                           @class =
+                                                               "js-modo-combinacion"
+                                                       }
+                                                   )
 
 
-                            <span class="sic-opcion-combinacion-icono">
+                                    <span class="sic-opcion-combinacion-selector">
 
-                                <i class="fa fa-sort-amount-desc"></i>
+                                        <i class="fa fa-check"></i>
 
-                            </span>
-
-
-                            <span class="sic-opcion-combinacion-texto">
-
-                                <strong>
-                                    Priorizar coincidencias
-                                </strong>
-
-                                <small>
-                                    Muestra primero a quienes cumplen
-                                    una mayor cantidad de criterios,
-                                    sin ocultar candidatos por datos faltantes.
-                                </small>
-
-                            </span>
-
-                        </label>
+                                    </span>
 
 
-                        <!-- ========================================
-                             ESTRICTO
-                             ======================================== -->
+                                    <span class="sic-opcion-combinacion-icono">
 
-                        <label class="sic-opcion-combinacion @(modoCombinacion == "ESTRICTO" ? "active" : "")"
-                               for="ModoCombinacionEstricto">
+                                        <i class="fa fa-sort-amount-desc"></i>
 
-                            @Html.RadioButtonFor(
-                                               model => model.ModoCombinacion,
-                                               "ESTRICTO",
-                                               new
-                                               {
-                                                   id =
-                                                       "ModoCombinacionEstricto",
-
-                                                   @class =
-                                                       "js-modo-combinacion"
-                                               }
-                                           )
+                                    </span>
 
 
-                            <span class="sic-opcion-combinacion-selector">
+                                    <span class="sic-opcion-combinacion-texto">
 
-                                <i class="fa fa-check"></i>
+                                        <strong>
+                                            Priorizar coincidencias
+                                        </strong>
 
-                            </span>
+                                        <small>
+                                            Muestra primero a quienes cumplen
+                                            una mayor cantidad de criterios,
+                                            sin ocultar candidatos por datos faltantes.
+                                        </small>
+
+                                    </span>
+
+                                </label>
 
 
-                            <span class="sic-opcion-combinacion-icono">
+                                <!-- ========================================
+                                     ESTRICTO
+                                     ======================================== -->
 
-                                <i class="fa fa-filter"></i>
+                                <label class="sic-opcion-combinacion @(modoCombinacion == "ESTRICTO" ? "active" : "")"
+                                       for="ModoCombinacionEstricto">
 
-                            </span>
+                                    @Html.RadioButtonFor(
+                                                       model => model.ModoCombinacion,
+                                                       "ESTRICTO",
+                                                       new
+                                                       {
+                                                           id =
+                                                               "ModoCombinacionEstricto",
+
+                                                           @class =
+                                                               "js-modo-combinacion"
+                                                       }
+                                                   )
 
 
-                            <span class="sic-opcion-combinacion-texto">
+                                    <span class="sic-opcion-combinacion-selector">
 
-                                <strong>
-                                    Exigir todos los criterios
-                                </strong>
+                                        <i class="fa fa-check"></i>
 
-                                <small>
-                                    Solo muestra candidatos que cumplan
-                                    todos los datos capturados.
-                                </small>
+                                    </span>
 
-                            </span>
 
-                        </label>
+                                    <span class="sic-opcion-combinacion-icono">
 
-                    </div>
+                                        <i class="fa fa-filter"></i>
+
+                                    </span>
+
+
+                                    <span class="sic-opcion-combinacion-texto">
+
+                                        <strong>
+                                            Exigir todos los criterios
+                                        </strong>
+
+                                        <small>
+                                            Solo muestra candidatos que cumplan
+                                            todos los datos capturados.
+                                        </small>
+
+                                    </span>
+
+                                </label>
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+
+                    <!-- ====================================================
+                         BIOMETRÍA
+                         ==================================================== -->
+
+                    @Html.Partial(
+                                       "Coincidencias/CargaBiometricaPartial",
+                                       Model
+                                   )
 
                 </div>
 
-            </section>
 
+                <!-- ========================================================
+                     FILTROS
+                     ======================================================== -->
 
-            <!-- ====================================================
-                 BIOMETRÍA
-                 ==================================================== -->
+                @Html.Partial(
+                                   "Coincidencias/FiltrosCoincidenciasPartial",
+                                   Model
+                               )
 
-            @Html.Partial(
-                               "Coincidencias/CargaBiometricaPartial",
-                               Model
-                           )
+            </div>
 
-        </div>
-
-
-        <!-- ========================================================
-             FILTROS
-             ======================================================== -->
-
-        @Html.Partial(
-                           "Coincidencias/FiltrosCoincidenciasPartial",
-                           Model
-                       )
+        </section>
 
     </form>
 
@@ -565,7 +603,7 @@
          ============================================================ -->
 
     <div id="contenedorResultadosCoincidencias"
-         class="sic-resultados-inicial">
+         class="sic-resultados-inicial sic-resultados-zona">
 
         <div class="sic-resultados-inicial-icono">
 
@@ -614,6 +652,6 @@
     </script>
 
 
-    <script src="@Url.Content("~/Scripts/SIC/busqueda-coincidencias.js")?v=20260806-4"></script>
+    <script src="@Url.Content("~/Scripts/SIC/busqueda-coincidencias.js")?v=20260821-tablet-1"></script>
 
 }

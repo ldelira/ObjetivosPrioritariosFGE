@@ -1,0 +1,358 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="AccesosModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="Agencias">
+          <Key>
+            <PropertyRef Name="Cve_age" />
+          </Key>
+          <Property Name="Cve_age" Type="smallint" Nullable="false" />
+          <Property Name="Desc_age" Type="nvarchar" MaxLength="75" />
+          <Property Name="Cve_area" Type="int" Nullable="false" />
+          <Property Name="Cve_ubica" Type="nvarchar" MaxLength="3" Nullable="false" />
+          <Property Name="Desc_doc" Type="nvarchar" MaxLength="100" />
+          <Property Name="No_age" Type="nvarchar" MaxLength="3" />
+          <Property Name="Extension" Type="nvarchar" MaxLength="10" />
+          <Property Name="Municipio" Type="nvarchar" MaxLength="50" />
+          <Property Name="Adscripcion" Type="nvarchar" MaxLength="100" />
+          <Property Name="Siglas" Type="nvarchar" MaxLength="30" />
+          <Property Name="Age_Deter_Reser" Type="int" Nullable="false" />
+          <Property Name="Num_Ordenado" Type="int" Nullable="false" />
+          <Property Name="Guardia" Type="smallint" Nullable="false" />
+          <Property Name="Fecha_Guardia" Type="datetime" />
+          <Property Name="rowguid" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="Cve_Calle" Type="int" />
+          <Property Name="NoCasa" Type="nvarchar" MaxLength="50" />
+          <Property Name="Id_Partido" Type="int" />
+          <Property Name="Id_Adscripcion" Type="int" />
+          <Property Name="Tipo" Type="int" Nullable="false" />
+          <Property Name="no_telefonico" Type="varchar" MaxLength="20" />
+          <Property Name="horario" Type="varchar" MaxLength="200" />
+          <Property Name="CveAgenciaOrigen" Type="int" />
+          <Property Name="UnidadID" Type="int" />
+          <Property Name="Agencia" Type="nvarchar" MaxLength="150" />
+        </EntityType>
+        <EntityType Name="Ministerios">
+          <Key>
+            <PropertyRef Name="Cve_Usuario" />
+          </Key>
+          <Property Name="Cve_Usuario" Type="int" Nullable="false" />
+          <Property Name="Cve_Age" Type="smallint" Nullable="false" />
+          <Property Name="Cve_Titulo" Type="smallint" />
+          <Property Name="Secretario" Type="bit" Nullable="false" />
+          <Property Name="Usuario" Type="nvarchar" MaxLength="50" />
+          <Property Name="Equipo" Type="nvarchar" MaxLength="50" />
+          <Property Name="Aplicacion" Type="nvarchar" MaxLength="50" />
+          <Property Name="rowguid" Type="uniqueidentifier" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Usuarios">
+          <Key>
+            <PropertyRef Name="Cve_Usuario" />
+          </Key>
+          <Property Name="Paterno" Type="nvarchar" MaxLength="25" />
+          <Property Name="Materno" Type="nvarchar" MaxLength="25" />
+          <Property Name="Nombre" Type="nvarchar" MaxLength="25" />
+          <Property Name="Puesto" Type="nvarchar" MaxLength="80" />
+          <Property Name="Cve_DirFGE" Type="int" />
+          <Property Name="Area" Type="decimal" Precision="18" Scale="0" />
+          <Property Name="Password" Type="nvarchar" MaxLength="15" />
+          <Property Name="Login" Type="nvarchar" MaxLength="15" />
+          <Property Name="Usu_DoctosSEGI" Type="nvarchar" MaxLength="60" />
+          <Property Name="Pas_DoctosSEGI" Type="nvarchar" MaxLength="25" />
+          <Property Name="Calle" Type="nvarchar" MaxLength="5" />
+          <Property Name="Telefono" Type="nvarchar" MaxLength="30" />
+          <Property Name="Celular" Type="nvarchar" MaxLength="20" />
+          <Property Name="Cve_Usuario" Type="numeric" Precision="18" Scale="0" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Fecha_Ingreso" Type="datetime" />
+          <Property Name="Fecha_Baja" Type="datetime" />
+          <Property Name="Cve_Presupuestal" Type="nvarchar" MaxLength="20" />
+          <Property Name="RFC" Type="nvarchar" MaxLength="16" />
+          <Property Name="Titulo" Type="nvarchar" MaxLength="10" />
+          <Property Name="Fecha_Nac" Type="datetime" />
+          <Property Name="Tipo_Sangre" Type="nvarchar" MaxLength="12" />
+          <Property Name="Horario" Type="nvarchar" MaxLength="50" />
+          <Property Name="NoPgr" Type="nvarchar" MaxLength="6" />
+          <Property Name="NoImss" Type="nvarchar" MaxLength="15" />
+          <Property Name="Curp" Type="nvarchar" MaxLength="18" />
+          <Property Name="Cuip" Type="nvarchar" MaxLength="21" />
+          <Property Name="Cve_Baja" Type="decimal" Precision="18" Scale="0" />
+          <Property Name="Baja" Type="char" MaxLength="1" />
+          <Property Name="DondeVer" Type="nvarchar" MaxLength="50" />
+          <Property Name="No_Casa" Type="nvarchar" MaxLength="30" />
+          <Property Name="CP" Type="nvarchar" MaxLength="10" />
+          <Property Name="Cve_Civil" Type="nvarchar" MaxLength="2" />
+          <Property Name="Gafete" Type="decimal" Precision="18" Scale="0" />
+          <Property Name="Cargo" Type="nvarchar" MaxLength="3" />
+          <Property Name="Cve_Puesto" Type="int" />
+          <Property Name="Comentario" Type="nvarchar" MaxLength="50" />
+          <Property Name="Direccion" Type="nvarchar" MaxLength="120" />
+          <Property Name="Sexo" Type="nvarchar" MaxLength="1" />
+          <Property Name="Lugar_Nac" Type="nvarchar" MaxLength="50" />
+          <Property Name="E_mail" Type="nvarchar" MaxLength="40" />
+          <Property Name="C_Barra" Type="nvarchar" MaxLength="20" Nullable="false" />
+          <Property Name="Cve_categoria" Type="int" />
+          <Property Name="fecha_password" Type="datetime" />
+          <Property Name="Cve_Horario" Type="int" Nullable="false" />
+          <Property Name="rowguid" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="Numero_Empleado" Type="nvarchar" MaxLength="7" />
+          <Property Name="Partida_Presupuestal" Type="nvarchar" MaxLength="10" Nullable="false" />
+          <Property Name="Cve_Categoria_Puesto" Type="int" Nullable="false" />
+          <Property Name="Huella_IB" Type="varbinary(max)" />
+          <Property Name="Cve_Clinica" Type="int" Nullable="false" />
+          <Property Name="Donador_Organos" Type="bit" />
+          <Property Name="Password_SIANET" Type="nvarchar" MaxLength="20" />
+          <Property Name="id_area_real" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityContainer Name="AccesosModelStoreContainer">
+          <EntitySet Name="Agencias" EntityType="Self.Agencias" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Ministerios" EntityType="Self.Ministerios" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Usuarios" EntityType="Self.Usuarios" Schema="dbo" store:Type="Tables" />
+        </EntityContainer>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="AccesosModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="Agencias">
+          <Key>
+            <PropertyRef Name="Cve_age" />
+          </Key>
+          <Property Name="Cve_age" Type="Int16" Nullable="false" />
+          <Property Name="Desc_age" Type="String" MaxLength="75" FixedLength="false" Unicode="true" />
+          <Property Name="Cve_area" Type="Int32" Nullable="false" />
+          <Property Name="Cve_ubica" Type="String" MaxLength="3" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Desc_doc" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="No_age" Type="String" MaxLength="3" FixedLength="false" Unicode="true" />
+          <Property Name="Extension" Type="String" MaxLength="10" FixedLength="false" Unicode="true" />
+          <Property Name="Municipio" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Adscripcion" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="Siglas" Type="String" MaxLength="30" FixedLength="false" Unicode="true" />
+          <Property Name="Age_Deter_Reser" Type="Int32" Nullable="false" />
+          <Property Name="Num_Ordenado" Type="Int32" Nullable="false" />
+          <Property Name="Guardia" Type="Int16" Nullable="false" />
+          <Property Name="Fecha_Guardia" Type="DateTime" Precision="3" />
+          <Property Name="rowguid" Type="Guid" Nullable="false" />
+          <Property Name="Cve_Calle" Type="Int32" />
+          <Property Name="NoCasa" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Id_Partido" Type="Int32" />
+          <Property Name="Id_Adscripcion" Type="Int32" />
+          <Property Name="Tipo" Type="Int32" Nullable="false" />
+          <Property Name="no_telefonico" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="horario" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="CveAgenciaOrigen" Type="Int32" />
+          <Property Name="UnidadID" Type="Int32" />
+          <Property Name="Agencia" Type="String" MaxLength="150" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="Ministerios">
+          <Key>
+            <PropertyRef Name="Cve_Usuario" />
+          </Key>
+          <Property Name="Cve_Usuario" Type="Int32" Nullable="false" />
+          <Property Name="Cve_Age" Type="Int16" Nullable="false" />
+          <Property Name="Cve_Titulo" Type="Int16" />
+          <Property Name="Secretario" Type="Boolean" Nullable="false" />
+          <Property Name="Usuario" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Equipo" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Aplicacion" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="rowguid" Type="Guid" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Usuarios">
+          <Key>
+            <PropertyRef Name="Cve_Usuario" />
+          </Key>
+          <Property Name="Paterno" Type="String" MaxLength="25" FixedLength="false" Unicode="true" />
+          <Property Name="Materno" Type="String" MaxLength="25" FixedLength="false" Unicode="true" />
+          <Property Name="Nombre" Type="String" MaxLength="25" FixedLength="false" Unicode="true" />
+          <Property Name="Puesto" Type="String" MaxLength="80" FixedLength="false" Unicode="true" />
+          <Property Name="Cve_DirFGE" Type="Int32" />
+          <Property Name="Area" Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="Password" Type="String" MaxLength="15" FixedLength="false" Unicode="true" />
+          <Property Name="Login" Type="String" MaxLength="15" FixedLength="false" Unicode="true" />
+          <Property Name="Usu_DoctosSEGI" Type="String" MaxLength="60" FixedLength="false" Unicode="true" />
+          <Property Name="Pas_DoctosSEGI" Type="String" MaxLength="25" FixedLength="false" Unicode="true" />
+          <Property Name="Calle" Type="String" MaxLength="5" FixedLength="false" Unicode="true" />
+          <Property Name="Telefono" Type="String" MaxLength="30" FixedLength="false" Unicode="true" />
+          <Property Name="Celular" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="Cve_Usuario" Type="Decimal" Precision="18" Scale="0" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Fecha_Ingreso" Type="DateTime" Precision="3" />
+          <Property Name="Fecha_Baja" Type="DateTime" Precision="3" />
+          <Property Name="Cve_Presupuestal" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="RFC" Type="String" MaxLength="16" FixedLength="false" Unicode="true" />
+          <Property Name="Titulo" Type="String" MaxLength="10" FixedLength="false" Unicode="true" />
+          <Property Name="Fecha_Nac" Type="DateTime" Precision="3" />
+          <Property Name="Tipo_Sangre" Type="String" MaxLength="12" FixedLength="false" Unicode="true" />
+          <Property Name="Horario" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="NoPgr" Type="String" MaxLength="6" FixedLength="false" Unicode="true" />
+          <Property Name="NoImss" Type="String" MaxLength="15" FixedLength="false" Unicode="true" />
+          <Property Name="Curp" Type="String" MaxLength="18" FixedLength="false" Unicode="true" />
+          <Property Name="Cuip" Type="String" MaxLength="21" FixedLength="false" Unicode="true" />
+          <Property Name="Cve_Baja" Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="Baja" Type="String" MaxLength="1" FixedLength="true" Unicode="false" />
+          <Property Name="DondeVer" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="No_Casa" Type="String" MaxLength="30" FixedLength="false" Unicode="true" />
+          <Property Name="CP" Type="String" MaxLength="10" FixedLength="false" Unicode="true" />
+          <Property Name="Cve_Civil" Type="String" MaxLength="2" FixedLength="false" Unicode="true" />
+          <Property Name="Gafete" Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="Cargo" Type="String" MaxLength="3" FixedLength="false" Unicode="true" />
+          <Property Name="Cve_Puesto" Type="Int32" />
+          <Property Name="Comentario" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Direccion" Type="String" MaxLength="120" FixedLength="false" Unicode="true" />
+          <Property Name="Sexo" Type="String" MaxLength="1" FixedLength="false" Unicode="true" />
+          <Property Name="Lugar_Nac" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="E_mail" Type="String" MaxLength="40" FixedLength="false" Unicode="true" />
+          <Property Name="C_Barra" Type="String" MaxLength="20" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Cve_categoria" Type="Int32" />
+          <Property Name="fecha_password" Type="DateTime" Precision="3" />
+          <Property Name="Cve_Horario" Type="Int32" Nullable="false" />
+          <Property Name="rowguid" Type="Guid" Nullable="false" />
+          <Property Name="Numero_Empleado" Type="String" MaxLength="7" FixedLength="false" Unicode="true" />
+          <Property Name="Partida_Presupuestal" Type="String" MaxLength="10" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Cve_Categoria_Puesto" Type="Int32" Nullable="false" />
+          <Property Name="Huella_IB" Type="Binary" MaxLength="Max" FixedLength="false" />
+          <Property Name="Cve_Clinica" Type="Int32" Nullable="false" />
+          <Property Name="Donador_Organos" Type="Boolean" />
+          <Property Name="Password_SIANET" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="id_area_real" Type="Int32" Nullable="false" />
+        </EntityType>
+        <EntityContainer Name="AccesosEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Agencias" EntityType="Self.Agencias" />
+          <EntitySet Name="Ministerios" EntityType="Self.Ministerios" />
+          <EntitySet Name="Usuarios" EntityType="Self.Usuarios" />
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="AccesosModelStoreContainer" CdmEntityContainer="AccesosEntities">
+          <EntitySetMapping Name="Agencias">
+            <EntityTypeMapping TypeName="AccesosModel.Agencias">
+              <MappingFragment StoreEntitySet="Agencias">
+                <ScalarProperty Name="Cve_age" ColumnName="Cve_age" />
+                <ScalarProperty Name="Desc_age" ColumnName="Desc_age" />
+                <ScalarProperty Name="Cve_area" ColumnName="Cve_area" />
+                <ScalarProperty Name="Cve_ubica" ColumnName="Cve_ubica" />
+                <ScalarProperty Name="Desc_doc" ColumnName="Desc_doc" />
+                <ScalarProperty Name="No_age" ColumnName="No_age" />
+                <ScalarProperty Name="Extension" ColumnName="Extension" />
+                <ScalarProperty Name="Municipio" ColumnName="Municipio" />
+                <ScalarProperty Name="Adscripcion" ColumnName="Adscripcion" />
+                <ScalarProperty Name="Siglas" ColumnName="Siglas" />
+                <ScalarProperty Name="Age_Deter_Reser" ColumnName="Age_Deter_Reser" />
+                <ScalarProperty Name="Num_Ordenado" ColumnName="Num_Ordenado" />
+                <ScalarProperty Name="Guardia" ColumnName="Guardia" />
+                <ScalarProperty Name="Fecha_Guardia" ColumnName="Fecha_Guardia" />
+                <ScalarProperty Name="rowguid" ColumnName="rowguid" />
+                <ScalarProperty Name="Cve_Calle" ColumnName="Cve_Calle" />
+                <ScalarProperty Name="NoCasa" ColumnName="NoCasa" />
+                <ScalarProperty Name="Id_Partido" ColumnName="Id_Partido" />
+                <ScalarProperty Name="Id_Adscripcion" ColumnName="Id_Adscripcion" />
+                <ScalarProperty Name="Tipo" ColumnName="Tipo" />
+                <ScalarProperty Name="no_telefonico" ColumnName="no_telefonico" />
+                <ScalarProperty Name="horario" ColumnName="horario" />
+                <ScalarProperty Name="CveAgenciaOrigen" ColumnName="CveAgenciaOrigen" />
+                <ScalarProperty Name="UnidadID" ColumnName="UnidadID" />
+                <ScalarProperty Name="Agencia" ColumnName="Agencia" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Ministerios">
+            <EntityTypeMapping TypeName="AccesosModel.Ministerios">
+              <MappingFragment StoreEntitySet="Ministerios">
+                <ScalarProperty Name="Cve_Usuario" ColumnName="Cve_Usuario" />
+                <ScalarProperty Name="Cve_Age" ColumnName="Cve_Age" />
+                <ScalarProperty Name="Cve_Titulo" ColumnName="Cve_Titulo" />
+                <ScalarProperty Name="Secretario" ColumnName="Secretario" />
+                <ScalarProperty Name="Usuario" ColumnName="Usuario" />
+                <ScalarProperty Name="Equipo" ColumnName="Equipo" />
+                <ScalarProperty Name="Aplicacion" ColumnName="Aplicacion" />
+                <ScalarProperty Name="rowguid" ColumnName="rowguid" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Usuarios">
+            <EntityTypeMapping TypeName="AccesosModel.Usuarios">
+              <MappingFragment StoreEntitySet="Usuarios">
+                <ScalarProperty Name="Paterno" ColumnName="Paterno" />
+                <ScalarProperty Name="Materno" ColumnName="Materno" />
+                <ScalarProperty Name="Nombre" ColumnName="Nombre" />
+                <ScalarProperty Name="Puesto" ColumnName="Puesto" />
+                <ScalarProperty Name="Cve_DirFGE" ColumnName="Cve_DirFGE" />
+                <ScalarProperty Name="Area" ColumnName="Area" />
+                <ScalarProperty Name="Password" ColumnName="Password" />
+                <ScalarProperty Name="Login" ColumnName="Login" />
+                <ScalarProperty Name="Usu_DoctosSEGI" ColumnName="Usu_DoctosSEGI" />
+                <ScalarProperty Name="Pas_DoctosSEGI" ColumnName="Pas_DoctosSEGI" />
+                <ScalarProperty Name="Calle" ColumnName="Calle" />
+                <ScalarProperty Name="Telefono" ColumnName="Telefono" />
+                <ScalarProperty Name="Celular" ColumnName="Celular" />
+                <ScalarProperty Name="Cve_Usuario" ColumnName="Cve_Usuario" />
+                <ScalarProperty Name="Fecha_Ingreso" ColumnName="Fecha_Ingreso" />
+                <ScalarProperty Name="Fecha_Baja" ColumnName="Fecha_Baja" />
+                <ScalarProperty Name="Cve_Presupuestal" ColumnName="Cve_Presupuestal" />
+                <ScalarProperty Name="RFC" ColumnName="RFC" />
+                <ScalarProperty Name="Titulo" ColumnName="Titulo" />
+                <ScalarProperty Name="Fecha_Nac" ColumnName="Fecha_Nac" />
+                <ScalarProperty Name="Tipo_Sangre" ColumnName="Tipo_Sangre" />
+                <ScalarProperty Name="Horario" ColumnName="Horario" />
+                <ScalarProperty Name="NoPgr" ColumnName="NoPgr" />
+                <ScalarProperty Name="NoImss" ColumnName="NoImss" />
+                <ScalarProperty Name="Curp" ColumnName="Curp" />
+                <ScalarProperty Name="Cuip" ColumnName="Cuip" />
+                <ScalarProperty Name="Cve_Baja" ColumnName="Cve_Baja" />
+                <ScalarProperty Name="Baja" ColumnName="Baja" />
+                <ScalarProperty Name="DondeVer" ColumnName="DondeVer" />
+                <ScalarProperty Name="No_Casa" ColumnName="No_Casa" />
+                <ScalarProperty Name="CP" ColumnName="CP" />
+                <ScalarProperty Name="Cve_Civil" ColumnName="Cve_Civil" />
+                <ScalarProperty Name="Gafete" ColumnName="Gafete" />
+                <ScalarProperty Name="Cargo" ColumnName="Cargo" />
+                <ScalarProperty Name="Cve_Puesto" ColumnName="Cve_Puesto" />
+                <ScalarProperty Name="Comentario" ColumnName="Comentario" />
+                <ScalarProperty Name="Direccion" ColumnName="Direccion" />
+                <ScalarProperty Name="Sexo" ColumnName="Sexo" />
+                <ScalarProperty Name="Lugar_Nac" ColumnName="Lugar_Nac" />
+                <ScalarProperty Name="E_mail" ColumnName="E_mail" />
+                <ScalarProperty Name="C_Barra" ColumnName="C_Barra" />
+                <ScalarProperty Name="Cve_categoria" ColumnName="Cve_categoria" />
+                <ScalarProperty Name="fecha_password" ColumnName="fecha_password" />
+                <ScalarProperty Name="Cve_Horario" ColumnName="Cve_Horario" />
+                <ScalarProperty Name="rowguid" ColumnName="rowguid" />
+                <ScalarProperty Name="Numero_Empleado" ColumnName="Numero_Empleado" />
+                <ScalarProperty Name="Partida_Presupuestal" ColumnName="Partida_Presupuestal" />
+                <ScalarProperty Name="Cve_Categoria_Puesto" ColumnName="Cve_Categoria_Puesto" />
+                <ScalarProperty Name="Huella_IB" ColumnName="Huella_IB" />
+                <ScalarProperty Name="Cve_Clinica" ColumnName="Cve_Clinica" />
+                <ScalarProperty Name="Donador_Organos" ColumnName="Donador_Organos" />
+                <ScalarProperty Name="Password_SIANET" ColumnName="Password_SIANET" />
+                <ScalarProperty Name="id_area_real" ColumnName="id_area_real" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="false" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="Ninguno" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

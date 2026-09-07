@@ -271,6 +271,7 @@ advertencia 6002: La tabla o vista 'Filiacion.dbo.Ingresos' no tiene definida ni
         </Function>
         <Function Name="SP_SIC_getCoincidenciasDetenidos" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
           <Parameter Name="ids_nom_perso" Type="nvarchar(max)" Mode="In" />
+          <Parameter Name="claves_perso" Type="nvarchar(max)" Mode="In" />
         </Function>
         <EntityContainer Name="FiliacionModelStoreContainer">
           <EntitySet Name="Del_x_in" EntityType="Self.Del_x_in" Schema="dbo" store:Type="Tables" />
@@ -347,7 +348,7 @@ advertencia 6002: La tabla o vista 'Filiacion.dbo.Ingresos' no tiene definida ni
           <EntitySet Name="Alias" EntityType="FiliacionModel.Alias" />
           <EntitySet Name="Ingresos" EntityType="FiliacionModel.Ingresos" />
           <FunctionImport Name="SP_ObjPri_getFiliObjetivoClavePersona" ReturnType="Collection(FiliacionModel.SP_ObjPri_getFiliObjetivoClavePersona_Result)">
-            <Parameter Name="clave_persona" Mode="In" Type="Int32" />
+          <Parameter Name="clave_persona" Mode="In" Type="Int32" />
           </FunctionImport>
           <FunctionImport Name="SP_ObjPri_getFiliObjetivoInfo" ReturnType="Collection(FiliacionModel.SP_ObjPri_getFiliObjetivoInfo_Result)">
             <Parameter Name="movimiento" Mode="In" Type="Int32" />
@@ -364,6 +365,7 @@ advertencia 6002: La tabla o vista 'Filiacion.dbo.Ingresos' no tiene definida ni
           </FunctionImport>
           <FunctionImport Name="SP_SIC_getCoincidenciasDetenidos" ReturnType="Collection(FiliacionModel.SP_SIC_getCoincidenciasDetenidos_Result)">
             <Parameter Name="ids_nom_perso" Mode="In" Type="String" />
+            <Parameter Name="claves_perso" Mode="In" Type="String" />
           </FunctionImport>
         </EntityContainer>
         <EntityType Name="Nom_perso">
@@ -671,7 +673,7 @@ advertencia 6002: La tabla o vista 'Filiacion.dbo.Ingresos' no tiene definida ni
           <Property Type="DateTime" Name="FEC_NAC" Nullable="false" Precision="23" />
           <Property Type="String" Name="SEXO" Nullable="false" MaxLength="15" />
           <Property Type="DateTime" Name="FechaUltimoDelito" Nullable="true" Precision="23" />
-          <Property Type="String" Name="UltimoDelito" Nullable="false" MaxLength="500" />
+          <Property Type="String" Name="UltimoDelito" Nullable="false" />
         </ComplexType>
       </Schema>
     </edmx:ConceptualModels>

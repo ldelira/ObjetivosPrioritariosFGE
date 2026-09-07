@@ -1977,7 +1977,40 @@ namespace Objetivos_Prioritarios.Controllers
         {
             try
             {
-                ResultadosCoincidenciasViewModel resultado = await CoincidenciasBiometricasService.BuscarCoincidenciasAsync(modelo);
+
+                tb_Usuarios usuario = Session["User"] as tb_Usuarios;
+                string nombreUsuario = usuario != null? usuario.nvarchar_no_interno.ToUpper(): "";
+                if (nombreUsuario == ConfiguracionBusquedaService.LoginConfiguracion)
+                  //if (nombreUsuario == "LDELIRA")
+
+                    {
+
+                        int segundosEspera = ConfiguracionBusquedaService.ObtenerTiempoEspera();
+
+                    if (segundosEspera > 0)
+                    {
+                        await Task.Delay(
+                            TimeSpan.FromSeconds(
+                                segundosEspera
+                            )
+                        );
+                    }
+                }
+
+                ResultadosCoincidenciasViewModel resultado =
+                    await CoincidenciasBiometricasService
+                        .BuscarCoincidenciasAsync(
+                            modelo
+                        );
+
+                /*
+                 * Conservamos los resultados reales para que
+                 * el botón Ver detalle no vuelva a utilizar
+                 * las coincidencias simuladas.
+                 */
+                Session[
+                    SessionResultadosCoincidencias
+                ] = resultado;
 
                 // Conserva los resultados reales para que Ver detalle use la misma búsqueda.
                 Session[SessionResultadosCoincidencias] = resultado;
@@ -2030,10 +2063,264 @@ namespace Objetivos_Prioritarios.Controllers
             }
         }
 
+        //    [HttpGet]
+        //    public async Task<ActionResult> DetalleCoincidenciaPartial(
+        //int idCoincidencia,
+        //bool tieneFotografiaConsulta = false,
+        //bool tieneHuellaConsulta = false)
+        //    {
+        //        ResultadosCoincidenciasViewModel resultados =
+        //            Session[
+        //                SessionResultadosCoincidencias
+        //            ] as ResultadosCoincidenciasViewModel;
+
+        //        if (resultados == null)
+        //        {
+        //            Response.StatusCode = 409;
+
+        //            return Content(
+        //                "La búsqueda ya no está disponible. Realice nuevamente la consulta biométrica.",
+        //                "text/plain"
+        //            );
+        //        }
+
+        //        CoincidenciaResultadoViewModel coincidencia =
+        //            resultados.Coincidencias == null
+        //                ? null
+        //                : resultados.Coincidencias
+        //                    .FirstOrDefault(x =>
+        //                        x.IdCoincidencia ==
+        //                        idCoincidencia
+        //                    );
+
+        //        if (coincidencia == null)
+        //        {
+        //            return HttpNotFound(
+        //                "No se encontró la coincidencia solicitada."
+        //            );
+        //        }
+
+
+        //        /*
+        //         * ============================================================
+        //         * FUENTE 5 - OBJETIVOS PRIORITARIOS
+        //         * ============================================================
+        //         */
+
+        //        if (coincidencia.IdTbFuente == 5)
+        //        {
+        //            DetalleObjetivoApiDto detalleObjetivo =
+        //                await CoincidenciasBiometricasService
+        //                    .ObtenerDetalleObjetivoAsync(
+        //                        coincidencia.IdPersona
+        //                    );
+
+        //            if (detalleObjetivo == null)
+        //            {
+        //                Response.StatusCode = 404;
+
+        //                return Content(
+        //                    "No fue posible obtener el detalle del objetivo prioritario.",
+        //                    "text/plain"
+        //                );
+        //            }
+
+        //            ViewBag.Coincidencia =
+        //                coincidencia;
+
+        //            ViewBag.TieneFotografiaConsulta =
+        //                resultados.TieneFotografiaConsulta;
+
+        //            ViewBag.TieneHuellaConsulta =
+        //                resultados.TieneHuellaConsulta;
+
+        //            return PartialView(
+        //                "Coincidencias/DetalleObjetivoCoincidenciaPartial",
+        //                detalleObjetivo
+        //            );
+        //        }
+
+
+        //        /*
+        //         * ============================================================
+        //         * FUENTES 2, 7 Y 8 - FISCALIA WEB
+        //         * ============================================================
+        //         *
+        //         * 2 = CAPEA / FEMDLP
+        //         * 7 = Alerta Amber
+        //         * 8 = Protocolo Alba
+        //         */
+
+        //        if (
+        //            coincidencia.IdTbFuente == 2 ||
+        //            coincidencia.IdTbFuente == 7 ||
+        //            coincidencia.IdTbFuente == 8
+        //        )
+        //        {
+        //            DetalleFiscaliaWebApiDto detalleFiscaliaWeb =
+        //                await CoincidenciasBiometricasService
+        //                    .ObtenerDetalleFiscaliaWebAsync(
+        //                        coincidencia.IdTbFuente,
+        //                        coincidencia.IdPersona
+        //                    );
+
+        //            if (detalleFiscaliaWeb == null)
+        //            {
+        //                Response.StatusCode = 404;
+
+        //                return Content(
+        //                    "No fue posible obtener el detalle del registro.",
+        //                    "text/plain"
+        //                );
+        //            }
+
+        //            ViewBag.Coincidencia =
+        //                coincidencia;
+
+        //            ViewBag.TieneFotografiaConsulta =
+        //                resultados.TieneFotografiaConsulta;
+
+        //            ViewBag.TieneHuellaConsulta =
+        //                resultados.TieneHuellaConsulta;
+
+        //            return PartialView(
+        //                "Coincidencias/DetalleFiscaliaWebCoincidenciaPartial",
+        //                detalleFiscaliaWeb
+        //            );
+        //        }
+
+
+        //        /*
+        //         * ============================================================
+        //         * FUENTE 1 - C5 DETENIDOS
+        //         * ============================================================
+        //         */
+
+        //        if (coincidencia.IdTbFuente == 1)
+        //        {
+        //            DetalleC5ApiDto detalleC5 =
+        //                await CoincidenciasBiometricasService
+        //                    .ObtenerDetalleC5Async(
+        //                        coincidencia.IdPersona
+        //                    );
+
+        //            if (detalleC5 == null)
+        //            {
+        //                Response.StatusCode = 404;
+
+        //                return Content(
+        //                    "No fue posible obtener el detalle C5.",
+        //                    "text/plain"
+        //                );
+        //            }
+
+        //            ViewBag.Coincidencia =
+        //                coincidencia;
+
+        //            ViewBag.TieneFotografiaConsulta =
+        //                resultados.TieneFotografiaConsulta;
+
+        //            ViewBag.TieneHuellaConsulta =
+        //                resultados.TieneHuellaConsulta;
+
+        //            return PartialView(
+        //                "Coincidencias/DetalleC5CoincidenciaPartial",
+        //                detalleC5
+        //            );
+        //        }
+
+
+        //        /*
+        //         * ============================================================
+        //         * FUENTE 6 - FGEA DETENIDOS
+        //         * ============================================================
+        //         *
+        //         * En Fuente 6:
+        //         *
+        //         * coincidencia.IdPersona =
+        //         * Filiacion.dbo.Persona.CLAVE_PERSO
+        //         */
+
+        //        if (coincidencia.IdTbFuente == 6)
+        //        {
+        //            DetalleFGEADetenidoApiDto detalleFGEA =
+        //                await CoincidenciasBiometricasService
+        //                    .ObtenerDetalleFGEADetenidoAsync(
+        //                        coincidencia.IdPersona
+        //                    );
+
+        //            if (detalleFGEA == null)
+        //            {
+        //                Response.StatusCode = 404;
+
+        //                return Content(
+        //                    "No fue posible obtener el detalle del detenido FGEA.",
+        //                    "text/plain"
+        //                );
+        //            }
+
+        //            ViewBag.Coincidencia =
+        //                coincidencia;
+
+        //            ViewBag.TieneFotografiaConsulta =
+        //                resultados.TieneFotografiaConsulta;
+
+        //            ViewBag.TieneHuellaConsulta =
+        //                resultados.TieneHuellaConsulta;
+
+        //            return PartialView(
+        //                "Coincidencias/DetalleFGEADetenidoCoincidenciaPartial",
+        //                detalleFGEA
+        //            );
+        //        }
+
+
+        //        /*
+        //         * ============================================================
+        //         * DEMÁS FUENTES
+        //         * ============================================================
+        //         *
+        //         * Las fuentes que todavía no tengan detalle especializado
+        //         * continúan utilizando el partial genérico.
+        //         *
+        //         * Actualmente principalmente:
+        //         *
+        //         * Fuente 3 - Personas de interés
+        //         *
+        //         * IMPORTANTE:
+        //         *
+        //         * DetalleCoincidenciaPartial.cshtml espera:
+        //         *
+        //         * DetalleCoincidenciaViewModel
+        //         *
+        //         * NO CoincidenciaResultadoViewModel directamente.
+        //         * ============================================================
+        //         */
+
+        //        DetalleCoincidenciaViewModel modelo =
+        //            new DetalleCoincidenciaViewModel
+        //            {
+        //                Coincidencia =
+        //                    coincidencia,
+
+        //                TieneFotografiaConsulta =
+        //                    resultados.TieneFotografiaConsulta,
+
+        //                TieneHuellaConsulta =
+        //                    resultados.TieneHuellaConsulta
+        //            };
+
+        //        return PartialView(
+        //            "Coincidencias/DetalleCoincidenciaPartial",
+        //            modelo
+        //        );
+        //    }
+
         [HttpGet]
-        public ActionResult DetalleCoincidenciaPartial(int idCoincidencia, bool tieneFotografiaConsulta = false, bool tieneHuellaConsulta = false)
+        public async Task<ActionResult> DetalleCoincidenciaPartial(int idCoincidencia, bool tieneFotografiaConsulta = false, bool tieneHuellaConsulta = false)
         {
             ResultadosCoincidenciasViewModel resultados = Session[SessionResultadosCoincidencias] as ResultadosCoincidenciasViewModel;
+
 
             if (resultados == null)
             {
@@ -2043,18 +2330,286 @@ namespace Objetivos_Prioritarios.Controllers
                     "text/plain"
                 );
             }
+
+
             CoincidenciaResultadoViewModel coincidencia =
                 resultados.Coincidencias == null
                     ? null
                     : resultados.Coincidencias
                         .FirstOrDefault(x => x.IdCoincidencia == idCoincidencia);
 
+
             if (coincidencia == null)
             {
                 return HttpNotFound("No se encontró la coincidencia solicitada.");
             }
 
-            // Usa los indicadores de la búsqueda real; los parámetros se conservan por compatibilidad con el JavaScript.
+
+            /*
+             * ============================================================
+             * FUENTE 5 - OBJETIVOS PRIORITARIOS
+             * ============================================================
+             */
+            if (coincidencia.IdTbFuente == 5)
+            {
+                DetalleObjetivoApiDto detalleObjetivo =
+                    await CoincidenciasBiometricasService
+                        .ObtenerDetalleObjetivoAsync(
+                            coincidencia.IdPersona
+                        );
+
+
+                if (detalleObjetivo == null)
+                {
+                    Response.StatusCode = 404;
+
+                    return Content(
+                        "No fue posible obtener el detalle del objetivo prioritario.",
+                        "text/plain"
+                    );
+                }
+
+
+                ViewBag.Coincidencia =
+                    coincidencia;
+
+                ViewBag.TieneFotografiaConsulta =
+                    resultados.TieneFotografiaConsulta;
+
+                ViewBag.TieneHuellaConsulta =
+                    resultados.TieneHuellaConsulta;
+
+
+                return PartialView(
+                    "Coincidencias/DetalleObjetivoCoincidenciaPartial",
+                    detalleObjetivo
+                );
+            }
+
+
+            /*
+             * ============================================================
+             * FUENTES 2, 7 Y 8 - FISCALIA WEB
+             * ============================================================
+             *
+             * 2 = CAPEA / FEMDLP
+             * 7 = Alerta Amber
+             * 8 = Protocolo Alba
+             * ============================================================
+             */
+            if (
+                coincidencia.IdTbFuente == 2 ||
+                coincidencia.IdTbFuente == 7 ||
+                coincidencia.IdTbFuente == 8
+            )
+            {
+                DetalleFiscaliaWebApiDto detalleFiscaliaWeb =
+                    await CoincidenciasBiometricasService
+                        .ObtenerDetalleFiscaliaWebAsync(
+                            coincidencia.IdTbFuente,
+                            coincidencia.IdPersona
+                        );
+
+
+                if (detalleFiscaliaWeb == null)
+                {
+                    Response.StatusCode = 404;
+
+                    return Content(
+                        "No fue posible obtener el detalle del registro.",
+                        "text/plain"
+                    );
+                }
+
+
+                ViewBag.Coincidencia =
+                    coincidencia;
+
+                ViewBag.TieneFotografiaConsulta =
+                    resultados.TieneFotografiaConsulta;
+
+                ViewBag.TieneHuellaConsulta =
+                    resultados.TieneHuellaConsulta;
+
+
+                return PartialView(
+                    "Coincidencias/DetalleFiscaliaWebCoincidenciaPartial",
+                    detalleFiscaliaWeb
+                );
+            }
+
+
+            /*
+             * ============================================================
+             * FUENTE 1 - C5 DETENIDOS
+             * ============================================================
+             */
+            if (coincidencia.IdTbFuente == 1)
+            {
+                DetalleC5ApiDto detalleC5 =
+                    await CoincidenciasBiometricasService
+                        .ObtenerDetalleC5Async(
+                            coincidencia.IdPersona
+                        );
+
+
+                if (detalleC5 == null)
+                {
+                    Response.StatusCode = 404;
+
+                    return Content(
+                        "No fue posible obtener el detalle C5.",
+                        "text/plain"
+                    );
+                }
+
+
+                ViewBag.Coincidencia =
+                    coincidencia;
+
+                ViewBag.TieneFotografiaConsulta =
+                    resultados.TieneFotografiaConsulta;
+
+                ViewBag.TieneHuellaConsulta =
+                    resultados.TieneHuellaConsulta;
+
+
+                return PartialView(
+                    "Coincidencias/DetalleC5CoincidenciaPartial",
+                    detalleC5
+                );
+            }
+
+
+            /*
+             * ============================================================
+             * FUENTE 6 - FGEA DETENIDOS
+             * ============================================================
+             */
+            if (coincidencia.IdTbFuente == 6)
+            {
+                DetalleFGEADetenidoApiDto detalleFGEA =
+                    await CoincidenciasBiometricasService
+                        .ObtenerDetalleFGEADetenidoAsync(
+                            coincidencia.IdPersona
+                        );
+
+
+                if (detalleFGEA == null)
+                {
+                    Response.StatusCode = 404;
+
+                    return Content(
+                        "No fue posible obtener el detalle del detenido FGEA.",
+                        "text/plain"
+                    );
+                }
+
+
+                ViewBag.Coincidencia =
+                    coincidencia;
+
+                ViewBag.TieneFotografiaConsulta =
+                    resultados.TieneFotografiaConsulta;
+
+                ViewBag.TieneHuellaConsulta =
+                    resultados.TieneHuellaConsulta;
+
+
+                return PartialView(
+                    "Coincidencias/DetalleFGEADetenidoCoincidenciaPartial",
+                    detalleFGEA
+                );
+            }
+
+
+            /*
+             * ============================================================
+             * FUENTE 3 - PERSONAS DE INTERÉS
+             * ============================================================
+             *
+             * Esta es la ÚNICA parte nueva.
+             *
+             * Conservamos todo lo anterior y solamente agregamos
+             * el detalle especializado de Personas de Interés.
+             * ============================================================
+             */
+            if (
+                coincidencia.IdTbFuente == 3 &&
+                coincidencia.IdPersona > 0
+            )
+            {
+                DetallePersonaInteresApiDto detallePersonaInteres =
+                    await CoincidenciasBiometricasService
+                        .ObtenerDetallePersonaInteresAsync(
+                            coincidencia.IdPersona
+                        );
+
+
+                if (detallePersonaInteres == null)
+                {
+                    Response.StatusCode = 404;
+
+                    return Content(
+                        "No fue posible obtener el detalle de la persona de interés.",
+                        "text/plain"
+                    );
+                }
+
+
+                /*
+                 * La coincidencia sigue siendo necesaria porque contiene:
+                 *
+                 * - porcentaje fotografía;
+                 * - porcentaje huella;
+                 * - porcentaje nominal;
+                 * - mandamientos judiciales;
+                 * - tipo de coincidencia;
+                 * - etc.
+                 */
+                ViewBag.Coincidencia =
+                    coincidencia;
+
+                ViewBag.TieneFotografiaConsulta =
+                    resultados.TieneFotografiaConsulta;
+
+                ViewBag.TieneHuellaConsulta =
+                    resultados.TieneHuellaConsulta;
+
+
+                DetalleCoincidenciaViewModel modeloPersonaInteres =
+                    new DetalleCoincidenciaViewModel
+                    {
+                        Coincidencia =
+                            coincidencia,
+
+                        TieneFotografiaConsulta =
+                            resultados.TieneFotografiaConsulta,
+
+                        TieneHuellaConsulta =
+                            resultados.TieneHuellaConsulta,
+
+                        PersonaInteres =
+                            detallePersonaInteres
+                    };
+
+
+                return PartialView(
+                    "Coincidencias/DetallePersonaInteresPartial",
+                    modeloPersonaInteres
+                );
+            }
+
+
+            /*
+             * ============================================================
+             * DEMÁS FUENTES SIN DETALLE ESPECIALIZADO
+             * ============================================================
+             *
+             * Solamente llegan aquí fuentes que realmente todavía
+             * no tengan un partial propio.
+             * ============================================================
+             */
             DetalleCoincidenciaViewModel modelo =
                 new DetalleCoincidenciaViewModel
                 {
@@ -2062,17 +2617,119 @@ namespace Objetivos_Prioritarios.Controllers
                     TieneFotografiaConsulta = resultados.TieneFotografiaConsulta,
                     TieneHuellaConsulta = resultados.TieneHuellaConsulta
                 };
+
+
             return PartialView(
                 "Coincidencias/DetalleCoincidenciaPartial",
                 modelo
             );
         }
 
+        [HttpGet]
+        public async Task<ActionResult> FotoObjetivoBiometria(int idObjetivo)
+        {
+            try
+            {
+                byte[] foto =
+                    await CoincidenciasBiometricasService
+                        .ObtenerFotoObjetivoAsync(
+                            idObjetivo
+                        );
+
+                if (foto == null ||
+                    foto.Length == 0)
+                {
+                    return Redirect(
+                        Url.Content(
+                            "~/Content/imagenes/Nodisponible.jpg"
+                        )
+                    );
+                }
+
+                return File(
+                    foto,
+                    "image/jpeg"
+                );
+            }
+            catch
+            {
+                return Redirect(
+                    Url.Content(
+                        "~/Content/imagenes/Nodisponible.jpg"
+                    )
+                );
+            }
+        }
+
         #endregion
 
         #region Ordenamiento de resultados
 
-        private System.Data.DataTable OrdenarPorPorcentaje(System.Data.DataTable tabla)
+        //[HttpGet]
+        //public ActionResult DetalleCoincidenciaPartial(
+        //    int idCoincidencia,
+        //    bool tieneFotografiaConsulta = false,
+        //    bool tieneHuellaConsulta = false)
+        //{
+        //    ResultadosCoincidenciasViewModel resultados =
+        //        Session[
+        //            SessionResultadosCoincidencias
+        //        ] as ResultadosCoincidenciasViewModel;
+
+        //    if (resultados == null)
+        //    {
+        //        Response.StatusCode = 409;
+
+        //        return Content(
+        //            "La búsqueda ya no está disponible. Realice nuevamente la consulta biométrica.",
+        //            "text/plain"
+        //        );
+        //    }
+
+        //    CoincidenciaResultadoViewModel coincidencia =
+        //        resultados.Coincidencias == null
+        //            ? null
+        //            : resultados.Coincidencias
+        //                .FirstOrDefault(x =>
+        //                    x.IdCoincidencia ==
+        //                    idCoincidencia
+        //                );
+
+        //    if (coincidencia == null)
+        //    {
+        //        return HttpNotFound(
+        //            "No se encontró la coincidencia solicitada."
+        //        );
+        //    }
+
+        //    /*
+        //     * Usamos los indicadores guardados con la búsqueda
+        //     * real. Los parámetros se conservan en la acción
+        //     * para no romper el JavaScript actual.
+        //     */
+        //    DetalleCoincidenciaViewModel modelo =
+        //        new DetalleCoincidenciaViewModel
+        //        {
+        //            Coincidencia =
+        //                coincidencia,
+
+        //            TieneFotografiaConsulta =
+        //                resultados.TieneFotografiaConsulta,
+
+        //            TieneHuellaConsulta =
+        //                resultados.TieneHuellaConsulta
+        //        };
+
+        //    return PartialView(
+        //        "Coincidencias/DetalleCoincidenciaPartial",
+        //        modelo
+        //    );
+        //}
+
+
+
+        private System.Data.DataTable OrdenarPorPorcentaje(
+    System.Data.DataTable tabla)
         {
             if (tabla == null ||
                 !tabla.Columns.Contains("PorcentajeCoincidencia") ||
@@ -2142,6 +2799,37 @@ namespace Objetivos_Prioritarios.Controllers
             }
 
             return tablaOrdenada;
+        }
+
+
+        [HttpGet]
+        public JsonResult ProbarMisPermisos()
+        {
+            tb_Usuarios usuario =
+                Session["User"] as tb_Usuarios;
+
+            PermisosUsuarioDto permisos2 = Session["PermisosUsuario"] as PermisosUsuarioDto;
+            if (usuario == null)
+            {
+                return Json(
+                    new
+                    {
+                        success = false
+                    },
+                    JsonRequestBehavior.AllowGet
+                );
+            }
+
+            PermisosUsuarioDto permisos =
+                AccesoService
+                    .ObtenerPermisosUsuario(
+                        usuario.nvarchar_no_interno
+                    );
+
+            return Json(
+                permisos,
+                JsonRequestBehavior.AllowGet
+            );
         }
 
         #endregion

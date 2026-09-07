@@ -74,7 +74,6 @@
                             <h5>@ViewBag.Texto(row["Nombre"])</h5>
 
                             @Html.Partial("~/Views/SIC/DetalleDetenidoC5/CoincidenciasAlertaPartial.cshtml", coincidenciasAlertaMandamiento)
-
                         </div>
 
                         @if (idOrigenMandamiento > 0)
@@ -87,7 +86,8 @@
                                             class="sic-btn-confirmar-identidad js-confirmar-identidad-normal"
                                             data-id-detenido="@idDetenidoC5"
                                             data-id-origen="@idOrigenMandamiento"
-                                            data-id-fuente="@idFuenteAlertaMandamiento">
+                                            data-id-fuente="@idFuenteAlertaMandamiento"
+                                            data-id-tipo-alerta="@idTipoAlertaMandamiento">
                                         <i class="fa fa-check"></i>
                                         Confirmar identidad
                                     </button>
@@ -96,7 +96,8 @@
                                             class="sic-btn-warning-soft sic-btn-descartar-alerta"
                                             data-id-detenido="@idDetenidoC5"
                                             data-id-origen="@idOrigenMandamiento"
-                                            data-id-fuente="@idFuenteAlertaMandamiento">
+                                            data-id-fuente="@idFuenteAlertaMandamiento"
+                                            data-id-tipo-alerta="@idTipoAlertaMandamiento">
                                         <i class="fa fa-times"></i>
                                         Descartar
                                     </button>
@@ -107,11 +108,10 @@
                                             class="sic-btn-resguardo-disponible js-confirmar-resguardo-fgea"
                                             data-id-detenido="@idDetenidoC5"
                                             data-id-origen="@idOrigenMandamiento"
-                                            data-id-fuente="@idFuenteAlertaMandamiento">
-
+                                            data-id-fuente="@idFuenteAlertaMandamiento"
+                                            data-id-tipo-alerta="@idTipoAlertaMandamiento">
                                         <i class="fa fa-shield"></i>
                                         Confirmar Resguardo FGEA
-
                                     </button>
 
                                     <button type="button"
@@ -119,11 +119,10 @@
                                             data-estatus-anterior="2"
                                             data-id-detenido="@idDetenidoC5"
                                             data-id-origen="@idOrigenMandamiento"
-                                            data-id-fuente="@idFuenteAlertaMandamiento">
-
+                                            data-id-fuente="@idFuenteAlertaMandamiento"
+                                            data-id-tipo-alerta="@idTipoAlertaMandamiento">
                                         <i class="fa fa-undo"></i>
                                         Cancelar Confirmación
-
                                     </button>
                                 }
                                 else if (estatusAlertaMandamiento == 3)
@@ -131,21 +130,18 @@
                                     <button type="button"
                                             class="sic-btn-resguardo-confirmado"
                                             disabled>
-
                                         <i class="fa fa-university"></i>
                                         DETENIDO EN RESGUARDO FGEA
-
                                     </button>
 
                                     <button type="button"
                                             class="sic-btn-cancelar-resguardo js-cancelar-resguardo-fgea"
                                             data-id-detenido="@idDetenidoC5"
                                             data-id-origen="@idOrigenMandamiento"
-                                            data-id-fuente="@idFuenteAlertaMandamiento">
-
+                                            data-id-fuente="@idFuenteAlertaMandamiento"
+                                            data-id-tipo-alerta="@idTipoAlertaMandamiento">
                                         <i class="fa fa-undo"></i>
                                         Cancelar Resguardo
-
                                     </button>
                                 }
                                 else
@@ -162,7 +158,8 @@
                                             data-estatus-anterior="0"
                                             data-id-detenido="@idDetenidoC5"
                                             data-id-origen="@idOrigenMandamiento"
-                                            data-id-fuente="@idFuenteAlertaMandamiento">
+                                            data-id-fuente="@idFuenteAlertaMandamiento"
+                                            data-id-tipo-alerta="@idTipoAlertaMandamiento">
                                         <i class="fa fa-undo"></i>
                                         Cancelar Confirmación
                                     </button>

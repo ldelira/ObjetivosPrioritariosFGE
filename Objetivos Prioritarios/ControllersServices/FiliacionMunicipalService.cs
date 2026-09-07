@@ -28,15 +28,24 @@ namespace Objetivos_Prioritarios.ControllersServices
             return dbFiliMuni.sp_BuscarDetenido(idDetenido).FirstOrDefault();
         }
 
-        public List<Tuple<int, int, int, int, int, string>> GetAlertaTipo(
-    int idDetenido
-)
+        public List<Tuple<int, int, int, int, int, string>> GetAlertaTipo(List<int> idsDetenidos)
         {
             using (var db = new Filiacion_MunicipiosEntities())
             {
+                if (idsDetenidos == null || idsDetenidos.Count == 0)
+                {
+                    return new List<Tuple<int, int, int, int, int, string>>();
+                }
+
+                idsDetenidos = idsDetenidos
+                    .Where(x => x > 0)
+                    .Distinct()
+                    .ToList();
+
                 var lista = db.tb_Alerta
                     .Where(x =>
-                        x.idDetenidoC5 == idDetenido &&
+                        x.idDetenidoC5.HasValue &&
+                        idsDetenidos.Contains(x.idDetenidoC5.Value) &&
                         x.idPersonaFGEA != null
                     )
                     .Select(x => new
@@ -46,48 +55,44 @@ namespace Objetivos_Prioritarios.ControllersServices
                         Estatus = x.Estatus,
                         Porcentaje = x.Porcentaje,
                         IdTipoAlerta = x.idTipoAlerta,
-
-                        NombreTipoAlerta =
-                            x.cat_TipoAlerta != null
-                                ? x.cat_TipoAlerta.Alerta
-                                : null
+                        NombreTipoAlerta = x.cat_TipoAlerta != null
+                            ? x.cat_TipoAlerta.Alerta
+                            : null
                     })
                     .ToList();
 
                 var resultado = lista
                     .Select(x =>
                     {
-                        int idPersonaFGEA =
-                            x.IdPersonaFGEA;
+                        int idPersonaFGEA = x.IdPersonaFGEA;
 
-                        int idTbFuente =
-                            Convert.ToInt32(x.IdTbFuente);
+                        int idTbFuente = x.IdTbFuente == null
+                            ? 0
+                            : Convert.ToInt32(x.IdTbFuente);
 
-                        int estatus =
-                            x.Estatus == null
-                                ? 0
-                                : Convert.ToInt32(x.Estatus);
+                        int estatus = x.Estatus == null
+                            ? 0
+                            : Convert.ToInt32(x.Estatus);
 
-                        int porcentaje =
-                            x.Porcentaje == null
-                                ? 0
-                                : Convert.ToInt32(x.Porcentaje);
+                        int porcentaje = x.Porcentaje == null
+                            ? 0
+                            : Convert.ToInt32(x.Porcentaje);
 
-                        int idTipoAlerta =
-                            Convert.ToInt32(x.IdTipoAlerta);
+                        int idTipoAlerta = x.IdTipoAlerta == null
+                            ? 0
+                            : Convert.ToInt32(x.IdTipoAlerta);
 
-                        string nombreTipoAlerta =
-                            string.IsNullOrWhiteSpace(x.NombreTipoAlerta)
-                                ? "SIN TIPO DE ALERTA"
-                                : x.NombreTipoAlerta.Trim();
+                        string nombreTipoAlerta = string.IsNullOrWhiteSpace(x.NombreTipoAlerta)
+                            ? "SIN TIPO DE ALERTA"
+                            : x.NombreTipoAlerta.Trim();
 
                         return Tuple.Create(
-                            idPersonaFGEA,       // Item1
-                            idTbFuente,          // Item2
-                            estatus,             // Item3
-                            porcentaje,          // Item4
-                            idTipoAlerta,        // Item5
-                            nombreTipoAlerta     // Item6
+                            idPersonaFGEA,   // Item1
+                            idTbFuente,      // Item2
+                            estatus,         // Item3
+                            porcentaje,      // Item4
+                            idTipoAlerta,    // Item5
+                            nombreTipoAlerta // Item6
                         );
                     })
                     .ToList();
@@ -96,12 +101,7 @@ namespace Objetivos_Prioritarios.ControllersServices
             }
         }
 
-        public List<Capea_boletin_busqueda> GetInfoCapeas(
-    List<int> idsCapea,
-    List<int> idsAmber,
-    List<int> idsAlba
-)
-        {
+        public List<Capea_boletin_busqueda> GetInfoCapeas( List<int> idsCapea, List<int> idsAmber, List<int> idsAlba){
             using (var db = new fiscalia_webEntities())
             {
                 var resultado =
@@ -456,11 +456,7 @@ namespace Objetivos_Prioritarios.ControllersServices
             }
         }
 
-        private static void AsignarValorCompatible(
-    object destino,
-    string nombrePropiedad,
-    object valor
-)
+        private static void AsignarValorCompatible(object destino,string nombrePropiedad,object valor)
         {
             if (
                 destino == null ||
@@ -673,21 +669,25 @@ namespace Objetivos_Prioritarios.ControllersServices
             return tabla;
         }
 
-
-        public DataTable GetInfoDetenidos(List<int> idsDetenidos)
+        public DataTable GetInfoDetenidos(List<int> idsNomPerso, List<int> clavesPerso)
         {
             DataTable tabla = new DataTable();
 
-            if (idsDetenidos == null || idsDetenidos.Count == 0)
+            idsNomPerso = idsNomPerso == null
+                ? new List<int>()
+                : idsNomPerso.Where(x => x > 0).Distinct().ToList();
+
+            clavesPerso = clavesPerso == null
+                ? new List<int>()
+                : clavesPerso.Where(x => x > 0).Distinct().ToList();
+
+            if (idsNomPerso.Count == 0 && clavesPerso.Count == 0)
             {
                 return tabla;
             }
 
-            idsDetenidos = idsDetenidos
-                .Distinct()
-                .ToList();
-
-            string clavesTexto = ConvertirIdsATexto(idsDetenidos);
+            string idsNomPersoTexto = ConvertirIdsATexto(idsNomPerso);
+            string clavesPersoTexto = ConvertirIdsATexto(clavesPerso);
 
             using (var db = new FiliacionEntities())
             {
@@ -706,10 +706,17 @@ namespace Objetivos_Prioritarios.ControllersServices
                     using (SqlCommand cmd = new SqlCommand("dbo.SP_SIC_getCoincidenciasDetenidos", cn))
                     {
                         cmd.CommandType = CommandType.StoredProcedure;
-
                         cmd.CommandTimeout = 300;
 
-                        cmd.Parameters.Add("@ids_nom_perso", SqlDbType.NVarChar).Value = clavesTexto;
+                        cmd.Parameters.Add("@ids_nom_perso", SqlDbType.NVarChar).Value =
+                            idsNomPerso.Count > 0
+                                ? (object)idsNomPersoTexto
+                                : DBNull.Value;
+
+                        cmd.Parameters.Add("@claves_perso", SqlDbType.NVarChar).Value =
+                            clavesPerso.Count > 0
+                                ? (object)clavesPersoTexto
+                                : DBNull.Value;
 
                         using (SqlDataAdapter da = new SqlDataAdapter(cmd))
                         {
@@ -722,10 +729,105 @@ namespace Objetivos_Prioritarios.ControllersServices
             return tabla;
         }
 
+        public DataTable GetInfoDetenidoMunicipio(List<int> idsDetenidos)
+        {
+            DataTable tabla = new DataTable();
 
-        public List<SP_SIC_getCoincidenciasDetenidos_Result>
-    getCoincidenciasDetenidos_Results(
-        List<int> idsNomPerso)
+            tabla.Columns.Add("IDDETENIDO", typeof(int));
+            tabla.Columns.Add("NOMBRE", typeof(string));
+            tabla.Columns.Add("DOMICILIO", typeof(string));
+            tabla.Columns.Add("EDAD", typeof(string));
+            tabla.Columns.Add("SEXO", typeof(string));
+            tabla.Columns.Add("Folio", typeof(string));
+            tabla.Columns.Add("Ocupacion", typeof(string));
+            tabla.Columns.Add("Situacion", typeof(string));
+            tabla.Columns.Add("FOTO", typeof(string));
+
+            if (idsDetenidos == null || idsDetenidos.Count == 0)
+                return tabla;
+
+            idsDetenidos = idsDetenidos
+                .Where(x => x > 0)
+                .Distinct()
+                .ToList();
+
+            if (idsDetenidos.Count == 0)
+                return tabla;
+
+            using (var db = new Filiacion_MunicipiosEntities())
+            {
+                var query =
+                            from d in db.tb_DETENIDO_C5.AsNoTracking()
+                            join f in db.tb_FOTO_C5.AsNoTracking()
+                                .Where(x => x.FOTO.Contains("1.jpg")
+                                         && !x.FOTO.Contains("pertenencia")
+                                         && !x.FOTO.Contains("rasgo")
+                                         && !x.FOTO.Contains("Evidencia"))
+                                on d.IDDETENIDO equals f.IDDETENIDO into fotos
+                            from f in fotos.DefaultIfEmpty()
+                            where idsDetenidos.Contains(d.IDDETENIDO)
+                            select new
+                            {
+                                Detenido = d,
+                                FOTO = f == null ? null : f.FOTO
+                            };
+
+                var detenidos = query
+                    .OrderBy(x => x.Detenido.IDDETENIDO)
+                    .ToList();
+
+                foreach (var item in detenidos)
+                {
+                    var detenido = item.Detenido;
+
+                    string nombre = string.Join(" ", new[]
+                    {
+                detenido.NOMBRE,
+                detenido.Ap_Paterno,
+                detenido.Ap_Materno
+            }.Where(x => !string.IsNullOrWhiteSpace(x)));
+
+                    string domicilio = "";
+
+                    if (!string.IsNullOrWhiteSpace(detenido.CALLE))
+                        domicilio += detenido.CALLE.Trim();
+
+                    if (!string.IsNullOrWhiteSpace(Convert.ToString(detenido.NUMEXT)))
+                        domicilio += " #" + detenido.NUMEXT;
+
+                    if (!string.IsNullOrWhiteSpace(Convert.ToString(detenido.NUMINT)))
+                        domicilio += ", INTERIOR: #" + detenido.NUMINT;
+
+                    if (!string.IsNullOrWhiteSpace(detenido.COLONIA))
+                        domicilio += ", " + detenido.COLONIA.Trim();
+
+                    if (!string.IsNullOrWhiteSpace(Convert.ToString(detenido.CP)))
+                        domicilio += " CP: " + detenido.CP;
+
+                    if (!string.IsNullOrWhiteSpace(detenido.MUNICIPIO))
+                        domicilio += ", " + detenido.MUNICIPIO.Trim();
+
+                    if (!string.IsNullOrWhiteSpace(detenido.Estado))
+                        domicilio += ", " + detenido.Estado.Trim();
+
+                    tabla.Rows.Add(
+                        Convert.ToInt32(detenido.IDDETENIDO),
+                        nombre,
+                        domicilio,
+                        Convert.ToString(detenido.EDAD),
+                        Convert.ToString(detenido.SEXO),
+                        Convert.ToString(detenido.Folio),
+                        Convert.ToString(detenido.Ocupacion),
+                        Convert.ToString(detenido.Situacion),
+                        Convert.ToString(item.FOTO)
+                    );
+                }
+            }
+
+            return tabla;
+        }
+
+        public List<SP_SIC_getCoincidenciasDetenidos_Result> getCoincidenciasDetenidos_Results(List<int> idsNomPerso)
         {
             if (
                 idsNomPerso == null ||
@@ -761,150 +863,139 @@ namespace Objetivos_Prioritarios.ControllersServices
             }
         }
 
-
-        public int ApagarNotificacion(int idDetenido, int idOrigen, int idFuente)
+        public int ApagarNotificacion(int idDetenido, int idOrigen, int idFuente, int idTipoAlerta)
         {
+            if (idDetenido <= 0 ||
+                idOrigen <= 0 ||
+                idFuente <= 0)
+            {
+                return 0;
+            }
+
+            if (idFuente == 6)
+            {
+                return ApagarNotificacionDetenidos(
+                    idDetenido,
+                    idOrigen,
+                    idTipoAlerta
+                );
+            }
+
             using (var db = new Filiacion_MunicipiosEntities())
             {
                 var alertas = db.tb_Alerta
-                    .Where(x => x.idDetenidoC5 == idDetenido
-                             && x.idPersonaFGEA == idOrigen
-                             && x.IdTbFuente == idFuente
-                             && x.Estatus == 1)
+                    .Where(x =>
+                        x.idDetenidoC5 == idDetenido &&
+                        x.idPersonaFGEA == idOrigen &&
+                        x.IdTbFuente == idFuente &&
+                        x.Estatus == 1)
                     .ToList();
 
+                DateTime fechaModificacion = DateTime.Now;
                 foreach (var alerta in alertas)
                 {
                     alerta.Estatus = 0;
+                    alerta.FechaModificacion = fechaModificacion;
                 }
 
-
-
-
                 db.SaveChanges();
-                bool bandera = !db.tb_Alerta .Any(x =>
-                                 x.idDetenidoC5 == idDetenido &&
-                                 x.IdTbFuente == idFuente &&
-                                 (x.Estatus == 1 || x.Estatus == 2));
+
+                bool bandera = !db.tb_Alerta.Any(x =>
+                    x.idDetenidoC5 == idDetenido &&
+                    x.IdTbFuente == idFuente &&
+                    (x.Estatus == 1 || x.Estatus == 2));
 
                 if (bandera)
                 {
-                    ActualizarEstatusDetenido(2, idDetenido);
+                    ActualizarEstatusDetenido(
+                        2,
+                        idDetenido
+                    );
                 }
-
-
 
                 return alertas.Count;
             }
         }
 
-        public bool ActualizarEstatusDetenido( int origen, int idDetenido)
+        public bool ActualizarEstatusDetenido(int origen, int idDetenido)
         {
-
-            if (origen == 2)
+            if (idDetenido <= 0)
             {
-                using (var db = new SICEntities())
-                {
-                    var registro = db.DETENIDO
-                        .FirstOrDefault(x =>
-                            x.IDDETENIDO == idDetenido);
-
-                    if (registro == null)
-                    {
-                        return false;
-                    }
-
-                    registro.Situacion = "R";
-
-                    db.SaveChanges();
-
-                    return true;
-                }
-            }
-            else if (origen == 1)
-            {
-                using (var db = new SICEntities())
-                {
-                    var registro = db.DETENIDO
-                        .FirstOrDefault(x =>
-                            x.IDDETENIDO == idDetenido);
-
-                    if (registro == null)
-                    {
-                        return false;
-                    }
-
-                    registro.Situacion = "C";
-
-                    db.SaveChanges();
-
-                    return true;
-                }
-            }
-            else if (origen == 3)
-            {
-                using (var db = new SICEntities())
-                {
-                    var registro = db.DETENIDO
-                       .FirstOrDefault(x =>
-                           x.IDDETENIDO == idDetenido);
-
-                    if (registro == null)
-                    {
-                        return false;
-                    }
-
-                    registro.Situacion = "I";
-
-                    db.SaveChanges();
-
-                    return true;
-                }
-            }
-            else if (origen == 4)
-            {
-                using (var db = new SICEntities())
-                {
-                    var registro = db.DETENIDO
-                       .FirstOrDefault(x =>
-                           x.IDDETENIDO == idDetenido);
-                    if (registro == null)
-                    {
-                        return false;
-                    }
-                    registro.Situacion = "D";
-                    db.SaveChanges();
-                    return true;
-                }
+                return false;
             }
 
-            return false;
+            string situacion;
+
+            switch (origen)
+            {
+                case 1:
+                    situacion = "C";
+                    break;
+
+                case 2:
+                    situacion = "R";
+                    break;
+
+                case 3:
+                    situacion = "I";
+                    break;
+
+                case 4:
+                    situacion = "D";
+                    break;
+
+                default:
+                    return false;
+            }
+
+            var idsRelacionados = GetIdsDetenidosRelacionados(idDetenido);
+
+            using (var db = new SICEntities())
+            {
+                var registros = db.DETENIDO
+                    .Where(x => idsRelacionados.Contains(x.IDDETENIDO))
+                    .ToList();
+
+                if (registros.Count == 0)
+                {
+                    return false;
+                }
+
+                foreach (var registro in registros)
+                {
+                    registro.Situacion = situacion;
+                }
+
+                db.SaveChanges();
+
+                return true;
+            }
         }
 
-        public int ApagarNotificacionDetenidos(int idDetenido, List<int> idsNomPerso)
+        public int ApagarNotificacionDetenidos(int idDetenido, int idOrigen, int idTipoAlerta)
         {
-            if (idsNomPerso == null || idsNomPerso.Count == 0)
+            if (idDetenido <= 0 ||
+                idOrigen <= 0)
             {
                 return 0;
             }
 
-            idsNomPerso = idsNomPerso
-                .Distinct()
-                .ToList();
-
             using (var db = new Filiacion_MunicipiosEntities())
             {
-                var alertas = db.tb_Alerta
-                    .Where(x => x.idDetenidoC5 == idDetenido
-                             && x.IdTbFuente == 6
-                             && x.idPersonaFGEA != null
-                             && idsNomPerso.Contains(x.idPersonaFGEA.Value)
-                             && x.Estatus == 1)
-                    .ToList();
+                var alertas = ObtenerAlertasRelacionadasDetenidosFGEA(
+                    db,
+                    idDetenido,
+                    idOrigen,
+                    idTipoAlerta
+                )
+                .Where(x => x.Estatus == 1)
+                .ToList();
 
+                DateTime fechaModificacion = DateTime.Now;
                 foreach (var alerta in alertas)
                 {
                     alerta.Estatus = 0;
+                    alerta.FechaModificacion = fechaModificacion;
                 }
 
                 db.SaveChanges();
@@ -913,31 +1004,30 @@ namespace Objetivos_Prioritarios.ControllersServices
             }
         }
 
-
-        public int ReactivarNotificacionDetenidos(int idDetenido, List<int> idsNomPerso)
+        public int ReactivarNotificacionDetenidos(int idDetenido, int idOrigen, int idTipoAlerta)
         {
-            if (idsNomPerso == null || idsNomPerso.Count == 0)
+            if (idDetenido <= 0 ||
+                idOrigen <= 0)
             {
                 return 0;
             }
 
-            idsNomPerso = idsNomPerso
-                .Distinct()
-                .ToList();
-
             using (var db = new Filiacion_MunicipiosEntities())
             {
-                var alertas = db.tb_Alerta
-                    .Where(x => x.idDetenidoC5 == idDetenido
-                             && x.IdTbFuente == 6
-                             && x.idPersonaFGEA != null
-                             && idsNomPerso.Contains(x.idPersonaFGEA.Value)
-                             && x.Estatus == 0)
-                    .ToList();
+                var alertas = ObtenerAlertasRelacionadasDetenidosFGEA(
+                    db,
+                    idDetenido,
+                    idOrigen,
+                    idTipoAlerta
+                )
+                .Where(x => x.Estatus == 0)
+                .ToList();
 
+                DateTime fechaModificacion = DateTime.Now;
                 foreach (var alerta in alertas)
                 {
                     alerta.Estatus = 1;
+                    alerta.FechaModificacion = fechaModificacion;
                 }
 
                 db.SaveChanges();
@@ -946,40 +1036,126 @@ namespace Objetivos_Prioritarios.ControllersServices
             }
         }
 
-        public tb_DETENCION_C5 GetInfoDetencionC5(int idDetencion)
+        public List<int> GetIdsDetenidosRelacionados(int idDetenido)
         {
             using (var db = new Filiacion_MunicipiosEntities())
             {
-                var resultado = db.tb_DETENCION_C5
-                    .FirstOrDefault(x => x.IDDETENCION == idDetencion);
+                var idsDetenidos = db.tb_CoincidenciasNormalizadas
+                    .Where(x => x.DetenidoCoincidenciaId == idDetenido)
+                    .Select(x => x.DetenidoId)
+                    .Distinct()
+                    .ToList();
 
-                return resultado;
+                if (!idsDetenidos.Contains(idDetenido))
+                {
+                    idsDetenidos.Insert(0, idDetenido);
+                }
+
+                return idsDetenidos;
             }
         }
 
-        public tb_DETENIDO_C5 GetDatosDetenidoC5(int idDetenido)
+        public List<int> GetInfoDetencionC5(List<int> idsDetenidos)
         {
             using (var db = new Filiacion_MunicipiosEntities())
             {
+                if (idsDetenidos == null || idsDetenidos.Count == 0)
+                {
+                    return new List<int>();
+                }
+
+                idsDetenidos = idsDetenidos
+                    .Where(x => x > 0)
+                    .Distinct()
+                    .ToList();
+
                 var resultado = db.tb_DETENIDO_C5
-                    .FirstOrDefault(x => x.IDDETENIDO == idDetenido);
+                    .Where(x => idsDetenidos.Contains(x.IDDETENIDO))
+                    .Where(x => x.IDDETENCION.HasValue)
+                    .Select(x => x.IDDETENCION.Value)
+                    .Where(x => x > 0)
+                    .Distinct()
+                    .OrderBy(x => x)
+                    .ToList();
 
                 return resultado;
             }
         }
 
 
-        public List<tb_FOTO_C5> GetFotosDetenidoC5(int idDetenido)
+        public List<tb_DETENCION_C5> GetDatosDetencionesC5(List<int> idsDetenciones)
         {
             using (var db = new Filiacion_MunicipiosEntities())
             {
+                if (idsDetenciones == null || idsDetenciones.Count == 0)
+                {
+                    return new List<tb_DETENCION_C5>();
+                }
+
+                idsDetenciones = idsDetenciones
+                    .Where(x => x > 0)
+                    .Distinct()
+                    .ToList();
+
+                var resultado = db.tb_DETENCION_C5
+                    .Where(x => idsDetenciones.Contains(x.IDDETENCION))
+                    .OrderByDescending(x => x.FECHA_DETENCION)
+                    .ToList();
+
+                return resultado;
+            }
+        }
+
+
+
+        public List<tb_DETENIDO_C5> GetDatosDetenidoC5(List<int> idsDetenidos)
+{
+    using (var db = new Filiacion_MunicipiosEntities())
+    {
+        if (idsDetenidos == null || idsDetenidos.Count == 0)
+        {
+            return new List<tb_DETENIDO_C5>();
+        }
+
+        idsDetenidos = idsDetenidos
+            .Where(x => x > 0)
+            .Distinct()
+            .ToList();
+
+        var resultado = db.tb_DETENIDO_C5
+            .Where(x => idsDetenidos.Contains(x.IDDETENIDO))
+            .OrderBy(x => x.IDDETENIDO)
+            .ToList();
+
+        return resultado;
+    }
+}
+
+
+        public List<tb_FOTO_C5> GetFotosDetenidoC5(List<int> idsDetenidos)
+        {
+            using (var db = new Filiacion_MunicipiosEntities())
+            {
+                if (idsDetenidos == null || idsDetenidos.Count == 0)
+                {
+                    return new List<tb_FOTO_C5>();
+                }
+
+                idsDetenidos = idsDetenidos
+                    .Where(x => x > 0)
+                    .Distinct()
+                    .ToList();
+
                 var resultado = db.tb_FOTO_C5
-                    .Where(x => x.IDDETENIDO == idDetenido
-                             && x.TIPO != null
-                             && x.TIPO.Contains("Foto")
-                             && x.FOTO != null
-                             && x.FOTO != "")
-                    .OrderBy(x => x.IDFOTO)
+                    .Where(x =>
+                        x.IDDETENIDO.HasValue &&
+                        idsDetenidos.Contains(x.IDDETENIDO.Value) &&
+                        x.TIPO != null &&
+                        x.TIPO.Contains("Foto") &&
+                        x.FOTO != null &&
+                        x.FOTO != "")
+                    .OrderBy(x => x.IDDETENIDO)
+                    .ThenBy(x => x.IDFOTO)
                     .ToList();
 
                 return resultado;
@@ -1011,6 +1187,7 @@ namespace Objetivos_Prioritarios.ControllersServices
 
                 return resultado;
             }
+
         }
 
         public tb_HUELLA_C5 GetHuellaC5PorId(int idHuella)
@@ -1024,22 +1201,36 @@ namespace Objetivos_Prioritarios.ControllersServices
             }
         }
 
-        public List<tb_FOTO_C5> GetRasgosDetenidoC5(int idDetenido)
+        public List<tb_FOTO_C5> GetRasgosDetenidoC5(List<int> idsDetenidos)
         {
+
             using (var db = new Filiacion_MunicipiosEntities())
             {
+                if (idsDetenidos == null || idsDetenidos.Count == 0)
+                {
+                    return new List<tb_FOTO_C5>();
+                }
+
+                idsDetenidos = idsDetenidos
+                    .Where(x => x > 0)
+                    .Distinct()
+                    .ToList();
+
                 var resultado = db.tb_FOTO_C5
-                    .Where(x => x.IDDETENIDO == idDetenido
-                             && x.TIPO != null
-                             && x.TIPO.Contains("Rasgo")
-                             && x.FOTO != null)
-                    .OrderBy(x => x.IDFOTO)
-                    .ToList()
-                    .Where(x => !string.IsNullOrWhiteSpace(x.FOTO))
+                    .Where(x =>
+                        x.IDDETENIDO.HasValue &&
+                        idsDetenidos.Contains(x.IDDETENIDO.Value) &&
+                        x.TIPO != null &&
+                        x.TIPO.Contains("Rasgo") &&
+                        x.FOTO != null &&
+                        x.FOTO != "")
+                    .OrderBy(x => x.IDDETENIDO)
+                    .ThenBy(x => x.IDFOTO)
                     .ToList();
 
                 return resultado;
             }
+
         }
 
         public Capea_boletin_busqueda GetCapeaPorId(int idCapea)
@@ -1053,95 +1244,22 @@ namespace Objetivos_Prioritarios.ControllersServices
             }
         }
 
-        public int ReactivarNotificacion(int idDetenido, int idOrigen, int idFuente)
+        public int ReactivarNotificacion(int idDetenido, int idOrigen, int idFuente, int idTipoAlerta)
         {
-            using (var db = new Filiacion_MunicipiosEntities())
+            if (idDetenido <= 0 ||
+                idOrigen <= 0 ||
+                idFuente <= 0)
             {
-                var alertas = db.tb_Alerta
-                    .Where(x => x.idDetenidoC5 == idDetenido
-                             && x.idPersonaFGEA == idOrigen
-                             && x.IdTbFuente == idFuente
-                             && x.Estatus == 0)
-                    .ToList();
-
-                foreach (var alerta in alertas)
-                {
-                    alerta.Estatus = 1;
-                }
-
-                db.SaveChanges();
-
-                if (db.tb_Alerta.Any(x =>
-                                      x.idDetenidoC5 == idDetenido &&
-                                      x.IdTbFuente != 6 &&
-                                       (x.Estatus != 1 || x.Estatus != 2)))
-                {
-                    ActualizarEstatusDetenido(2, idDetenido);
-                }
-
-                return alertas.Count;
+                return 0;
             }
-        }
 
-        public Tuple<int, int, int> GetConteoAlertasPorEstatus(int idDetenido)
-{
-    using (var db = new Filiacion_MunicipiosEntities())
-    {
-        int totalActivas = db.tb_Alerta.Count(x =>
-            x.idDetenidoC5 == idDetenido &&
-            x.Estatus == 1
-        );
-
-        int totalRevisadas = db.tb_Alerta.Count(x =>
-            x.idDetenidoC5 == idDetenido &&
-            x.Estatus == 0
-        );
-
-        int totalConfirmadas = db.tb_Alerta.Count(x =>
-            x.idDetenidoC5 == idDetenido &&
-            (x.Estatus == 2 || x.Estatus == 3)
-        );
-
-        return Tuple.Create(
-            totalActivas,
-            totalRevisadas,
-            totalConfirmadas
-        );
-    }
-}
-
-
-        public List<Tuple<int, int>> GetTiposAlertas(int idDetenido)
-        {
-            using (var db = new Filiacion_MunicipiosEntities())
+            if (idFuente == 6)
             {
-                var resultado = db.tb_Alerta
-                    .Where(x => x.idDetenidoC5 == idDetenido)
-                    .GroupBy(x => x.idTipoAlerta)
-                    .Select(grupo => new
-                    {
-                        IdTipoAlerta = grupo.Key,
-                        TotalAlertas = grupo.Count()
-                    })
-                    .OrderByDescending(x => x.TotalAlertas)
-                    .ToList()
-                    .Select(x => Tuple.Create(
-                        x.IdTipoAlerta == null ? 0 : Convert.ToInt32(x.IdTipoAlerta),
-                        x.TotalAlertas
-                    ))
-                    .ToList();
-
-                return resultado;
-            }
-        }
-
-        public int ActualizarEstatusNotificacion( int idDetenido, int idOrigen, int idFuente, int nuevoEstatus) {
-            if (nuevoEstatus != 0 &&
-                nuevoEstatus != 1 &&
-                nuevoEstatus != 2 &&
-                nuevoEstatus != 3)
-            {
-                throw new ArgumentException("El estatus recibido no es válido.");
+                return ReactivarNotificacionDetenidos(
+                    idDetenido,
+                    idOrigen,
+                    idTipoAlerta
+                );
             }
 
             using (var db = new Filiacion_MunicipiosEntities())
@@ -1150,71 +1268,332 @@ namespace Objetivos_Prioritarios.ControllersServices
                     .Where(x =>
                         x.idDetenidoC5 == idDetenido &&
                         x.idPersonaFGEA == idOrigen &&
-                        x.IdTbFuente == idFuente)
+                        x.IdTbFuente == idFuente &&
+                        x.Estatus == 0)
                     .ToList();
 
+                DateTime fechaModificacion = DateTime.Now;
                 foreach (var alerta in alertas)
                 {
-                    alerta.Estatus = nuevoEstatus;
+                    alerta.Estatus = 1;
+                    alerta.FechaModificacion = fechaModificacion;
                 }
 
                 db.SaveChanges();
 
-                if(nuevoEstatus == 2)
+                /*
+                 * Se conserva tu lógica actual.
+                 */
+                if (db.tb_Alerta.Any(x =>
+                    x.idDetenidoC5 == idDetenido &&
+                    x.IdTbFuente != 6 &&
+                    (x.Estatus != 1 || x.Estatus != 2)))
                 {
-                    if (db.tb_Alerta.Any(x =>
-                                     x.idDetenidoC5 == idDetenido &&
-                                     x.IdTbFuente != 6 &&
-                                     x.Estatus == 2))
-                    {
-                        ActualizarEstatusDetenido(1, idDetenido);
-                    }
-                }
-                else if(nuevoEstatus == 1)
-                {
-                    if (db.tb_Alerta.Any(x =>
-                                     x.idDetenidoC5 == idDetenido &&
-                                     x.IdTbFuente != 6 &&
-                                     x.Estatus == 1 &&
-                                     x.Estatus != 2))
-                    {
-                        ActualizarEstatusDetenido(3, idDetenido);
-                    }
-                }else if(nuevoEstatus == 0)
-                {
-                    if (db.tb_Alerta.Any(x =>
-                                     x.idDetenidoC5 == idDetenido &&
-                                     x.IdTbFuente != 6 &&
-                                      (x.Estatus != 1 || x.Estatus != 2)))
-                    {
-                        ActualizarEstatusDetenido(2, idDetenido);
-                    }
-                }else if(nuevoEstatus == 3)
-                {
-                    if (db.tb_Alerta.Any(x =>
-                                     x.idDetenidoC5 == idDetenido &&
-                                     x.IdTbFuente != 6 &&
-                                      (x.Estatus == 3))) 
-                    {
-                        ActualizarEstatusDetenido(4, idDetenido);
-                    }
+                    ActualizarEstatusDetenido(
+                        2,
+                        idDetenido
+                    );
                 }
 
-
-                    return alertas.Count;
+                return alertas.Count;
             }
         }
 
-        public int ActualizarEstatusNotificacionDetenidos(
-    int idDetenido,
-    List<int> idsNomPerso,
-    int nuevoEstatus)
+        public Tuple<int, int, int> GetConteoAlertasPorEstatus(List<int> idsDetenidos)
         {
-            if (idsNomPerso == null || idsNomPerso.Count == 0)
+            using (var db = new Filiacion_MunicipiosEntities())
+            {
+                if (idsDetenidos == null || idsDetenidos.Count == 0)
+                {
+                    return Tuple.Create(0, 0, 0);
+                }
+
+                var alertas = db.tb_Alerta
+                    .Where(x =>
+                        x.idDetenidoC5.HasValue &&
+                        idsDetenidos.Contains(x.idDetenidoC5.Value))
+                    .ToList();
+
+                var alertasUnicas = alertas
+                    .GroupBy(x => new
+                    {
+                        x.idPersonaFGEA,
+                        x.idTipoAlerta,
+                        x.IdTbFuente
+                    })
+                    .Select(g => g
+                        .OrderByDescending(x => x.Porcentaje ?? 0)
+                        .ThenByDescending(x => x.FechaAlerta)
+                        .ThenByDescending(x => x.idAlerta)
+                        .First())
+                    .ToList();
+
+                int totalActivas = alertasUnicas.Count(x =>
+                    x.Estatus == 1
+                );
+
+                int totalRevisadas = alertasUnicas.Count(x =>
+                    x.Estatus == 0
+                );
+
+                int totalConfirmadas = alertasUnicas.Count(x =>
+                    x.Estatus == 2 ||
+                    x.Estatus == 3
+                );
+
+                return Tuple.Create(
+                    totalActivas,
+                    totalRevisadas,
+                    totalConfirmadas
+                );
+            }
+        }
+
+        public List<Tuple<int, int>> GetTiposAlertas(List<int> idsDetenidos)
+        {
+            using (var db = new Filiacion_MunicipiosEntities())
+            {
+                if (idsDetenidos == null || idsDetenidos.Count == 0)
+                {
+                    return new List<Tuple<int, int>>();
+                }
+
+                idsDetenidos = idsDetenidos
+                    .Where(x => x > 0)
+                    .Distinct()
+                    .ToList();
+
+                var alertas = db.tb_Alerta
+                    .Where(x =>
+                        x.idDetenidoC5.HasValue &&
+                        idsDetenidos.Contains(x.idDetenidoC5.Value))
+                    .ToList();
+
+                /*
+                 * Si la misma alerta existe en varios IDDETENIDO relacionados,
+                 * conservamos solamente la de mayor porcentaje.
+                 *
+                 * La identidad de una alerta se determina por:
+                 *
+                 * idPersonaFGEA
+                 * idTipoAlerta
+                 * IdTbFuente
+                 */
+                var alertasUnicas = alertas
+                    .GroupBy(x => new
+                    {
+                        x.idPersonaFGEA,
+                        x.idTipoAlerta,
+                        x.IdTbFuente
+                    })
+                    .Select(grupo => grupo
+                        .OrderByDescending(x => x.Porcentaje ?? 0)
+                        .ThenByDescending(x => x.FechaAlerta)
+                        .ThenByDescending(x => x.idAlerta)
+                        .First())
+                    .ToList();
+
+                var resultado = alertasUnicas
+                    .GroupBy(x => x.idTipoAlerta)
+                    .Select(grupo => Tuple.Create(
+                        grupo.Key == null
+                            ? 0
+                            : Convert.ToInt32(grupo.Key),
+                        grupo.Count()
+                    ))
+                    .OrderByDescending(x => x.Item2)
+                    .ToList();
+
+                return resultado;
+            }
+        }
+
+        public int ActualizarEstatusNotificacion(int idDetenido, int idOrigen, int idFuente, int idTipoAlerta, int nuevoEstatus)
+        {
+            var idsRelacionados = GetIdsDetenidosRelacionados(idDetenido);
+
+            if (nuevoEstatus != 0 &&
+                nuevoEstatus != 1 &&
+                nuevoEstatus != 2 &&
+                nuevoEstatus != 3)
+            {
+                throw new ArgumentException("El estatus recibido no es válido.");
+            }
+
+            if (idDetenido <= 0 ||
+                idOrigen <= 0 ||
+                idFuente <= 0)
             {
                 return 0;
             }
 
+            /*
+             * FUENTE 6 tiene la particularidad de que:
+             *
+             * Tipo 1 = Nom_perso.id
+             * Tipo 2 = CLAVE_PERSO
+             * Tipo 3 = CLAVE_PERSO
+             *
+             * Se manda al método especializado.
+             */
+            if (idFuente == 6)
+            {
+                return ActualizarEstatusNotificacionDetenidos(
+                    idDetenido,
+                    idOrigen,
+                    idTipoAlerta,
+                    nuevoEstatus
+                );
+            }
+
+            using (var db = new Filiacion_MunicipiosEntities())
+            {
+                /*
+                 * Se buscan las alertas de cualquiera de los IDDETENIDO
+                 * relacionados con la raíz.
+                 *
+                 * Una alerta se identifica por:
+                 * idPersonaFGEA
+                 * idTipoAlerta
+                 * IdTbFuente
+                 */
+                var alertas = db.tb_Alerta
+                    .Where(x =>
+                        x.idDetenidoC5.HasValue &&
+                        idsRelacionados.Contains(x.idDetenidoC5.Value) &&
+                        x.idPersonaFGEA == idOrigen &&
+                        x.IdTbFuente == idFuente &&
+                        x.idTipoAlerta == idTipoAlerta)
+                    .ToList();
+
+                DateTime fechaModificacion = DateTime.Now;
+                foreach (var alerta in alertas)
+                {
+                    alerta.Estatus = nuevoEstatus;
+                    alerta.FechaModificacion = fechaModificacion;
+                }
+
+                /*
+                 * FUENTE 1 - DETENIDOS MUNICIPIOS
+                 *
+                 * Al confirmar identidad se genera la relación
+                 * entre el detenido coincidente y el detenido raíz.
+                 */
+                if (idFuente == 1)
+                {
+                    if (nuevoEstatus == 2)
+                    {
+                        bool yaExisteRelacion = db.tb_CoincidenciasNormalizadas
+                            .Any(x => x.DetenidoId == idOrigen);
+
+                        if (!yaExisteRelacion)
+                        {
+                            var nuevaCoincidencia = new tb_CoincidenciasNormalizadas
+                            {
+                                DetenidoId = idOrigen,
+                                DetenidoCoincidenciaId = idDetenido,
+                                TipoCoincidencia = "visual",
+                                FechaRegistro = DateTime.Now
+                            };
+
+                            db.tb_CoincidenciasNormalizadas.Add(
+                                nuevaCoincidencia
+                            );
+                        }
+                    }
+
+                    db.SaveChanges();
+
+                    return alertas.Count;
+                }
+
+                /*
+                 * Primero se guardan los nuevos estatus
+                 * de las alertas encontradas.
+                 */
+                db.SaveChanges();
+
+                /*
+                 * Se revisan las alertas de todos los IDDETENIDO
+                 * relacionados para determinar el estado general
+                 * del detenido raíz.
+                 */
+                if (nuevoEstatus == 2)
+                {
+                    bool tieneConfirmada = db.tb_Alerta.Any(x =>
+                        x.idDetenidoC5.HasValue &&
+                        idsRelacionados.Contains(x.idDetenidoC5.Value) &&
+                        x.IdTbFuente != 6 &&
+                        x.IdTbFuente != 1 &&
+                        x.Estatus == 2);
+
+                    if (tieneConfirmada)
+                    {
+                        ActualizarEstatusDetenido(
+                            1,
+                            idDetenido
+                        );
+                    }
+                }
+                else if (nuevoEstatus == 1)
+                {
+                    bool tienePendiente = db.tb_Alerta.Any(x =>
+                        x.idDetenidoC5.HasValue &&
+                        idsRelacionados.Contains(x.idDetenidoC5.Value) &&
+                        x.IdTbFuente != 6 &&
+                        x.IdTbFuente != 1 &&
+                        x.Estatus == 1);
+
+                    if (tienePendiente)
+                    {
+                        ActualizarEstatusDetenido(
+                            3,
+                            idDetenido
+                        );
+                    }
+                }
+                else if (nuevoEstatus == 0)
+                {
+                    bool tieneDescartada = db.tb_Alerta.Any(x =>
+                        x.idDetenidoC5.HasValue &&
+                        idsRelacionados.Contains(x.idDetenidoC5.Value) &&
+                        x.IdTbFuente != 6 &&
+                        x.IdTbFuente != 1 &&
+                        x.Estatus != 1 &&
+                        x.Estatus != 2);
+
+                    if (tieneDescartada)
+                    {
+                        ActualizarEstatusDetenido(
+                            2,
+                            idDetenido
+                        );
+                    }
+                }
+                else if (nuevoEstatus == 3)
+                {
+                    bool tieneResguardo = db.tb_Alerta.Any(x =>
+                        x.idDetenidoC5.HasValue &&
+                        idsRelacionados.Contains(x.idDetenidoC5.Value) &&
+                        x.IdTbFuente != 6 &&
+                        x.IdTbFuente != 1 &&
+                        x.Estatus == 3);
+
+                    if (tieneResguardo)
+                    {
+                        ActualizarEstatusDetenido(
+                            4,
+                            idDetenido
+                        );
+                    }
+                }
+
+                return alertas.Count;
+            }
+        }
+
+        public int ActualizarEstatusNotificacionDetenidos(int idDetenido, int idOrigen, int idTipoAlerta, int nuevoEstatus)
+        {
             if (nuevoEstatus != 0 &&
                 nuevoEstatus != 1 &&
                 nuevoEstatus != 2)
@@ -1222,38 +1601,71 @@ namespace Objetivos_Prioritarios.ControllersServices
                 throw new ArgumentException("El estatus recibido no es válido.");
             }
 
-            idsNomPerso = idsNomPerso
-                .Distinct()
-                .ToList();
+            if (idDetenido <= 0 ||
+                idOrigen <= 0)
+            {
+                return 0;
+            }
+
+            var idsRelacionados = GetIdsDetenidosRelacionados(idDetenido);
 
             using (var db = new Filiacion_MunicipiosEntities())
             {
+                /*
+                 * Se obtienen las alertas de la misma identidad
+                 * para TODOS los IDDETENIDO relacionados.
+                 */
+                var alertas = new List<tb_Alerta>();
+
+                foreach (var idDetenidoRelacionado in idsRelacionados)
+                {
+                    var alertasRelacionado = ObtenerAlertasRelacionadasDetenidosFGEA(
+                        db,
+                        idDetenidoRelacionado,
+                        idOrigen,
+                        idTipoAlerta
+                    );
+
+                    if (alertasRelacionado != null &&
+                        alertasRelacionado.Count > 0)
+                    {
+                        alertas.AddRange(alertasRelacionado);
+                    }
+                }
+
+                /*
+                 * Evitamos repetir una misma alerta por si llegara
+                 * a obtenerse más de una vez.
+                 */
+                alertas = alertas
+                    .GroupBy(x => x.idAlerta)
+                    .Select(x => x.First())
+                    .ToList();
+
+                /*
+                 * Al confirmar una ficha de Detenidos FGEA:
+                 *
+                 * primero se descartan TODAS las coincidencias
+                 * de Fuente 6 pertenecientes a cualquiera de los
+                 * IDDETENIDO relacionados.
+                 */
+                DateTime fechaModificacion = DateTime.Now;
 
                 if (nuevoEstatus == 2)
                 {
-                    var desactivar = db.tb_Alerta
-                        .Where(x =>
-                            x.idDetenidoC5 == idDetenido &&
-                            x.IdTbFuente == 6);
+                    var desactivar = db.tb_Alerta.Where(x => x.idDetenidoC5.HasValue && idsRelacionados.Contains(x.idDetenidoC5.Value) && x.IdTbFuente == 6).ToList();
 
                     foreach (var alerta in desactivar)
                     {
                         alerta.Estatus = 0;
+                        alerta.FechaModificacion = fechaModificacion;
                     }
-
                 }
-
-                var alertas = db.tb_Alerta
-                    .Where(x =>
-                        x.idDetenidoC5 == idDetenido &&
-                        x.IdTbFuente == 6 &&
-                        x.idPersonaFGEA.HasValue &&
-                        idsNomPerso.Contains(x.idPersonaFGEA.Value))
-                    .ToList();
 
                 foreach (var alerta in alertas)
                 {
                     alerta.Estatus = nuevoEstatus;
+                    alerta.FechaModificacion = fechaModificacion;
                 }
 
                 db.SaveChanges();
@@ -1263,9 +1675,7 @@ namespace Objetivos_Prioritarios.ControllersServices
         }
 
 
-        public DataTable BuscarMandamientosCandidatosPorNombre(
-    string nombreCompleto)
-        {
+        public DataTable BuscarMandamientosCandidatosPorNombre( string nombreCompleto) {
             DataTable tabla =
                 new DataTable();
 
@@ -1454,8 +1864,7 @@ WHERE
         }
 
 
-        private static List<string> ObtenerTokensMandamientos(
-    string nombreCompleto)
+        private static List<string> ObtenerTokensMandamientos(string nombreCompleto)
         {
             string nombreNormalizado =
                 NormalizarNombreMandamientos(
@@ -1496,10 +1905,7 @@ WHERE
                 .ToList();
         }
 
-
-        private static string NormalizarNombreMandamientos(
-            string texto)
-        {
+        private static string NormalizarNombreMandamientos(string texto){
             if (string.IsNullOrWhiteSpace(texto))
             {
                 return "";
@@ -1555,7 +1961,6 @@ WHERE
             );
         }
 
-
         public List<Tuple<int, int, string, string, string>> GetContactosMunicipios()
         {
             using (var dbFiliacion = new Filiacion_MunicipiosEntities())
@@ -1607,7 +2012,6 @@ WHERE
                 return resultado;
             }
         }
-
 
         public DataTable GetInfoPersonasFiliacion( List<int> idsPersona)
         {
@@ -1763,6 +2167,203 @@ WHERE
 
 
             return tabla;
+        }
+
+        public int GetIdDetenidoRaiz(int idDetenido)
+        {
+            using (var db = new Filiacion_MunicipiosEntities())
+            {
+                var relacion = db.tb_CoincidenciasNormalizadas
+                    .AsNoTracking()
+                    .FirstOrDefault(x => x.DetenidoId == idDetenido);
+
+                if (relacion == null)
+                {
+                    return idDetenido;
+                }
+
+                return Convert.ToInt32(relacion.DetenidoCoincidenciaId);
+            }
+        }
+
+        private Tuple<int, List<int>> ObtenerIdentidadFiliacion(int idReferencia, int idTipoAlerta)
+        {
+            int clavePerso = 0;
+            List<int> idsNomPerso = new List<int>();
+
+            if (idReferencia <= 0)
+            {
+                return Tuple.Create(clavePerso, idsNomPerso);
+            }
+
+            /*
+             * Tipo 2 = Foto
+             * Tipo 3 = Huella
+             *
+             * En estos casos idReferencia YA ES CLAVE_PERSO.
+             */
+            if (idTipoAlerta == 2 || idTipoAlerta == 3)
+            {
+                clavePerso = idReferencia;
+            }
+
+            using (var db = new FiliacionEntities())
+            {
+                string conexion = db.Database.Connection.ConnectionString;
+
+                if (conexion.TrimStart().StartsWith("metadata=", StringComparison.OrdinalIgnoreCase))
+                {
+                    var builder = new EntityConnectionStringBuilder(conexion);
+                    conexion = builder.ProviderConnectionString;
+                }
+
+                using (SqlConnection cn = new SqlConnection(conexion))
+                {
+                    cn.Open();
+
+                    /*
+                     * Tipo 1 = Nombre
+                     *
+                     * idReferencia es Nom_perso.id.
+                     * Primero obtenemos su CLAVE_PERSO.
+                     */
+                    if (idTipoAlerta == 1)
+                    {
+                        using (SqlCommand cmd = new SqlCommand(@"
+SELECT TOP 1
+    CLAVE_PERSO
+FROM dbo.Nom_perso
+WHERE id = @id;", cn))
+                        {
+                            cmd.Parameters.Add("@id", SqlDbType.Int).Value = idReferencia;
+
+                            object resultado = cmd.ExecuteScalar();
+
+                            if (resultado != null && resultado != DBNull.Value)
+                            {
+                                int.TryParse(
+                                    Convert.ToString(resultado),
+                                    out clavePerso
+                                );
+                            }
+                        }
+                    }
+
+                    /*
+                     * Si encontramos CLAVE_PERSO, recuperamos TODOS
+                     * los Nom_perso.id asociados a esa persona.
+                     */
+                    if (clavePerso > 0)
+                    {
+                        using (SqlCommand cmd = new SqlCommand(@"
+SELECT
+    id
+FROM dbo.Nom_perso
+WHERE CLAVE_PERSO = @clavePerso;", cn))
+                        {
+                            cmd.Parameters.Add("@clavePerso", SqlDbType.Int).Value = clavePerso;
+
+                            using (SqlDataReader dr = cmd.ExecuteReader())
+                            {
+                                while (dr.Read())
+                                {
+                                    int idNomPerso = 0;
+
+                                    int.TryParse(
+                                        Convert.ToString(dr["id"]),
+                                        out idNomPerso
+                                    );
+
+                                    if (idNomPerso > 0 &&
+                                        !idsNomPerso.Contains(idNomPerso))
+                                    {
+                                        idsNomPerso.Add(idNomPerso);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            /*
+             * Si por alguna razón no encontramos CLAVE_PERSO,
+             * conservamos el ID recibido para no romper la lógica
+             * anterior de coincidencia por nombre.
+             */
+            if (idTipoAlerta == 1 &&
+                idReferencia > 0 &&
+                !idsNomPerso.Contains(idReferencia))
+            {
+                idsNomPerso.Add(idReferencia);
+            }
+
+            return Tuple.Create(
+                clavePerso,
+                idsNomPerso
+            );
+        }
+
+        private List<tb_Alerta> ObtenerAlertasRelacionadasDetenidosFGEA(Filiacion_MunicipiosEntities db, int idDetenido, int idOrigen, int idTipoAlerta)
+        {
+            if (db == null ||
+                idDetenido <= 0 ||
+                idOrigen <= 0)
+            {
+                return new List<tb_Alerta>();
+            }
+
+            /*
+             * Si por algún motivo llega otro tipo de alerta,
+             * conservamos el comportamiento anterior.
+             */
+            if (idTipoAlerta != 1 &&
+                idTipoAlerta != 2 &&
+                idTipoAlerta != 3)
+            {
+                return db.tb_Alerta
+                    .Where(x =>
+                        x.idDetenidoC5 == idDetenido &&
+                        x.IdTbFuente == 6 &&
+                        x.idPersonaFGEA.HasValue &&
+                        x.idPersonaFGEA.Value == idOrigen)
+                    .ToList();
+            }
+
+            var identidad = ObtenerIdentidadFiliacion(
+                idOrigen,
+                idTipoAlerta
+            );
+
+            int clavePerso = identidad.Item1;
+            List<int> idsNomPerso = identidad.Item2;
+
+            return db.tb_Alerta
+                .Where(x =>
+                    x.idDetenidoC5 == idDetenido &&
+                    x.IdTbFuente == 6 &&
+                    x.idPersonaFGEA.HasValue &&
+                    (
+                        /*
+                         * Tipo 1:
+                         * idPersonaFGEA contiene Nom_perso.id.
+                         */
+                        (
+                            x.idTipoAlerta == 1 &&
+                            idsNomPerso.Contains(x.idPersonaFGEA.Value)
+                        )
+                        ||
+                        /*
+                         * Tipo 2 / 3:
+                         * idPersonaFGEA contiene CLAVE_PERSO.
+                         */
+                        (
+                            (x.idTipoAlerta == 2 || x.idTipoAlerta == 3) &&
+                            clavePerso > 0 &&
+                            x.idPersonaFGEA.Value == clavePerso
+                        )
+                    ))
+                .ToList();
         }
 
     }

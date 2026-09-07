@@ -304,7 +304,7 @@
                                     "\r\n",
                                     "\n",
                                     "\r"
-                                    },
+                                        },
                                 StringSplitOptions
                                     .RemoveEmptyEntries
                             )
@@ -355,7 +355,7 @@
                                     "\r\n",
                                     "\n",
                                     "\r"
-                                    },
+                                        },
                                 StringSplitOptions
                                     .RemoveEmptyEntries
                             )
@@ -399,13 +399,26 @@
                 }
 
 
+                int idTipoAlerta = 0;
+
+                if (row.Table.Columns.Contains("IdTipoAlerta") &&
+                    row["IdTipoAlerta"] != DBNull.Value)
+                {
+                    int.TryParse(
+                        Convert.ToString(
+                            row["IdTipoAlerta"]
+                        ),
+                        out idTipoAlerta
+                    );
+                }
+
                 /* ====================================================
                    COINCIDENCIAS
                    FUENTE 3 = PERSONA DE INTERÉS
                    ==================================================== */
 
                 System.Collections.ArrayList coincidenciasAlerta =
-                    new System.Collections.ArrayList();
+                new System.Collections.ArrayList();
 
 
                 if (obtenerCoincidencias != null &&
@@ -416,11 +429,11 @@
                             new int[]
                             {
                                 idPersona
-                                },
+                                    },
                             new int[]
                             {
                                 3
-                                }
+                                    }
                         );
 
 
@@ -588,7 +601,8 @@
                                                         class="sic-btn-confirmar-identidad js-confirmar-identidad-normal"
                                                         data-id-detenido="@idDetenidoC5"
                                                         data-id-origen="@idPersona"
-                                                        data-id-fuente="3">
+                                                        data-id-fuente="3"
+                                                        data-id-tipo-alerta="@idTipoAlerta">
 
                                                     <i class="fa fa-check"></i>
 
@@ -601,7 +615,8 @@
                                                         class="sic-btn-warning-soft sic-btn-descartar-alerta"
                                                         data-id-detenido="@idDetenidoC5"
                                                         data-id-origen="@idPersona"
-                                                        data-id-fuente="3">
+                                                        data-id-fuente="3"
+                                                        data-id-tipo-alerta="@idTipoAlerta">
 
                                                     <i class="fa fa-times"></i>
 
@@ -627,7 +642,8 @@
                                                         data-estatus-anterior="2"
                                                         data-id-detenido="@idDetenidoC5"
                                                         data-id-origen="@idPersona"
-                                                        data-id-fuente="3">
+                                                        data-id-fuente="3"
+                                                        data-id-tipo-alerta="@idTipoAlerta">
 
                                                     <i class="fa fa-undo"></i>
 
@@ -653,7 +669,8 @@
                                                         data-estatus-anterior="0"
                                                         data-id-detenido="@idDetenidoC5"
                                                         data-id-origen="@idPersona"
-                                                        data-id-fuente="3">
+                                                        data-id-fuente="3"
+                                                        data-id-tipo-alerta="@idTipoAlerta">
 
                                                     <i class="fa fa-undo"></i>
 
@@ -678,9 +695,9 @@
                                         <div class="sic-modal-det-coincidencias">
 
                                             @Html.Partial(
-                                                "~/Views/SIC/DetalleDetenidoC5/CoincidenciasAlertaPartial.cshtml",
-                                                coincidenciasAlerta
-                                            )
+                                                     "~/Views/SIC/DetalleDetenidoC5/CoincidenciasAlertaPartial.cshtml",
+                                                     coincidenciasAlerta
+                                                 )
 
                                         </div>
                                     }
@@ -769,8 +786,8 @@
                                     sic-pi-listas-inferiores">
 
                                     <!-- =================================
-    PERIODOS DE BÚSQUEDA
-    ================================= -->
+                                    PERIODOS DE BÚSQUEDA
+                                    ================================= -->
 
                                     <div class="
       sic-modal-det-lista-box
@@ -842,8 +859,8 @@
 
 
                                     <!-- =================================
-         ALIAS
-         ================================= -->
+                                    ALIAS
+                                    ================================= -->
 
                                     <div class="sic-modal-det-lista-box">
 
@@ -900,7 +917,6 @@
                                 <!-- =====================================
                                      OBSERVACIONES
                                      ===================================== -->
-
                                 <!--<div class="sic-pi-observaciones">
 
                                     <div class="sic-info-label">
@@ -922,66 +938,39 @@
 
 
 
-                    <!-- ================================================
-                         CONTROLES DEL CARRUSEL
-                         ================================================ -->
-
-                    @if (personasInteres.Rows.Count > 1)
-                    {
-                        <div class="
-                            sic-rel-carousel-footer
-                            sic-persona-interes-carousel-footer">
-
-
-                            <!-- ANTERIOR -->
-
-                            <button type="button"
-                                    class="
-                                        sic-rel-nav
-                                        sic-persona-interes-prev"
-                                    title="Anterior">
-
-                                <i class="fa fa-chevron-left"></i>
-
-                            </button>
-
-
-
-                            <!-- CONTADOR -->
-
-                            <span class="sic-rel-counter">
-
-                                <span class="sic-persona-interes-current">
-                                    @(i + 1)
-                                </span>
-
-                                /
-
-                                @personasInteres.Rows.Count
-
-                            </span>
-
-
-
-                            <!-- SIGUIENTE -->
-
-                            <button type="button"
-                                    class="
-                                        sic-rel-nav
-                                        sic-persona-interes-next"
-                                    title="Siguiente">
-
-                                <i class="fa fa-chevron-right"></i>
-
-                            </button>
-
-                        </div>
-                    }
 
                 </div>
             }
 
         </div>
+
+
+        @if (personasInteres.Rows.Count > 1)
+        {
+            <!-- =====================================================
+                 NAVEGACIÓN FLOTANTE DEL CARRUSEL
+                 ===================================================== -->
+            <button type="button"
+                    class="sic-rel-nav-flotante sic-rel-prev-flotante sic-persona-interes-prev"
+                    title="Persona anterior"
+                    aria-label="Persona anterior">
+                <i class="fa fa-chevron-left"></i>
+            </button>
+
+            <button type="button"
+                    class="sic-rel-nav-flotante sic-rel-next-flotante sic-persona-interes-next"
+                    title="Siguiente persona"
+                    aria-label="Siguiente persona">
+                <i class="fa fa-chevron-right"></i>
+            </button>
+
+            <!-- CONTADOR FLOTANTE SUPERIOR -->
+            <div class="sic-rel-counter-superior" aria-live="polite">
+                <span class="sic-persona-interes-current">1</span>
+                <span class="sic-rel-counter-separator">/</span>
+                <span>@personasInteres.Rows.Count</span>
+            </div>
+        }
 
     </div>
 }

@@ -36,5 +36,10 @@ namespace Objetivos_Prioritarios.Models
         public string Folio { get; set; }
         public string Situacion { get; set; }
         public string Telefono { get; set; }
+        public string Estatus { get; set; }
+        public Nullable<System.DateTime> FechaRegistro { get; set; }
+        public string UsuarioRegistro { get; set; }
+        public string RFC { get; set; }
+        public string CURP { get; set; }
     }
 }

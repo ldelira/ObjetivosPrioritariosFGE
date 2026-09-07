@@ -22,6 +22,7 @@ namespace Objetivos_Prioritarios.Models
         public Nullable<int> Estatus { get; set; }
         public Nullable<int> idDetenidoC5 { get; set; }
         public Nullable<int> Porcentaje { get; set; }
+        public Nullable<System.DateTime> FechaModificacion { get; set; }
     
         public virtual cat_EstatusAlerta cat_EstatusAlerta { get; set; }
         public virtual cat_TbFuente cat_TbFuente { get; set; }

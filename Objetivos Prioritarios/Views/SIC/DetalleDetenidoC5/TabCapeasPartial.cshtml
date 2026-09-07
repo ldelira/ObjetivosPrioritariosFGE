@@ -53,9 +53,11 @@
                 int porcentajeAlertaCapea =
                     datosAlertaCapea.Item3;
 
+                int idTipoAlertaCapea =
+    datosAlertaCapea.Item4;
 
                 string nombreTipoAlertaCapea =
-                    datosAlertaCapea.Item5;
+                datosAlertaCapea.Item5;
 
                 string porcentajeAlertaCapeaTexto =
                     porcentajeAlertaCapea > 0
@@ -97,22 +99,6 @@
                                 }
                             </div>
 
-                            @if (capeas.Count > 1)
-                            {
-                                <div class="sic-rel-carousel-footer">
-                                    <button type="button" class="sic-rel-nav sic-capea-prev">
-                                        <i class="fa fa-chevron-left"></i>
-                                    </button>
-
-                                    <span class="sic-rel-counter">
-                                        <span class="sic-capea-current">@(i + 1)</span> / @capeas.Count
-                                    </span>
-
-                                    <button type="button" class="sic-rel-nav sic-capea-next">
-                                        <i class="fa fa-chevron-right"></i>
-                                    </button>
-                                </div>
-                            }
 
                         </div>
 
@@ -134,7 +120,8 @@
                                                     class="sic-btn-confirmar-identidad js-confirmar-identidad-normal"
                                                     data-id-detenido="@idDetenidoC5"
                                                     data-id-origen="@idOrigenCapea"
-                                                    data-id-fuente="@idFuenteAlertaCapea">
+                                                    data-id-fuente="@idFuenteAlertaCapea"
+                                                    data-id-tipo-alerta="@idTipoAlertaCapea">
                                                 <i class="fa fa-check"></i>
                                                 Confirmar identidad
                                             </button>
@@ -143,7 +130,8 @@
                                                     class="sic-btn-warning-soft sic-btn-descartar-alerta"
                                                     data-id-detenido="@idDetenidoC5"
                                                     data-id-origen="@idOrigenCapea"
-                                                    data-id-fuente="@idFuenteAlertaCapea">
+                                                    data-id-fuente="@idFuenteAlertaCapea"
+                                                    data-id-tipo-alerta="@idTipoAlertaCapea">
                                                 <i class="fa fa-times"></i>
                                                 Descartar
                                             </button>
@@ -154,7 +142,8 @@
                                                     class="sic-btn-resguardo-disponible js-confirmar-resguardo-fgea"
                                                     data-id-detenido="@idDetenidoC5"
                                                     data-id-origen="@idOrigenCapea"
-                                                    data-id-fuente="2">
+                                                    data-id-fuente="@idFuenteAlertaCapea"
+                                                    data-id-tipo-alerta="@idTipoAlertaCapea">
 
                                                 <i class="fa fa-shield"></i>
                                                 Confirmar Resguardo FGEA
@@ -166,7 +155,8 @@
                                                     data-estatus-anterior="2"
                                                     data-id-detenido="@idDetenidoC5"
                                                     data-id-origen="@idOrigenCapea"
-                                                    data-id-fuente="2">
+                                                    data-id-fuente="@idFuenteAlertaCapea"
+                                                    data-id-tipo-alerta="@idTipoAlertaCapea">
 
                                                 <i class="fa fa-undo"></i>
                                                 Cancelar Confirmación
@@ -188,7 +178,8 @@
                                                     class="sic-btn-cancelar-resguardo js-cancelar-resguardo-fgea"
                                                     data-id-detenido="@idDetenidoC5"
                                                     data-id-origen="@idOrigenCapea"
-                                                    data-id-fuente="2">
+                                                    data-id-fuente="@idFuenteAlertaCapea"
+                                                    data-id-tipo-alerta="@idTipoAlertaCapea">
 
                                                 <i class="fa fa-undo"></i>
                                                 Cancelar Resguardo
@@ -209,7 +200,8 @@
                                                     data-estatus-anterior="0"
                                                     data-id-detenido="@idDetenidoC5"
                                                     data-id-origen="@idOrigenCapea"
-                                                    data-id-fuente="@idFuenteAlertaCapea">
+                                                    data-id-fuente="@idFuenteAlertaCapea"
+                                                    data-id-tipo-alerta="@idTipoAlertaCapea">
                                                 <i class="fa fa-undo"></i>
                                                 Cancelar Confirmación
                                             </button>
@@ -279,6 +271,34 @@
             }
 
         </div>
+
+
+        @if (capeas.Count > 1)
+        {
+            <!-- =====================================================
+                 NAVEGACIÓN FLOTANTE DEL CARRUSEL
+                 ===================================================== -->
+            <button type="button"
+                    class="sic-rel-nav-flotante sic-rel-prev-flotante sic-capea-prev"
+                    title="Boletín anterior"
+                    aria-label="Boletín anterior">
+                <i class="fa fa-chevron-left"></i>
+            </button>
+
+            <button type="button"
+                    class="sic-rel-nav-flotante sic-rel-next-flotante sic-capea-next"
+                    title="Siguiente boletín"
+                    aria-label="Siguiente boletín">
+                <i class="fa fa-chevron-right"></i>
+            </button>
+
+            <!-- CONTADOR FLOTANTE SUPERIOR -->
+            <div class="sic-rel-counter-superior" aria-live="polite">
+                <span class="sic-capea-current">1</span>
+                <span class="sic-rel-counter-separator">/</span>
+                <span>@capeas.Count</span>
+            </div>
+        }
 
     </div>
 }

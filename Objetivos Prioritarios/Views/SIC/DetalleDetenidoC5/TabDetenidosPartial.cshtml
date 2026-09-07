@@ -11,7 +11,14 @@
         ViewBag.IdDetenidoC5 == null
             ? 0
             : Convert.ToInt32(ViewBag.IdDetenidoC5);
+    string rutaCss = Server.MapPath("~/Content/SIC/busqueda-coincidencias.css");
+    long versionCss = System.IO.File.GetLastWriteTimeUtc(rutaCss).Ticks;
 }
+
+<link href="@Url.Content("~/Content/SIC/busqueda-coincidencias.css")?v=@versionCss"
+      rel="stylesheet"
+      type="text/css" />
+
 
 
 @if (detenidos.Rows.Count > 0)
@@ -34,22 +41,21 @@
                 System.Data.DataRow row =
                     detenidos.Rows[i];
 
-
                 /* ==================================================
-                   IDS NOM_PERSO QUE ORIGINARON LA ALERTA
-                   ================================================== */
+    IDS NOM_PERSO DE LA PERSONA CONSOLIDADA
+    ================================================== */
 
                 var idsOrigenDetenidoCoincidencias =
                     new List<int>();
 
                 if (
-                    row.Table.Columns.Contains("IdsNomPersoOrigenAlerta") &&
-                    row["IdsNomPersoOrigenAlerta"] != DBNull.Value
+                    row.Table.Columns.Contains("IdsNomPerso") &&
+                    row["IdsNomPerso"] != DBNull.Value
                 )
                 {
                     string idsTexto =
                         Convert.ToString(
-                            row["IdsNomPersoOrigenAlerta"]
+                            row["IdsNomPerso"]
                         );
 
                     if (!string.IsNullOrWhiteSpace(idsTexto))
@@ -85,14 +91,48 @@
 
 
                 /* ==================================================
-                   COINCIDENCIAS GENERALES DEL DETENIDO
+                   CLAVE_PERSO DE LA PERSONA CONSOLIDADA
+                   ================================================== */
+
+                int clavePersoDetenido = 0;
+
+                if (
+                    row.Table.Columns.Contains("CLAVE_PERSO") &&
+                    row["CLAVE_PERSO"] != DBNull.Value
+                )
+                {
+                    int.TryParse(
+                        Convert.ToString(
+                            row["CLAVE_PERSO"]
+                        ),
+                        out clavePersoDetenido
+                    );
+                }
+
+
+                /* ==================================================
+                   TODAS LAS COINCIDENCIAS DEL DETENIDO
+
+                   Tipo 1 = Nom_perso.id
+                   Tipo 2 = CLAVE_PERSO
+                   Tipo 3 = CLAVE_PERSO
                    ================================================== */
 
                 System.Collections.ArrayList coincidenciasAlertaDetenido =
-                    ViewBag.ObtenerCoincidenciasAlerta(
-                        idsOrigenDetenidoCoincidencias.ToArray(),
-                        new int[] { 6 }
-                    ) as System.Collections.ArrayList;
+                    new System.Collections.ArrayList();
+
+                var obtenerCoincidenciasAlertaDetenido =
+                    ViewBag.ObtenerCoincidenciasAlertaDetenido
+                    as Func<int[], int, System.Collections.ArrayList>;
+
+                if (obtenerCoincidenciasAlertaDetenido != null)
+                {
+                    coincidenciasAlertaDetenido =
+                        obtenerCoincidenciasAlertaDetenido(
+                            idsOrigenDetenidoCoincidencias.ToArray(),
+                            clavePersoDetenido
+                        );
+                }
 
                 if (coincidenciasAlertaDetenido == null)
                 {
@@ -102,8 +142,8 @@
 
 
                 /* ==================================================
-                   COINCIDENCIAS POR NOMBRE / NOM_PERSO
-                   ================================================== */
+    COINCIDENCIAS POR NOMBRE / NOM_PERSO
+    ================================================== */
 
                 var coincidenciasNombrePorId =
                     new Dictionary<int, object[]>();
@@ -127,21 +167,115 @@
                         continue;
                     }
 
-                    object[] datosCoincidencia =
-                        coincidenciaIndividual[0] as object[];
+                    object[] datosCoincidenciaNombre = null;
 
-                    if (
-                        datosCoincidencia == null ||
-                        datosCoincidencia.Length < 5
-                    )
+                    foreach (object elementoCoincidencia in coincidenciaIndividual)
                     {
-                        continue;
+                        object[] datosCoincidencia =
+                            elementoCoincidencia as object[];
+
+                        if (
+                            datosCoincidencia == null ||
+                            datosCoincidencia.Length < 5
+                        )
+                        {
+                            continue;
+                        }
+
+                        int idTipoAlerta = 0;
+
+                        int.TryParse(
+                            Convert.ToString(
+                                datosCoincidencia[3]
+                            ),
+                            out idTipoAlerta
+                        );
+
+                        if (idTipoAlerta == 1)
+                        {
+                            datosCoincidenciaNombre =
+                                datosCoincidencia;
+
+                            break;
+                        }
                     }
 
-                    coincidenciasNombrePorId[idNombre] =
-                        datosCoincidencia;
+                    if (datosCoincidenciaNombre != null)
+                    {
+                        coincidenciasNombrePorId[idNombre] =
+                            datosCoincidenciaNombre;
+                    }
                 }
 
+                /* ==================================================
+    IDENTIFICADOR QUE SE ENVIARÁ AL CONFIRMAR
+
+    Tipo 1 = Nom_perso.id
+    Tipo 2 = CLAVE_PERSO
+    Tipo 3 = CLAVE_PERSO
+    ================================================== */
+
+                int idTipoAlertaAccionDetenido = 0;
+
+                if (row.Table.Columns.Contains("IdTipoAlerta") &&
+                    row["IdTipoAlerta"] != DBNull.Value)
+                {
+                    int.TryParse(
+                        Convert.ToString(row["IdTipoAlerta"]),
+                        out idTipoAlertaAccionDetenido
+                    );
+                }
+
+                int idOrigenAccionDetenido = 0;
+
+                if ((idTipoAlertaAccionDetenido == 2 ||
+                     idTipoAlertaAccionDetenido == 3) &&
+                    clavePersoDetenido > 0)
+                {
+                    /*
+                     * Foto / Huella:
+                     * mandamos CLAVE_PERSO.
+                     */
+                    idOrigenAccionDetenido =
+                        clavePersoDetenido;
+                }
+                else if (idTipoAlertaAccionDetenido == 1 &&
+                         idsOrigenDetenidoCoincidencias.Count > 0)
+                {
+                    /*
+                     * Nombre:
+                     * mandamos cualquier Nom_perso.id de esta persona.
+                     *
+                     * El servicio obtiene después la CLAVE_PERSO
+                     * y todos los demás Nom_perso.id.
+                     */
+                    idOrigenAccionDetenido =
+                        idsOrigenDetenidoCoincidencias[0];
+                }
+                else if (idsOrigenDetenidoCoincidencias.Count > 0)
+                {
+                    /*
+                     * Respaldo:
+                     * si no se pudo determinar el tipo,
+                     * usamos Nom_perso.id.
+                     */
+                    idOrigenAccionDetenido =
+                        idsOrigenDetenidoCoincidencias[0];
+
+                    idTipoAlertaAccionDetenido = 1;
+                }
+                else if (clavePersoDetenido > 0)
+                {
+                    /*
+                     * Último respaldo:
+                     * si solamente tenemos CLAVE_PERSO,
+                     * la mandamos como Tipo 2.
+                     */
+                    idOrigenAccionDetenido =
+                        clavePersoDetenido;
+
+                    idTipoAlertaAccionDetenido = 2;
+                }
 
                 <!-- =================================================
                      SLIDE INDIVIDUAL DEL DETENIDO
@@ -150,7 +284,9 @@
                      Debe permanecer DENTRO del tab Detenidos.
                      ================================================= -->
                 <div class="sic-rel-slide sic-detenido-slide @(i == 0 ? "active" : "")"
-                     data-index="@i">
+                     data-index="@i"
+                     data-id-origen-accion="@idOrigenAccionDetenido"
+                     data-id-tipo-alerta-accion="@idTipoAlertaAccionDetenido">
 
                     @{
                         var viewDataDetenido =
@@ -176,13 +312,13 @@
 
 
                     <!-- =============================================
-                         FICHA REUTILIZABLE DEL DETENIDO
-                         ============================================= -->
+                    FICHA REUTILIZABLE DEL DETENIDO
+                    ============================================= -->
                     @Html.Partial(
-                        "~/Views/SIC/DetalleDetenidoC5/DetenidoObjetivoPartial.cshtml",
-                        row,
-                        viewDataDetenido
-                    )
+                                            "~/Views/SIC/DetalleDetenidoC5/DetenidoObjetivoPartial.cshtml",
+                                            row,
+                                            viewDataDetenido
+                                        )
 
                 </div>
             }
@@ -193,42 +329,27 @@
         @if (detenidos.Rows.Count > 1)
         {
             <!-- =====================================================
-                 NAVEGACIÓN DEL CARRUSEL
+                 NAVEGACIÓN FLOTANTE DEL CARRUSEL
                  ===================================================== -->
-            <div class="sic-rel-carousel-footer sic-detenidos-carousel-footer">
+            <button type="button"
+                    class="sic-detenidos-nav-flotante sic-detenidos-prev"
+                    title="Detenido anterior"
+                    aria-label="Detenido anterior">
+                <i class="fa fa-chevron-left"></i>
+            </button>
 
-                <button type="button"
-                        class="sic-rel-nav sic-detenidos-prev"
-                        title="Detenido anterior">
+            <button type="button"
+                    class="sic-detenidos-nav-flotante sic-detenidos-next"
+                    title="Siguiente detenido"
+                    aria-label="Siguiente detenido">
+                <i class="fa fa-chevron-right"></i>
+            </button>
 
-                    <i class="fa fa-chevron-left"></i>
-
-                </button>
-
-
-                <span class="sic-rel-counter">
-
-                    <span class="sic-detenidos-current">
-                        1
-                    </span>
-
-                    /
-
-                    <span>
-                        @detenidos.Rows.Count
-                    </span>
-
-                </span>
-
-
-                <button type="button"
-                        class="sic-rel-nav sic-detenidos-next"
-                        title="Siguiente detenido">
-
-                    <i class="fa fa-chevron-right"></i>
-
-                </button>
-
+            <!-- CONTADOR FLOTANTE SUPERIOR -->
+            <div class="sic-detenidos-counter-superior" aria-live="polite">
+                <span class="sic-detenidos-current">1</span>
+                <span class="sic-detenidos-counter-separator">/</span>
+                <span>@detenidos.Rows.Count</span>
             </div>
         }
 

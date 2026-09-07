@@ -1,4 +1,7 @@
-﻿@model Objetivos_Prioritarios.Models.sp_BuscarDetenido_Result
+﻿
+@model Objetivos_Prioritarios.Models.sp_BuscarDetenido_Result
+@using System.Linq
+@using System.Collections.Generic
 
 @{
     ViewBag.Title = "Ficha del detenido en Municipio / Sistema de Identificación Criminal";
@@ -13,7 +16,6 @@
     string idDetenido = Convert.ToString(Model.IDDETENIDO);
     string idDetencion = Convert.ToString(Model.IDDETENCION);
     string edad = Convert.ToString(Model.EDAD);
-
     string totalFotos = Convert.ToString(Model.TotalFotos);
     string totalHuellas = Convert.ToString(Model.TotalHuellas);
     string totalAlertas = Convert.ToString(Model.TotalRegistroAlertas);
@@ -22,7 +24,6 @@
     idDetenido = string.IsNullOrWhiteSpace(idDetenido) ? "SIN INFORMACIÓN" : idDetenido;
     idDetencion = string.IsNullOrWhiteSpace(idDetencion) ? "SIN INFORMACIÓN" : idDetencion;
     edad = string.IsNullOrWhiteSpace(edad) ? "SIN INFORMACIÓN" : edad;
-
     totalFotos = string.IsNullOrWhiteSpace(totalFotos) ? "0" : totalFotos;
     totalHuellas = string.IsNullOrWhiteSpace(totalHuellas) ? "0" : totalHuellas;
     totalAlertas = string.IsNullOrWhiteSpace(totalAlertas) ? "0" : totalAlertas;
@@ -33,75 +34,72 @@
     string fuente = "SIC / C5";
     string tipoAlerta = "Coincidencia activa";
     string estatus = "Coincidencia pendiente";
-
     string lugarDetencion = municipioDetencion;
     string fechaDetencion = "SIN INFORMACIÓN";
     string horaDetencion = "SIN INFORMACIÓN";
     string anio = "SIN INFORMACIÓN";
-
     string hecho = "SIN INFORMACIÓN";
     string causa = "SIN INFORMACIÓN";
     string aseguramiento = "SIN INFORMACIÓN";
-
     string latitud = "";
     string longitud = "";
 
-    var capeas = ViewBag.Capeas as System.Collections.Generic.List<Objetivos_Prioritarios.Models.Capea_boletin_busqueda>
-             ?? new System.Collections.Generic.List<Objetivos_Prioritarios.Models.Capea_boletin_busqueda>();
-
-    int totalPersonasInteres = ViewBag.PersonasInteres == null ? 0  : ((System.Data.DataTable)ViewBag.PersonasInteres).Rows.Count;
-
-    var mandamientos = ViewBag.Mandamientos as System.Data.DataTable
-?? new System.Data.DataTable();
-
-    var objetivosPrioritarios = ViewBag.ObjetivosPrioritarios as System.Data.DataTable
-    ?? new System.Data.DataTable();
-
-    var detenidos = ViewBag.Detenidos as System.Data.DataTable
-        ?? new System.Data.DataTable();
+    var capeas = ViewBag.Capeas as List<Objetivos_Prioritarios.Models.Capea_boletin_busqueda> ?? new List<Objetivos_Prioritarios.Models.Capea_boletin_busqueda>();
+    int totalPersonasInteres = ViewBag.PersonasInteres == null ? 0 : ((System.Data.DataTable)ViewBag.PersonasInteres).Rows.Count;
+    var mandamientos = ViewBag.Mandamientos as System.Data.DataTable ?? new System.Data.DataTable();
+    var objetivosPrioritarios = ViewBag.ObjetivosPrioritarios as System.Data.DataTable ?? new System.Data.DataTable();
+    var detenidos = ViewBag.Detenidos as System.Data.DataTable ?? new System.Data.DataTable();
 
     int fuenteCapea = ViewBag.FuenteCapea == null ? 0 : Convert.ToInt32(ViewBag.FuenteCapea);
-    var detencionC5 = ViewBag.DetencionC5 as Objetivos_Prioritarios.Models.tb_DETENCION_C5;
+
+    var detencionesC5 = ViewBag.DetencionC5 as List<Objetivos_Prioritarios.Models.tb_DETENCION_C5> ?? new List<Objetivos_Prioritarios.Models.tb_DETENCION_C5>();
+    var detencionC5 = detencionesC5.Count > 0 ? detencionesC5[0] : null;
+    int totalDetenciones = detencionesC5.Count;
+    var idsRelacionadosHero = ViewBag.idsrelacionados as List<int> ?? new List<int>();
+
     var datosDetenidoC5 = ViewBag.DatosDetenidoC5 as Objetivos_Prioritarios.Models.tb_DETENIDO_C5;
+    var fotosC5 = ViewBag.FotosC5 as List<Objetivos_Prioritarios.Models.tb_FOTO_C5> ?? new List<Objetivos_Prioritarios.Models.tb_FOTO_C5>();
+    var huellasC5 = ViewBag.HuellasC5 as List<Objetivos_Prioritarios.Models.tb_HUELLA_C5> ?? new List<Objetivos_Prioritarios.Models.tb_HUELLA_C5>();
+    var rasgosC5 = ViewBag.RasgosC5 as List<Objetivos_Prioritarios.Models.tb_FOTO_C5> ?? new List<Objetivos_Prioritarios.Models.tb_FOTO_C5>();
+    var alertasTipo = ViewBag.AlertasTipo as List<Tuple<int, int, int, int, int, string>> ?? new List<Tuple<int, int, int, int, int, string>>();
+    var alertasPersonaInteres = ViewBag.AlertasPersonaInteres as List<Tuple<int, int, int, int, int, string>> ?? new List<Tuple<int, int, int, int, int, string>>();
 
-    var fotosC5 = ViewBag.FotosC5 as System.Collections.Generic.List<Objetivos_Prioritarios.Models.tb_FOTO_C5>
-              ?? new System.Collections.Generic.List<Objetivos_Prioritarios.Models.tb_FOTO_C5>();
+    int totalAlertasActivas = ViewBag.TotalAlertasActivas == null ? 0 : Convert.ToInt32(ViewBag.TotalAlertasActivas);
+    int totalAlertasRevisadas = ViewBag.TotalAlertasRevisadas == null ? 0 : Convert.ToInt32(ViewBag.TotalAlertasRevisadas);
+    int totalCoincidenciasConfirmadas = ViewBag.TotalCoincidenciasConfirmadas == null ? 0 : Convert.ToInt32(ViewBag.TotalCoincidenciasConfirmadas);
 
-    var huellasC5 = ViewBag.HuellasC5 as System.Collections.Generic.List<Objetivos_Prioritarios.Models.tb_HUELLA_C5>
-                ?? new System.Collections.Generic.List<Objetivos_Prioritarios.Models.tb_HUELLA_C5>();
+    var tiposAlertas = ViewBag.TiposAlertas as List<Tuple<int, int>> ?? new List<Tuple<int, int>>();
+    var detenidosMunicipios = ViewBag.DetenidosMunicipios as System.Data.DataTable;
+    int totalDetenidosMunicipios = detenidosMunicipios != null ? detenidosMunicipios.Rows.Count : 0;
 
-    var rasgosC5 = ViewBag.RasgosC5 as System.Collections.Generic.List<Objetivos_Prioritarios.Models.tb_FOTO_C5>
-               ?? new System.Collections.Generic.List<Objetivos_Prioritarios.Models.tb_FOTO_C5>();
-
-    var alertasTipo = ViewBag.AlertasTipo as System.Collections.Generic.List<System.Tuple<int, int, int, int, int, string>>
-               ?? new System.Collections.Generic.List<System.Tuple<int, int, int, int, int, string>>();
-
-    var alertasPersonaInteres = ViewBag.AlertasPersonaInteres as System.Collections.Generic.List<System.Tuple<int, int, int, int, int, string>>
-               ?? new System.Collections.Generic.List<System.Tuple<int, int, int, int, int, string>>();
-
-    int totalAlertasActivas = ViewBag.TotalAlertasActivas == null
-? 0
-: Convert.ToInt32(ViewBag.TotalAlertasActivas);
-
-    int totalAlertasRevisadas = ViewBag.TotalAlertasRevisadas == null
-        ? 0
-        : Convert.ToInt32(ViewBag.TotalAlertasRevisadas);
-
-    int totalCoincidenciasConfirmadas =
-    ViewBag.TotalCoincidenciasConfirmadas == null
-        ? 0
-        : Convert.ToInt32(ViewBag.TotalCoincidenciasConfirmadas);
-
-    var tiposAlertas = ViewBag.TiposAlertas as System.Collections.Generic.List<System.Tuple<int, int>>
-           ?? new System.Collections.Generic.List<System.Tuple<int, int>>();
-
-    // Datos compartidos con las vistas parciales.
     ViewBag.IdDetenidoC5 = Model.IDDETENIDO;
     ViewBag.TotalRegistrosDetenidoVista = totalRegistrosDetenido;
 
+    Func<int[], int, string> ObtenerClaseTab = (fuentes, totalRegistros) =>
+    {
+        if (totalRegistros == 0) return "sic-tab-sin-registros";
+
+        var estatusTab = alertasTipo.Where(x => fuentes.Contains(x.Item2)).Select(x => x.Item3).ToList();
+
+        if (estatusTab.Any(x => x == 2 || x == 3)) return "sic-tab-confirmado";
+        if (estatusTab.Count > 0 && estatusTab.All(x => x == 0)) return "sic-tab-descartado";
+
+        return "";
+    };
+
+    string claseCapea = ObtenerClaseTab(new int[] { 2, 7, 8 }, capeas.Count);
+    string clasePersonaInteres = ObtenerClaseTab(new int[] { 3 }, totalPersonasInteres);
+    string claseMandamientos = ObtenerClaseTab(new int[] { 4 }, mandamientos.Rows.Count);
+    string claseObjetivos = ObtenerClaseTab(new int[] { 5 }, objetivosPrioritarios.Rows.Count);
+    string claseDetenidos = ObtenerClaseTab(new int[] { 6 }, detenidos.Rows.Count);
+    string claseDetenidosMunicipios = ObtenerClaseTab(new int[] { 1 }, totalDetenidosMunicipios);
+}
+@{
+    string rutaCss = Server.MapPath("~/Content/SIC/busqueda-coincidencias.css");
+    long versionCss = System.IO.File.GetLastWriteTimeUtc(rutaCss).Ticks;
 }
 
-<link href="@Url.Content("~/Content/SIC/busqueda-coincidencias.css")?v=20260813-1905"
+<link href="@Url.Content("~/Content/SIC/busqueda-coincidencias.css")?v=@versionCss"
       rel="stylesheet"
       type="text/css" />
 
@@ -213,6 +211,22 @@
                         Folio: @folio
                     </span>
 
+                    @if (datosDetenidoC5 != null && !string.IsNullOrWhiteSpace(datosDetenidoC5.CURP))
+                    {
+                        <span class="sic-pill">
+                            <i class="fa fa-id-card"></i>
+                            CURP: @datosDetenidoC5.CURP
+                        </span>
+                    }
+
+                    @if (datosDetenidoC5 != null && !string.IsNullOrWhiteSpace(datosDetenidoC5.RFC))
+                    {
+                        <span class="sic-pill">
+                            <i class="fa fa-file-text"></i>
+                            RFC: @datosDetenidoC5.RFC
+                        </span>
+                    }
+
 
                 </div>
 
@@ -233,8 +247,14 @@
                         </div>
                         <div>
                             <label>Falta administrativa</label>
-                            <strong>
-                                @(detencionC5 == null || string.IsNullOrWhiteSpace(Convert.ToString(detencionC5.CAUSA)) ? "SIN INFORMACIÓN"  : Convert.ToString(detencionC5.CAUSA).Trim())
+                            @{
+                                string fueroDescripcion = detencionC5 == null ? "" : Convert.ToString(detencionC5.FueroDescripcion).Trim();
+                                string fueroTexto = string.IsNullOrWhiteSpace(fueroDescripcion) ? "SIN INFORMACIÓN" : (fueroDescripcion.Length > 100 ? fueroDescripcion.Substring(0, 100) + "..." : fueroDescripcion);
+                                string fueroTitle = string.IsNullOrWhiteSpace(fueroDescripcion) ? "SIN INFORMACIÓN" : fueroDescripcion;
+                            }
+
+                            <strong title="@fueroTitle">
+                                @fueroTexto
                             </strong>
                         </div>
                     </div>
@@ -412,6 +432,28 @@
                     </div>
                 </div>
 
+
+            </div>
+
+            <div class="sic-hero-ids-relacionados">
+                <span class="sic-hero-ids-label">
+                    <i class="fa fa-link"></i>
+                    IDs relacionados
+                </span>
+
+                <div class="sic-hero-ids-lista">
+                    @if (idsRelacionadosHero.Count > 0)
+                    {
+                        foreach (var idRelacionado in idsRelacionadosHero)
+                        {
+                            <span class="sic-hero-id">@idRelacionado</span>
+                        }
+                    }
+                    else
+                    {
+                        <span class="sic-hero-id-vacio">SIN REGISTROS RELACIONADOS</span>
+                    }
+                </div>
             </div>
 
         </div>
@@ -427,119 +469,182 @@
 
             <div class="sic-card-body">
 
-                <div class="sic-source-tabs">
+                <div class="sic-source-tabs sic-source-tabs-compact">
 
-                    <button type="button"
-                            class="sic-source-tab active"
-                            data-tab="tab-capea">
+                    <button type="button" class="sic-source-tab sic-source-tab-compact active @claseCapea" data-tab="tab-capea">
+
                         <i class="fa fa-search"></i>
-                        FEMDLP (@capeas.Count)
+
+                        <span class="sic-tab-compact-name">
+                            FEMDLP
+                        </span>
+
+                        <span class="sic-tab-compact-count">
+                            (@capeas.Count)
+                        </span>
+
                     </button>
 
-                    <button type="button"
-                            class="sic-source-tab"
+                    <button type="button" class="sic-source-tab sic-source-tab-compact @clasePersonaInteres"
                             data-tab="tab-persona-interes">
-                        <i class="fa fa-user-circle"></i>
-                        Persona Interés (@totalPersonasInteres)
+
+                        <i class="bi bi-person-bounding-box"></i>
+
+                        <span class="sic-tab-compact-name">Persona Interés</span>
+
+                        <span class="sic-tab-compact-count">
+                            (@totalPersonasInteres)
+                        </span>
+
                     </button>
 
                     <button type="button"
-                            class="sic-source-tab"
+                            class="sic-source-tab sic-source-tab-compact @claseMandamientos"
                             data-tab="tab-mandamientos">
+
                         <i class="fa fa-gavel"></i>
-                        Mandamientos Judiciales
-                        (@(mandamientos != null ? mandamientos.Rows.Count : 0))
+
+                        <span class="sic-tab-compact-name">
+                            Mandamientos Judiciales
+                        </span>
+
+                        <span class="sic-tab-compact-count">
+                            (@(mandamientos != null ? mandamientos.Rows.Count : 0))
+                        </span>
+
                     </button>
 
                     <button type="button"
-                            class="sic-source-tab"
+                            class="sic-source-tab sic-source-tab-compact @claseObjetivos"
                             data-tab="tab-objetivos">
+
                         <i class="fa fa-crosshairs"></i>
-                        Objetivos Prioritarios
-                        (@(objetivosPrioritarios != null ? objetivosPrioritarios.Rows.Count : 0))
+
+                        <span class="sic-tab-compact-name">
+                            Objetivos Prioritarios
+                        </span>
+
+                        <span class="sic-tab-compact-count">
+                            (@(objetivosPrioritarios != null ? objetivosPrioritarios.Rows.Count : 0))
+                        </span>
+
                     </button>
 
                     <button type="button"
-                            class="sic-source-tab"
+                            class="sic-source-tab sic-source-tab-compact @claseDetenidos"
                             data-tab="tab-fgea-detenidos">
-                        <i class="fa fa-id-badge"></i>
-                        Detenidos
-                        (@(detenidos != null ? detenidos.Rows.Count : 0))
+
+                        <i class="fa fa-user-secret"></i>
+
+                        <span class="sic-tab-compact-name">
+                            Detenidos
+                        </span>
+
+                        <span class="sic-tab-compact-count">
+                            (@(detenidos != null ? detenidos.Rows.Count : 0))
+                        </span>
+
+                    </button>
+
+                    <button type="button"
+                            class="sic-source-tab sic-source-tab-compact @claseDetenidosMunicipios"
+                            data-tab="tab-detenidos-municipio">
+
+                        <img src="@Url.Content("~/Content/image/SIC/icono_aguascalientes.png")"
+                             class="sic-tab-icono-personalizado"
+                             alt="" />
+
+                        <span class="sic-tab-compact-name">
+                            Detenidos Municipios
+                        </span>
+
+                        <span class="sic-tab-compact-count">
+                            (@totalDetenidosMunicipios)
+                        </span>
+
                     </button>
 
                 </div>
 
 
                 <!-- =================================================
-                 TAB CAPEA
-                 ================================================= -->
+                TAB CAPEA
+                ================================================= -->
                 <div class="sic-source-tab-content active"
                      id="tab-capea">
 
                     @Html.Partial(
-                             "~/Views/SIC/DetalleDetenidoC5/TabCapeasPartial.cshtml",
-                             capeas
-                         )
+                                       "~/Views/SIC/DetalleDetenidoC5/TabCapeasPartial.cshtml",
+                                       capeas
+                                   )
 
                 </div>
 
 
                 <!-- =================================================
-                 TAB PERSONA DE INTERÉS
-                 ================================================= -->
+                TAB PERSONA DE INTERÉS
+                ================================================= -->
                 <div class="sic-source-tab-content"
                      id="tab-persona-interes">
 
                     @Html.Partial(
-                             "~/Views/SIC/DetalleDetenidoC5/TabPersonaInteresPartial.cshtml",
-                             alertasPersonaInteres
-                         )
+                                       "~/Views/SIC/DetalleDetenidoC5/TabPersonaInteresPartial.cshtml",
+                                       alertasPersonaInteres
+                                   )
 
                 </div>
 
 
                 <!-- =================================================
-                 TAB MANDAMIENTOS
-                 ================================================= -->
+                TAB MANDAMIENTOS
+                ================================================= -->
                 <div class="sic-source-tab-content"
                      id="tab-mandamientos">
 
                     @Html.Partial(
-                             "~/Views/SIC/DetalleDetenidoC5/TabMandamientosPartial.cshtml",
-                             mandamientos
-                         )
+                                       "~/Views/SIC/DetalleDetenidoC5/TabMandamientosPartial.cshtml",
+                                       mandamientos
+                                   )
 
                 </div>
 
 
                 <!-- =================================================
-                 TAB OBJETIVOS PRIORITARIOS
-                 ================================================= -->
+                TAB OBJETIVOS PRIORITARIOS
+                ================================================= -->
                 <div class="sic-source-tab-content"
                      id="tab-objetivos">
 
                     @Html.Partial(
-                             "~/Views/SIC/DetalleDetenidoC5/TabObjetivosPartial.cshtml",
-                             objetivosPrioritarios
-                         )
+                                       "~/Views/SIC/DetalleDetenidoC5/TabObjetivosPartial.cshtml",
+                                       objetivosPrioritarios
+                                   )
 
                 </div>
 
 
                 <!-- =================================================
-                 TAB DETENIDOS FGEA
-
-                 AQUÍ DEBE APARECER LA FICHA DE:
-                 JESUS DANIEL ORNELAS ADAME
-                 ================================================= -->
+                TAB DETENIDOS FGEA
+                ================================================= -->
                 <div class="sic-source-tab-content"
                      id="tab-fgea-detenidos">
 
                     @Html.Partial(
-                             "~/Views/SIC/DetalleDetenidoC5/TabDetenidosPartial.cshtml",
-                             detenidos
-                         )
+                                       "~/Views/SIC/DetalleDetenidoC5/TabDetenidosPartial.cshtml",
+                                       detenidos
+                                   )
 
+                </div>
+
+                <!-- =================================================
+                TAB DETENIDOS Municipio
+                ================================================= -->
+
+                <div class="sic-source-tab-content" id="tab-detenidos-municipio">
+                    @Html.Partial(
+                                  "~/Views/SIC/DetalleDetenidoC5/TabDetenidosMunicipioPartial.cshtml",
+                                  detenidosMunicipios
+                              )
                 </div>
 
             </div>
@@ -554,16 +659,16 @@
          AQUÍ NO VA DetenidoObjetivoPartial
          ========================================================= -->
         @Html.Partial(
-                "~/Views/SIC/DetalleDetenidoC5/InformacionDetenidoMunicipioPartial.cshtml",
-                Model
-            )
+                          "~/Views/SIC/DetalleDetenidoC5/InformacionDetenidoMunicipioPartial.cshtml",
+                          Model
+                      )
 
     </div>
 
     @Html.Partial(
-            "~/Views/SIC/DetalleDetenidoC5/DetencionMapaPartial.cshtml",
-            Model
-        )
+                    "~/Views/SIC/DetalleDetenidoC5/DetencionMapaPartial.cshtml",
+                    Model
+                )
 
 </div>
 
@@ -579,19 +684,19 @@
         <div class="sic-media-grid">
 
             @Html.Partial(
-                     "~/Views/SIC/DetalleDetenidoC5/FotosMunicipioPartial.cshtml",
-                     fotosC5
-                 )
+                               "~/Views/SIC/DetalleDetenidoC5/FotosMunicipioPartial.cshtml",
+                               fotosC5
+                           )
 
             @Html.Partial(
-                     "~/Views/SIC/DetalleDetenidoC5/HuellasMunicipioPartial.cshtml",
-                     huellasC5
-                 )
+                               "~/Views/SIC/DetalleDetenidoC5/HuellasMunicipioPartial.cshtml",
+                               huellasC5
+                           )
 
             @Html.Partial(
-                     "~/Views/SIC/DetalleDetenidoC5/RasgosMunicipioPartial.cshtml",
-                     rasgosC5
-                 )
+                               "~/Views/SIC/DetalleDetenidoC5/RasgosMunicipioPartial.cshtml",
+                               rasgosC5
+                           )
 
         </div>
     </div>
@@ -745,6 +850,19 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
+    var estadosAlertasTabs = @Html.Raw(
+        Json.Encode(
+            alertasTipo.Select(x => new
+            {
+                idOrigen = x.Item1,
+                idFuente = x.Item2,
+                estatus = x.Item3
+            })
+        )
+    );
+</script>
+
+<script>
 $(document).ready(function () {
     var titulo = $('.pagetitle h1').first();
 
@@ -777,42 +895,29 @@ $(document).ready(function () {
 });
 
     function registrarEventosDetalleSic() {
+        var documento = $(document);
 
-        var documento =
-            $(document);
-
-
-        documento.off(
-            '.sicDetalle'
-        );
-
+        documento.off('.sicDetalle');
 
         documento.on(
             'click.sicDetalle',
             '.sic-source-tab',
             function () {
-
-                var tabId =
-                    $(this).data('tab');
-
+                var tabId = $(this).data('tab');
 
                 $('.sic-source-tab')
                     .removeClass('active');
 
-
                 $(this)
                     .addClass('active');
 
-
                 $('.sic-source-tab-content')
                     .removeClass('active');
-
 
                 $('#' + tabId)
                     .addClass('active');
             }
         );
-
 
         documento.on(
             'click.sicDetalle',
@@ -820,13 +925,11 @@ $(document).ready(function () {
             confirmarIdentidadNormal
         );
 
-
         documento.on(
             'click.sicDetalle',
             '.js-confirmar-identidad-detenido',
             confirmarIdentidadDetenido
         );
-
 
         documento.on(
             'click.sicDetalle',
@@ -834,13 +937,11 @@ $(document).ready(function () {
             descartarCoincidenciaNormal
         );
 
-
         documento.on(
             'click.sicDetalle',
             '.sic-btn-descartar-alerta-detenidos',
             descartarCoincidenciaDetenido
         );
-
 
         documento.on(
             'click.sicDetalle',
@@ -848,24 +949,17 @@ $(document).ready(function () {
             reabrirCoincidenciaNormal
         );
 
-
         documento.on(
             'click.sicDetalle',
             '.sic-btn-reactivar-alerta-detenidos',
             reabrirCoincidenciaDetenido
         );
 
-
-        /*
-         * NUEVOS
-         */
-
         documento.on(
             'click.sicDetalle',
             '.js-confirmar-resguardo-fgea',
             confirmarResguardoFGEA
         );
-
 
         documento.on(
             'click.sicDetalle',
@@ -902,26 +996,20 @@ async function cancelarResguardoFGEA(e) {
 
 
 
-async function cambiarResguardoFGEA(
-    boton,
-    activar
-) {
+async function cambiarResguardoFGEA(boton, activar) {
+    var idDetenido = parseInt(boton.attr('data-id-detenido'), 10);
+    var idOrigen = parseInt(boton.attr('data-id-origen'), 10);
+    var idFuente = parseInt(boton.attr('data-id-fuente'), 10);
+    var idTipoAlerta = parseInt(boton.attr('data-id-tipo-alerta'), 10);
 
-    var idDetenido =
-        boton.data('id-detenido');
-
-    var idOrigen =
-        boton.data('id-origen');
-
-    var idFuente =
-        boton.data('id-fuente');
-
-
-    if (
-        !idDetenido ||
-        !idOrigen ||
-        !idFuente
-    ) {
+    if (isNaN(idDetenido) ||
+        idDetenido <= 0 ||
+        isNaN(idOrigen) ||
+        idOrigen <= 0 ||
+        isNaN(idFuente) ||
+        idFuente <= 0 ||
+        isNaN(idTipoAlerta) ||
+        idTipoAlerta <= 0) {
 
         mostrarMensajeSIC(
             'Datos incompletos',
@@ -932,61 +1020,104 @@ async function cambiarResguardoFGEA(
         return;
     }
 
-
-    var continuar =
-        await confirmarAccionSIC(
-
-            activar
-                ? 'Confirmar Resguardo FGEA'
-                : 'Cancelar Resguardo FGEA',
-
-            activar
-                ? '¿Confirmas que el detenido ya se encuentra físicamente en resguardo de FGEA?'
-                : '¿Seguro que deseas cancelar el Resguardo FGEA de este detenido?',
-
-            activar
-                ? 'Sí, confirmar resguardo'
-                : 'Sí, cancelar resguardo',
-
-            activar
-                ? 'question'
-                : 'warning'
-        );
-
-        var urlResguardo =
-    activar
-        ? '@Url.Action("ResguardoFGEA", "SIC")'
-        : '@Url.Action("CancelarResguardoFGEA", "SIC")';
+    var continuar = await confirmarAccionSIC(
+        activar
+            ? 'Confirmar Resguardo FGEA'
+            : 'Cancelar Resguardo FGEA',
+        activar
+            ? '¿Confirmas que el detenido ya se encuentra físicamente en resguardo de FGEA?'
+            : '¿Seguro que deseas cancelar el Resguardo FGEA de este detenido?',
+        activar
+            ? 'Sí, confirmar resguardo'
+            : 'Sí, cancelar resguardo',
+        activar
+            ? 'question'
+            : 'warning'
+    );
 
     if (!continuar) {
         return;
     }
 
+    var urlResguardo = activar
+        ? '@Url.Action("ResguardoFGEA", "SIC")'
+        : '@Url.Action("CancelarResguardoFGEA", "SIC")';
 
     bloquearBoton(
         boton,
-
         activar
             ? 'Confirmando resguardo...'
             : 'Cancelando resguardo...'
     );
 
+    $.ajax({
+        url: urlResguardo,
+        type: 'POST',
+        data: {
+            idDetenido: idDetenido,
+            idOrigen: idOrigen,
+            idFuente: idFuente,
+            idTipoAlerta: idTipoAlerta
+        },
+        success: function (response) {
+            if (!response || response.success !== true) {
+                restaurarBotonResguardo(
+                    boton,
+                    activar
+                );
 
-   $.ajax({
+                mostrarMensajeSIC(
+                    'No se pudo actualizar',
+                    response && response.message
+                        ? response.message
+                        : 'No se pudo actualizar el Resguardo FGEA.',
+                    'error'
+                );
 
-    url: urlResguardo,
+                return;
+            }
 
-    type: 'POST',
+            var acciones = boton.closest('.sic-rel-actions');
 
-    data: {
-        idDetenido: idDetenido,
-        idOrigen: idOrigen,
-        idFuente: idFuente
-    },
+            if (activar) {
+                acciones.html(
+                    htmlResguardoFGEA(
+                        idDetenido,
+                        idOrigen,
+                        idFuente,
+                        idTipoAlerta
+                    )
+                );
+            }
+            else {
+                acciones.html(
+                    htmlConfirmadoNormal(
+                        idDetenido,
+                        idOrigen,
+                        idFuente,
+                        idTipoAlerta
+                    )
+                );
+            }
 
-    success: function (response) {
+            actualizarEstadoTabsDesdeDOM();
 
-        if (!response || response.success !== true) {
+            actualizarPildoraEstadoIdentidad(
+                idDetenido
+            );
+
+            mostrarMensajeSIC(
+                activar
+                    ? 'Resguardo confirmado'
+                    : 'Resguardo cancelado',
+                response.message,
+                'success'
+            );
+        },
+        error: function (xhr) {
+            console.log(
+                xhr.responseText
+            );
 
             restaurarBotonResguardo(
                 boton,
@@ -994,86 +1125,13 @@ async function cambiarResguardoFGEA(
             );
 
             mostrarMensajeSIC(
-                'No se pudo actualizar',
-                response && response.message
-                    ? response.message
-                    : 'No se pudo actualizar el Resguardo FGEA.',
+                'Error',
+                'Ocurrió un error al actualizar el Resguardo FGEA.',
                 'error'
             );
-
-            return;
         }
-
-
-        var acciones =
-            boton.closest('.sic-rel-actions');
-
-
-        if (activar) {
-
-            /*
-             * ESTATUS 2 -> 3
-             */
-            acciones.html(
-                htmlResguardoFGEA(
-                    idDetenido,
-                    idOrigen,
-                    idFuente
-                )
-            );
-
-        }
-        else {
-
-            /*
-             * ESTATUS 3 -> 2
-             */
-            acciones.html(
-                htmlConfirmadoNormal(
-                    idDetenido,
-                    idOrigen,
-                    idFuente
-                )
-            );
-        }
-
-
-        actualizarPildoraEstadoIdentidad(
-            idDetenido
-        );
-
-
-        mostrarMensajeSIC(
-            activar
-                ? 'Resguardo confirmado'
-                : 'Resguardo cancelado',
-
-            response.message,
-
-            'success'
-        );
-    },
-
-    error: function (xhr) {
-
-        console.log(
-            xhr.responseText
-        );
-
-        restaurarBotonResguardo(
-            boton,
-            activar
-        );
-
-        mostrarMensajeSIC(
-            'Error',
-            'Ocurrió un error al actualizar el Resguardo FGEA.',
-            'error'
-        );
-    }
-});
+    });
 }
-
 
 function restaurarBotonResguardo(
     boton,
@@ -1148,41 +1206,50 @@ window.mostrarFotoNoExiste = function (img) {
         + '</div>';
 };
 
-function htmlPendienteNormal(idDetenido, idOrigen, idFuente) {
+    function htmlPendienteNormal(idDetenido, idOrigen, idFuente, idTipoAlerta) {
+        var fuente = parseInt(idFuente, 10);
+        var esFusion = fuente === 1;
+
         return ''
             + '<button type="button"'
             + ' class="sic-btn-confirmar-identidad js-confirmar-identidad-normal"'
             + ' data-id-detenido="' + idDetenido + '"'
             + ' data-id-origen="' + idOrigen + '"'
-            + ' data-id-fuente="' + idFuente + '">'
-            + '<i class="fa fa-check"></i> Confirmar identidad'
+            + ' data-id-fuente="' + idFuente + '"'
+            + ' data-id-tipo-alerta="' + idTipoAlerta + '"'
+            + (esFusion ? ' data-es-fusion="1"' : '') + '>'
+            + '<i class="fa ' + (esFusion ? 'fa-link' : 'fa-check') + '"></i> '
+            + (esFusion ? 'Fusionar' : 'Confirmar identidad')
             + '</button>'
+
             + '<button type="button"'
             + ' class="sic-btn-warning-soft sic-btn-descartar-alerta"'
             + ' data-id-detenido="' + idDetenido + '"'
             + ' data-id-origen="' + idOrigen + '"'
-            + ' data-id-fuente="' + idFuente + '">'
+            + ' data-id-fuente="' + idFuente + '"'
+            + ' data-id-tipo-alerta="' + idTipoAlerta + '">'
             + '<i class="fa fa-times"></i> Descartar'
             + '</button>';
     }
 
-    function htmlConfirmadoNormal( idDetenido, idOrigen, idFuente ) {
-
-        var fuente =  parseInt(  idFuente,  10 );
+    function htmlConfirmadoNormal(idDetenido, idOrigen, idFuente, idTipoAlerta) {
+        var fuente = parseInt(idFuente, 10);
 
         /*
          * Solamente CAPEA, Mandamientos
          * y Objetivos pueden registrar Resguardo FGEA.
          */
-        if (  fuente === 2 ||  fuente === 4 ||  fuente === 5
-        ) {
+        if (fuente === 2 ||
+            fuente === 4 ||
+            fuente === 5) {
 
             return ''
                 + '<button type="button"'
                 + ' class="sic-btn-resguardo-disponible js-confirmar-resguardo-fgea"'
                 + ' data-id-detenido="' + idDetenido + '"'
                 + ' data-id-origen="' + idOrigen + '"'
-                + ' data-id-fuente="' + idFuente + '">'
+                + ' data-id-fuente="' + idFuente + '"'
+                + ' data-id-tipo-alerta="' + idTipoAlerta + '">'
                 + '<i class="fa fa-shield"></i> Confirmar Resguardo FGEA'
                 + '</button>'
 
@@ -1191,16 +1258,12 @@ function htmlPendienteNormal(idDetenido, idOrigen, idFuente) {
                 + ' data-estatus-anterior="2"'
                 + ' data-id-detenido="' + idDetenido + '"'
                 + ' data-id-origen="' + idOrigen + '"'
-                + ' data-id-fuente="' + idFuente + '">'
+                + ' data-id-fuente="' + idFuente + '"'
+                + ' data-id-tipo-alerta="' + idTipoAlerta + '">'
                 + '<i class="fa fa-undo"></i> Cancelar Confirmación'
                 + '</button>';
         }
 
-
-        /*
-         * Las demás fuentes conservan
-         * el comportamiento normal.
-         */
         return ''
             + '<button type="button"'
             + ' class="sic-btn-identidad-confirmada"'
@@ -1213,13 +1276,13 @@ function htmlPendienteNormal(idDetenido, idOrigen, idFuente) {
             + ' data-estatus-anterior="2"'
             + ' data-id-detenido="' + idDetenido + '"'
             + ' data-id-origen="' + idOrigen + '"'
-            + ' data-id-fuente="' + idFuente + '">'
+            + ' data-id-fuente="' + idFuente + '"'
+            + ' data-id-tipo-alerta="' + idTipoAlerta + '">'
             + '<i class="fa fa-undo"></i> Cancelar Confirmación'
             + '</button>';
     }
 
-    function htmlResguardoFGEA( idDetenido, idOrigen, idFuente ) {
-
+    function htmlResguardoFGEA(idDetenido, idOrigen, idFuente, idTipoAlerta) {
         return ''
             + '<button type="button"'
             + ' class="sic-btn-resguardo-confirmado"'
@@ -1231,68 +1294,154 @@ function htmlPendienteNormal(idDetenido, idOrigen, idFuente) {
             + ' class="sic-btn-cancelar-resguardo js-cancelar-resguardo-fgea"'
             + ' data-id-detenido="' + idDetenido + '"'
             + ' data-id-origen="' + idOrigen + '"'
-            + ' data-id-fuente="' + idFuente + '">'
+            + ' data-id-fuente="' + idFuente + '"'
+            + ' data-id-tipo-alerta="' + idTipoAlerta + '">'
             + '<i class="fa fa-undo"></i> Cancelar Resguardo'
             + '</button>';
     }
 
-    function htmlDescartadoNormal(idDetenido, idOrigen, idFuente) {
+    function htmlDescartadoNormal(idDetenido, idOrigen, idFuente, idTipoAlerta) {
         return ''
             + '<button type="button" class="sic-btn-descartada" disabled>'
             + '<i class="fa fa-times-circle"></i> Descartada'
             + '</button>'
+
             + '<button type="button"'
             + ' class="sic-btn-reactivar-alerta"'
             + ' data-estatus-anterior="0"'
             + ' data-id-detenido="' + idDetenido + '"'
             + ' data-id-origen="' + idOrigen + '"'
-            + ' data-id-fuente="' + idFuente + '">'
+            + ' data-id-fuente="' + idFuente + '"'
+            + ' data-id-tipo-alerta="' + idTipoAlerta + '">'
             + '<i class="fa fa-undo"></i> Cancelar Confirmación'
             + '</button>';
     }
 
-    function htmlPendienteDetenido(idDetenido, idsNomPerso) {
+    function htmlPendienteDetenido(idDetenido, idOrigen, idTipoAlerta) {
         return ''
             + '<button type="button"'
             + ' class="sic-btn-confirmar-identidad js-confirmar-identidad-detenido"'
             + ' data-id-detenido="' + idDetenido + '"'
-            + ' data-ids-nom-perso="' + idsNomPerso + '">'
+            + ' data-id-origen="' + idOrigen + '"'
+            + ' data-id-tipo-alerta="' + idTipoAlerta + '">'
             + '<i class="fa fa-check"></i> Confirmar identidad'
             + '</button>'
+
             + '<button type="button"'
             + ' class="sic-btn-warning-soft sic-btn-descartar-alerta-detenidos"'
             + ' data-id-detenido="' + idDetenido + '"'
-            + ' data-ids-nom-perso="' + idsNomPerso + '">'
+            + ' data-id-origen="' + idOrigen + '"'
+            + ' data-id-tipo-alerta="' + idTipoAlerta + '">'
             + '<i class="fa fa-times"></i> Descartar'
             + '</button>';
     }
 
-    function htmlConfirmadoDetenido(idDetenido, idsNomPerso) {
+    function htmlConfirmadoDetenido(idDetenido, idOrigen, idTipoAlerta) {
         return ''
             + '<button type="button" class="sic-btn-identidad-confirmada" disabled>'
             + '<i class="fa fa-check-circle"></i> Identidad confirmada'
             + '</button>'
+
             + '<button type="button"'
             + ' class="sic-btn-reactivar-alerta-detenidos"'
             + ' data-estatus-anterior="2"'
             + ' data-id-detenido="' + idDetenido + '"'
-            + ' data-ids-nom-perso="' + idsNomPerso + '">'
+            + ' data-id-origen="' + idOrigen + '"'
+            + ' data-id-tipo-alerta="' + idTipoAlerta + '">'
             + '<i class="fa fa-undo"></i> Cancelar Confirmación'
             + '</button>';
     }
 
-    function htmlDescartadoDetenido(idDetenido, idsNomPerso) {
+    function htmlDescartadoDetenido(idDetenido, idOrigen, idTipoAlerta) {
         return ''
             + '<button type="button" class="sic-btn-descartada" disabled>'
             + '<i class="fa fa-times-circle"></i> Descartada'
             + '</button>'
+
             + '<button type="button"'
             + ' class="sic-btn-reactivar-alerta-detenidos"'
             + ' data-estatus-anterior="0"'
             + ' data-id-detenido="' + idDetenido + '"'
-            + ' data-ids-nom-perso="' + idsNomPerso + '">'
+            + ' data-id-origen="' + idOrigen + '"'
+            + ' data-id-tipo-alerta="' + idTipoAlerta + '">'
             + '<i class="fa fa-undo"></i> Cancelar Confirmación'
             + '</button>';
+    }
+
+    function desactivarOtrasCoincidenciasDetenidos(botonConfirmado, idDetenido) {
+        var slideSeleccionado =
+            botonConfirmado.closest('.sic-detenido-slide');
+
+        $('#tab-fgea-detenidos .sic-detenido-slide')
+            .each(function () {
+
+                var slide =
+                    $(this);
+
+                /*
+                 * La ficha que acabamos de confirmar
+                 * NO se toca.
+                 */
+                if (slideSeleccionado.length > 0 &&
+                    slide[0] === slideSeleccionado[0]) {
+                    return;
+                }
+
+                var acciones =
+                    slide.find('.sic-rel-actions').first();
+
+                if (acciones.length === 0) {
+                    return;
+                }
+
+                /*
+                 * Tomamos los identificadores que ya tiene
+                 * cualquiera de los botones de esa ficha.
+                 */
+                var botonDatos =
+                    acciones
+                        .find(
+                            '[data-id-origen][data-id-tipo-alerta]'
+                        )
+                        .first();
+
+                if (botonDatos.length === 0) {
+                    return;
+                }
+
+                var idOrigen =
+                    parseInt(
+                        botonDatos.attr('data-id-origen'),
+                        10
+                    );
+
+                var idTipoAlerta =
+                    parseInt(
+                        botonDatos.attr('data-id-tipo-alerta'),
+                        10
+                    );
+
+                if (isNaN(idOrigen) ||
+                    idOrigen <= 0 ||
+                    isNaN(idTipoAlerta) ||
+                    idTipoAlerta <= 0) {
+                    return;
+                }
+
+                /*
+                 * El service acaba de poner estas alertas
+                 * en Estatus = 0.
+                 *
+                 * Reflejamos ese cambio también en pantalla.
+                 */
+                acciones.html(
+                    htmlDescartadoDetenido(
+                        idDetenido,
+                        idOrigen,
+                        idTipoAlerta
+                    )
+                );
+            });
     }
 
     async function confirmarAccionSIC(
@@ -1335,190 +1484,389 @@ function htmlPendienteNormal(idDetenido, idOrigen, idFuente) {
     }
 
     async function confirmarIdentidadNormal(e) {
-        e.preventDefault();
-        e.stopImmediatePropagation();
+    e.preventDefault();
+    e.stopImmediatePropagation();
 
-        var boton = $(this);
-        var idDetenido = boton.data('id-detenido');
-        var idOrigen = boton.data('id-origen');
-        var idFuente = boton.data('id-fuente');
+    var boton = $(this);
 
-        if (!idDetenido || !idOrigen || !idFuente) {
-
-            mostrarMensajeSIC(
-                'Datos incompletos',
-                'Faltan datos para confirmar la identidad.',
-                'warning'
-            );
-
-            return;
-        }
-
-        var continuar = await confirmarAccionSIC(
-            'Confirmar identidad',
-            '¿Seguro que deseas confirmar la identidad de este registro?',
-            'Sí, confirmar',
-            'question'
+    var idDetenido =
+        parseInt(
+            boton.attr('data-id-detenido'),
+            10
         );
 
-        if (!continuar) {
-            return;
-        }
-
-        bloquearBoton(
-            boton,
-            'Confirmando...'
+    var idOrigen =
+        parseInt(
+            boton.attr('data-id-origen'),
+            10
         );
 
-        $.ajax({
-            url: '@Url.Action("ConfirmarIdentidad", "SIC")',
-            type: 'POST',
-            data: {
-                idDetenido: idDetenido,
-                idOrigen: idOrigen,
-                idFuente: idFuente
-            },
-            success: function (response) {
-                if (!response.success) {
+    var idFuente =
+        parseInt(
+            boton.attr('data-id-fuente'),
+            10
+        );
 
-                    restaurarBotonConfirmar(
-                        boton
-                    );
+    var idTipoAlerta =
+        parseInt(
+            boton.attr('data-id-tipo-alerta'),
+            10
+        );
 
-                    mostrarMensajeSIC(
-                        'No se pudo confirmar',
-                        response.message ||
-                        'No se pudo confirmar la identidad.',
-                        'error'
-                    );
+    var esFusion =
+        parseInt(
+            boton.attr('data-es-fusion'),
+            10
+        ) === 1;
 
-                    return;
-                }
+    if (isNaN(idDetenido) ||
+        idDetenido <= 0 ||
+        isNaN(idOrigen) ||
+        idOrigen <= 0 ||
+        isNaN(idFuente) ||
+        idFuente <= 0 ||
+        isNaN(idTipoAlerta) ||
+        idTipoAlerta <= 0) {
 
-                boton.closest('.sic-rel-actions').html(
-                    htmlConfirmadoNormal(idDetenido, idOrigen, idFuente)
+        mostrarMensajeSIC(
+            'Datos incompletos',
+            'Faltan datos para confirmar la identidad.',
+            'warning'
+        );
+
+        return;
+    }
+
+    var continuar = await confirmarAccionSIC(
+        esFusion
+            ? 'Fusionar registros'
+            : 'Confirmar identidad',
+
+        esFusion
+            ? 'Se confirmará que ambos registros pertenecen a la misma persona. ¿Deseas continuar?'
+            : '¿Seguro que deseas confirmar la identidad de este registro?',
+
+        esFusion
+            ? 'Sí, fusionar'
+            : 'Sí, confirmar',
+
+        'question'
+    );
+
+    if (!continuar) {
+        return;
+    }
+
+    bloquearBoton(
+        boton,
+        esFusion
+            ? 'Fusionando...'
+            : 'Confirmando...'
+    );
+
+    $.ajax({
+        url: '@Url.Action("ConfirmarIdentidad", "SIC")',
+        type: 'POST',
+
+        data: {
+            idDetenido: idDetenido,
+            idOrigen: idOrigen,
+            idFuente: idFuente,
+            idTipoAlerta: idTipoAlerta
+        },
+
+        success: function (response) {
+
+            if (!response.success) {
+
+                restaurarBotonConfirmar(
+                    boton
                 );
 
-                actualizarContadoresAlertas(-1, 0, 1);
+                mostrarMensajeSIC(
+                    'No se pudo confirmar',
+                    response.message ||
+                    'No se pudo confirmar la identidad.',
+                    'error'
+                );
+
+                return;
+            }
+
+            if (esFusion) {
+
+                quitarDetenidoMunicipioFusionado(
+                    boton
+                );
+
+                actualizarContadoresAlertas(
+                    -1,
+                    0,
+                    1
+                );
 
                 actualizarPildoraEstadoIdentidad(
                     idDetenido
                 );
 
-                //mostrarMensajeSIC(
-                //    'Identidad confirmada',
-                //    response.message ||
-                //    'Identidad confirmada correctamente.',
-                //    'success'
-                //);
-            },
-            error: function (xhr) {
-                console.log(xhr.responseText);
-                restaurarBotonConfirmar(boton);
-                mostrarMensajeSIC(
-                    'Error',
-                    'Error del servidor al confirmar la identidad.',
-                    'error'
-                );
+                return;
             }
-        });
-    }
 
-    async function confirmarIdentidadDetenido(e) {
-        e.preventDefault();
-        e.stopImmediatePropagation();
+            boton.closest('.sic-rel-actions').html(
+                htmlConfirmadoNormal(
+                    idDetenido,
+                    idOrigen,
+                    idFuente,
+                    idTipoAlerta
+                )
+            );
 
-        var boton = $(this);
-        var idDetenido = boton.data('id-detenido');
-        var idsNomPerso = boton.attr('data-ids-nom-perso');
+            actualizarContadoresAlertas(
+                -1,
+                0,
+                1
+            );
 
-        if (!idDetenido || !idsNomPerso) {
+            actualizarEstadoTabsDesdeDOM();
+
+            actualizarPildoraEstadoIdentidad(
+                idDetenido
+            );
+        },
+
+        error: function (xhr) {
+
+            console.log(
+                xhr.responseText
+            );
+
+            restaurarBotonConfirmar(
+                boton
+            );
 
             mostrarMensajeSIC(
-                'Datos incompletos',
-                'Faltan datos para confirmar la identidad del detenido.',
-                'warning'
+                'Error',
+                'Error del servidor al confirmar la identidad.',
+                'error'
+            );
+        }
+    });
+}
+
+    function quitarDetenidoMunicipioFusionado(boton) {
+        var carrusel = boton.closest('.sic-detenidos-municipio-carousel');
+        var slideActual = boton.closest('.sic-detenidos-municipio-slide');
+        var indiceAnterior = parseInt(slideActual.attr('data-index'), 10) || 0;
+
+        slideActual.remove();
+
+        var slides = carrusel.find('.sic-detenidos-municipio-slide');
+        var total = slides.length;
+
+        slides.each(function (indice) {
+            $(this)
+                .attr('data-index', indice)
+                .removeClass('active');
+        });
+
+        var tab = $('.sic-source-tab[data-tab="tab-detenidos-municipio"]');
+
+        tab.find('.sic-tab-compact-count')
+            .text('(' + total + ')');
+
+        if (total === 0) {
+
+            carrusel.replaceWith(
+                '<div class="sic-empty-source">' +
+                '<i class="fa fa-id-card"></i>' +
+                '<strong>Detenidos Municipios</strong>' +
+                '<span>Sin registros relacionados por el momento.</span>' +
+                '</div>'
             );
 
             return;
         }
 
-        var continuar = await confirmarAccionSIC(
+        var nuevoIndice = Math.min(indiceAnterior, total - 1);
+
+        slides.eq(nuevoIndice)
+            .addClass('active');
+
+        var contador = carrusel.find('.sic-rel-counter');
+
+        if (total === 1) {
+
+            carrusel.find('.sic-detenidos-carousel-footer')
+                .remove();
+
+        } else {
+
+            contador.html(
+                '<span class="sic-detenidos-municipio-current">' +
+                (nuevoIndice + 1) +
+                '</span> / ' +
+                total
+            );
+        }
+    }
+
+    async function confirmarIdentidadDetenido(e) {
+    e.preventDefault();
+    e.stopImmediatePropagation();
+
+    var boton = $(this);
+
+    var idDetenido =
+        parseInt(
+            boton.attr('data-id-detenido'),
+            10
+        );
+
+    var idOrigen =
+        parseInt(
+            boton.attr('data-id-origen'),
+            10
+        );
+
+    var idTipoAlerta =
+        parseInt(
+            boton.attr('data-id-tipo-alerta'),
+            10
+        );
+
+    if (isNaN(idDetenido) ||
+        idDetenido <= 0 ||
+        isNaN(idOrigen) ||
+        idOrigen <= 0 ||
+        isNaN(idTipoAlerta) ||
+        idTipoAlerta <= 0) {
+
+        mostrarMensajeSIC(
+            'Datos incompletos',
+            'Faltan datos para confirmar la identidad del detenido.',
+            'warning'
+        );
+
+        return;
+    }
+
+    var continuar =
+        await confirmarAccionSIC(
             'Confirmar identidad',
             '¿Seguro que deseas confirmar la identidad de este detenido?',
             'Sí, confirmar',
             'question'
         );
 
-        if (!continuar) {
-            return;
-        }
+    if (!continuar) {
+        return;
+    }
 
-        bloquearBoton(boton, 'Confirmando...');
+    bloquearBoton(
+        boton,
+        'Confirmando...'
+    );
 
-        $.ajax({
-            url: '@Url.Action("ConfirmarIdentidadDetenidos", "SIC")',
-            type: 'POST',
-            data: {
-                idDetenido: idDetenido,
-                idsNomPerso: idsNomPerso
-            },
-            success: function (response) {
-                if (!response.success) {
-                    restaurarBotonConfirmar(boton);
-                    mostrarMensajeSIC(
-                        'No se pudo confirmar',
-                        response.message ||
-                        'No se pudo confirmar la identidad.',
-                        'error'
-                    );
-                    return;
-                }
+    $.ajax({
+        url: '@Url.Action("ConfirmarIdentidadDetenidos", "SIC")',
+        type: 'POST',
 
-                boton.closest('.sic-rel-actions').html(
-                    htmlConfirmadoDetenido(idDetenido, idsNomPerso)
+        data: {
+            idDetenido: idDetenido,
+            idOrigen: idOrigen,
+            idTipoAlerta: idTipoAlerta
+        },
+
+        success: function (response) {
+            if (!response.success) {
+                restaurarBotonConfirmar(
+                    boton
                 );
 
-                actualizarContadoresAlertas(-1, 0, 1);
-
-                actualizarPildoraEstadoIdentidad(
-                    idDetenido
-                );
-
-                //mostrarMensajeSIC(
-                //    'Identidad confirmada',
-                //    response.message ||
-                //    'Identidad confirmada correctamente.',
-                //    'success'
-                //);
-            },
-            error: function (xhr) {
-                console.log(xhr.responseText);
-                restaurarBotonConfirmar(boton);
                 mostrarMensajeSIC(
-                    'Error',
-                    'Error del servidor al confirmar la identidad.',
+                    'No se pudo confirmar',
+                    response.message ||
+                    'No se pudo confirmar la identidad.',
                     'error'
                 );
+
+                return;
             }
-        });
-    }
+
+            /*
+             * IMPORTANTE:
+             * El backend puso las demás coincidencias
+             * de Detenidos FGEA en Estatus = 0.
+             *
+             * Aquí reflejamos eso inmediatamente
+             * en las demás fichas del carrusel.
+             */
+            desactivarOtrasCoincidenciasDetenidos(
+                boton,
+                idDetenido
+            );
+
+            /*
+             * La ficha seleccionada queda confirmada.
+             */
+            boton.closest('.sic-rel-actions').html(
+                htmlConfirmadoDetenido(
+                    idDetenido,
+                    idOrigen,
+                    idTipoAlerta
+                )
+            );
+
+            actualizarEstadoTabsDesdeDOM();
+
+            actualizarPildoraEstadoIdentidad(
+                idDetenido
+            );
+        },
+
+        error: function (xhr) {
+            console.log(
+                xhr.responseText
+            );
+
+            restaurarBotonConfirmar(
+                boton
+            );
+
+            mostrarMensajeSIC(
+                'Error',
+                'Error del servidor al confirmar la identidad.',
+                'error'
+            );
+        }
+    });
+}
 
     async function descartarCoincidenciaNormal(e) {
         e.preventDefault();
         e.stopImmediatePropagation();
 
         var boton = $(this);
-        var idDetenido = boton.data('id-detenido');
-        var idOrigen = boton.data('id-origen');
-        var idFuente = boton.data('id-fuente');
+        var idDetenido = parseInt(boton.attr('data-id-detenido'), 10);
+        var idOrigen = parseInt(boton.attr('data-id-origen'), 10);
+        var idFuente = parseInt(boton.attr('data-id-fuente'), 10);
+        var idTipoAlerta = parseInt(boton.attr('data-id-tipo-alerta'), 10);
 
-        if (!idDetenido || !idOrigen || !idFuente) {
+        if (isNaN(idDetenido) ||
+            idDetenido <= 0 ||
+            isNaN(idOrigen) ||
+            idOrigen <= 0 ||
+            isNaN(idFuente) ||
+            idFuente <= 0 ||
+            isNaN(idTipoAlerta) ||
+            idTipoAlerta <= 0) {
+
             mostrarMensajeSIC(
                 'Datos incompletos',
                 'Faltan datos para descartar la coincidencia.',
                 'warning'
             );
+
             return;
         }
 
@@ -1533,7 +1881,10 @@ function htmlPendienteNormal(idDetenido, idOrigen, idFuente) {
             return;
         }
 
-        bloquearBoton(boton, 'Descartando...');
+        bloquearBoton(
+            boton,
+            'Descartando...'
+        );
 
         $.ajax({
             url: '@Url.Action("DescartarNotificacion", "SIC")',
@@ -1541,40 +1892,55 @@ function htmlPendienteNormal(idDetenido, idOrigen, idFuente) {
             data: {
                 idDetenido: idDetenido,
                 idOrigen: idOrigen,
-                idFuente: idFuente
+                idFuente: idFuente,
+                idTipoAlerta: idTipoAlerta
             },
             success: function (response) {
                 if (!response.success) {
-                    restaurarBotonDescartar(boton);
+                    restaurarBotonDescartar(
+                        boton
+                    );
+
                     mostrarMensajeSIC(
                         'No se pudo descartar',
                         response.message ||
                         'No se pudo descartar la coincidencia.',
                         'error'
                     );
+
                     return;
                 }
 
                 boton.closest('.sic-rel-actions').html(
-                    htmlDescartadoNormal(idDetenido, idOrigen, idFuente)
+                    htmlDescartadoNormal(
+                        idDetenido,
+                        idOrigen,
+                        idFuente,
+                        idTipoAlerta
+                    )
                 );
 
-                actualizarContadoresAlertas(-1, 1, 0);
+                actualizarContadoresAlertas(
+                    -1,
+                    1,
+                    0
+                );
+
+                actualizarEstadoTabsDesdeDOM();
 
                 actualizarPildoraEstadoIdentidad(
                     idDetenido
                 );
-
-                //mostrarMensajeSIC(
-                //    'Coincidencia descartada',
-                //    response.message ||
-                //    'Coincidencia descartada correctamente.',
-                //    'success'
-                //);
             },
             error: function (xhr) {
-                console.log(xhr.responseText);
-                restaurarBotonDescartar(boton);
+                console.log(
+                    xhr.responseText
+                );
+
+                restaurarBotonDescartar(
+                    boton
+                );
+
                 mostrarMensajeSIC(
                     'Error',
                     'Error del servidor al descartar la coincidencia.',
@@ -1589,11 +1955,23 @@ function htmlPendienteNormal(idDetenido, idOrigen, idFuente) {
         e.stopImmediatePropagation();
 
         var boton = $(this);
-        var idDetenido = boton.data('id-detenido');
-        var idsNomPerso = boton.attr('data-ids-nom-perso');
+        var idDetenido = parseInt(boton.attr('data-id-detenido'), 10);
+        var idOrigen = parseInt(boton.attr('data-id-origen'), 10);
+        var idTipoAlerta = parseInt(boton.attr('data-id-tipo-alerta'), 10);
 
-        if (!idDetenido || !idsNomPerso) {
-            mostrarMensajeSIC('Datos incompletos', 'Faltan datos para descartar la coincidencia.', 'warning');
+        if (isNaN(idDetenido) ||
+            idDetenido <= 0 ||
+            isNaN(idOrigen) ||
+            idOrigen <= 0 ||
+            isNaN(idTipoAlerta) ||
+            idTipoAlerta <= 0) {
+
+            mostrarMensajeSIC(
+                'Datos incompletos',
+                'Faltan datos para descartar la coincidencia del detenido.',
+                'warning'
+            );
+
             return;
         }
 
@@ -1608,42 +1986,64 @@ function htmlPendienteNormal(idDetenido, idOrigen, idFuente) {
             return;
         }
 
-        bloquearBoton(boton, 'Descartando...');
+        bloquearBoton(
+            boton,
+            'Descartando...'
+        );
 
         $.ajax({
             url: '@Url.Action("DescartarNotificacionDetenidos", "SIC")',
             type: 'POST',
             data: {
                 idDetenido: idDetenido,
-                idsNomPerso: idsNomPerso
+                idOrigen: idOrigen,
+                idTipoAlerta: idTipoAlerta
             },
             success: function (response) {
                 if (!response.success) {
-                    restaurarBotonDescartar(boton);
-                    mostrarMensajeSIC('No se pudo descartar', response.message || 'No se pudo descartar la coincidencia.', 'error');
+                    restaurarBotonDescartar(
+                        boton
+                    );
+
+                    mostrarMensajeSIC(
+                        'No se pudo descartar',
+                        response.message ||
+                        'No se pudo descartar la coincidencia.',
+                        'error'
+                    );
+
                     return;
                 }
 
                 boton.closest('.sic-rel-actions').html(
-                    htmlDescartadoDetenido(idDetenido, idsNomPerso)
+                    htmlDescartadoDetenido(
+                        idDetenido,
+                        idOrigen,
+                        idTipoAlerta
+                    )
                 );
 
-                actualizarContadoresAlertas(-1, 1, 0);
+                actualizarContadoresAlertas(
+                    -1,
+                    1,
+                    0
+                );
+
+                actualizarEstadoTabsDesdeDOM();
 
                 actualizarPildoraEstadoIdentidad(
                     idDetenido
                 );
-
-                //mostrarMensajeSIC(
-                //    'Coincidencia descartada',
-                //    response.message ||
-                //    'Coincidencia descartada correctamente.',
-                //    'success'
-                //);
             },
             error: function (xhr) {
-                console.log(xhr.responseText);
-                restaurarBotonDescartar(boton);
+                console.log(
+                    xhr.responseText
+                );
+
+                restaurarBotonDescartar(
+                    boton
+                );
+
                 mostrarMensajeSIC(
                     'Error',
                     'Error del servidor al descartar la coincidencia.',
@@ -1654,128 +2054,145 @@ function htmlPendienteNormal(idDetenido, idOrigen, idFuente) {
     }
 
     async function reabrirCoincidenciaNormal(e) {
-        e.preventDefault();
-        e.stopImmediatePropagation();
+    e.preventDefault();
+    e.stopImmediatePropagation();
 
-        var boton = $(this);
-        var estatusAnterior =
-            parseInt(boton.attr('data-estatus-anterior'), 10);
+    var boton = $(this);
+    var estatusAnterior = parseInt(boton.attr('data-estatus-anterior'), 10);
+    var idDetenido = parseInt(boton.attr('data-id-detenido'), 10);
+    var idOrigen = parseInt(boton.attr('data-id-origen'), 10);
+    var idFuente = parseInt(boton.attr('data-id-fuente'), 10);
+    var idTipoAlerta = parseInt(boton.attr('data-id-tipo-alerta'), 10);
 
-        var idDetenido = boton.data('id-detenido');
-        var idOrigen = boton.data('id-origen');
-        var idFuente = boton.data('id-fuente');
-
-        if (isNaN(estatusAnterior)) {
-
-            mostrarMensajeSIC(
-                'Estado no disponible',
-                'No se pudo determinar el estado anterior de la coincidencia.',
-                'warning'
-            );
-
-            return;
-        }
-
-        if (!idDetenido || !idOrigen || !idFuente) {
-
-            mostrarMensajeSIC(
-                'Datos incompletos',
-                'Faltan datos para cancelar la confirmación de la coincidencia.',
-                'warning'
-            );
-
-            return;
-        }
-
-        var continuar = await confirmarAccionSIC(
-            'Cancelar confirmación',
-            'La coincidencia volverá a quedar pendiente de revisión. ¿Deseas continuar?',
-            'Sí, cancelar confirmación',
+    if (isNaN(estatusAnterior)) {
+        mostrarMensajeSIC(
+            'Estado no disponible',
+            'No se pudo determinar el estado anterior de la coincidencia.',
             'warning'
         );
 
-        if (!continuar) {
-            return;
-        }
+        return;
+    }
 
-        bloquearBoton(boton, 'Reabriendo...');
+    console.log('REABRIR COINCIDENCIA NORMAL');
+    console.log('estatusAnterior:', estatusAnterior);
+    console.log('idDetenido:', idDetenido);
+    console.log('idOrigen:', idOrigen);
+    console.log('idFuente:', idFuente);
+    console.log('idTipoAlerta:', idTipoAlerta);
+    console.log('BOTON:', boton[0].outerHTML);
 
-        $.ajax({
-            url: '@Url.Action("ReactivarNotificacion", "SIC")',
-            type: 'POST',
-            data: {
-                idDetenido: idDetenido,
-                idOrigen: idOrigen,
-                idFuente: idFuente
-            },
-            success: function (response) {
-                if (!response.success) {
+    var datosFaltantes = [];
 
-                    restaurarBotonReabrir(
-                        boton
-                    );
+    if (isNaN(idDetenido) || idDetenido <= 0) {
+        datosFaltantes.push('idDetenido');
+    }
 
-                    mostrarMensajeSIC(
-                        'No se pudo cancelar',
-                        response.message ||
-                        'No se pudo cancelar la confirmación de la coincidencia.',
-                        'error'
-                    );
+    if (isNaN(idOrigen) || idOrigen <= 0) {
+        datosFaltantes.push('idOrigen');
+    }
 
-                    return;
-                }
+    if (isNaN(idFuente) || idFuente <= 0) {
+        datosFaltantes.push('idFuente');
+    }
 
-                boton.closest('.sic-rel-actions').html(
-                    htmlPendienteNormal(idDetenido, idOrigen, idFuente)
-                );
+    if (isNaN(idTipoAlerta) || idTipoAlerta <= 0) {
+        datosFaltantes.push('idTipoAlerta');
+    }
 
-                actualizarContadoresAlReabrir(
-                    estatusAnterior
-                );
+    if (datosFaltantes.length > 0) {
+        mostrarMensajeSIC(
+            'Datos incompletos',
+            'Faltan datos: ' + datosFaltantes.join(', '),
+            'warning'
+        );
 
-                actualizarPildoraEstadoIdentidad(
-                    idDetenido
-                );
+        return;
+    }
 
-                //mostrarMensajeSIC(
-                //    'Confirmación cancelada',
-                //    response.message ||
-                //    'La coincidencia volvió a quedar pendiente de revisión.',
-                //    'success'
-                //);
-            },
-            error: function (xhr) {
+    var continuar = await confirmarAccionSIC(
+        'Cancelar confirmación',
+        'La coincidencia volverá a quedar pendiente de revisión. ¿Deseas continuar?',
+        'Sí, cancelar confirmación',
+        'warning'
+    );
 
-                console.log(
-                    xhr.responseText
-                );
+    if (!continuar) {
+        return;
+    }
 
-                restaurarBotonReabrir(
-                    boton
-                );
+    bloquearBoton(
+        boton,
+        'Reabriendo...'
+    );
+
+    $.ajax({
+        url: '@Url.Action("ReactivarNotificacion", "SIC")',
+        type: 'POST',
+        data: {
+            idDetenido: idDetenido,
+            idOrigen: idOrigen,
+            idFuente: idFuente,
+            idTipoAlerta: idTipoAlerta
+        },
+        success: function (response) {
+            if (!response.success) {
+                restaurarBotonReabrir(boton);
 
                 mostrarMensajeSIC(
-                    'Error',
-                    'Error del servidor al cancelar la confirmación de la coincidencia.',
+                    'No se pudo cancelar',
+                    response.message ||
+                    'No se pudo cancelar la confirmación de la coincidencia.',
                     'error'
                 );
+
+                return;
             }
-        });
-    }
+
+            boton.closest('.sic-rel-actions').html(
+                htmlPendienteNormal(
+                    idDetenido,
+                    idOrigen,
+                    idFuente,
+                    idTipoAlerta
+                )
+            );
+
+            actualizarContadoresAlReabrir(
+                estatusAnterior
+            );
+
+            actualizarEstadoTabsDesdeDOM();
+
+            actualizarPildoraEstadoIdentidad(
+                idDetenido
+            );
+        },
+        error: function (xhr) {
+            console.log(xhr.responseText);
+
+            restaurarBotonReabrir(boton);
+
+            mostrarMensajeSIC(
+                'Error',
+                'Error del servidor al cancelar la confirmación de la coincidencia.',
+                'error'
+            );
+        }
+    });
+}
 
     async function reabrirCoincidenciaDetenido(e) {
         e.preventDefault();
         e.stopImmediatePropagation();
 
         var boton = $(this);
-        var estatusAnterior =
-            parseInt(boton.attr('data-estatus-anterior'), 10);
-
-        var idDetenido = boton.data('id-detenido');
-        var idsNomPerso = boton.attr('data-ids-nom-perso');
+        var estatusAnterior = parseInt(boton.attr('data-estatus-anterior'), 10);
+        var idDetenido = parseInt(boton.attr('data-id-detenido'), 10);
+        var idOrigen = parseInt(boton.attr('data-id-origen'), 10);
+        var idTipoAlerta = parseInt(boton.attr('data-id-tipo-alerta'), 10);
 
         if (isNaN(estatusAnterior)) {
-
             mostrarMensajeSIC(
                 'Estado no disponible',
                 'No se pudo determinar el estado anterior de la coincidencia.',
@@ -1785,7 +2202,12 @@ function htmlPendienteNormal(idDetenido, idOrigen, idFuente) {
             return;
         }
 
-        if (!idDetenido || !idsNomPerso) {
+        if (isNaN(idDetenido) ||
+            idDetenido <= 0 ||
+            isNaN(idOrigen) ||
+            idOrigen <= 0 ||
+            isNaN(idTipoAlerta) ||
+            idTipoAlerta <= 0) {
 
             mostrarMensajeSIC(
                 'Datos incompletos',
@@ -1807,18 +2229,21 @@ function htmlPendienteNormal(idDetenido, idOrigen, idFuente) {
             return;
         }
 
-        bloquearBoton(boton, 'Reabriendo...');
+        bloquearBoton(
+            boton,
+            'Reabriendo...'
+        );
 
         $.ajax({
             url: '@Url.Action("ReactivarNotificacionDetenidos", "SIC")',
             type: 'POST',
             data: {
                 idDetenido: idDetenido,
-                idsNomPerso: idsNomPerso
+                idOrigen: idOrigen,
+                idTipoAlerta: idTipoAlerta
             },
             success: function (response) {
                 if (!response.success) {
-
                     restaurarBotonReabrir(
                         boton
                     );
@@ -1834,26 +2259,24 @@ function htmlPendienteNormal(idDetenido, idOrigen, idFuente) {
                 }
 
                 boton.closest('.sic-rel-actions').html(
-                    htmlPendienteDetenido(idDetenido, idsNomPerso)
+                    htmlPendienteDetenido(
+                        idDetenido,
+                        idOrigen,
+                        idTipoAlerta
+                    )
                 );
 
                 actualizarContadoresAlReabrir(
                     estatusAnterior
                 );
 
+                actualizarEstadoTabsDesdeDOM();
+
                 actualizarPildoraEstadoIdentidad(
                     idDetenido
                 );
-
-                //mostrarMensajeSIC(
-                //    'Confirmación cancelada',
-                //    response.message ||
-                //    'La coincidencia volvió a quedar pendiente de revisión.',
-                //    'success'
-                //);
             },
             error: function (xhr) {
-
                 console.log(
                     xhr.responseText
                 );
@@ -1870,7 +2293,6 @@ function htmlPendienteNormal(idDetenido, idOrigen, idFuente) {
             }
         });
     }
-
 
     function actualizarPildoraEstadoIdentidad(idDetenido) {
 
@@ -2102,6 +2524,82 @@ function htmlPendienteNormal(idDetenido, idOrigen, idFuente) {
         $('#contadorAlertasActivas').text(activas);
         $('#contadorAlertasDescartadas').text(revisadas);
         $('#contadorCoincidenciasConfirmadas').text(confirmadas);
+    }
+
+    function actualizarEstadoTabsDesdeDOM() {
+        $('.sic-source-tab').each(function () {
+            var tab = $(this);
+
+            /*
+             * Si no tiene registros, Razor ya le puso
+             * sic-tab-sin-registros y se conserva en gris.
+             */
+            if (tab.hasClass('sic-tab-sin-registros')) {
+                return;
+            }
+
+            var idContenido = tab.attr('data-tab');
+
+            if (!idContenido) {
+                return;
+            }
+
+            var contenido = $('#' + idContenido);
+
+            if (contenido.length === 0) {
+                return;
+            }
+
+            /*
+             * Quitamos únicamente los estados dinámicos.
+             * No tocamos active ni sic-tab-sin-registros.
+             */
+            tab.removeClass(
+                'sic-tab-confirmado sic-tab-descartado'
+            );
+
+            /*
+             * ESTATUS 2 o 3
+             *
+             * Identidad confirmada o Resguardo FGEA.
+             */
+            var tieneConfirmada =
+                contenido.find('.sic-btn-identidad-confirmada').length > 0 ||
+                contenido.find('.sic-btn-resguardo-confirmado').length > 0;
+
+            if (tieneConfirmada) {
+                tab.addClass('sic-tab-confirmado');
+                return;
+            }
+
+            /*
+             * ESTATUS 1
+             *
+             * Si todavía existe al menos una coincidencia pendiente,
+             * el tab conserva su color normal.
+             */
+            var tienePendiente =
+                contenido.find('.js-confirmar-identidad-normal').length > 0 ||
+                contenido.find('.js-confirmar-identidad-detenido').length > 0;
+
+            if (tienePendiente) {
+                return;
+            }
+
+            /*
+             * ESTATUS 0
+             *
+             * Si ya no hay pendientes ni confirmadas y existe
+             * al menos una descartada, significa que todas
+             * terminaron descartadas.
+             */
+            var tieneDescartada =
+                contenido.find('.sic-btn-descartada').length > 0;
+
+            if (tieneDescartada) {
+                tab.addClass('sic-tab-descartado');
+            }
+        });
     }
 
     function bloquearBoton(boton, texto) {
@@ -2802,8 +3300,17 @@ $(document)
             var idFuente =
                 boton.data('id-fuente');
 
+            var idTipoAlerta =
+                parseInt(
+                    boton.attr('data-id-tipo-alerta'),
+                    10
+                );
 
-            if (!idDetenido || !idOrigen || !idFuente) {
+            if (!idDetenido ||
+                !idOrigen ||
+                !idFuente ||
+                isNaN(idTipoAlerta) ||
+                idTipoAlerta <= 0) {
 
                 mostrarMensajeSIC(
                     'Datos incompletos',
@@ -2845,7 +3352,8 @@ $(document)
                 data: {
                     idDetenido: idDetenido,
                     idOrigen: idOrigen,
-                    idFuente: idFuente
+                    idFuente: idFuente,
+                    idTipoAlerta: idTipoAlerta
                 },
 
                 success: function (response) {
@@ -2874,7 +3382,8 @@ $(document)
                             htmlResguardoFGEA(
                                 idDetenido,
                                 idOrigen,
-                                idFuente
+                                idFuente,
+                                idTipoAlerta
                             )
                         );
 
@@ -2915,4 +3424,15 @@ $(document)
         }
     );
 
+
+
+
 </script>
+
+<style>
+    @@media (min-width:1200px) {
+        body.toggle-sidebar #main.main {
+            margin-left: 0 !important;
+        }
+    }
+</style>

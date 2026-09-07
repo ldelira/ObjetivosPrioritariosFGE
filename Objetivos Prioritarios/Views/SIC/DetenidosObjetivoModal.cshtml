@@ -555,12 +555,42 @@ new System.Collections.ArrayList();
         out idOrigenDetenido
     );
 
-    bool tieneUltimoDelito =
-        !string.IsNullOrWhiteSpace(ultimoDelitoTexto) &&
-        !ultimoDelitoTexto.Equals(
-            "SIN INFORMACIÓN",
-            StringComparison.OrdinalIgnoreCase
+    int idTipoAlertaAccion = 0;
+
+    if (row.Table.Columns.Contains("IdTipoAlerta") &&
+        row["IdTipoAlerta"] != DBNull.Value)
+    {
+        int.TryParse(
+            Convert.ToString(row["IdTipoAlerta"]),
+            out idTipoAlertaAccion
         );
+    }
+
+    int clavePersoAccion = 0;
+
+    if (row.Table.Columns.Contains("CLAVE_PERSO") &&
+        row["CLAVE_PERSO"] != DBNull.Value)
+    {
+        int.TryParse(
+            Convert.ToString(row["CLAVE_PERSO"]),
+            out clavePersoAccion
+        );
+    }
+
+    int idOrigenAccion = idOrigenDetenido;
+
+    if (idTipoAlertaAccion == 2 ||
+        idTipoAlertaAccion == 3)
+    {
+        idOrigenAccion = clavePersoAccion;
+    }
+
+    bool tieneUltimoDelito =
+!string.IsNullOrWhiteSpace(ultimoDelitoTexto) &&
+!ultimoDelitoTexto.Equals(
+"SIN INFORMACIÓN",
+StringComparison.OrdinalIgnoreCase
+);
 
     List<string> delitosRegistrados =
     new List<string>();
@@ -645,10 +675,11 @@ new System.Collections.ArrayList();
 
                     </div>
 
+
                     <div class="sic-modal-det-sidebar-item">
 
                         <div class="sic-info-label">
-                            Edad
+                            Edad Actual
                         </div>
 
                         <div class="sic-info-value">
@@ -683,7 +714,8 @@ new System.Collections.ArrayList();
                         {
                             <div class="sic-rel-actions">
 
-                                @if (idOrigenDetenido <= 0)
+                                @if (idOrigenAccion <= 0 ||
+idTipoAlertaAccion <= 0)
                                 {
                                     <button type="button"
                                             class="sic-btn-alerta-desactivada"
@@ -699,7 +731,9 @@ new System.Collections.ArrayList();
                                     <button type="button"
                                             class="sic-btn-confirmar-identidad js-confirmar-identidad-detenido"
                                             data-id-detenido="@idDetenidoC5"
-                                            data-ids-nom-perso="@idsNomPersoTexto">
+                                            data-ids-nom-perso="@idsNomPersoTexto"
+                                            data-id-origen="@idOrigenAccion"
+                                            data-id-tipo-alerta="@idTipoAlertaAccion">
 
                                         <i class="fa fa-check"></i>
                                         Confirmar identidad
@@ -709,7 +743,9 @@ new System.Collections.ArrayList();
                                     <button type="button"
                                             class="sic-btn-warning-soft sic-btn-descartar-alerta-detenidos"
                                             data-id-detenido="@idDetenidoC5"
-                                            data-ids-nom-perso="@idsNomPersoTexto">
+                                            data-ids-nom-perso="@idsNomPersoTexto"
+                                            data-id-origen="@idOrigenAccion"
+                                            data-id-tipo-alerta="@idTipoAlertaAccion">
 
                                         <i class="fa fa-times"></i>
                                         Descartar
@@ -731,7 +767,9 @@ new System.Collections.ArrayList();
                                             class="sic-btn-reactivar-alerta-detenidos"
                                             data-estatus-anterior="2"
                                             data-id-detenido="@idDetenidoC5"
-                                            data-ids-nom-perso="@idsNomPersoTexto">
+                                            data-ids-nom-perso="@idsNomPersoTexto"
+                                            data-id-origen="@idOrigenAccion"
+                                            data-id-tipo-alerta="@idTipoAlertaAccion">
 
                                         <i class="fa fa-undo"></i>
                                         Cancelar Confirmación
@@ -753,7 +791,9 @@ new System.Collections.ArrayList();
                                             class="sic-btn-reactivar-alerta-detenidos"
                                             data-estatus-anterior="0"
                                             data-id-detenido="@idDetenidoC5"
-                                            data-ids-nom-perso="@idsNomPersoTexto">
+                                            data-ids-nom-perso="@idsNomPersoTexto"
+                                            data-id-origen="@idOrigenAccion"
+                                            data-id-tipo-alerta="@idTipoAlertaAccion">
 
                                         <i class="fa fa-undo"></i>
                                         Cancelar Confirmación

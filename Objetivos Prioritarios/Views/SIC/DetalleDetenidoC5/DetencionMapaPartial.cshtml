@@ -1,235 +1,433 @@
 ﻿@model Objetivos_Prioritarios.Models.sp_BuscarDetenido_Result
-
 @using System
+@using System.Collections.Generic
 
 @{
-    var detencionC5 =
-        ViewBag.DetencionC5 as Objetivos_Prioritarios.Models.tb_DETENCION_C5;
-
-    string totalRegistrosDetenido = Convert.ToString(Model.TotalRegistrosDetenido);
-    totalRegistrosDetenido = string.IsNullOrWhiteSpace(totalRegistrosDetenido)
-        ? "0"
-        : totalRegistrosDetenido;
+    var detencionesC5 = ViewBag.DetencionC5 as List<Objetivos_Prioritarios.Models.tb_DETENCION_C5> ?? new List<Objetivos_Prioritarios.Models.tb_DETENCION_C5>();
 }
 
-<div class="sic-section-grid">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
-    <div class="sic-card">
-        <div class="sic-card-header"
-             style="display:flex;
-            align-items:center;
-            justify-content:space-between;
-            gap:16px;
-            width:100%;
-            flex-wrap:nowrap;">
+<div class="sic-card sic-det-hist-card">
 
-            <h5 style="display:flex;
-               align-items:center;
-               gap:8px;
-               margin:0;
-               min-width:0;
-               white-space:nowrap;">
+    <div class="sic-det-top">
+        <div class="sic-det-top-left">
+            <h5><i class="fa fa-map-marker"></i> Historial de detenciones</h5>
 
-                <i class="fa fa-car"></i>
+            <div class="sic-det-hist-total">
+                <span>Total detenciones</span>
+                <strong>@detencionesC5.Count</strong>
+            </div>
+        </div>
 
-                Información de detención en Municipio
-            </h5>
+        <div class="sic-det-top-right">
+            <div class="sic-det-map-selected">
+                <span id="sicDetMapaNumero" class="sic-det-map-number">1</span>
 
-            <div class="sic-confirmadas-counter" style="display:flex; align-items:center; gap:10px; margin-left:auto; flex-shrink:0;">
+                <div class="sic-det-map-selected-text">
+                    <small>Detención seleccionada</small>
+                    <strong id="sicDetMapaTitulo">SIN INFORMACIÓN</strong>
+                </div>
+            </div>
 
-                <div class="sic-confirmadas-counter-icon" style="display:flex; align-items:center; justify-content:center;">
-                    <i class="fa fa-check-circle"></i>
+            <div class="sic-det-map-actions">
+                <button type="button" id="sicDetVerTodas" class="sic-det-top-btn">
+                    <i class="fa fa-map"></i> Ver todas
+                </button>
+
+                <a id="sicDetGoogleMaps" class="sic-det-top-btn" href="#" target="_blank" style="display:none;">
+                    <i class="fa fa-map-marker"></i> Google Maps
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="sic-card-body sic-det-hist-body">
+
+        @if (detencionesC5.Count > 0)
+        {
+            <div class="sic-det-hist-layout">
+
+                <div class="sic-det-hist-list-window">
+                    <div class="sic-det-hist-list">
+
+                        @for (int i = 0; i < detencionesC5.Count; i++)
+                        {
+                            var detencion = detencionesC5[i];
+
+                            string detConsecutivo = ViewBag.TextoDetencion(detencion.CONSECUTIVO);
+                            string detFecha = ViewBag.FechaHoraDetencion(detencion.FECHA_DETENCION);
+                            string detCalle = ViewBag.TextoDetencion(detencion.CALLE);
+                            string detColonia = ViewBag.TextoDetencion(detencion.COLONIA);
+                            string detCp = ViewBag.TextoDetencion(detencion.CP);
+                            string detMunicipio = ViewBag.TextoDetencion(detencion.MUNICIPIO);
+                            string detNumExt = ViewBag.TextoDetencion(detencion.NUMEXT);
+                            string detNumInt = ViewBag.TextoDetencion(detencion.NUMINT);
+                            string detLatitud = ViewBag.TextoDetencion(detencion.Latitud);
+                            string detLongitud = ViewBag.TextoDetencion(detencion.Longitud);
+                            string detCausa = ViewBag.TextoDetencion(detencion.CAUSA);
+
+                            string latMapa = detLatitud == "SIN INFORMACIÓN" ? "" : detLatitud.Replace(",", ".");
+                            string lngMapa = detLongitud == "SIN INFORMACIÓN" ? "" : detLongitud.Replace(",", ".");
+
+                            <div class="sic-det-hist-row">
+
+                                <div class="sic-det-hist-axis">
+                                    <span class="sic-det-hist-number @(i == 0 ? "selected" : "")">@(i + 1)</span>
+                                </div>
+
+                                <div class="sic-det-hist-item @(i == 0 ? "selected" : "")">
+
+                                    <button type="button"
+                                            class="sic-det-hist-summary"
+                                            data-index="@i"
+                                            data-consecutivo="@detConsecutivo"
+                                            data-fecha="@detFecha"
+                                            data-municipio="@detMunicipio"
+                                            data-calle="@detCalle"
+                                            data-colonia="@detColonia"
+                                            data-cp="@detCp"
+                                            data-numext="@detNumExt"
+                                            data-numint="@detNumInt"
+                                            data-lat="@latMapa"
+                                            data-lng="@lngMapa"
+                                            data-causa="@detCausa">
+
+                                        <span class="sic-det-hist-summary-part sic-det-hist-summary-fecha">
+                                            <i class="fa fa-calendar-o"></i>
+                                            <strong>@detFecha</strong>
+                                        </span>
+
+                                        <span class="sic-det-hist-separator"></span>
+
+                                        <span class="sic-det-hist-summary-part sic-det-hist-summary-municipio">
+                                            <i class="fa fa-building-o"></i>
+                                            <strong>@detMunicipio</strong>
+                                        </span>
+
+                                        <span class="sic-det-hist-separator"></span>
+
+                                        <span class="sic-det-hist-summary-part sic-det-hist-folio">
+                                            <label>Folio:</label>
+                                            <strong>@detConsecutivo</strong>
+                                        </span>
+
+                                        <span class="sic-det-hist-arrow">
+                                            <i class="fa fa-chevron-down"></i>
+                                        </span>
+                                    </button>
+
+                                    <div class="sic-det-hist-detail" style="display:none;">
+                                        <div><label>Calle</label><strong>@detCalle</strong></div>
+                                        <div><label>Colonia</label><strong>@detColonia</strong></div>
+                                        <div><label>Núm. exterior</label><strong>@detNumExt</strong></div>
+                                        <div><label>Núm. interior</label><strong>@detNumInt</strong></div>
+                                        <div><label>Código postal</label><strong>@detCp</strong></div>
+                                        <div><label>Municipio</label><strong>@detMunicipio</strong></div>
+                                        <div><label>Latitud</label><strong>@detLatitud</strong></div>
+                                        <div><label>Longitud</label><strong>@detLongitud</strong></div>
+
+                                        <div class="sic-det-hist-detail-full">
+                                            <label>Falta administrativa</label>
+                                            <strong>@detCausa</strong>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        }
+
+                    </div>
                 </div>
 
-                <div style="display:flex; flex-direction:column; justify-content:center;">
+                <div class="sic-det-map-panel">
+                    <div class="sic-det-map-container">
 
-                    <label style="display:block; margin:0; white-space:nowrap;">
-                        Total detenciones
-                    </label>
+                        <div id="sicMapaDetenciones"></div>
 
-                    <strong style="display:block;  margin:0;">
-                        @totalRegistrosDetenido
-                    </strong>
+                        <div id="sicDetMapaVacio" class="sic-empty-source" style="display:none;">
+                            <i class="fa fa-map-marker"></i>
+                            <strong>Ubicación de detenciones</strong>
+                            <span>No existen coordenadas registradas.</span>
+                        </div>
 
+                    </div>
                 </div>
 
             </div>
+        }
+        else
+        {
+            <div class="sic-empty-source">
+                <i class="fa fa-car"></i>
+                <strong>Historial de detenciones</strong>
+                <span>Sin información cargada por el momento.</span>
+            </div>
+        }
 
-        </div>
-
-        <div class="sic-card-body">
-
-            @if (detencionC5 != null)
-            {
-                string detConsecutivo = ViewBag.TextoDetencion(detencionC5.CONSECUTIVO);
-                string detFecha = ViewBag.FechaHoraDetencion(detencionC5.FECHA_DETENCION);
-                string detCalle = ViewBag.TextoDetencion(detencionC5.CALLE);
-                string detColonia = ViewBag.TextoDetencion(detencionC5.COLONIA);
-                string detCp = ViewBag.TextoDetencion(detencionC5.CP);
-                string detMunicipio = ViewBag.TextoDetencion(detencionC5.MUNICIPIO);
-                string detNumExt = ViewBag.TextoDetencion(detencionC5.NUMEXT);
-                string detNumInt = ViewBag.TextoDetencion(detencionC5.NUMINT);
-                string detLatitud = ViewBag.TextoDetencion(detencionC5.Latitud);
-                string detLongitud = ViewBag.TextoDetencion(detencionC5.Longitud);
-
-
-                <div class="sic-detencion-compact">
-
-                    <div class="sic-detencion-compact-head">
-                        <div class="sic-detencion-compact-icon">
-                            <i class="fa fa-map-marker"></i>
-                        </div>
-
-                        <div class="sic-detencion-compact-title">
-                            <strong>@detMunicipio</strong>
-                            <span>
-                                @detCalle
-                                @if (detNumExt != "SIN INFORMACIÓN")
-                                {
-                                    <text> #@detNumExt</text>
-                                }
-                                @if (detNumInt != "SIN INFORMACIÓN")
-                                {
-                                    <text> Int. @detNumInt</text>
-                                }
-                                , Col. @detColonia, C.P. @detCp
-                            </span>
-                        </div>
-
-                        @if (detLatitud != "SIN INFORMACIÓN" && detLongitud != "SIN INFORMACIÓN")
-                        {
-                            <a class="sic-small-btn sic-detencion-map-btn"
-                               href="https://www.google.com/maps?q=@detLatitud,@detLongitud"
-                               target="_blank">
-                                <i class="fa fa-map"></i>
-                                Ubicación
-                            </a>
-                        }
-                    </div>
-
-                    <div class="sic-detencion-compact-grid">
-
-                        <div class="sic-detencion-line">
-                            <label>Consecutivo:</label>
-                            <strong>@detConsecutivo</strong>
-                        </div>
-
-                        <div class="sic-detencion-line">
-                            <label>Fecha detención:</label>
-                            <strong>@detFecha</strong>
-                        </div>
-
-                        <div class="sic-detencion-line">
-                            <label>Calle:</label>
-                            <strong>@detCalle</strong>
-                        </div>
-
-                        <div class="sic-detencion-line">
-                            <label>Colonia:</label>
-                            <strong>@detColonia</strong>
-                        </div>
-
-                        <div class="sic-detencion-line">
-                            <label>Núm. exterior:</label>
-                            <strong>@detNumExt</strong>
-                        </div>
-
-                        <div class="sic-detencion-line">
-                            <label>Núm. interior:</label>
-                            <strong>@detNumInt</strong>
-                        </div>
-
-                        <div class="sic-detencion-line">
-                            <label>Código postal:</label>
-                            <strong>@detCp</strong>
-                        </div>
-
-                        <div class="sic-detencion-line">
-                            <label>Municipio:</label>
-                            <strong>@detMunicipio</strong>
-                        </div>
-
-                        <div class="sic-detencion-line">
-                            <label>Latitud:</label>
-                            <strong>@detLatitud</strong>
-                        </div>
-
-                        <div class="sic-detencion-line">
-                            <label>Longitud:</label>
-                            <strong>@detLongitud</strong>
-                        </div>
-
-                    </div>
-
-                </div>
-            }
-            else
-            {
-                <div class="sic-empty-source">
-                    <i class="fa fa-car"></i>
-                    <strong>Información de detención C5</strong>
-                    <span>Sin información cargada por el momento.</span>
-                </div>
-            }
-
-        </div>
     </div>
-
-    <div class="sic-card">
-        <div class="sic-card-header">
-            <h5>
-                <i class="fa fa-map-marker"></i>
-                Ubicación de detención
-            </h5>
-        </div>
-
-        <div class="sic-card-body">
-
-            @if (ViewBag.TieneCoordenadasMapa)
-            {
-                <div class="sic-map-card">
-
-                    <div class="sic-map-info">
-                        <div>
-                            <label>Latitud:</label>
-                            <strong>@ViewBag.MapaLatitud</strong>
-                        </div>
-
-                        <div>
-                            <label>Longitud:</label>
-                            <strong>@ViewBag.MapaLongitud</strong>
-                        </div>
-
-                        <a class="sic-small-btn"
-                           href="https://www.google.com/maps?q=@ViewBag.MapaLatitud,@ViewBag.MapaLongitud"
-                           target="_blank">
-                            <i class="fa fa-map"></i>
-                            Abrir en Google Maps
-                        </a>
-                    </div>
-
-                    <div class="sic-map-frame">
-                        <iframe src="https://maps.google.com/maps?q=@ViewBag.MapaLatitud,@ViewBag.MapaLongitud&z=16&output=embed"
-                                width="100%"
-                                height="100%"
-                                style="border:0;"
-                                allowfullscreen=""
-                                loading="lazy">
-                        </iframe>
-                    </div>
-
-                </div>
-            }
-            else
-            {
-                <div class="sic-empty-source">
-                    <i class="fa fa-map-marker"></i>
-                    <strong>Ubicación de detención</strong>
-                    <span>Sin coordenadas registradas por el momento.</span>
-                </div>
-            }
-
-        </div>
-    </div>
-
 </div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+    (function () {
+        var elementos = document.querySelectorAll('.sic-det-hist-summary');
+        if (!elementos.length || typeof L === 'undefined') return;
+
+        var mapa = L.map('sicMapaDetenciones', {
+            zoomControl: true,
+            scrollWheelZoom: true,
+            dragging: true,
+            doubleClickZoom: true,
+            boxZoom: true,
+            keyboard: true
+        });
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; OpenStreetMap'
+        }).addTo(mapa);
+
+        var grupo = L.featureGroup().addTo(mapa);
+        var marcadores = {};
+        var puntosLinea = [];
+        var lineaDetenciones = null;
+        var totalMarcadores = 0;
+
+        function valor(elemento, nombre) {
+            var resultado = elemento.getAttribute('data-' + nombre);
+            return resultado && resultado.trim() !== '' ? resultado : 'SIN INFORMACIÓN';
+        }
+
+        function coordenada(elemento, nombre) {
+            var resultado = elemento.getAttribute('data-' + nombre);
+            if (!resultado) return null;
+
+            resultado = parseFloat(resultado.replace(',', '.'));
+
+            return isNaN(resultado) ? null : resultado;
+        }
+
+        function crearIconoNumero(numero, activo) {
+            return L.divIcon({
+                className: 'sic-det-marker-wrap',
+                html: '<div class="sic-det-marker ' + (activo ? 'active' : '') + '"><span>' + numero + '</span></div>',
+                iconSize: [34, 40],
+                iconAnchor: [17, 40],
+                popupAnchor: [0, -36]
+            });
+        }
+
+        function cerrarDetalles() {
+            document.querySelectorAll('.sic-det-hist-item').forEach(function (item) {
+                item.classList.remove('open');
+
+                var detalle = item.querySelector('.sic-det-hist-detail');
+
+                if (detalle) detalle.style.display = 'none';
+            });
+        }
+
+        function actualizarSeleccion(indice) {
+            document.querySelectorAll('.sic-det-hist-item').forEach(function (item) {
+                item.classList.remove('selected');
+            });
+
+            document.querySelectorAll('.sic-det-hist-number').forEach(function (numero) {
+                numero.classList.remove('selected');
+            });
+
+            var elemento = elementos[indice];
+
+            if (!elemento) return;
+
+            var item = elemento.closest('.sic-det-hist-item');
+            var fila = elemento.closest('.sic-det-hist-row');
+            var numero = fila ? fila.querySelector('.sic-det-hist-number') : null;
+
+            if (item) item.classList.add('selected');
+            if (numero) numero.classList.add('selected');
+        }
+
+        function actualizarMarcadores(indiceActivo) {
+            Object.keys(marcadores).forEach(function (key) {
+                var indice = parseInt(key, 10);
+
+                marcadores[key].setIcon(
+                    crearIconoNumero(indice + 1, indice === indiceActivo)
+                );
+            });
+        }
+
+        function seleccionarDetencion(elemento, moverMapa, alternarDetalle) {
+            var item = elemento.closest('.sic-det-hist-item');
+            var estabaAbierto = item.classList.contains('open');
+
+            var indice = parseInt(elemento.getAttribute('data-index'), 10);
+            var lat = coordenada(elemento, 'lat');
+            var lng = coordenada(elemento, 'lng');
+
+            cerrarDetalles();
+            actualizarSeleccion(indice);
+
+            if (alternarDetalle !== false && !estabaAbierto) {
+                item.classList.add('open');
+
+                var detalle = item.querySelector('.sic-det-hist-detail');
+
+                if (detalle) detalle.style.display = 'grid';
+            }
+
+            document.getElementById('sicDetMapaNumero').textContent = indice + 1;
+            document.getElementById('sicDetMapaTitulo').textContent = valor(elemento, 'fecha') + ' · ' + valor(elemento, 'municipio');
+
+            var enlace = document.getElementById('sicDetGoogleMaps');
+
+            if (lat !== null && lng !== null) {
+                enlace.href = 'https://www.google.com/maps?q=' + lat + ',' + lng;
+                enlace.style.display = 'inline-flex';
+
+                if (moverMapa !== false && marcadores[indice]) {
+                    mapa.setView([lat, lng], 16);
+                    marcadores[indice].openPopup();
+                }
+            }
+            else {
+                enlace.style.display = 'none';
+            }
+
+            actualizarMarcadores(indice);
+        }
+
+        elementos.forEach(function (elemento) {
+            var indice = parseInt(elemento.getAttribute('data-index'), 10);
+
+            var lat = coordenada(elemento, 'lat');
+            var lng = coordenada(elemento, 'lng');
+
+            elemento.addEventListener('click', function () {
+                seleccionarDetencion(elemento, true, true);
+            });
+
+            if (lat === null || lng === null) return;
+
+            puntosLinea.push([lat, lng]);
+
+            var popup = document.createElement('div');
+            popup.className = 'sic-det-popup';
+
+            var titulo = document.createElement('strong');
+            titulo.textContent = (indice + 1) + '. ' + valor(elemento, 'municipio');
+
+            var fecha = document.createElement('span');
+            fecha.textContent = valor(elemento, 'fecha');
+
+            var folio = document.createElement('span');
+            folio.textContent = 'Folio: ' + valor(elemento, 'consecutivo');
+
+            var direccion = document.createElement('span');
+
+            var textoDireccion = valor(elemento, 'calle');
+
+            if (valor(elemento, 'numext') !== 'SIN INFORMACIÓN') {
+                textoDireccion += ' #' + valor(elemento, 'numext');
+            }
+
+            if (valor(elemento, 'colonia') !== 'SIN INFORMACIÓN') {
+                textoDireccion += ', Col. ' + valor(elemento, 'colonia');
+            }
+
+            direccion.textContent = textoDireccion;
+
+            popup.appendChild(titulo);
+            popup.appendChild(fecha);
+            popup.appendChild(folio);
+            popup.appendChild(direccion);
+
+            var marcador = L.marker([lat, lng], {
+                icon: crearIconoNumero(indice + 1, indice === 0)
+            }).addTo(grupo).bindPopup(popup);
+
+            marcador.on('click', function () {
+                seleccionarDetencion(elemento, false, false);
+
+                var fila = elemento.closest('.sic-det-hist-row');
+
+                if (fila) {
+                    fila.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'nearest'
+                    });
+                }
+            });
+
+            marcadores[indice] = marcador;
+
+            totalMarcadores++;
+        });
+
+        if (puntosLinea.length > 1) {
+            lineaDetenciones = L.polyline(puntosLinea, {
+                color: '#3769c8',
+                weight: 3,
+                opacity: 0.65,
+                lineJoin: 'round',
+                lineCap: 'round'
+            }).addTo(mapa);
+        }
+
+        if (totalMarcadores > 0) {
+            if (lineaDetenciones) {
+                mapa.fitBounds(
+                    lineaDetenciones.getBounds().pad(0.15)
+                );
+            }
+            else {
+                mapa.setView(
+                    grupo.getLayers()[0].getLatLng(),
+                    16
+                );
+            }
+
+            seleccionarDetencion(
+                elementos[0],
+                false,
+                false
+            );
+
+            setTimeout(function () {
+                mapa.invalidateSize();
+            }, 150);
+        }
+        else {
+            document.getElementById('sicMapaDetenciones').style.display = 'none';
+            document.getElementById('sicDetMapaVacio').style.display = 'flex';
+
+            seleccionarDetencion(
+                elementos[0],
+                false,
+                false
+            );
+        }
+
+        document.getElementById('sicDetVerTodas').addEventListener('click', function () {
+            if (lineaDetenciones) {
+                mapa.fitBounds(
+                    lineaDetenciones.getBounds().pad(0.15)
+                );
+            }
+            else if (totalMarcadores === 1) {
+                mapa.setView(
+                    grupo.getLayers()[0].getLatLng(),
+                    16
+                );
+            }
+            else if (totalMarcadores > 1) {
+                mapa.fitBounds(
+                    grupo.getBounds().pad(0.15)
+                );
+            }
+        });
+    })();
+</script>

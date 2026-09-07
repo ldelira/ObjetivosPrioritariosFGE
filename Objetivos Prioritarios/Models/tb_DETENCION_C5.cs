@@ -44,5 +44,6 @@ namespace Objetivos_Prioritarios.Models
         public string Cartuchos { get; set; }
         public string FueroDescripcion { get; set; }
         public string Cargadores { get; set; }
+        public string OficialTraslada { get; set; }
     }
 }

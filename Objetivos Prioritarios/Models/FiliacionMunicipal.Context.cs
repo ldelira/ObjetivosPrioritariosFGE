@@ -52,6 +52,9 @@ namespace Objetivos_Prioritarios.Models
         public virtual DbSet<tb_PersonaEmbedding> tb_PersonaEmbedding { get; set; }
         public virtual DbSet<tb_PersonaSourceAFIS> tb_PersonaSourceAFIS { get; set; }
         public virtual DbSet<tb_DETENCION_C5> tb_DETENCION_C5 { get; set; }
+        public virtual DbSet<COINCIDENCIA> COINCIDENCIA { get; set; }
+        public virtual DbSet<tb_CoincidenciasNormalizadas> tb_CoincidenciasNormalizadas { get; set; }
+        public virtual DbSet<Usuario> Usuario { get; set; }
     
         public virtual ObjectResult<sp_BuscarDetenido_Result> sp_BuscarDetenido(Nullable<int> iDDETENIDO)
         {

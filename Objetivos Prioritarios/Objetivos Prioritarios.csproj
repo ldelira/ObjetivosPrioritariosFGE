@@ -370,7 +370,7 @@
       <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\COINCIDENCIA.cs">
-      <DependentUpon>SIC.tt</DependentUpon>
+      <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Colonia.cs">
       <DependentUpon>Catalogos.tt</DependentUpon>
@@ -614,6 +614,9 @@
     <Compile Include="Models\tb_CarpetasObjetivo.cs">
       <DependentUpon>ObjetivosPrioritarios.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\tb_CoincidenciasNormalizadas.cs">
+      <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\tb_Detencion.cs">
       <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
     </Compile>
@@ -699,7 +702,7 @@
       <DependentUpon>ObjetivosPrioritarios.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Usuario.cs">
-      <DependentUpon>SIC.tt</DependentUpon>
+      <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Usuario_Modulos.cs">
       <DependentUpon>SIC.tt</DependentUpon>
@@ -2903,6 +2906,8 @@
     <Content Include="Content\Image\Customer\Performa.png" />
     <Content Include="Content\Image\default-image.jpg" />
     <Content Include="Content\Image\ProductImages\default-image.jpg" />
+    <Content Include="Content\Image\SIC\icono_aguascalientes.png" />
+    <Content Include="Content\Image\SIC\ic_launcher.png" />
     <Content Include="Content\Selectize\css\normalize.css" />
     <Content Include="Content\Selectize\css\selectize.bootstrap2.css" />
     <Content Include="Content\Selectize\css\selectize.bootstrap3.css" />
@@ -3656,6 +3661,7 @@
     <Content Include="Views\SIC\DetalleDetenidoC5\TabMandamientosPartial.cshtml" />
     <Content Include="Views\SIC\DetalleDetenidoC5\CoincidenciasAlertaPartial.cshtml" />
     <Content Include="Views\SIC\DetalleDetenidoC5\DetencionMapaPartial.cshtml" />
+    <Content Include="Views\SIC\DetalleDetenidoC5\TabDetenidosMunicipioPartial.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -46,6 +46,9 @@
         <AssociationConnector Association="Filiacion_MunicipiosModel.FK_tb_PersonaAlias_tb_Persona" />
         <AssociationConnector Association="Filiacion_MunicipiosModel.FK_tb_PersonaPeriodoBusqueda_tb_Persona" />
         <EntityTypeShape EntityType="Filiacion_MunicipiosModel.tb_DETENCION_C5" Width="1.5" PointX="13.375" PointY="13.75" />
+        <EntityTypeShape EntityType="Filiacion_MunicipiosModel.COINCIDENCIA" Width="1.5" PointX="15.375" PointY="13.75" />
+        <EntityTypeShape EntityType="Filiacion_MunicipiosModel.tb_CoincidenciasNormalizadas" Width="1.5" PointX="16.375" PointY="0.75" />
+        <EntityTypeShape EntityType="Filiacion_MunicipiosModel.Usuario" Width="1.5" PointX="16.375" PointY="3.75" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

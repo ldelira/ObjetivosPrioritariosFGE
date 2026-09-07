@@ -73,6 +73,16 @@ advertencia 6002: La tabla o vista 'Filiacion_Municipios.dbo.cat_Contactos_Munic
           <Property Name="Descripcion" Type="nvarchar" MaxLength="150" Nullable="false" />
           <Property Name="Activo" Type="bit" />
         </EntityType>
+        <EntityType Name="COINCIDENCIA">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="DetenidoId" Type="int" Nullable="false" />
+          <Property Name="DetenidoCoincidenciaId" Type="int" Nullable="false" />
+          <Property Name="TipoCoincidencia" Type="nvarchar" MaxLength="50" />
+          <Property Name="FechaRegistro" Type="datetime2" Precision="7" Nullable="false" />
+        </EntityType>
         <EntityType Name="sysdiagrams">
           <Key>
             <PropertyRef Name="diagram_id" />
@@ -95,6 +105,17 @@ advertencia 6002: La tabla o vista 'Filiacion_Municipios.dbo.cat_Contactos_Munic
           <Property Name="Estatus" Type="int" />
           <Property Name="idDetenidoC5" Type="int" />
           <Property Name="Porcentaje" Type="int" />
+          <Property Name="FechaModificacion" Type="datetime" />
+        </EntityType>
+        <EntityType Name="tb_CoincidenciasNormalizadas">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="DetenidoId" Type="int" Nullable="false" />
+          <Property Name="DetenidoCoincidenciaId" Type="int" Nullable="false" />
+          <Property Name="TipoCoincidencia" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="FechaRegistro" Type="datetime2" Precision="7" Nullable="false" />
         </EntityType>
         <EntityType Name="tb_Detencion">
           <Key>
@@ -141,6 +162,7 @@ advertencia 6002: La tabla o vista 'Filiacion_Municipios.dbo.cat_Contactos_Munic
           <Property Name="Cartuchos" Type="varchar" MaxLength="500" />
           <Property Name="FueroDescripcion" Type="varchar(max)" />
           <Property Name="Cargadores" Type="varchar" MaxLength="500" />
+          <Property Name="OficialTraslada" Type="varchar" MaxLength="200" />
         </EntityType>
         <EntityType Name="tb_DETENIDO_C5">
           <Key>
@@ -168,6 +190,11 @@ advertencia 6002: La tabla o vista 'Filiacion_Municipios.dbo.cat_Contactos_Munic
           <Property Name="Folio" Type="varchar" MaxLength="50" />
           <Property Name="Situacion" Type="varchar" MaxLength="1" />
           <Property Name="Telefono" Type="varchar" MaxLength="20" />
+          <Property Name="Estatus" Type="varchar" MaxLength="10" />
+          <Property Name="FechaRegistro" Type="datetime" />
+          <Property Name="UsuarioRegistro" Type="varchar" MaxLength="100" />
+          <Property Name="RFC" Type="varchar" MaxLength="20" />
+          <Property Name="CURP" Type="varchar" MaxLength="20" />
         </EntityType>
         <EntityType Name="tb_Domicilio">
           <Key>
@@ -325,6 +352,27 @@ advertencia 6002: La tabla o vista 'Filiacion_Municipios.dbo.tb_PersonaSourceAFI
           <Property Name="FechaRegistro" Type="datetime" />
           <Property Name="UsuarioRegistro" Type="int" Nullable="false" />
           <Property Name="Activo" Type="bit" />
+        </EntityType>
+        <EntityType Name="Usuario">
+          <Key>
+            <PropertyRef Name="idUsuario" />
+          </Key>
+          <Property Name="idUsuario" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Usuario" Type="varchar" MaxLength="50" />
+          <Property Name="Contrasena" Type="varchar" MaxLength="500" />
+          <Property Name="App" Type="varchar" MaxLength="180" />
+          <Property Name="Apm" Type="varchar" MaxLength="180" />
+          <Property Name="Nombre" Type="varchar" MaxLength="200" />
+          <Property Name="Grupo" Type="varchar" MaxLength="80" />
+          <Property Name="Unidad" Type="varchar" MaxLength="80" />
+          <Property Name="Corporacion" Type="varchar" MaxLength="80" />
+          <Property Name="Municipio" Type="varchar" MaxLength="80" />
+          <Property Name="Turno" Type="varchar" MaxLength="60" />
+          <Property Name="Grado" Type="varchar" MaxLength="80" />
+          <Property Name="Rol" Type="varchar" MaxLength="30" />
+          <Property Name="Estatus" Type="bit" />
+          <Property Name="Cedula" Type="varchar" MaxLength="50" />
+          <Property Name="SSA" Type="varchar" MaxLength="50" />
         </EntityType>
         <Association Name="FK_Alerta_cat_TipoAlerta">
           <End Role="cat_TipoAlerta" Type="Self.cat_TipoAlerta" Multiplicity="0..1" />
@@ -494,18 +542,6 @@ advertencia 6002: La tabla o vista 'Filiacion_Municipios.dbo.tb_PersonaSourceAFI
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_tbAlerta_catEstatusAlerta">
-          <End Role="cat_EstatusAlerta" Type="Self.cat_EstatusAlerta" Multiplicity="0..1" />
-          <End Role="tb_Alerta" Type="Self.tb_Alerta" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="cat_EstatusAlerta">
-              <PropertyRef Name="idEstatus" />
-            </Principal>
-            <Dependent Role="tb_Alerta">
-              <PropertyRef Name="Estatus" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_tbAlerta_catTbFuente">
           <End Role="cat_TbFuente" Type="Self.cat_TbFuente" Multiplicity="1" />
           <End Role="tb_Alerta" Type="Self.tb_Alerta" Multiplicity="*" />
@@ -530,8 +566,10 @@ advertencia 6002: La tabla o vista 'Filiacion_Municipios.dbo.tb_PersonaSourceAFI
           <EntitySet Name="cat_TipoFoto" EntityType="Self.cat_TipoFoto" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="cat_TipoSena" EntityType="Self.cat_TipoSena" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="cat_ZonaCuerpo" EntityType="Self.cat_ZonaCuerpo" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="COINCIDENCIA" EntityType="Self.COINCIDENCIA" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagrams" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="tb_Alerta" EntityType="Self.tb_Alerta" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tb_CoincidenciasNormalizadas" EntityType="Self.tb_CoincidenciasNormalizadas" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="tb_Detencion" EntityType="Self.tb_Detencion" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="tb_DETENCION_C5" EntityType="Self.tb_DETENCION_C5" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="tb_DETENIDO_C5" EntityType="Self.tb_DETENIDO_C5" Schema="dbo" store:Type="Tables" />
@@ -544,6 +582,7 @@ advertencia 6002: La tabla o vista 'Filiacion_Municipios.dbo.tb_PersonaSourceAFI
           <EntitySet Name="tb_PersonaAlias" EntityType="Self.tb_PersonaAlias" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="tb_PersonaPeriodoBusqueda" EntityType="Self.tb_PersonaPeriodoBusqueda" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="tb_SenasParticulares" EntityType="Self.tb_SenasParticulares" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Usuario" EntityType="Self.Usuario" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="cat_Contactos_Municipios" EntityType="Self.cat_Contactos_Municipios" store:Type="Tables" store:Schema="dbo">
             <DefiningQuery>SELECT 
     [cat_Contactos_Municipios].[ID_Mun] AS [ID_Mun], 
@@ -635,10 +674,6 @@ advertencia 6002: La tabla o vista 'Filiacion_Municipios.dbo.tb_PersonaSourceAFI
           <AssociationSet Name="FK_tb_PersonaSourceAFIS_cat_TbFuente" Association="Self.FK_tb_PersonaSourceAFIS_cat_TbFuente">
             <End Role="cat_TbFuente" EntitySet="cat_TbFuente" />
             <End Role="tb_PersonaSourceAFIS" EntitySet="tb_PersonaSourceAFIS" />
-          </AssociationSet>
-          <AssociationSet Name="FK_tbAlerta_catEstatusAlerta" Association="Self.FK_tbAlerta_catEstatusAlerta">
-            <End Role="cat_EstatusAlerta" EntitySet="cat_EstatusAlerta" />
-            <End Role="tb_Alerta" EntitySet="tb_Alerta" />
           </AssociationSet>
           <AssociationSet Name="FK_tbAlerta_catTbFuente" Association="Self.FK_tbAlerta_catTbFuente">
             <End Role="cat_TbFuente" EntitySet="cat_TbFuente" />
@@ -746,6 +781,9 @@ advertencia 6002: La tabla o vista 'Filiacion_Municipios.dbo.tb_PersonaSourceAFI
             <End Role="tb_PersonaPeriodoBusqueda" EntitySet="tb_PersonaPeriodoBusqueda" />
           </AssociationSet>
           <EntitySet Name="tb_DETENCION_C5" EntityType="Filiacion_MunicipiosModel.tb_DETENCION_C5" />
+          <EntitySet Name="COINCIDENCIA" EntityType="Filiacion_MunicipiosModel.COINCIDENCIA" />
+          <EntitySet Name="tb_CoincidenciasNormalizadas" EntityType="Filiacion_MunicipiosModel.tb_CoincidenciasNormalizadas" />
+          <EntitySet Name="Usuario" EntityType="Filiacion_MunicipiosModel.Usuario" />
           </EntityContainer>
         <ComplexType Name="sp_BuscarDetenido_Result">
           <Property Type="Int32" Name="IDDETENIDO" Nullable="false" />
@@ -886,6 +924,7 @@ advertencia 6002: La tabla o vista 'Filiacion_Municipios.dbo.tb_PersonaSourceAFI
           <NavigationProperty Name="cat_EstatusAlerta" Relationship="Filiacion_MunicipiosModel.FK_tbAlerta_catEstatusAlerta" FromRole="tb_Alerta" ToRole="cat_EstatusAlerta" />
           <NavigationProperty Name="cat_TbFuente" Relationship="Filiacion_MunicipiosModel.FK_tbAlerta_catTbFuente" FromRole="tb_Alerta" ToRole="cat_TbFuente" />
           <NavigationProperty Name="cat_TipoAlerta" Relationship="Filiacion_MunicipiosModel.FK_Alerta_cat_TipoAlerta" FromRole="tb_Alerta" ToRole="cat_TipoAlerta" />
+          <Property Name="FechaModificacion" Type="DateTime" Precision="3" />
         </EntityType>
         <EntityType Name="tb_Detencion">
           <Key>
@@ -925,6 +964,11 @@ advertencia 6002: La tabla o vista 'Filiacion_Municipios.dbo.tb_PersonaSourceAFI
           <Property Name="Folio" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="Situacion" Type="String" MaxLength="1" FixedLength="false" Unicode="false" />
           <Property Name="Telefono" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="Estatus" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+          <Property Name="FechaRegistro" Type="DateTime" Precision="3" />
+          <Property Name="UsuarioRegistro" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="RFC" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="CURP" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
         </EntityType>
         <EntityType Name="tb_Domicilio">
           <Key>
@@ -1330,6 +1374,48 @@ advertencia 6002: La tabla o vista 'Filiacion_Municipios.dbo.tb_PersonaSourceAFI
           <Property Name="Cartuchos" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
           <Property Name="FueroDescripcion" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
           <Property Name="Cargadores" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="OficialTraslada" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="COINCIDENCIA">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="DetenidoId" Type="Int32" Nullable="false" />
+          <Property Name="DetenidoCoincidenciaId" Type="Int32" Nullable="false" />
+          <Property Name="TipoCoincidencia" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="FechaRegistro" Type="DateTime" Nullable="false" Precision="7" />
+        </EntityType>
+        <EntityType Name="tb_CoincidenciasNormalizadas">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="DetenidoId" Type="Int32" Nullable="false" />
+          <Property Name="DetenidoCoincidenciaId" Type="Int32" Nullable="false" />
+          <Property Name="TipoCoincidencia" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="FechaRegistro" Type="DateTime" Nullable="false" Precision="7" />
+        </EntityType>
+        <EntityType Name="Usuario">
+          <Key>
+            <PropertyRef Name="idUsuario" />
+          </Key>
+          <Property Name="idUsuario" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Usuario1" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Contrasena" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="App" Type="String" MaxLength="180" FixedLength="false" Unicode="false" />
+          <Property Name="Apm" Type="String" MaxLength="180" FixedLength="false" Unicode="false" />
+          <Property Name="Nombre" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="Grupo" Type="String" MaxLength="80" FixedLength="false" Unicode="false" />
+          <Property Name="Unidad" Type="String" MaxLength="80" FixedLength="false" Unicode="false" />
+          <Property Name="Corporacion" Type="String" MaxLength="80" FixedLength="false" Unicode="false" />
+          <Property Name="Municipio" Type="String" MaxLength="80" FixedLength="false" Unicode="false" />
+          <Property Name="Turno" Type="String" MaxLength="60" FixedLength="false" Unicode="false" />
+          <Property Name="Grado" Type="String" MaxLength="80" FixedLength="false" Unicode="false" />
+          <Property Name="Rol" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="Estatus" Type="Boolean" />
+          <Property Name="Cedula" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="SSA" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
         </EntityType>
         </Schema>
     </edmx:ConceptualModels>
@@ -1448,6 +1534,7 @@ advertencia 6002: La tabla o vista 'Filiacion_Municipios.dbo.tb_PersonaSourceAFI
           <EntitySetMapping Name="tb_Alerta">
             <EntityTypeMapping TypeName="Filiacion_MunicipiosModel.tb_Alerta">
               <MappingFragment StoreEntitySet="tb_Alerta">
+                <ScalarProperty Name="FechaModificacion" ColumnName="FechaModificacion" />
                 <ScalarProperty Name="Porcentaje" ColumnName="Porcentaje" />
                 <ScalarProperty Name="idDetenidoC5" ColumnName="idDetenidoC5" />
                 <ScalarProperty Name="Estatus" ColumnName="Estatus" />
@@ -1474,6 +1561,11 @@ advertencia 6002: La tabla o vista 'Filiacion_Municipios.dbo.tb_PersonaSourceAFI
           <EntitySetMapping Name="tb_DETENIDO_C5">
             <EntityTypeMapping TypeName="Filiacion_MunicipiosModel.tb_DETENIDO_C5">
               <MappingFragment StoreEntitySet="tb_DETENIDO_C5">
+                <ScalarProperty Name="CURP" ColumnName="CURP" />
+                <ScalarProperty Name="RFC" ColumnName="RFC" />
+                <ScalarProperty Name="UsuarioRegistro" ColumnName="UsuarioRegistro" />
+                <ScalarProperty Name="FechaRegistro" ColumnName="FechaRegistro" />
+                <ScalarProperty Name="Estatus" ColumnName="Estatus" />
                 <ScalarProperty Name="Telefono" ColumnName="Telefono" />
                 <ScalarProperty Name="Situacion" ColumnName="Situacion" />
                 <ScalarProperty Name="Folio" ColumnName="Folio" />
@@ -1670,6 +1762,7 @@ advertencia 6002: La tabla o vista 'Filiacion_Municipios.dbo.tb_PersonaSourceAFI
           <EntitySetMapping Name="tb_DETENCION_C5">
             <EntityTypeMapping TypeName="Filiacion_MunicipiosModel.tb_DETENCION_C5">
               <MappingFragment StoreEntitySet="tb_DETENCION_C5">
+                <ScalarProperty Name="OficialTraslada" ColumnName="OficialTraslada" />
                 <ScalarProperty Name="Cargadores" ColumnName="Cargadores" />
                 <ScalarProperty Name="FueroDescripcion" ColumnName="FueroDescripcion" />
                 <ScalarProperty Name="Cartuchos" ColumnName="Cartuchos" />
@@ -1700,6 +1793,50 @@ advertencia 6002: La tabla o vista 'Filiacion_Municipios.dbo.tb_PersonaSourceAFI
                 <ScalarProperty Name="CONSECUTIVO" ColumnName="CONSECUTIVO" />
                 <ScalarProperty Name="SERIE_MUNICIPIO" ColumnName="SERIE_MUNICIPIO" />
                 <ScalarProperty Name="IDDETENCION" ColumnName="IDDETENCION" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="COINCIDENCIA">
+            <EntityTypeMapping TypeName="Filiacion_MunicipiosModel.COINCIDENCIA">
+              <MappingFragment StoreEntitySet="COINCIDENCIA">
+                <ScalarProperty Name="FechaRegistro" ColumnName="FechaRegistro" />
+                <ScalarProperty Name="TipoCoincidencia" ColumnName="TipoCoincidencia" />
+                <ScalarProperty Name="DetenidoCoincidenciaId" ColumnName="DetenidoCoincidenciaId" />
+                <ScalarProperty Name="DetenidoId" ColumnName="DetenidoId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tb_CoincidenciasNormalizadas">
+            <EntityTypeMapping TypeName="Filiacion_MunicipiosModel.tb_CoincidenciasNormalizadas">
+              <MappingFragment StoreEntitySet="tb_CoincidenciasNormalizadas">
+                <ScalarProperty Name="FechaRegistro" ColumnName="FechaRegistro" />
+                <ScalarProperty Name="TipoCoincidencia" ColumnName="TipoCoincidencia" />
+                <ScalarProperty Name="DetenidoCoincidenciaId" ColumnName="DetenidoCoincidenciaId" />
+                <ScalarProperty Name="DetenidoId" ColumnName="DetenidoId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Usuario">
+            <EntityTypeMapping TypeName="Filiacion_MunicipiosModel.Usuario">
+              <MappingFragment StoreEntitySet="Usuario">
+                <ScalarProperty Name="SSA" ColumnName="SSA" />
+                <ScalarProperty Name="Cedula" ColumnName="Cedula" />
+                <ScalarProperty Name="Estatus" ColumnName="Estatus" />
+                <ScalarProperty Name="Rol" ColumnName="Rol" />
+                <ScalarProperty Name="Grado" ColumnName="Grado" />
+                <ScalarProperty Name="Turno" ColumnName="Turno" />
+                <ScalarProperty Name="Municipio" ColumnName="Municipio" />
+                <ScalarProperty Name="Corporacion" ColumnName="Corporacion" />
+                <ScalarProperty Name="Unidad" ColumnName="Unidad" />
+                <ScalarProperty Name="Grupo" ColumnName="Grupo" />
+                <ScalarProperty Name="Nombre" ColumnName="Nombre" />
+                <ScalarProperty Name="Apm" ColumnName="Apm" />
+                <ScalarProperty Name="App" ColumnName="App" />
+                <ScalarProperty Name="Contrasena" ColumnName="Contrasena" />
+                <ScalarProperty Name="Usuario1" ColumnName="Usuario" />
+                <ScalarProperty Name="idUsuario" ColumnName="idUsuario" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

@@ -1,396 +1,1336 @@
 ﻿@model Objetivos_Prioritarios.Models.sp_BuscarDetenido_Result
 
 @using System
+@using System.Linq
+@using System.Collections.Generic
+@using Objetivos_Prioritarios.Models
 
 @{
-    var datosDetenidoC5 =
-        ViewBag.DatosDetenidoC5
-        as Objetivos_Prioritarios.Models.tb_DETENIDO_C5;
-}
+    /* ============================================================
+       DATOS RECIBIDOS
+       ============================================================ */
 
+    var datosDetenidoC5 =
+        ViewBag.DatosDetenidoC5 as List<tb_DETENIDO_C5>
+        ?? new List<tb_DETENIDO_C5>();
+
+    int idDetenidoRaiz =
+        ViewBag.IdDetenidoRaiz == null
+            ? Convert.ToInt32(Model.IDDETENIDO)
+            : Convert.ToInt32(ViewBag.IdDetenidoRaiz);
+
+    var detenidoRaiz = datosDetenidoC5
+        .FirstOrDefault(x => x.IDDETENIDO == idDetenidoRaiz);
+
+    if (detenidoRaiz == null)
+    {
+        detenidoRaiz = datosDetenidoC5.FirstOrDefault();
+    }
+
+    /* ============================================================
+       FUNCIONES EXISTENTES DEL CONTROLLER
+       ============================================================ */
+
+    var Texto =
+        ViewBag.Texto as Func<object, string>;
+
+    var Fecha =
+        ViewBag.Fecha as Func<object, string>;
+
+    Func<object, string> TextoLimpio = valor =>
+    {
+        string texto = Texto == null
+            ? Convert.ToString(valor)
+            : Texto(valor);
+
+        if (string.IsNullOrWhiteSpace(texto) ||
+            texto.Trim().ToUpper() == "SIN INFORMACIÓN")
+        {
+            return "";
+        }
+
+        return texto.Trim();
+    };
+
+    Func<object, string> FechaLimpia = valor =>
+    {
+        string texto = Fecha == null
+            ? Convert.ToString(valor)
+            : Fecha(valor);
+
+        if (string.IsNullOrWhiteSpace(texto) ||
+            texto.Trim().ToUpper() == "SIN INFORMACIÓN")
+        {
+            return "";
+        }
+
+        return texto.Trim();
+    };
+
+    /* ============================================================
+       FUNCIÓN PARA AGRUPAR VALORES ÚNICOS Y CONTARLOS
+       ============================================================ */
+
+    Func<IEnumerable<string>, List<Tuple<string, int>>> AgruparValores = valores =>
+    {
+        return valores
+            .Where(x => !string.IsNullOrWhiteSpace(x))
+            .Select(x => x.Trim())
+            .GroupBy(
+                x => x,
+                StringComparer.OrdinalIgnoreCase
+            )
+            .Select(x => Tuple.Create(
+                x.First(),
+                x.Count()
+            ))
+            .OrderByDescending(x => x.Item2)
+            .ThenBy(x => x.Item1)
+            .ToList();
+    };
+
+    /* ============================================================
+       TODOS LOS ALIAS
+       ============================================================ */
+
+    var aliasRegistrados = AgruparValores(
+        datosDetenidoC5.Select(x => TextoLimpio(x.ALIAS))
+    );
+
+    /* ============================================================
+       VARIACIONES
+       ============================================================ */
+
+    var variacionAlias = aliasRegistrados;
+
+    var variacionFechaNacimiento = AgruparValores(
+        datosDetenidoC5.Select(x => FechaLimpia(x.FECHA_NACIMIENTO))
+    );
+
+    var variacionOriginario = AgruparValores(
+        datosDetenidoC5.Select(x => TextoLimpio(x.ORIGINARIO))
+    );
+
+    var variacionOcupacion = AgruparValores(
+        datosDetenidoC5.Select(x => TextoLimpio(x.Ocupacion))
+    );
+
+    var variacionEstado = AgruparValores(
+        datosDetenidoC5.Select(x => TextoLimpio(x.Estado))
+    );
+
+    var variacionCalle = AgruparValores(
+        datosDetenidoC5.Select(x => TextoLimpio(x.CALLE))
+    );
+
+    var variacionColonia = AgruparValores(
+        datosDetenidoC5.Select(x => TextoLimpio(x.COLONIA))
+    );
+
+    var variacionNumExt = AgruparValores(
+        datosDetenidoC5.Select(x => TextoLimpio(x.NUMEXT))
+    );
+
+    var variacionNumInt = AgruparValores(
+        datosDetenidoC5.Select(x => TextoLimpio(x.NUMINT))
+    );
+
+    var variacionCp = AgruparValores(
+        datosDetenidoC5.Select(x => TextoLimpio(x.CP))
+    );
+
+    var variacionMunicipio = AgruparValores(
+        datosDetenidoC5.Select(x => TextoLimpio(x.MUNICIPIO))
+    );
+
+    var variacionCaracteristicas = AgruparValores(
+        datosDetenidoC5.Select(x => TextoLimpio(x.CaracteristicasDetenido))
+    );
+
+    /* ============================================================
+       TOTAL DE CAMPOS QUE REALMENTE TIENEN VARIACIÓN
+       ============================================================ */
+
+    int totalCamposVariacion =
+        new[]
+        {
+            variacionAlias.Count,
+            variacionFechaNacimiento.Count,
+            variacionOriginario.Count,
+            variacionOcupacion.Count,
+            variacionEstado.Count,
+            variacionCalle.Count,
+            variacionColonia.Count,
+            variacionNumExt.Count,
+            variacionNumInt.Count,
+            variacionCp.Count,
+            variacionMunicipio.Count,
+            variacionCaracteristicas.Count
+                }
+        .Count(x => x > 1);
+}
 
 <!-- ================================================================
      INFORMACIÓN DEL DETENIDO EN MUNICIPIO
-     SEGUNDA COLUMNA DEL GRID SUPERIOR
      ================================================================ -->
-<div class="sic-card">
+<div class="sic-card sic-info-municipio-card">
 
     <!-- ============================================================
-         ENCABEZADO
+         ENCABEZADO + TABS EN LA MISMA FILA
          ============================================================ -->
-    <div class="sic-card-header sic-card-header-confirmadas">
+    <div class="sic-card-header sic-card-header-confirmadas sic-info-municipio-header">
 
         <h5>
             <i class="fa fa-user"></i>
             Datos del detenido en Municipio
         </h5>
 
+        <div class="sic-info-tabs">
+
+            <button type="button"
+                    class="sic-info-tab active"
+                    data-target="sic-info-resumen">
+
+                Resumen
+
+            </button>
+
+            <button type="button"
+                    class="sic-info-tab"
+                    data-target="sic-info-variaciones">
+
+                Variaciones
+
+                @if (totalCamposVariacion > 0)
+                {
+                    <span class="sic-info-tab-count">
+                        @totalCamposVariacion
+                    </span>
+                }
+
+            </button>
+
+        </div>
+
     </div>
 
-
     <!-- ============================================================
-         CONTENIDO
+         CUERPO DEL CARD
+         ALTURA CONTROLADA
          ============================================================ -->
-    <div class="sic-card-body">
+    <div class="sic-card-body sic-info-municipio-body">
 
-        @if (datosDetenidoC5 != null)
-        {
-            /* ======================================================
-               PREPARACIÓN DE DATOS
-               ====================================================== */
+        <!-- ========================================================
+             TAB RESUMEN
+             SOLO DATOS DEL IDDETENIDO RAÍZ
+             ======================================================== -->
+        <div id="sic-info-resumen"
+             class="sic-info-tab-content active">
 
-            string detNombre =
-                ViewBag.Texto(
-                    datosDetenidoC5.NOMBRE
-                );
-
-            string detPaterno =
-                ViewBag.Texto(
-                    datosDetenidoC5.Ap_Paterno
-                );
-
-            string detMaterno =
-                ViewBag.Texto(
-                    datosDetenidoC5.Ap_Materno
-                );
-
-
-            string detNombreCompleto =
-                (
-                    (
-                        detNombre == "SIN INFORMACIÓN"
-                            ? ""
-                            : detNombre
-                    )
-                    + " "
-                    +
-                    (
-                        detPaterno == "SIN INFORMACIÓN"
-                            ? ""
-                            : detPaterno
-                    )
-                    + " "
-                    +
-                    (
-                        detMaterno == "SIN INFORMACIÓN"
-                            ? ""
-                            : detMaterno
-                    )
-                ).Trim();
-
-
-            if (
-                string.IsNullOrWhiteSpace(
-                    detNombreCompleto
-                )
-            )
+            @if (detenidoRaiz != null)
             {
-                detNombreCompleto =
-                    "SIN INFORMACIÓN";
-            }
+                /* ====================================================
+                   PREPARACIÓN DE DATOS DEL DETENIDO RAÍZ
+                   ==================================================== */
 
+                string detNombre =
+                    Texto == null
+                        ? Convert.ToString(detenidoRaiz.NOMBRE)
+                        : Texto(detenidoRaiz.NOMBRE);
 
-            string detAlias =
-                ViewBag.Texto(
-                    datosDetenidoC5.ALIAS
-                );
+                string detPaterno =
+                    Texto == null
+                        ? Convert.ToString(detenidoRaiz.Ap_Paterno)
+                        : Texto(detenidoRaiz.Ap_Paterno);
 
-            string detEdad =
-                ViewBag.Texto(
-                    datosDetenidoC5.EDAD
-                );
+                string detMaterno =
+                    Texto == null
+                        ? Convert.ToString(detenidoRaiz.Ap_Materno)
+                        : Texto(detenidoRaiz.Ap_Materno);
 
-            string detOriginario =
-                ViewBag.Texto(
-                    datosDetenidoC5.ORIGINARIO
-                );
+                string detNombreCompleto =
+                    (
+                        (
+                            detNombre == "SIN INFORMACIÓN"
+                                ? ""
+                                : detNombre
+                        )
+                        + " " +
+                        (
+                            detPaterno == "SIN INFORMACIÓN"
+                                ? ""
+                                : detPaterno
+                        )
+                        + " " +
+                        (
+                            detMaterno == "SIN INFORMACIÓN"
+                                ? ""
+                                : detMaterno
+                        )
+                    ).Trim();
 
-            string detSexo =
-                ViewBag.Texto(
-                    datosDetenidoC5.SEXO
-                );
+                if (string.IsNullOrWhiteSpace(detNombreCompleto))
+                {
+                    detNombreCompleto = "SIN INFORMACIÓN";
+                }
 
-            string detFechaNacimiento =
-                ViewBag.Fecha(
-                    datosDetenidoC5.FECHA_NACIMIENTO
-                );
+                string detEdad =
+                    Texto == null
+                        ? Convert.ToString(detenidoRaiz.EDAD)
+                        : Texto(detenidoRaiz.EDAD);
 
-            string detCalle =
-                ViewBag.Texto(
-                    datosDetenidoC5.CALLE
-                );
+                string detOriginario =
+                    Texto == null
+                        ? Convert.ToString(detenidoRaiz.ORIGINARIO)
+                        : Texto(detenidoRaiz.ORIGINARIO);
 
-            string detColonia =
-                ViewBag.Texto(
-                    datosDetenidoC5.COLONIA
-                );
+                string detSexo =
+                    Texto == null
+                        ? Convert.ToString(detenidoRaiz.SEXO)
+                        : Texto(detenidoRaiz.SEXO);
 
-            string detCp =
-                ViewBag.Texto(
-                    datosDetenidoC5.CP
-                );
+                string detFechaNacimiento =
+                    Fecha == null
+                        ? Convert.ToString(detenidoRaiz.FECHA_NACIMIENTO)
+                        : Fecha(detenidoRaiz.FECHA_NACIMIENTO);
 
-            string detMunicipio =
-                ViewBag.Texto(
-                    datosDetenidoC5.MUNICIPIO
-                );
+                string detCalle =
+                    Texto == null
+                        ? Convert.ToString(detenidoRaiz.CALLE)
+                        : Texto(detenidoRaiz.CALLE);
 
-            string detNumExt =
-                ViewBag.Texto(
-                    datosDetenidoC5.NUMEXT
-                );
+                string detColonia =
+                    Texto == null
+                        ? Convert.ToString(detenidoRaiz.COLONIA)
+                        : Texto(detenidoRaiz.COLONIA);
 
-            string detNumInt =
-                ViewBag.Texto(
-                    datosDetenidoC5.NUMINT
-                );
+                string detCp =
+                    Texto == null
+                        ? Convert.ToString(detenidoRaiz.CP)
+                        : Texto(detenidoRaiz.CP);
 
-            string detOcupacion =
-                ViewBag.Texto(
-                    datosDetenidoC5.Ocupacion
-                );
+                string detMunicipio =
+                    Texto == null
+                        ? Convert.ToString(detenidoRaiz.MUNICIPIO)
+                        : Texto(detenidoRaiz.MUNICIPIO);
 
-            string detCaracteristicas =
-                ViewBag.Texto(
-                    datosDetenidoC5.CaracteristicasDetenido
-                );
+                string detNumExt =
+                    Texto == null
+                        ? Convert.ToString(detenidoRaiz.NUMEXT)
+                        : Texto(detenidoRaiz.NUMEXT);
 
-            string detEstado =
-                ViewBag.Texto(
-                    datosDetenidoC5.Estado
-                );
+                string detNumInt =
+                    Texto == null
+                        ? Convert.ToString(detenidoRaiz.NUMINT)
+                        : Texto(detenidoRaiz.NUMINT);
 
+                string detOcupacion =
+                    Texto == null
+                        ? Convert.ToString(detenidoRaiz.Ocupacion)
+                        : Texto(detenidoRaiz.Ocupacion);
 
-            <!-- =====================================================
-                 DATOS PRINCIPALES DEL DETENIDO
-                 ===================================================== -->
-            <div class="sic-detenido-c5">
+                string detCaracteristicas =
+                    Texto == null
+                        ? Convert.ToString(detenidoRaiz.CaracteristicasDetenido)
+                        : Texto(detenidoRaiz.CaracteristicasDetenido);
+
+                string detEstado =
+                    Texto == null
+                        ? Convert.ToString(detenidoRaiz.Estado)
+                        : Texto(detenidoRaiz.Estado);
 
                 <!-- =================================================
-                     CABECERA: NOMBRE / SEXO / EDAD
+                     CONTENEDOR PRINCIPAL
                      ================================================= -->
-                <div class="sic-detenido-c5-head">
+                <div class="sic-detenido-c5">
 
-                    <div class="sic-detenido-c5-icon">
+                    <!-- =============================================
+                         NOMBRE / SEXO / EDAD
+                         ============================================= -->
+                    <div class="sic-detenido-c5-head">
 
-                        <i class="fa fa-user"></i>
+                        <div class="sic-detenido-c5-icon">
+                            <i class="fa fa-user"></i>
+                        </div>
+
+                        <div>
+
+                            <strong>
+                                @detNombreCompleto
+                            </strong>
+
+                            <span>
+
+                                @detSexo
+
+                                @if (detEdad != "SIN INFORMACIÓN")
+                                {
+                                    <text>
+                                        · @detEdad años
+                                    </text>
+                                }
+
+                            </span>
+
+                        </div>
 
                     </div>
 
-                    <div>
+                    <!-- =============================================
+                         DATOS
+                         ALIAS YA NO VA AQUÍ
+                         ============================================= -->
+                    <div class="sic-detenido-c5-grid">
+
+                        <div class="sic-detenido-line">
+
+                            <label>
+                                Fecha nac.:
+                            </label>
+
+                            <strong>
+                                @detFechaNacimiento
+                            </strong>
+
+                        </div>
+
+                        <div class="sic-detenido-line">
+
+                            <label>
+                                Originario:
+                            </label>
+
+                            <strong>
+                                @detOriginario
+                            </strong>
+
+                        </div>
+
+                        <div class="sic-detenido-line">
+
+                            <label>
+                                Ocupación:
+                            </label>
+
+                            <strong>
+                                @detOcupacion
+                            </strong>
+
+                        </div>
+
+                        <div class="sic-detenido-line">
+
+                            <label>
+                                Estado:
+                            </label>
+
+                            <strong>
+                                @detEstado
+                            </strong>
+
+                        </div>
+
+                        <div class="sic-detenido-line">
+
+                            <label>
+                                Calle:
+                            </label>
+
+                            <strong>
+                                @detCalle
+                            </strong>
+
+                        </div>
+
+                        <div class="sic-detenido-line">
+
+                            <label>
+                                Colonia:
+                            </label>
+
+                            <strong>
+                                @detColonia
+                            </strong>
+
+                        </div>
+
+                        <div class="sic-detenido-line">
+
+                            <label>
+                                Núm. ext.:
+                            </label>
+
+                            <strong>
+                                @detNumExt
+                            </strong>
+
+                        </div>
+
+                        <div class="sic-detenido-line">
+
+                            <label>
+                                Núm. int.:
+                            </label>
+
+                            <strong>
+                                @detNumInt
+                            </strong>
+
+                        </div>
+
+                        <div class="sic-detenido-line">
+
+                            <label>
+                                C.P.:
+                            </label>
+
+                            <strong>
+                                @detCp
+                            </strong>
+
+                        </div>
+
+                        <div class="sic-detenido-line">
+
+                            <label>
+                                Municipio:
+                            </label>
+
+                            <strong>
+                                @detMunicipio
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+                    <!-- =============================================
+                         CARACTERÍSTICAS
+                         ============================================= -->
+                    <div class="sic-detenido-c5-extra">
+
+                        <label>
+                            Características:
+                        </label>
 
                         <strong>
-                            @detNombreCompleto
+                            @detCaracteristicas
+                        </strong>
+
+                    </div>
+
+                    <!-- =============================================
+                         TODOS LOS ALIAS RELACIONADOS
+                         ============================================= -->
+                    <div class="sic-alias-accordion">
+
+                        <button type="button"
+                                class="sic-alias-header">
+
+                            <span class="sic-alias-header-left">
+
+                                <i class="fa fa-tag"></i>
+
+                                <strong>
+                                    Alias registrados
+                                </strong>
+
+                                <span class="sic-alias-total">
+                                    @aliasRegistrados.Count
+                                </span>
+
+                            </span>
+
+                            <i class="fa fa-chevron-down sic-alias-chevron"></i>
+
+                        </button>
+
+                        <div class="sic-alias-body">
+
+                            @if (aliasRegistrados.Count > 0)
+                            {
+                                foreach (var alias in aliasRegistrados)
+                                {
+                                    <div class="sic-alias-item">
+
+                                        <span>
+                                            @alias.Item1
+                                        </span>
+
+                                        <span class="sic-alias-count">
+
+                                            @alias.Item2
+
+                                            @(alias.Item2 == 1
+                                                ? "registro"
+                                                : "registros")
+
+                                        </span>
+
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <div class="sic-alias-empty">
+
+                                    <i class="fa fa-info-circle"></i>
+
+                                    Sin alias registrados.
+
+                                </div>
+                            }
+
+                        </div>
+
+                    </div>
+
+                </div>
+            }
+            else
+            {
+                <div class="sic-empty-source">
+
+                    <i class="fa fa-user"></i>
+
+                    <strong>
+                        Datos del detenido en Municipio
+                    </strong>
+
+                    <span>
+                        Sin información cargada por el momento.
+                    </span>
+
+                </div>
+            }
+
+        </div>
+
+        <!-- ========================================================
+             TAB VARIACIONES
+             TODOS LOS REGISTROS RELACIONADOS
+             ======================================================== -->
+        <div id="sic-info-variaciones"
+             class="sic-info-tab-content">
+
+            <div class="sic-variaciones-scroll">
+
+                <div class="sic-variaciones-descripcion">
+
+                    <i class="fa fa-info-circle"></i>
+
+                    <span>
+                        Se muestran los valores diferentes reportados
+                        en los registros relacionados.
+                    </span>
+
+                </div>
+
+                @if (totalCamposVariacion == 0)
+                {
+                    <div class="sic-empty-source">
+
+                        <i class="fa fa-check-circle"></i>
+
+                        <strong>
+                            Sin variaciones
                         </strong>
 
                         <span>
-
-                            @detSexo
-
-                            @if (
-                                detEdad !=
-                                "SIN INFORMACIÓN"
-                            )
-                            {
-                                <text>
-                                    · @detEdad años
-                                </text>
-                            }
-
+                            Los registros relacionados no presentan
+                            valores diferentes.
                         </span>
 
                     </div>
+                }
+                else
+                {
+                    /* =================================================
+                       ALIAS
+                       ================================================= */
+                    if (variacionAlias.Count > 1)
+                    {
+                        <div class="sic-variacion-accordion active">
 
-                </div>
+                            <button type="button"
+                                    class="sic-variacion-header">
 
+                                <span>
 
-                <!-- =================================================
-                     GRID DE INFORMACIÓN
-                     ================================================= -->
-                <div class="sic-detenido-c5-grid">
+                                    <i class="fa fa-tag"></i>
 
-                    <div class="sic-detenido-line">
+                                    Alias
 
-                        <label>
-                            Alias:
-                        </label>
+                                </span>
 
-                        <strong>
-                            @detAlias
-                        </strong>
+                                <i class="fa fa-chevron-up"></i>
 
-                    </div>
+                            </button>
 
+                            <div class="sic-variacion-body">
 
-                    <div class="sic-detenido-line">
+                                @foreach (var valor in variacionAlias)
+                                {
+                                    <div class="sic-variacion-item">
 
-                        <label>
-                            Fecha nac.:
-                        </label>
+                                        <strong>
+                                            @valor.Item1
+                                        </strong>
 
-                        <strong>
-                            @detFechaNacimiento
-                        </strong>
+                                        <span class="sic-variacion-count">
 
-                    </div>
+                                            @valor.Item2
 
+                                            @(valor.Item2 == 1
+                                                ? "registro"
+                                                : "registros")
 
-                    <div class="sic-detenido-line">
+                                        </span>
 
-                        <label>
-                            Originario:
-                        </label>
+                                    </div>
+                                }
 
-                        <strong>
-                            @detOriginario
-                        </strong>
+                            </div>
 
-                    </div>
+                        </div>
+                    }
 
+                    /* =================================================
+                       FECHA NACIMIENTO
+                       ================================================= */
+                    if (variacionFechaNacimiento.Count > 1)
+                    {
+                        <div class="sic-variacion-accordion">
 
-                    <div class="sic-detenido-line">
+                            <button type="button"
+                                    class="sic-variacion-header">
 
-                        <label>
-                            Ocupación:
-                        </label>
+                                <span>
 
-                        <strong>
-                            @detOcupacion
-                        </strong>
+                                    <i class="fa fa-calendar"></i>
 
-                    </div>
+                                    Fecha nac.
 
+                                </span>
 
-                    <div class="sic-detenido-line">
+                                <i class="fa fa-chevron-down"></i>
 
-                        <label>
-                            Estado:
-                        </label>
+                            </button>
 
-                        <strong>
-                            @detEstado
-                        </strong>
+                            <div class="sic-variacion-body">
 
-                    </div>
+                                @foreach (var valor in variacionFechaNacimiento)
+                                {
+                                    <div class="sic-variacion-item">
 
+                                        <strong>
+                                            @valor.Item1
+                                        </strong>
 
-                    <div class="sic-detenido-line">
+                                        <span class="sic-variacion-count">
 
-                        <label>
-                            Calle:
-                        </label>
+                                            @valor.Item2
 
-                        <strong>
-                            @detCalle
-                        </strong>
+                                            @(valor.Item2 == 1
+                                                ? "registro"
+                                                : "registros")
 
-                    </div>
+                                        </span>
 
+                                    </div>
+                                }
 
-                    <div class="sic-detenido-line">
+                            </div>
 
-                        <label>
-                            Colonia:
-                        </label>
+                        </div>
+                    }
 
-                        <strong>
-                            @detColonia
-                        </strong>
+                    /* =================================================
+                       ORIGINARIO
+                       ================================================= */
+                    if (variacionOriginario.Count > 1)
+                    {
+                        <div class="sic-variacion-accordion">
 
-                    </div>
+                            <button type="button"
+                                    class="sic-variacion-header">
 
+                                <span>
 
-                    <div class="sic-detenido-line">
+                                    <i class="fa fa-map-marker"></i>
 
-                        <label>
-                            Núm. ext.:
-                        </label>
+                                    Originario
 
-                        <strong>
-                            @detNumExt
-                        </strong>
+                                </span>
 
-                    </div>
+                                <i class="fa fa-chevron-down"></i>
 
+                            </button>
 
-                    <div class="sic-detenido-line">
+                            <div class="sic-variacion-body">
 
-                        <label>
-                            Núm. int.:
-                        </label>
+                                @foreach (var valor in variacionOriginario)
+                                {
+                                    <div class="sic-variacion-item">
 
-                        <strong>
-                            @detNumInt
-                        </strong>
+                                        <strong>
+                                            @valor.Item1
+                                        </strong>
 
-                    </div>
+                                        <span class="sic-variacion-count">
 
+                                            @valor.Item2
 
-                    <div class="sic-detenido-line">
+                                            @(valor.Item2 == 1
+                                                ? "registro"
+                                                : "registros")
 
-                        <label>
-                            C.P.:
-                        </label>
+                                        </span>
 
-                        <strong>
-                            @detCp
-                        </strong>
+                                    </div>
+                                }
 
-                    </div>
+                            </div>
 
+                        </div>
+                    }
 
-                    <div class="sic-detenido-line">
+                    /* =================================================
+                       OCUPACIÓN
+                       ================================================= */
+                    if (variacionOcupacion.Count > 1)
+                    {
+                        <div class="sic-variacion-accordion">
 
-                        <label>
-                            Municipio:
-                        </label>
+                            <button type="button"
+                                    class="sic-variacion-header">
 
-                        <strong>
-                            @detMunicipio
-                        </strong>
+                                <span>
 
-                    </div>
+                                    <i class="fa fa-briefcase"></i>
 
-                </div>
+                                    Ocupación
 
+                                </span>
 
-                <!-- =================================================
-                     CARACTERÍSTICAS FÍSICAS
-                     ================================================= -->
-                <div class="sic-detenido-c5-extra">
+                                <i class="fa fa-chevron-down"></i>
 
-                    <label>
-                        Características:
-                    </label>
+                            </button>
 
-                    <strong>
-                        @detCaracteristicas
-                    </strong>
+                            <div class="sic-variacion-body">
 
-                </div>
+                                @foreach (var valor in variacionOcupacion)
+                                {
+                                    <div class="sic-variacion-item">
+
+                                        <strong>
+                                            @valor.Item1
+                                        </strong>
+
+                                        <span class="sic-variacion-count">
+
+                                            @valor.Item2
+
+                                            @(valor.Item2 == 1
+                                                ? "registro"
+                                                : "registros")
+
+                                        </span>
+
+                                    </div>
+                                }
+
+                            </div>
+
+                        </div>
+                    }
+
+                    /* =================================================
+                       ESTADO
+                       ================================================= */
+                    if (variacionEstado.Count > 1)
+                    {
+                        <div class="sic-variacion-accordion">
+
+                            <button type="button"
+                                    class="sic-variacion-header">
+
+                                <span>
+
+                                    <i class="fa fa-map"></i>
+
+                                    Estado
+
+                                </span>
+
+                                <i class="fa fa-chevron-down"></i>
+
+                            </button>
+
+                            <div class="sic-variacion-body">
+
+                                @foreach (var valor in variacionEstado)
+                                {
+                                    <div class="sic-variacion-item">
+
+                                        <strong>
+                                            @valor.Item1
+                                        </strong>
+
+                                        <span class="sic-variacion-count">
+
+                                            @valor.Item2
+
+                                            @(valor.Item2 == 1
+                                                ? "registro"
+                                                : "registros")
+
+                                        </span>
+
+                                    </div>
+                                }
+
+                            </div>
+
+                        </div>
+                    }
+
+                    /* =================================================
+                       CALLE
+                       ================================================= */
+                    if (variacionCalle.Count > 1)
+                    {
+                        <div class="sic-variacion-accordion">
+
+                            <button type="button"
+                                    class="sic-variacion-header">
+
+                                <span>
+
+                                    <i class="fa fa-home"></i>
+
+                                    Calle
+
+                                </span>
+
+                                <i class="fa fa-chevron-down"></i>
+
+                            </button>
+
+                            <div class="sic-variacion-body">
+
+                                @foreach (var valor in variacionCalle)
+                                {
+                                    <div class="sic-variacion-item">
+
+                                        <strong>
+                                            @valor.Item1
+                                        </strong>
+
+                                        <span class="sic-variacion-count">
+
+                                            @valor.Item2
+
+                                            @(valor.Item2 == 1
+                                                ? "registro"
+                                                : "registros")
+
+                                        </span>
+
+                                    </div>
+                                }
+
+                            </div>
+
+                        </div>
+                    }
+
+                    /* =================================================
+                       COLONIA
+                       ================================================= */
+                    if (variacionColonia.Count > 1)
+                    {
+                        <div class="sic-variacion-accordion">
+
+                            <button type="button"
+                                    class="sic-variacion-header">
+
+                                <span>
+
+                                    <i class="fa fa-map-marker"></i>
+
+                                    Colonia
+
+                                </span>
+
+                                <i class="fa fa-chevron-down"></i>
+
+                            </button>
+
+                            <div class="sic-variacion-body">
+
+                                @foreach (var valor in variacionColonia)
+                                {
+                                    <div class="sic-variacion-item">
+
+                                        <strong>
+                                            @valor.Item1
+                                        </strong>
+
+                                        <span class="sic-variacion-count">
+
+                                            @valor.Item2
+
+                                            @(valor.Item2 == 1
+                                                ? "registro"
+                                                : "registros")
+
+                                        </span>
+
+                                    </div>
+                                }
+
+                            </div>
+
+                        </div>
+                    }
+
+                    /* =================================================
+                       NÚMERO EXTERIOR
+                       ================================================= */
+                    if (variacionNumExt.Count > 1)
+                    {
+                        <div class="sic-variacion-accordion">
+
+                            <button type="button"
+                                    class="sic-variacion-header">
+
+                                <span>
+
+                                    <i class="fa fa-hashtag"></i>
+
+                                    Núm. ext.
+
+                                </span>
+
+                                <i class="fa fa-chevron-down"></i>
+
+                            </button>
+
+                            <div class="sic-variacion-body">
+
+                                @foreach (var valor in variacionNumExt)
+                                {
+                                    <div class="sic-variacion-item">
+
+                                        <strong>
+                                            @valor.Item1
+                                        </strong>
+
+                                        <span class="sic-variacion-count">
+
+                                            @valor.Item2
+
+                                            @(valor.Item2 == 1
+                                                ? "registro"
+                                                : "registros")
+
+                                        </span>
+
+                                    </div>
+                                }
+
+                            </div>
+
+                        </div>
+                    }
+
+                    /* =================================================
+                       NÚMERO INTERIOR
+                       ================================================= */
+                    if (variacionNumInt.Count > 1)
+                    {
+                        <div class="sic-variacion-accordion">
+
+                            <button type="button"
+                                    class="sic-variacion-header">
+
+                                <span>
+
+                                    <i class="fa fa-hashtag"></i>
+
+                                    Núm. int.
+
+                                </span>
+
+                                <i class="fa fa-chevron-down"></i>
+
+                            </button>
+
+                            <div class="sic-variacion-body">
+
+                                @foreach (var valor in variacionNumInt)
+                                {
+                                    <div class="sic-variacion-item">
+
+                                        <strong>
+                                            @valor.Item1
+                                        </strong>
+
+                                        <span class="sic-variacion-count">
+
+                                            @valor.Item2
+
+                                            @(valor.Item2 == 1
+                                                ? "registro"
+                                                : "registros")
+
+                                        </span>
+
+                                    </div>
+                                }
+
+                            </div>
+
+                        </div>
+                    }
+
+                    /* =================================================
+                       C.P.
+                       ================================================= */
+                    if (variacionCp.Count > 1)
+                    {
+                        <div class="sic-variacion-accordion">
+
+                            <button type="button"
+                                    class="sic-variacion-header">
+
+                                <span>
+
+                                    <i class="fa fa-envelope"></i>
+
+                                    C.P.
+
+                                </span>
+
+                                <i class="fa fa-chevron-down"></i>
+
+                            </button>
+
+                            <div class="sic-variacion-body">
+
+                                @foreach (var valor in variacionCp)
+                                {
+                                    <div class="sic-variacion-item">
+
+                                        <strong>
+                                            @valor.Item1
+                                        </strong>
+
+                                        <span class="sic-variacion-count">
+
+                                            @valor.Item2
+
+                                            @(valor.Item2 == 1
+                                                ? "registro"
+                                                : "registros")
+
+                                        </span>
+
+                                    </div>
+                                }
+
+                            </div>
+
+                        </div>
+                    }
+
+                    /* =================================================
+                       MUNICIPIO
+                       ================================================= */
+                    if (variacionMunicipio.Count > 1)
+                    {
+                        <div class="sic-variacion-accordion">
+
+                            <button type="button"
+                                    class="sic-variacion-header">
+
+                                <span>
+
+                                    <i class="fa fa-building"></i>
+
+                                    Municipio
+
+                                </span>
+
+                                <i class="fa fa-chevron-down"></i>
+
+                            </button>
+
+                            <div class="sic-variacion-body">
+
+                                @foreach (var valor in variacionMunicipio)
+                                {
+                                    <div class="sic-variacion-item">
+
+                                        <strong>
+                                            @valor.Item1
+                                        </strong>
+
+                                        <span class="sic-variacion-count">
+
+                                            @valor.Item2
+
+                                            @(valor.Item2 == 1
+                                                ? "registro"
+                                                : "registros")
+
+                                        </span>
+
+                                    </div>
+                                }
+
+                            </div>
+
+                        </div>
+                    }
+
+                    /* =================================================
+                       CARACTERÍSTICAS
+                       ================================================= */
+                    if (variacionCaracteristicas.Count > 1)
+                    {
+                        <div class="sic-variacion-accordion">
+
+                            <button type="button"
+                                    class="sic-variacion-header">
+
+                                <span>
+
+                                    <i class="fa fa-id-card"></i>
+
+                                    Características
+
+                                </span>
+
+                                <i class="fa fa-chevron-down"></i>
+
+                            </button>
+
+                            <div class="sic-variacion-body">
+
+                                @foreach (var valor in variacionCaracteristicas)
+                                {
+                                    <div class="sic-variacion-item">
+
+                                        <strong>
+                                            @valor.Item1
+                                        </strong>
+
+                                        <span class="sic-variacion-count">
+
+                                            @valor.Item2
+
+                                            @(valor.Item2 == 1
+                                                ? "registro"
+                                                : "registros")
+
+                                        </span>
+
+                                    </div>
+                                }
+
+                            </div>
+
+                        </div>
+                    }
+                }
 
             </div>
-        }
-        else
-        {
-            <!-- =====================================================
-                 SIN INFORMACIÓN MUNICIPAL
-                 ===================================================== -->
-            <div class="sic-empty-source">
 
-                <i class="fa fa-user"></i>
-
-                <strong>
-                    Datos del detenido en Municipio
-                </strong>
-
-                <span>
-                    Sin información cargada por el momento.
-                </span>
-
-            </div>
-        }
+        </div>
 
     </div>
 
 </div>
+
+
+<script>
+
+    /* ============================================================
+       TABS RESUMEN / VARIACIONES
+       ============================================================ */
+
+    $(document)
+        .off('click.sicInfoTabs', '.sic-info-tab')
+        .on('click.sicInfoTabs', '.sic-info-tab', function () {
+
+            var boton = $(this);
+            var target = boton.attr('data-target');
+
+            var card = boton.closest('.sic-info-municipio-card');
+
+            card
+                .find('.sic-info-tab')
+                .removeClass('active');
+
+            boton.addClass('active');
+
+            card
+                .find('.sic-info-tab-content')
+                .removeClass('active');
+
+            card
+                .find('#' + target)
+                .addClass('active');
+        });
+
+
+    /* ============================================================
+       DESPLEGABLE DE ALIAS
+       ============================================================ */
+
+    $(document)
+        .off('click.sicAlias', '.sic-alias-header')
+        .on('click.sicAlias', '.sic-alias-header', function () {
+
+            var accordion = $(this)
+                .closest('.sic-alias-accordion');
+
+            accordion.toggleClass('active');
+        });
+
+
+    /* ============================================================
+       ACORDEONES DE VARIACIONES
+       ============================================================ */
+
+    $(document)
+        .off('click.sicVariacion', '.sic-variacion-header')
+        .on('click.sicVariacion', '.sic-variacion-header', function () {
+
+            var accordion = $(this)
+                .closest('.sic-variacion-accordion');
+
+            accordion.toggleClass('active');
+
+            var icono = $(this)
+                .find('.fa-chevron-down, .fa-chevron-up');
+
+            if (accordion.hasClass('active')) {
+
+                icono
+                    .removeClass('fa-chevron-down')
+                    .addClass('fa-chevron-up');
+
+            }
+            else {
+
+                icono
+                    .removeClass('fa-chevron-up')
+                    .addClass('fa-chevron-down');
+
+            }
+        });
+
+</script>

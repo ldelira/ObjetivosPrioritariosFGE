@@ -1,0 +1,321 @@
+﻿@model System.Data.DataTable
+
+@using System
+@using System.Data
+
+@{
+    var detenidosMunicipios = Model;
+}
+
+@if (detenidosMunicipios != null && detenidosMunicipios.Rows.Count > 0)
+{
+    <div class="sic-rel-carousel sic-detenidos-municipio-carousel">
+
+        <div class="sic-detenidos-municipio-slides">
+
+            @for (int i = 0; i < detenidosMunicipios.Rows.Count; i++)
+            {
+                DataRow row = detenidosMunicipios.Rows[i];
+
+                int idDetenido = Convert.ToInt32(row["IDDETENIDO"]);
+                string nombre = Convert.ToString(row["NOMBRE"]);
+                string domicilio = Convert.ToString(row["DOMICILIO"]);
+                string edad = Convert.ToString(row["EDAD"]);
+                string sexo = Convert.ToString(row["SEXO"]);
+                string folio = Convert.ToString(row["Folio"]);
+                string ocupacion = Convert.ToString(row["Ocupacion"]);
+                string situacion = Convert.ToString(row["Situacion"]);
+                string foto = Convert.ToString(row["FOTO"]);
+
+                string fotoUrl = string.IsNullOrWhiteSpace(foto)
+                    ? Url.Content("~/Content/imagenes/Nodisponible.jpg")
+                    : Url.Action("FotoDetenidoC5", "SIC", new { idDetenido = idDetenido });
+
+                int idDetenidoMunicipio = row["IDDETENIDO"] == DBNull.Value ? 0 : Convert.ToInt32(row["IDDETENIDO"]);
+
+                int idDetenidoC5Actual = ViewBag.IdDetenidoC5 == null
+                    ? 0
+                    : Convert.ToInt32(ViewBag.IdDetenidoC5);
+
+                int estatusAlertaMunicipio =
+                    row.Table.Columns.Contains("EstatusAlerta") &&
+                    row["EstatusAlerta"] != DBNull.Value
+                        ? Convert.ToInt32(row["EstatusAlerta"])
+                        : -1;
+
+                int idTipoAlertaDetenidoMunicipio =
+                    row.Table.Columns.Contains("IdTipoAlerta") &&
+                    row["IdTipoAlerta"] != DBNull.Value
+                        ? Convert.ToInt32(row["IdTipoAlerta"])
+                        : 0;
+
+                string porcentajeCoincidenciaTexto =
+                row.Table.Columns.Contains("PorcentajeCoincidenciaTexto") &&
+                row["PorcentajeCoincidenciaTexto"] != DBNull.Value
+                    ? Convert.ToString(row["PorcentajeCoincidenciaTexto"])
+                    : "";
+
+                string nombreTipoAlerta =
+                    row.Table.Columns.Contains("NombreTipoAlerta") &&
+                    row["NombreTipoAlerta"] != DBNull.Value
+                        ? Convert.ToString(row["NombreTipoAlerta"])
+                        : "";
+
+                <div class="sic-rel-slide sic-detenidos-municipio-slide @(i == 0 ? "active" : "")"
+                     data-index="@i">
+
+                    <div class="sic-modal-det-card sic-ficha-detenido-tab">
+
+                        <div class="sic-modal-det-layout">
+
+                            <!-- FOTO -->
+                            <aside class="sic-modal-det-sidebar">
+
+                                <div class="sic-modal-det-photo">
+                                    <div class="sic-photo-loader"></div>
+
+                                    <img src="@fotoUrl"
+                                         alt="Fotografía de @nombre"
+                                         loading="lazy"
+                                         class="sic-foto-expandible"
+                                         role="button"
+                                         tabindex="0"
+                                         title="Presione para comparar fotografías"
+                                         onload="this.parentElement.classList.add('sic-photo-loaded');"
+                                         onclick="event.stopPropagation(); abrirComparacionFotos(this.currentSrc || this.src, this.alt);"
+                                         onkeydown="if(event.key === 'Enter' || event.key === ' '){ event.preventDefault(); event.stopPropagation(); abrirComparacionFotos(this.currentSrc || this.src, this.alt); }"
+                                         onerror="this.onerror=null; this.parentElement.classList.add('sic-photo-loaded'); this.src='@Url.Content("~/Content/imagenes/Nodisponible.jpg")';" />
+                                </div>
+
+                                <div class="sic-modal-det-sidebar-data">
+
+                                    <div class="sic-modal-det-sidebar-item">
+                                        <span class="sic-info-label">ID DETENIDO</span>
+                                        <span class="sic-info-value">@idDetenido</span>
+                                    </div>
+
+                                    <div class="sic-modal-det-sidebar-item">
+                                        <span class="sic-info-label">FOLIO</span>
+                                        <span class="sic-info-value">@ViewBag.Texto(folio)</span>
+                                    </div>
+
+                                </div>
+
+                            </aside>
+
+                            <!-- INFORMACIÓN -->
+                            <div class="sic-modal-det-content">
+
+                                <div class="sic-modal-det-header">
+                                    <div class="sic-modal-det-title-row">
+
+                                        <div class="sic-modal-det-title-content">
+                                            <h4>@ViewBag.Texto(nombre)</h4>
+
+                                            <div class="sic-modal-det-subtitle">
+                                                Detenido registrado en municipio
+                                            </div>
+
+                                            @if (!string.IsNullOrWhiteSpace(porcentajeCoincidenciaTexto))
+                                            {
+                                                <span class="sic-porcentaje-coincidencia">
+                                                    @porcentajeCoincidenciaTexto de coincidencia en @ViewBag.Texto(nombreTipoAlerta)
+                                                </span>
+                                            }
+                                        </div>
+
+                                        <div class="sic-rel-actions">
+
+                                            @if (estatusAlertaMunicipio == 1)
+                                            {
+                                                <button type="button"
+                                                        class="sic-btn-confirmar-identidad js-confirmar-identidad-normal"
+                                                        data-id-detenido="@idDetenidoC5Actual"
+                                                        data-id-origen="@idDetenidoMunicipio"
+                                                        data-id-fuente="1"
+                                                        data-es-fusion="1"
+                                                        data-id-tipo-alerta="@idTipoAlertaDetenidoMunicipio">
+                                                    <i class="fa fa-link"></i>
+                                                    Fusionar
+                                                </button>
+
+                                                <button type="button"
+                                                        class="sic-btn-warning-soft sic-btn-descartar-alerta"
+                                                        data-id-detenido="@idDetenidoC5Actual"
+                                                        data-id-origen="@idDetenidoMunicipio"
+                                                        data-id-fuente="1"
+                                                        data-id-tipo-alerta="@idTipoAlertaDetenidoMunicipio">
+                                                    <i class="fa fa-times"></i>
+                                                    Descartar
+                                                </button>
+                                            }
+                                            else if (estatusAlertaMunicipio == 0)
+                                            {
+                                                <button type="button"
+                                                        class="sic-btn-descartada"
+                                                        disabled>
+                                                    <i class="fa fa-times-circle"></i>
+                                                    Descartada
+                                                </button>
+
+                                                <button type="button"
+                                                        class="sic-btn-reactivar-alerta"
+                                                        data-estatus-anterior="0"
+                                                        data-id-detenido="@idDetenidoC5Actual"
+                                                        data-id-origen="@idDetenidoMunicipio"
+                                                        data-id-fuente="1"
+                                                        data-id-tipo-alerta="@idTipoAlertaDetenidoMunicipio">
+                                                    <i class="fa fa-undo"></i>
+                                                    Reabrir
+                                                </button>
+                                            }
+
+                                        </div>
+
+                                    </div>
+                                </div>
+
+
+
+                                <!-- DATOS GENERALES -->
+                                <div class="sic-modal-det-identidad">
+
+                                    <div class="sic-modal-det-identidad-item">
+                                        <span class="sic-info-label">
+                                            <i class="fa fa-calendar"></i>
+                                            EDAD3
+                                        </span>
+                                        <span class="sic-info-value">@ViewBag.Texto(edad)</span>
+                                    </div>
+
+                                    <div class="sic-modal-det-identidad-item">
+                                        <span class="sic-info-label">
+                                            <i class="fa fa-user"></i>
+                                            SEXO
+                                        </span>
+                                        <span class="sic-info-value">@ViewBag.Texto(sexo)</span>
+                                    </div>
+
+                                    <div class="sic-modal-det-identidad-item">
+                                        <span class="sic-info-label">
+                                            <i class="fa fa-briefcase"></i>
+                                            OCUPACIÓN
+                                        </span>
+                                        <span class="sic-info-value">@ViewBag.Texto(ocupacion)</span>
+                                    </div>
+
+                                    <div class="sic-modal-det-identidad-item">
+                                        <span class="sic-info-label">
+                                            <i class="fa fa-info-circle"></i>
+                                            SITUACIÓN
+                                        </span>
+                                        <span class="sic-info-value">
+                                            @((situacion ?? "").Trim().ToUpper() == "A" ? "Alta" :
+                                              (situacion ?? "").Trim().ToUpper() == "I" ? "De Interés" :
+                                              (situacion ?? "").Trim().ToUpper() == "R" ? "Revisado" :
+                                              (situacion ?? "").Trim().ToUpper() == "C" ? "Confirmado" :
+                                              "SIN INFORMACIÓN")
+                                        </span>
+                                    </div>
+
+                                </div>
+
+                                <!-- DOMICILIO -->
+                                <div class="sic-modal-det-lista-box">
+
+                                    <div class="sic-modal-det-lista-title">
+                                        <i class="fa fa-map-marker"></i>
+                                        DOMICILIO REGISTRADO
+                                    </div>
+
+                                    <div class="sic-modal-det-lista-scroll">
+
+                                        @if (!string.IsNullOrWhiteSpace(domicilio))
+                                        {
+                                            <div class="sic-modal-det-lista-item">
+                                                <i class="fa fa-home"></i>
+                                                <span>@domicilio</span>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div class="sic-rel-box-empty">
+                                                Sin domicilio registrado.
+                                            </div>
+                                        }
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
+
+
+        @if (detenidosMunicipios.Rows.Count > 1)
+        {
+            <!-- =====================================================
+                 NAVEGACIÓN FLOTANTE DEL CARRUSEL
+                 ===================================================== -->
+            <button type="button"
+                    class="sic-rel-nav-flotante sic-rel-prev-flotante sic-detenidos-municipio-prev"
+                    title="Detenido anterior"
+                    aria-label="Detenido anterior">
+                <i class="fa fa-chevron-left"></i>
+            </button>
+
+            <button type="button"
+                    class="sic-rel-nav-flotante sic-rel-next-flotante sic-detenidos-municipio-next"
+                    title="Siguiente detenido"
+                    aria-label="Siguiente detenido">
+                <i class="fa fa-chevron-right"></i>
+            </button>
+
+            <!-- CONTADOR FLOTANTE SUPERIOR -->
+            <div class="sic-rel-counter-superior" aria-live="polite">
+                <span class="sic-detenidos-municipio-current">1</span>
+                <span class="sic-rel-counter-separator">/</span>
+                <span>@detenidosMunicipios.Rows.Count</span>
+            </div>
+        }
+
+    </div>
+}
+else
+{
+    <div class="sic-empty-source">
+        <i class="fa fa-id-card"></i>
+        <strong>Detenidos Municipios</strong>
+        <span>Sin registros relacionados por el momento.</span>
+    </div>
+}
+
+<script>
+    $(document)
+        .off(
+            'click.tabDetenidosMunicipio',
+            '.sic-detenidos-municipio-next, .sic-detenidos-municipio-prev'
+        )
+        .on(
+            'click.tabDetenidosMunicipio',
+            '.sic-detenidos-municipio-next, .sic-detenidos-municipio-prev',
+            function (e) {
+                e.preventDefault();
+
+                moverCarruselSic(
+                    $(this),
+                    '.sic-detenidos-municipio-slide',
+                    '.sic-detenidos-municipio-current',
+                    $(this).hasClass('sic-detenidos-municipio-next') ? 1 : -1
+                );
+            }
+        );
+</script>

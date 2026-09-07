@@ -66,11 +66,11 @@ namespace Objetivos_Prioritarios.Controllers
                             grupo => grupo.Key,
                             grupo => new
                             {
-                                TieneConfirmacionDetenidos = grupo.Any(x => Convert.ToInt32(x.IdTbFuente) == 6 && (Convert.ToInt32(x.Estatus) == 2)),
-                                TieneObjetivoConfirmado = grupo.Any(x => Convert.ToInt32(x.IdTbFuente) != 6 && (Convert.ToInt32(x.Estatus) == 2)),
+                                TieneConfirmacionDetenidos = grupo.Any(x => (Convert.ToInt32(x.IdTbFuente) == 6 || Convert.ToInt32(x.IdTbFuente) == 1) && (Convert.ToInt32(x.Estatus) == 2)),
+                                TieneObjetivoConfirmado = grupo.Any(x => Convert.ToInt32(x.IdTbFuente) != 6 && Convert.ToInt32(x.IdTbFuente) != 1 && Convert.ToInt32(x.Estatus) == 2),
                                 TieneDetenidoResguardo = grupo.Any(x => Convert.ToInt32(x.IdTbFuente) != 6 && Convert.ToInt32(x.Estatus) == 3),
-                                TieneFuente6Activa = grupo.Any(x => Convert.ToInt32(x.IdTbFuente) == 6 && Convert.ToInt32(x.Estatus) != 0),
-                                TieneOtraFuenteActiva = grupo.Any(x => Convert.ToInt32(x.IdTbFuente) != 6 && Convert.ToInt32(x.Estatus) != 0),
+                                TieneFuente6Activa = grupo.Any(x => (Convert.ToInt32(x.IdTbFuente) == 6 || Convert.ToInt32(x.IdTbFuente) == 1) && Convert.ToInt32(x.Estatus) != 0),
+                                TieneOtraFuenteActiva = grupo.Any(x => Convert.ToInt32(x.IdTbFuente) != 6 && Convert.ToInt32(x.IdTbFuente) != 1 && Convert.ToInt32(x.Estatus) != 0),
                                 TienePendiente = grupo.Any(x => Convert.ToInt32(x.Estatus) == 1),
                                 FuentesActivas = string.Join(
                                     ",",
@@ -173,8 +173,15 @@ namespace Objetivos_Prioritarios.Controllers
 
             if (alertasTipo != null && alertasTipo.Count > 0)
             {
-                identidadConfirmada = alertasTipo.Any(x => x.Item3 == 2 || x.Item3 == 3);
-                esDeInteres = alertasTipo.Any(x => (x.Item3 == 2 || x.Item3 == 3) && x.Item2 != 6);
+                identidadConfirmada = alertasTipo.Any(x =>
+     x.Item3 == 2 || x.Item3 == 3
+ );
+
+                esDeInteres = alertasTipo.Any(x =>
+                    (x.Item3 == 2 || x.Item3 == 3) &&
+                    x.Item2 != 6 &&
+                    x.Item2 != 1
+                );
             }
             ViewBag.IdentidadConfirmada = identidadConfirmada;
             ViewBag.EsDeInteres = esDeInteres;
@@ -703,8 +710,12 @@ namespace Objetivos_Prioritarios.Controllers
             }
             // Prioridad 1: identidad confirmada en una fuente de interés (estatus 2 o 3, excepto fuente 6).
             var confirmadasDeInteres = alertasTipo
-                .Where(x => (x.Item3 == 2 || x.Item3 == 3) && x.Item2 != 6)
-                .ToList();
+    .Where(x =>
+        (x.Item3 == 2 || x.Item3 == 3) &&
+        x.Item2 != 6 &&
+        x.Item2 != 1
+    )
+    .ToList();
 
             if (confirmadasDeInteres.Count > 0)
             {
@@ -713,7 +724,7 @@ namespace Objetivos_Prioritarios.Controllers
             }
             // Prioridad 2: identidad confirmada únicamente contra Detenidos FGEA (fuente 6).
             var confirmadasDetenidos = alertasTipo
-                .Where(x => x.Item3 == 2 && x.Item2 == 6)
+                .Where(x => x.Item3 == 2 && (x.Item2 == 6 || x.Item2 == 1))
                 .ToList();
 
             if (confirmadasDetenidos.Count > 0)
@@ -1257,8 +1268,12 @@ namespace Objetivos_Prioritarios.Controllers
             }
             // Prioridad 1: identidad confirmada en una fuente de interés.
             var alertasConfirmadasInteres = alertasTipo
-                .Where(x => (x.Item3 == 2 || x.Item3 == 3) && x.Item2 != 6)
-                .ToList();
+    .Where(x =>
+        (x.Item3 == 2 || x.Item3 == 3) &&
+        x.Item2 != 6 &&
+        x.Item2 != 1
+    )
+    .ToList();
 
             if (alertasConfirmadasInteres.Count > 0)
             {
@@ -1287,8 +1302,8 @@ namespace Objetivos_Prioritarios.Controllers
             }
             // Prioridad 2: identidad confirmada únicamente en Detenidos FGEA.
             var alertasConfirmadasDetenidos = alertasTipo
-                .Where(x => x.Item3 == 2 && x.Item2 == 6)
-                .ToList();
+    .Where(x => x.Item3 == 2 && (x.Item2 == 6 || x.Item2 == 1))
+    .ToList();
 
             if (alertasConfirmadasDetenidos.Count > 0)
             {

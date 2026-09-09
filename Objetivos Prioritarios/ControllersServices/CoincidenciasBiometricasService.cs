@@ -1155,6 +1155,20 @@ namespace Objetivos_Prioritarios.ControllersServices
                         PorcentajeHuella =
                             porcentajeHuella,
 
+                        HuellasCoincidentes =
+                            (item.HuellasCoincidentes ?? new List<ApiCoincidenciaHuellaConsultaDto>())
+                                .Where(x => x != null && x.Huella > 0)
+                                .GroupBy(x => x.Huella)
+                                .Select(grupo => grupo.OrderByDescending(x => x.Score).First())
+                                .OrderBy(x => x.Huella)
+                                .Select(x => new CoincidenciaHuellaConsultaViewModel
+                                {
+                                    Huella = x.Huella,
+                                    Dpi = x.Dpi,
+                                    Score = x.Score
+                                })
+                                .ToList(),
+
                         /* =============================================
                            DATOS DE RESULTADO
                            ============================================= */
@@ -1319,6 +1333,8 @@ namespace Objetivos_Prioritarios.ControllersServices
              * Así "Ver detalle" utiliza exactamente
              * los mismos resultados.
              */
+            AsociarComponentesIdentidad(resultadoApi.ComponentesIdentidad, coincidencias);
+
             GuardarCoincidenciasEnSesion(
                 coincidencias
             );
@@ -3039,6 +3055,112 @@ namespace Objetivos_Prioritarios.ControllersServices
             return "SIN COINCIDENCIA";
         }
 
+
+        private static void AsociarComponentesIdentidad(
+            List<ApiComponenteIdentidadDto> componentesApi,
+            List<CoincidenciaResultadoViewModel> coincidencias)
+        {
+            var indice = new Dictionary<Tuple<int, int>, ComponenteIdentidadViewModel>();
+            var raicesAmbiguas = new HashSet<Tuple<int, int>>();
+
+            foreach (var componenteApi in componentesApi ?? new List<ApiComponenteIdentidadDto>())
+            {
+                if (componenteApi == null)
+                {
+                    continue;
+                }
+
+                var componente = new ComponenteIdentidadViewModel
+                {
+                    Raices = MapearIdentidades(componenteApi.Raices),
+                    Identidades = MapearIdentidades(componenteApi.Identidades)
+                };
+
+                foreach (var relacionApi in componenteApi.Relaciones ?? new List<ApiRelacionIdentidadDto>())
+                {
+                    if (relacionApi == null)
+                    {
+                        continue;
+                    }
+
+                    var extremoA = MapearIdentidad(relacionApi.ExtremoA);
+                    var extremoB = MapearIdentidad(relacionApi.ExtremoB);
+                    if (extremoA == null || extremoB == null)
+                    {
+                        continue;
+                    }
+
+                    componente.Relaciones.Add(new RelacionIdentidadViewModel
+                    {
+                        ExtremoA = extremoA,
+                        ExtremoB = extremoB,
+                        TipoRelacion = relacionApi.TipoRelacion,
+                        Referencias = (relacionApi.Referencias ?? new List<ApiReferenciaIdentidadDto>())
+                            .Where(x => x != null)
+                            .Select(x => new ReferenciaRelacionIdentidadViewModel
+                            {
+                                IdAlerta = x.IdAlerta,
+                                Estatus = x.Estatus,
+                                Id = x.Id,
+                                TipoCoincidencia = x.TipoCoincidencia
+                            }).ToList()
+                    });
+                }
+
+                foreach (var raiz in componente.Raices)
+                {
+                    var clave = Tuple.Create(raiz.IdTbFuente, raiz.IdPersona);
+                    if (raicesAmbiguas.Contains(clave))
+                    {
+                        continue;
+                    }
+
+                    if (indice.ContainsKey(clave))
+                    {
+                        // No atribuir un componente arbitrario a una raíz ambigua.
+                        indice.Remove(clave);
+                        raicesAmbiguas.Add(clave);
+                        System.Diagnostics.Debug.WriteLine(
+                            "Identidad consolidada: raíz presente en varios componentes: " + clave);
+                        continue;
+                    }
+
+                    indice.Add(clave, componente);
+                }
+            }
+
+            foreach (var coincidencia in coincidencias)
+            {
+                ComponenteIdentidadViewModel componente;
+                indice.TryGetValue(Tuple.Create(coincidencia.IdTbFuente, coincidencia.IdPersona), out componente);
+                // Las raíces de un componente comparten esta instancia, sin estado de UI.
+                coincidencia.IdentidadConsolidada = componente;
+            }
+        }
+
+        private static List<IdentidadRelacionadaViewModel> MapearIdentidades(List<ApiIdentidadDto> identidades)
+        {
+            return (identidades ?? new List<ApiIdentidadDto>())
+                .Select(MapearIdentidad)
+                .Where(x => x != null)
+                .GroupBy(x => Tuple.Create(x.IdTbFuente, x.IdPersona))
+                .Select(grupo => grupo.First())
+                .ToList();
+        }
+
+        private static IdentidadRelacionadaViewModel MapearIdentidad(ApiIdentidadDto identidad)
+        {
+            if (identidad == null || identidad.IdTbFuente <= 0 || identidad.IdPersona <= 0)
+            {
+                return null;
+            }
+
+            return new IdentidadRelacionadaViewModel
+            {
+                IdTbFuente = identidad.IdTbFuente,
+                IdPersona = identidad.IdPersona
+            };
+        }
 
         private void GuardarCoincidenciasEnSesion(
             List<CoincidenciaResultadoViewModel> coincidencias)

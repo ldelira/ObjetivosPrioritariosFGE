@@ -17,6 +17,8 @@ namespace Objetivos_Prioritarios.Models.Extends
 
         public int IdTbFuente { get; set; }
 
+        public ComponenteIdentidadViewModel IdentidadConsolidada { get; set; }
+
         public string NombreFuente { get; set; }
 
         public bool EsFuenteInformativa { get; set; }
@@ -161,6 +163,9 @@ namespace Objetivos_Prioritarios.Models.Extends
 
         public decimal PorcentajeHuella { get; set; }
 
+        public List<CoincidenciaHuellaConsultaViewModel> HuellasCoincidentes { get; set; }
+            = new List<CoincidenciaHuellaConsultaViewModel>();
+
 
         /*
          * ============================================================
@@ -204,5 +209,43 @@ namespace Objetivos_Prioritarios.Models.Extends
                     PorcentajeHuella > 0;
             }
         }
+    }
+
+    public class ComponenteIdentidadViewModel
+    {
+        public List<IdentidadRelacionadaViewModel> Raices { get; set; } = new List<IdentidadRelacionadaViewModel>();
+        public List<IdentidadRelacionadaViewModel> Identidades { get; set; } = new List<IdentidadRelacionadaViewModel>();
+        public List<RelacionIdentidadViewModel> Relaciones { get; set; } = new List<RelacionIdentidadViewModel>();
+    }
+
+    public class IdentidadRelacionadaViewModel
+    {
+        public int IdTbFuente { get; set; }
+        public int IdPersona { get; set; }
+    }
+
+    public class RelacionIdentidadViewModel
+    {
+        public IdentidadRelacionadaViewModel ExtremoA { get; set; }
+        public IdentidadRelacionadaViewModel ExtremoB { get; set; }
+        public string TipoRelacion { get; set; }
+        public List<ReferenciaRelacionIdentidadViewModel> Referencias { get; set; } = new List<ReferenciaRelacionIdentidadViewModel>();
+    }
+
+    public class ReferenciaRelacionIdentidadViewModel
+    {
+        public int? IdAlerta { get; set; }
+        public int? Estatus { get; set; }
+        public int? Id { get; set; }
+        public string TipoCoincidencia { get; set; }
+    }
+
+    public class CoincidenciaHuellaConsultaViewModel
+    {
+        public int Huella { get; set; }
+
+        public int Dpi { get; set; }
+
+        public double Score { get; set; }
     }
 }

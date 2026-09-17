@@ -7,6 +7,8 @@
 @using System.Collections.Generic
 
 @{
+    var contextoIdentidad = ViewBag.ContextoRegistroIdentidad as Objetivos_Prioritarios.Models.Extends.RegistroIdentidadViewModel;
+    bool puedeCompararFoto = contextoIdentidad != null && contextoIdentidad.PuedeCompararFotografia;
     Objetivos_Prioritarios.Models.Extends.CoincidenciaResultadoViewModel coincidencia =
     ViewBag.Coincidencia as Objetivos_Prioritarios.Models.Extends.CoincidenciaResultadoViewModel;
 
@@ -58,6 +60,8 @@ Url.Content("~/Content/imagenes/Nodisponible.jpg");
      * DATOS PRINCIPALES
      * ============================================================
      */
+
+    if (contextoIdentidad != null) { fotoUrl = contextoIdentidad.FotoUrl; }
 
     string nombre =
         string.IsNullOrWhiteSpace(Model.NombreCompleto)
@@ -351,6 +355,10 @@ Model.FechaFiliacion.HasValue ||
 
 
 <div class="sic-fgea-detalle">
+    @if (contextoIdentidad != null)
+    {
+        <p class="sic-identidad-tipo">@(contextoIdentidad.EsCoincidenciaDirecta ? "Coincidencia directa" : "Identidad relacionada confirmada")</p>
+    }
 
     <!-- =========================================================
          CABECERA
@@ -361,11 +369,13 @@ Model.FechaFiliacion.HasValue ||
         <div class="sic-fgea-foto-wrap">
 
             <button type="button"
-                    class="sic-fgea-btn-foto js-ampliar-foto"
+                    class="sic-fgea-btn-foto @(puedeCompararFoto ? "js-abrir-comparacion-foto" : "js-ampliar-foto")"
+                    data-foto-candidato="@fotoUrl"
+                    data-porcentaje="@(puedeCompararFoto ? coincidencia.PorcentajeFoto.ToString("0") : "")"
                     data-foto="@fotoUrl"
                     data-nombre="@nombre"
                     data-fuente="FGEA - DETENIDOS"
-                    title="Ver fotografía en grande">
+                    title="@(puedeCompararFoto ? "Comparar fotografía de consulta y registro" : "Ver fotografía en grande")">
 
                 <img src="@fotoUrl"
                      alt="@nombre"
@@ -467,6 +477,8 @@ Model.FechaFiliacion.HasValue ||
          EVIDENCIA
          ========================================================= -->
 
+    @if (contextoIdentidad == null || contextoIdentidad.EsCoincidenciaDirecta)
+    {
     <div class="sic-fgea-evidencia">
 
         <div class="sic-fgea-evidencia-icono">
@@ -495,6 +507,7 @@ Model.FechaFiliacion.HasValue ||
 
     </div>
 
+    }
     @if (
     coincidencia != null &&
     (

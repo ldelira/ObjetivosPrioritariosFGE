@@ -25,7 +25,6 @@ namespace Objetivos_Prioritarios.Models
             throw new UnintentionalCodeFirstException();
         }
     
-        public virtual DbSet<cat_FuenteBusqueda> cat_FuenteBusqueda { get; set; }
         public virtual DbSet<cat_ModuloSistema> cat_ModuloSistema { get; set; }
         public virtual DbSet<cat_Perfil> cat_Perfil { get; set; }
         public virtual DbSet<cat_PermisoSistema> cat_PermisoSistema { get; set; }
@@ -33,6 +32,7 @@ namespace Objetivos_Prioritarios.Models
         public virtual DbSet<tb_PerfilModulo> tb_PerfilModulo { get; set; }
         public virtual DbSet<tb_PerfilPermiso> tb_PerfilPermiso { get; set; }
         public virtual DbSet<tb_UsuarioPerfil> tb_UsuarioPerfil { get; set; }
+        public virtual DbSet<cat_FuenteBusqueda> cat_FuenteBusqueda { get; set; }
         public virtual DbSet<tb_Usuarios> tb_Usuarios { get; set; }
     }
 }

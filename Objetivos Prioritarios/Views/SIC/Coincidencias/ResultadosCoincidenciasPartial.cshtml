@@ -634,6 +634,19 @@ else
                             }
                         </div>
 
+                        @if (item.HuellasCoincidentes != null && item.HuellasCoincidentes.Any())
+                        {
+                            <div class="sic-resultado-evidencias">
+                                <span>@(item.HuellasCoincidentes.Count == 1 ? "Huella coincidente:" : "Huellas coincidentes:")</span>
+                                @foreach (var huellaCoincidente in item.HuellasCoincidentes)
+                                {
+                                    <span class="sic-evidencia-badge sic-evidencia-huella">
+                                        <strong>@huellaCoincidente.Huella</strong>
+                                    </span>
+                                }
+                            </div>
+                        }
+
                         @if (
                             tieneTexto &&
                             !string.IsNullOrWhiteSpace(textoCoincidente)

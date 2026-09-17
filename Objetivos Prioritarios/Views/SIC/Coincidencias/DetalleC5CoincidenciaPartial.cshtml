@@ -4,6 +4,8 @@
 @using Objetivos_Prioritarios.Models.Extends
 
 @{
+    var contextoIdentidad = ViewBag.ContextoRegistroIdentidad as RegistroIdentidadViewModel;
+    bool puedeCompararFoto = contextoIdentidad != null && contextoIdentidad.PuedeCompararFotografia;
     CoincidenciaResultadoViewModel coincidencia =
         ViewBag.Coincidencia
         as CoincidenciaResultadoViewModel;
@@ -42,6 +44,8 @@
         }
     }
 
+
+    if (contextoIdentidad != null) { fotoUrl = contextoIdentidad.FotoUrl; }
 
     string nombre =
         string.IsNullOrWhiteSpace(
@@ -823,6 +827,10 @@
 
 
 <div class="sic-c5-detalle">
+    @if (contextoIdentidad != null)
+    {
+        <p class="sic-identidad-tipo">@(contextoIdentidad.EsCoincidenciaDirecta ? "Coincidencia directa" : "Identidad relacionada confirmada")</p>
+    }
 
     <!-- ==========================================================
          CABECERA
@@ -832,11 +840,13 @@
         <div class="sic-c5-foto-wrap">
 
             <button type="button"
-                    class="sic-c5-btn-foto js-ampliar-foto"
+                    class="sic-c5-btn-foto @(puedeCompararFoto ? "js-abrir-comparacion-foto" : "js-ampliar-foto")"
+                    data-foto-candidato="@fotoUrl"
+                    data-porcentaje="@(puedeCompararFoto ? coincidencia.PorcentajeFoto.ToString("0") : "")"
                     data-foto="@fotoUrl"
                     data-nombre="@nombre"
                     data-fuente="@fuenteMostrar"
-                    title="Ver fotografía en grande">
+                    title="@(puedeCompararFoto ? "Comparar fotografía de consulta y registro" : "Ver fotografía en grande")">
 
                 <img src="@fotoUrl"
                      class="sic-c5-foto"

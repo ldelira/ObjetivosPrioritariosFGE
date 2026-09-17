@@ -2,8 +2,11 @@
 
 @using System
 @using System.Linq
+@using Objetivos_Prioritarios.Models.Extends
 
 @{
+    var contextoIdentidad = ViewBag.ContextoRegistroIdentidad as RegistroIdentidadViewModel;
+    bool puedeCompararFoto = contextoIdentidad != null && contextoIdentidad.PuedeCompararFotografia;
     var coincidencia =
         ViewBag.Coincidencia
         as Objetivos_Prioritarios.Models.Extends.CoincidenciaResultadoViewModel;
@@ -17,6 +20,11 @@
                 idObjetivo = Model.IdObjetivo
             }
         );
+
+    if (contextoIdentidad != null)
+    {
+        fotoUrl = contextoIdentidad.FotoUrl;
+    }
 
     int edad = 0;
 
@@ -730,6 +738,10 @@
 
 
 <div class="sic-obj-detalle">
+    @if (contextoIdentidad != null)
+    {
+        <p class="sic-identidad-tipo">@(contextoIdentidad.EsCoincidenciaDirecta ? "Coincidencia directa" : "Identidad relacionada confirmada")</p>
+    }
 
     @* ============================================================
         CABECERA
@@ -742,11 +754,13 @@
             <div class="sic-obj-foto">
 
                 <button type="button"
-                        class="sic-obj-btn-foto js-ampliar-foto"
+                        class="sic-obj-btn-foto @(puedeCompararFoto ? "js-abrir-comparacion-foto" : "js-ampliar-foto")"
+                        data-foto-candidato="@fotoUrl"
+                        data-porcentaje="@(puedeCompararFoto ? coincidencia.PorcentajeFoto.ToString("0") : "")"
                         data-foto="@fotoUrl"
                         data-nombre="@nombrePrincipal"
                         data-fuente="FGEA - OBJETIVOS PRIORITARIOS"
-                        title="Ver fotografía en grande">
+                        title="@(puedeCompararFoto ? "Comparar fotografía" : "Ver fotografía en grande")">
 
                     <img src="@fotoUrl"
                          alt="@nombrePrincipal"

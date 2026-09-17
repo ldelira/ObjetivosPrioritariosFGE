@@ -449,6 +449,7 @@
     <Compile Include="Models\Extends\PerfilUsuarioViewModel.cs" />
     <Compile Include="Models\Extends\PermisosUsuarioDto.cs" />
     <Compile Include="Models\Extends\ResultadosCoincidenciasViewModel.cs" />
+    <Compile Include="Models\Extends\RegistroIdentidadViewModel.cs" />
     <Compile Include="Models\Extends\tb_NombreObjetivo.cs" />
     <Compile Include="Models\Extends\tb_Victimas.cs" />
     <Compile Include="Models\Extends\tb_Usuarios.cs" />
@@ -3791,6 +3792,7 @@
     <Content Include="Views\SIC\Coincidencias\CargaBiometricaPartial.cshtml" />
     <Content Include="Views\SIC\Coincidencias\FiltrosCoincidenciasPartial.cshtml" />
     <Content Include="Views\SIC\Coincidencias\ResultadosCoincidenciasPartial.cshtml" />
+    <Content Include="Views\SIC\Coincidencias\PanelIdentidadPartial.cshtml" />
     <Content Include="Views\SIC\Coincidencias\DetalleCoincidenciaPartial.cshtml" />
     <Content Include="Views\SIC\DetalleDetenidoC5\TabCapeasPartial.cshtml" />
     <Content Include="Views\SIC\DetalleDetenidoC5\TabDetenidosPartial.cshtml" />

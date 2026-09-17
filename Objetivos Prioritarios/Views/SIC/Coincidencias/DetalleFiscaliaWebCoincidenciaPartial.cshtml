@@ -1,8 +1,11 @@
 ﻿@model Objetivos_Prioritarios.Models.Extends.DetalleFiscaliaWebApiDto
 
 @using System
+@using Objetivos_Prioritarios.Models.Extends
 
 @{
+    var contextoIdentidad = ViewBag.ContextoRegistroIdentidad as RegistroIdentidadViewModel;
+    bool puedeCompararFoto = contextoIdentidad != null && contextoIdentidad.PuedeCompararFotografia;
     Objetivos_Prioritarios.Models.Extends.CoincidenciaResultadoViewModel coincidencia =
         ViewBag.Coincidencia
         as Objetivos_Prioritarios.Models.Extends.CoincidenciaResultadoViewModel;
@@ -299,6 +302,10 @@
 
 
 <div class="sic-fw-detalle">
+    @if (contextoIdentidad != null)
+    {
+        <p class="sic-identidad-tipo">@(contextoIdentidad.EsCoincidenciaDirecta ? "Coincidencia directa" : "Identidad relacionada confirmada")</p>
+    }
 
     <!-- =========================================================
          CABECERA
@@ -309,11 +316,13 @@
         <div class="sic-fw-foto-wrap">
 
             <button type="button"
-                    class="sic-fw-btn-foto js-ampliar-foto"
+                    class="sic-fw-btn-foto @(puedeCompararFoto ? "js-abrir-comparacion-foto" : "js-ampliar-foto")"
+                    data-foto-candidato="@fotoUrl"
+                    data-porcentaje="@(puedeCompararFoto ? coincidencia.PorcentajeFoto.ToString("0") : "")"
                     data-foto="@fotoUrl"
                     data-nombre="@nombre"
                     data-fuente="@fuente"
-                    title="Ver fotografía en grande">
+                    title="@(puedeCompararFoto ? "Comparar fotografía" : "Ver fotografía en grande")">
 
                 <img src="@fotoUrl"
                      alt="@nombre"

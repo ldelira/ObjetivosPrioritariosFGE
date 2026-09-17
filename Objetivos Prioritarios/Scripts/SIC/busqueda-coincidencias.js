@@ -23,6 +23,21 @@
     let solicitudDetalleActual =
         null;
 
+    let fotoConsultaEnviada = '';
+    let solicitudRegistroIdentidad = null;
+    let versionRegistroIdentidad = 0;
+
+    function limpiarFotoConsultaEnviada() {
+        if (fotoConsultaEnviada) URL.revokeObjectURL(fotoConsultaEnviada);
+        fotoConsultaEnviada = '';
+    }
+
+    function cancelarRegistroIdentidad() {
+        versionRegistroIdentidad++;
+        if (solicitudRegistroIdentidad) solicitudRegistroIdentidad.abort();
+        solicitudRegistroIdentidad = null;
+    }
+
     let buscandoCoincidencias =
         false;
 
@@ -951,7 +966,78 @@
                         this
                     );
                 }
+        );
+
+        // =========================================================
+        // CÁMARA PARA FOTOGRAFÍA
+        // =========================================================
+
+        $(document)
+            .off(
+                'click.sicCamaraFotografia',
+                '#btnTomarFotografia'
+            )
+            .on(
+                'click.sicCamaraFotografia',
+                '#btnTomarFotografia',
+                function (evento) {
+
+                    evento.preventDefault();
+                    evento.stopPropagation();
+
+                    const inputCamara =
+                        document.getElementById(
+                            'FotografiaCamara'
+                        );
+
+                    if (!inputCamara) {
+                        return;
+                    }
+
+                    inputCamara.value = '';
+
+                    inputCamara.click();
+                }
             );
+
+        $(document)
+            .off(
+                'change.sicCamaraFotografia',
+                '#FotografiaCamara'
+            )
+            .on(
+                'change.sicCamaraFotografia',
+                '#FotografiaCamara',
+                function () {
+
+                    if (
+                        !this.files ||
+                        this.files.length === 0
+                    ) {
+                        return;
+                    }
+
+                    const archivo =
+                        this.files[0];
+
+                    const inputFotografia =
+                        document.getElementById(
+                            'Fotografia'
+                        );
+
+                    if (!inputFotografia) {
+                        return;
+                    }
+
+                    asignarArchivoAInput(
+                        inputFotografia,
+                        archivo
+                    );
+
+                    this.value = '';
+                }
+            );
+
 
         $(document)
             .off(
@@ -2419,6 +2505,13 @@
                 formulario
             );
 
+        cancelarSolicitudDetalle();
+        limpiarFotoConsultaEnviada();
+        const fotoEnviada = datos.get('Fotografia');
+        if (fotoEnviada instanceof Blob && fotoEnviada.size > 0) {
+            fotoConsultaEnviada = URL.createObjectURL(fotoEnviada);
+        }
+
         const nombreBusqueda =
             obtenerNombreBusquedaActivo();
 
@@ -2683,6 +2776,54 @@
        ============================================================ */
 
     function inicializarEventosResultados() {
+        $(document).off('click.sicIdentidadTab', '.js-identidad-tab')
+            .on('click.sicIdentidadTab', '.js-identidad-tab', function () {
+                const boton = $(this);
+                const panel = boton.closest('.sic-panel-identidad');
+                const fuente = boton.attr('data-fuente');
+                cancelarRegistroIdentidad();
+                panel.find('.js-identidad-tab').removeClass('active').attr('aria-pressed', 'false');
+                boton.addClass('active').attr('aria-pressed', 'true');
+                panel.find('.sic-identidad-selector').prop('hidden', true);
+                panel.find('.sic-identidad-resumen').prop('hidden', fuente !== '0');
+                panel.find('.sic-identidad-ficha').prop('hidden', fuente === '0').attr('aria-busy', 'false');
+                if (fuente !== '0') {
+                    panel.find('.sic-identidad-selector[data-fuente="' + fuente + '"]')
+                        .prop('hidden', false).find('.js-identidad-registro').first().trigger('click');
+                }
+            });
+        $(document).off('click.sicIdentidadRegistro', '.js-identidad-registro')
+            .on('click.sicIdentidadRegistro', '.js-identidad-registro', function () {
+                const boton = $(this);
+                const panel = boton.closest('.sic-panel-identidad');
+                const ficha = panel.find('.sic-identidad-ficha');
+                cancelarRegistroIdentidad();
+                const version = versionRegistroIdentidad;
+                panel.find('.js-identidad-registro').removeClass('active').attr('aria-pressed', 'false');
+                boton.addClass('active').attr('aria-pressed', 'true');
+                ficha.prop('hidden', false).attr('aria-busy', 'true')
+                    .html('<div class="sic-detalle-loader">Cargando ficha...</div>');
+                solicitudRegistroIdentidad = $.ajax({
+                    url: window.sicCoincidenciasConfig.urlDetalleRegistroIdentidad,
+                    type: 'GET', cache: false,
+                    data: { idCoincidenciaOrigen: panel.attr('data-origen'),
+                        idTbFuente: boton.attr('data-fuente'), idPersona: boton.attr('data-persona') },
+                    success: function (html) {
+                        if (version !== versionRegistroIdentidad) return;
+                        ficha.html(html);
+                        sincronizarImagenesConsulta();
+                    },
+                    error: function (xhr, estado) {
+                        if (estado === 'abort' || version !== versionRegistroIdentidad) return;
+                        ficha.html('<div class="sic-detalle-vacio">No fue posible cargar la ficha. Seleccione el registro para reintentar.</div>');
+                    },
+                    complete: function () {
+                        if (version !== versionRegistroIdentidad) return;
+                        solicitudRegistroIdentidad = null;
+                        ficha.attr('aria-busy', 'false');
+                    }
+                });
+            });
 
         $(document)
             .off(
@@ -2808,8 +2949,7 @@
                         $(this);
 
                     const fotoConsulta =
-                        ($('#previewFotografia').attr('src') || '')
-                            .trim();
+                        fotoConsultaEnviada;
                     const fotoCandidato =
                         boton.attr(
                             'data-foto-candidato'
@@ -3707,6 +3847,7 @@
     }
 
     function cancelarSolicitudDetalle() {
+        cancelarRegistroIdentidad();
         if (
             solicitudDetalleActual &&
             solicitudDetalleActual.readyState !== 4
@@ -3720,8 +3861,7 @@
 
     function sincronizarImagenesConsulta() {
         const fotoConsulta =
-            ($('#previewFotografia').attr('src') || '')
-                .trim();
+            fotoConsultaEnviada;
 
         const huellaConsulta =
             $('#previewHuella').is(':visible')
@@ -3793,6 +3933,7 @@
 
 
     function limpiarBusquedaCompleta() {
+        limpiarFotoConsultaEnviada();
         cancelarSolicitudBusqueda();
         cancelarSolicitudDetalle();
 

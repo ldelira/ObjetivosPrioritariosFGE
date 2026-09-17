@@ -37,15 +37,53 @@
             }
 
             string claseEstatus =
-     estatus == 2 || estatus == 3
-         ? "sic-coincidencia-confirmada"
-         : estatus == 0
-             ? "sic-coincidencia-descartada"
-             : "sic-coincidencia-pendiente";
+                estatus == 2 || estatus == 3
+                    ? "sic-coincidencia-confirmada"
+                    : estatus == 0
+                        ? "sic-coincidencia-descartada"
+                        : "sic-coincidencia-pendiente";
 
-            <span class="sic-porcentaje-coincidencia @claseEstatus">
+            string tipoNormalizado =
+                nombreTipo.Trim().ToUpperInvariant();
+
+            <span class="sic-porcentaje-coincidencia @claseEstatus"
+                  title="@nombreTipo">
+
                 <strong>@porcentaje%</strong>
-                de coincidencia en @nombreTipo
+
+                @if (tipoNormalizado.Contains("HUELLA"))
+                {
+                    <i class="bi bi-fingerprint" style="font-size:20px;"
+                       title="Coincidencia por huella"
+                       aria-label="Huella"></i>
+                }
+                else if (tipoNormalizado.Contains("NOMBRE"))
+                {
+                    <span class="sic-icono-credencial"
+                          title="Coincidencia por nombre"
+                          aria-label="Nombre">
+
+                        <i class="fa fa-user"></i>
+
+                        <span class="sic-credencial-lineas">
+                            <span></span>
+                            <span></span>
+                        </span>
+
+                    </span>
+                }
+                else if (tipoNormalizado.Contains("FOTO"))
+                {
+                    <i class="fa fa-picture-o" style="font-size:20px;"
+                       title="Coincidencia por fotografía"
+                       aria-label="Fotografía"></i>
+                }
+                else
+                {
+                    <i class="fa fa-exclamation-circle"
+                       title="@nombreTipo"></i>
+                }
+
             </span>
         }
 

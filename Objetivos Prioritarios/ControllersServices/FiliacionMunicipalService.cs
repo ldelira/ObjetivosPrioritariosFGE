@@ -1041,7 +1041,7 @@ namespace Objetivos_Prioritarios.ControllersServices
             using (var db = new Filiacion_MunicipiosEntities())
             {
                 var idsDetenidos = db.tb_CoincidenciasNormalizadas
-                    .Where(x => x.DetenidoCoincidenciaId == idDetenido)
+                    .Where(x => x.DetenidoCoincidenciaId == idDetenido && x.Activo ==  true)
                     .Select(x => x.DetenidoId)
                     .Distinct()
                     .ToList();
@@ -1484,7 +1484,7 @@ namespace Objetivos_Prioritarios.ControllersServices
                     if (nuevoEstatus == 2)
                     {
                         bool yaExisteRelacion = db.tb_CoincidenciasNormalizadas
-                            .Any(x => x.DetenidoId == idOrigen);
+                            .Any(x => x.DetenidoId == idOrigen && x.Activo == true);
 
                         if (!yaExisteRelacion)
                         {
@@ -1493,7 +1493,8 @@ namespace Objetivos_Prioritarios.ControllersServices
                                 DetenidoId = idOrigen,
                                 DetenidoCoincidenciaId = idDetenido,
                                 TipoCoincidencia = "visual",
-                                FechaRegistro = DateTime.Now
+                                FechaRegistro = DateTime.Now,
+                                Activo = true
                             };
 
                             db.tb_CoincidenciasNormalizadas.Add(
@@ -2293,7 +2294,7 @@ WHERE
             {
                 var relacion = db.tb_CoincidenciasNormalizadas
                     .AsNoTracking()
-                    .FirstOrDefault(x => x.DetenidoId == idDetenido);
+                    .FirstOrDefault(x => x.DetenidoId == idDetenido && x.Activo == true);
 
                 if (relacion == null)
                 {

@@ -16,9 +16,9 @@ namespace Objetivos_Prioritarios.Models
     {
         public int idFicha { get; set; }
         public int idPersona { get; set; }
-        public string RutaHuella { get; set; }
         public Nullable<System.DateTime> FechaRegistro { get; set; }
         public Nullable<bool> Activo { get; set; }
+        public string RutaHuella { get; set; }
         public Nullable<int> IdTbFuente { get; set; }
     }
 }

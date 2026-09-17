@@ -5,13 +5,10 @@
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
       <Diagram DiagramId="a2de8ffb9b4f45c39fb32c392d506612" Name="Diagram1">
-        <EntityTypeShape EntityType="SICModel.COINCIDENCIA" Width="1.5" PointX="0.75" PointY="0.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="SICModel.DETENCION" Width="1.5" PointX="2.75" PointY="0.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="SICModel.DETENIDO" Width="1.5" PointX="4.75" PointY="0.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="SICModel.FOTO" Width="1.5" PointX="6.75" PointY="0.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="SICModel.Modulos" Width="1.5" PointX="6.75" PointY="3.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="SICModel.Usuario" Width="1.5" PointX="6.75" PointY="6.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="SICModel.Usuario_Modulos" Width="1.5" PointX="8.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="SICModel.DETENCION" Width="1.5" PointX="0.75" PointY="0.75" />
+        <EntityTypeShape EntityType="SICModel.DETENIDO" Width="1.5" PointX="2.75" PointY="0.75" />
+        <EntityTypeShape EntityType="SICModel.Modulos" Width="1.5" PointX="4.75" PointY="0.75" />
+        <EntityTypeShape EntityType="SICModel.Usuario" Width="1.5" PointX="4.75" PointY="3.75" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

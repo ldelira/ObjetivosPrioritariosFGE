@@ -498,9 +498,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>FiscaliaWeb.edmx</DependentUpon>
     </Compile>
-    <Compile Include="Models\FOTO.cs">
-      <DependentUpon>SIC.tt</DependentUpon>
-    </Compile>
     <Compile Include="Models\getInfoObjetivoListById_Result.cs">
       <DependentUpon>ObjetivosPrioritarios.tt</DependentUpon>
     </Compile>
@@ -669,9 +666,6 @@
     <Compile Include="Models\SP_SIC_ObtenerPersonas_Result.cs">
       <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\sysdiagrams.cs">
-      <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
-    </Compile>
     <Compile Include="Models\tb_AlbumFichaObjetivo.cs">
       <DependentUpon>ObjetivosPrioritarios.tt</DependentUpon>
     </Compile>
@@ -693,10 +687,10 @@
     <Compile Include="Models\tb_CarpetasObjetivo.cs">
       <DependentUpon>ObjetivosPrioritarios.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\tb_CoincidenciasNormalizadas.cs">
+    <Compile Include="Models\tb_COINCIDENCIA.cs">
       <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\tb_Detencion.cs">
+    <Compile Include="Models\tb_CoincidenciasNormalizadas.cs">
       <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\tb_DETENCION_C5.cs">
@@ -783,6 +777,9 @@
     <Compile Include="Models\tb_SenasParticulares.cs">
       <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\tb_Usuario.cs">
+      <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\tb_UsuarioPerfil.cs">
       <DependentUpon>Objetivos_Perfiles.tt</DependentUpon>
     </Compile>
@@ -793,13 +790,10 @@
       <DependentUpon>ObjetivosPrioritarios.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Usuario.cs">
-      <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
+      <DependentUpon>SIC.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Usuarios.cs">
       <DependentUpon>Accesos.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Models\Usuario_Modulos.cs">
-      <DependentUpon>SIC.tt</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utils\BasicOperationResponse.cs" />

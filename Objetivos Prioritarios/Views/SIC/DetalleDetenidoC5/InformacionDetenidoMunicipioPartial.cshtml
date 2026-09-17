@@ -100,6 +100,9 @@
     /* ============================================================
        VARIACIONES
        ============================================================ */
+    var variacionNombre = AgruparValores(
+        datosDetenidoC5.Select(x => TextoLimpio(x.NOMBRE) + ' ' + TextoLimpio(x.Ap_Paterno) + ' ' + TextoLimpio(x.Ap_Materno))
+    );
 
     var variacionAlias = aliasRegistrados;
 
@@ -119,21 +122,27 @@
         datosDetenidoC5.Select(x => TextoLimpio(x.Estado))
     );
 
-    var variacionCalle = AgruparValores(
-        datosDetenidoC5.Select(x => TextoLimpio(x.CALLE))
-    );
+    var variacionDomicilio = AgruparValores(
+    datosDetenidoC5.Select(x =>
+        "Colonia: " + TextoLimpio(x.COLONIA) +
+        " | Calle: " + TextoLimpio(x.CALLE) +
+        " | Núm. Ext.: " + TextoLimpio(x.NUMEXT) +
+        " | Núm. Int.: " + TextoLimpio(x.NUMINT) +
+        " | C.P.:" + TextoLimpio(x.CP)
+    )
+);
 
-    var variacionColonia = AgruparValores(
-        datosDetenidoC5.Select(x => TextoLimpio(x.COLONIA))
-    );
+    //    var variacionCalle = AgruparValores(
+    //datosDetenidoC5.Select(x => TextoLimpio(x.CALLE))
+    //);
 
-    var variacionNumExt = AgruparValores(
-        datosDetenidoC5.Select(x => TextoLimpio(x.NUMEXT))
-    );
+    //    var variacionNumExt = AgruparValores(
+    //        datosDetenidoC5.Select(x => TextoLimpio(x.NUMEXT))
+    //    );
 
-    var variacionNumInt = AgruparValores(
-        datosDetenidoC5.Select(x => TextoLimpio(x.NUMINT))
-    );
+    //    var variacionNumInt = AgruparValores(
+    //        datosDetenidoC5.Select(x => TextoLimpio(x.NUMINT))
+    //    );
 
     var variacionCp = AgruparValores(
         datosDetenidoC5.Select(x => TextoLimpio(x.CP))
@@ -154,16 +163,17 @@
     int totalCamposVariacion =
         new[]
         {
+            variacionNombre.Count,
             variacionAlias.Count,
             variacionFechaNacimiento.Count,
             variacionOriginario.Count,
             variacionOcupacion.Count,
             variacionEstado.Count,
-            variacionCalle.Count,
-            variacionColonia.Count,
-            variacionNumExt.Count,
-            variacionNumInt.Count,
-            variacionCp.Count,
+            variacionDomicilio.Count,
+            //variacionCalle.Count,
+            //variacionNumExt.Count,
+            //variacionNumInt.Count,
+            //variacionCp.Count,
             variacionMunicipio.Count,
             variacionCaracteristicas.Count
                 }
@@ -646,6 +656,56 @@
                 else
                 {
                     /* =================================================
+                        NOMBRE
+                    ================================================= */
+                    if (variacionNombre.Count > 1)
+                    {
+                        <div class="sic-variacion-accordion">
+
+                            <button type="button"
+                                    class="sic-variacion-header">
+
+                                <span>
+
+                                    <i class="fa fa-calendar"></i>
+
+                                    Nombre.
+
+                                </span>
+
+                                <i class="fa fa-chevron-down"></i>
+
+                            </button>
+
+                            <div class="sic-variacion-body">
+
+                                @foreach (var valor in variacionNombre)
+                                {
+                                    <div class="sic-variacion-item">
+
+                                        <strong>
+                                            @valor.Item1
+                                        </strong>
+
+                                        <span class="sic-variacion-count">
+
+                                            @valor.Item2
+
+                                            @(valor.Item2 == 1
+                            ? "registro"
+                            : "registros")
+
+                                        </span>
+
+                                    </div>
+                                }
+
+                            </div>
+
+                        </div>
+                    }
+
+                    /* =================================================
                        ALIAS
                        ================================================= */
                     if (variacionAlias.Count > 1)
@@ -895,7 +955,7 @@
                         </div>
                     }
 
-                    /* =================================================
+                    @*/* =================================================
                        CALLE
                        ================================================= */
                     if (variacionCalle.Count > 1)
@@ -943,12 +1003,12 @@
                             </div>
 
                         </div>
-                    }
+                    }*@
 
                     /* =================================================
                        COLONIA
                        ================================================= */
-                    if (variacionColonia.Count > 1)
+                    if (variacionDomicilio.Count > 1)
                     {
                         <div class="sic-variacion-accordion">
 
@@ -959,7 +1019,7 @@
 
                                     <i class="fa fa-map-marker"></i>
 
-                                    Colonia
+                                    Domicilio
 
                                 </span>
 
@@ -969,7 +1029,7 @@
 
                             <div class="sic-variacion-body">
 
-                                @foreach (var valor in variacionColonia)
+                                @foreach (var valor in variacionDomicilio)
                                 {
                                     <div class="sic-variacion-item">
 
@@ -995,7 +1055,7 @@
                         </div>
                     }
 
-                    /* =================================================
+                    @*/* =================================================
                        NÚMERO EXTERIOR
                        ================================================= */
                     if (variacionNumExt.Count > 1)
@@ -1093,9 +1153,9 @@
                             </div>
 
                         </div>
-                    }
+                    }*@
 
-                    /* =================================================
+                    @*/* =================================================
                        C.P.
                        ================================================= */
                     if (variacionCp.Count > 1)
@@ -1143,7 +1203,7 @@
                             </div>
 
                         </div>
-                    }
+                    }*@
 
                     /* =================================================
                        MUNICIPIO

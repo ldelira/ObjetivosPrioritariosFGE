@@ -459,6 +459,13 @@
         </div>
     </div>
 
+    <button type="button"
+            id="btnActualizarContenidoTabs"
+            class="sic-btn-actualizar-tabs"
+            title="Actualizar coincidencias">
+        <i class="fa fa-refresh"></i>
+    </button>
+
     <div class="sic-section-grid sic-top-grid">
 
         <!-- =========================================================
@@ -469,100 +476,151 @@
 
             <div class="sic-card-body">
 
-                <div class="sic-source-tabs sic-source-tabs-compact">
+                <div class="sic-source-tabs-wrap">
 
-                    <button type="button" class="sic-source-tab sic-source-tab-compact active @claseCapea" data-tab="tab-capea">
+                    <div class="sic-source-tabs sic-source-tabs-compact">
 
-                        <i class="fa fa-search"></i>
+                        <button type="button"
+                                class="sic-source-tab sic-source-tab-compact active @claseCapea"
+                                data-tab="tab-capea">
 
-                        <span class="sic-tab-compact-name">
-                            FEMDLP
-                        </span>
+                            <i class="fa fa-search"></i>
 
-                        <span class="sic-tab-compact-count">
-                            (@capeas.Count)
-                        </span>
+                            <span class="sic-tab-compact-name">
+                                FEMDLP
+                            </span>
 
-                    </button>
+                            <span class="sic-tab-compact-count">
+                                (@capeas.Count)
+                            </span>
 
-                    <button type="button" class="sic-source-tab sic-source-tab-compact @clasePersonaInteres"
-                            data-tab="tab-persona-interes">
+                        </button>
 
-                        <i class="bi bi-person-bounding-box"></i>
+                        <button type="button"
+                                class="sic-source-tab sic-source-tab-compact @clasePersonaInteres"
+                                data-tab="tab-persona-interes">
 
-                        <span class="sic-tab-compact-name">Persona Interés</span>
+                            <i class="bi bi-person-bounding-box"></i>
 
-                        <span class="sic-tab-compact-count">
-                            (@totalPersonasInteres)
-                        </span>
+                            <span class="sic-tab-compact-name">
+                                Persona Interés
+                            </span>
 
-                    </button>
+                            <span class="sic-tab-compact-count">
+                                (@totalPersonasInteres)
+                            </span>
 
-                    <button type="button"
-                            class="sic-source-tab sic-source-tab-compact @claseMandamientos"
-                            data-tab="tab-mandamientos">
+                        </button>
 
-                        <i class="fa fa-gavel"></i>
+                        <button type="button"
+                                class="sic-source-tab sic-source-tab-compact @claseMandamientos"
+                                data-tab="tab-mandamientos">
 
-                        <span class="sic-tab-compact-name">
-                            Mandamientos Judiciales
-                        </span>
+                            <i class="fa fa-gavel"></i>
 
-                        <span class="sic-tab-compact-count">
-                            (@(mandamientos != null ? mandamientos.Rows.Count : 0))
-                        </span>
+                            <span class="sic-tab-compact-name">
+                                Mandamientos Judiciales
+                            </span>
 
-                    </button>
+                            <span class="sic-tab-compact-count">
+                                (@(mandamientos != null ? mandamientos.Rows.Count : 0))
+                            </span>
 
-                    <button type="button"
-                            class="sic-source-tab sic-source-tab-compact @claseObjetivos"
-                            data-tab="tab-objetivos">
+                        </button>
 
-                        <i class="fa fa-crosshairs"></i>
+                        <button type="button"
+                                class="sic-source-tab sic-source-tab-compact @claseObjetivos"
+                                data-tab="tab-objetivos">
 
-                        <span class="sic-tab-compact-name">
-                            Objetivos Prioritarios
-                        </span>
+                            <i class="fa fa-crosshairs"></i>
 
-                        <span class="sic-tab-compact-count">
-                            (@(objetivosPrioritarios != null ? objetivosPrioritarios.Rows.Count : 0))
-                        </span>
+                            <span class="sic-tab-compact-name">
+                                Objetivos Prioritarios
+                            </span>
 
-                    </button>
+                            <span class="sic-tab-compact-count">
+                                (@(objetivosPrioritarios != null ? objetivosPrioritarios.Rows.Count : 0))
+                            </span>
 
-                    <button type="button"
-                            class="sic-source-tab sic-source-tab-compact @claseDetenidos"
-                            data-tab="tab-fgea-detenidos">
+                        </button>
 
-                        <i class="fa fa-user-secret"></i>
+                        <button type="button"
+                                class="sic-source-tab sic-source-tab-compact @claseDetenidos"
+                                data-tab="tab-fgea-detenidos">
 
-                        <span class="sic-tab-compact-name">
-                            Detenidos
-                        </span>
+                            <i class="fa fa-user-secret"></i>
 
-                        <span class="sic-tab-compact-count">
-                            (@(detenidos != null ? detenidos.Rows.Count : 0))
-                        </span>
+                            <span class="sic-tab-compact-name">
+                                Detenidos
+                            </span>
 
-                    </button>
+                            <span class="sic-tab-compact-count">
+                                (@(detenidos != null ? detenidos.Rows.Count : 0))
+                            </span>
 
-                    <button type="button"
-                            class="sic-source-tab sic-source-tab-compact @claseDetenidosMunicipios"
-                            data-tab="tab-detenidos-municipio">
+                        </button>
 
-                        <img src="@Url.Content("~/Content/image/SIC/icono_aguascalientes.png")"
-                             class="sic-tab-icono-personalizado"
-                             alt="" />
+                        <button type="button"
+                                class="sic-source-tab sic-source-tab-compact @claseDetenidosMunicipios"
+                                data-tab="tab-detenidos-municipio">
 
-                        <span class="sic-tab-compact-name">
-                            Detenidos Municipios
-                        </span>
+                            <img src="@Url.Content("~/Content/image/SIC/icono_aguascalientes.png")"
+                                 class="sic-tab-icono-personalizado"
+                                 alt="" />
 
-                        <span class="sic-tab-compact-count">
-                            (@totalDetenidosMunicipios)
-                        </span>
+                            <span class="sic-tab-compact-name">
+                                Detenidos Municipios
+                            </span>
 
-                    </button>
+                            <span class="sic-tab-compact-count">
+                                (@totalDetenidosMunicipios)
+                            </span>
+
+                        </button>
+
+                    </div>
+
+                    @if (detenidos != null && detenidos.Rows.Count > 1)
+                    {
+                        <div id="sicDetenidosTopControls"
+                             class="sic-detenidos-top-controls"
+                             aria-label="Navegación de detenidos">
+
+                            <button type="button"
+                                    class="sic-detenidos-nav-flotante sic-detenidos-prev"
+                                    title="Detenido anterior"
+                                    aria-label="Detenido anterior">
+
+                                <i class="fa fa-chevron-left"></i>
+
+                            </button>
+
+                            <div class="sic-detenidos-counter-superior"
+                                 aria-live="polite">
+
+                                <span class="sic-detenidos-current">1</span>
+
+                                <span class="sic-detenidos-counter-separator">
+                                    /
+                                </span>
+
+                                <span>
+                                    @detenidos.Rows.Count
+                                </span>
+
+                            </div>
+
+                            <button type="button"
+                                    class="sic-detenidos-nav-flotante sic-detenidos-next"
+                                    title="Siguiente detenido"
+                                    aria-label="Siguiente detenido">
+
+                                <i class="fa fa-chevron-right"></i>
+
+                            </button>
+
+                        </div>
+                    }
 
                 </div>
 
@@ -1595,20 +1653,7 @@ window.mostrarFotoNoExiste = function (img) {
 
             if (esFusion) {
 
-                quitarDetenidoMunicipioFusionado(
-                    boton
-                );
-
-                actualizarContadoresAlertas(
-                    -1,
-                    0,
-                    1
-                );
-
-                actualizarPildoraEstadoIdentidad(
-                    idDetenido
-                );
-
+                window.location.reload();
                 return;
             }
 
@@ -2891,13 +2936,21 @@ function abrirFotoExpandida(src, descripcion) {
         $('#sicVistaFotoUnica')
             .show();
 
-        $('#sicFotoExpandida')
-            .css('display', 'block')
-            .attr('src', src)
-            .attr(
-                'alt',
-                descripcion || 'Fotografía ampliada'
-            );
+    $('#sicFotoExpandida')
+        .css('display', 'block')
+        .attr('src', src)
+        .attr(
+            'alt',
+            descripcion || 'Fotografía ampliada'
+        );
+
+    reiniciarZoomFotoSic(
+        document.getElementById(
+            'sicFotoExpandida'
+        )
+    );
+
+
 
         $('#sicFotoExpandidaTexto')
             .text(
@@ -2967,7 +3020,19 @@ function abrirFotoExpandida(src, descripcion) {
                 'alt',
                 descripcionDetenido ||
                 'Fotografía del registro de detenidos FGEA'
-            );
+        );
+
+        reiniciarZoomFotoSic(
+            document.getElementById(
+                'sicFotoComparacionPrincipal'
+            )
+        );
+
+        reiniciarZoomFotoSic(
+            document.getElementById(
+                'sicFotoComparacionDetenido'
+            )
+        );
 
         $('#sicVisorFoto')
             .addClass('activo')
@@ -3100,7 +3165,14 @@ function abrirGaleriaSic(grupo, visorId, indice, titulo) {
     sicGaleriasEstado[visorId] = {
         fotos: fotos,
         indice: indiceActual,
-        titulo: titulo || 'Galería'
+        titulo: titulo || 'Galería',
+
+        zoom: 1,
+        desplazamientoX: 0,
+        desplazamientoY: 0,
+        arrastrando: false,
+        inicioX: 0,
+        inicioY: 0
     };
 
     mostrarImagenGaleriaSic(visorId);
@@ -3132,6 +3204,11 @@ function mostrarImagenGaleriaSic(visorId) {
     var anterior = visor.querySelector('[data-sic-galeria-anterior]');
     var siguiente = visor.querySelector('[data-sic-galeria-siguiente]');
 
+    estado.zoom = 1;
+    estado.desplazamientoX = 0;
+    estado.desplazamientoY = 0;
+    estado.arrastrando = false;
+
     if (titulo) {
         titulo.textContent = estado.titulo;
     }
@@ -3142,6 +3219,10 @@ function mostrarImagenGaleriaSic(visorId) {
 
     if (imagen) {
         imagen.style.display = 'block';
+
+        imagen.style.transform = 'translate(0px, 0px) scale(1)';
+        imagen.style.transformOrigin = 'center center';
+        imagen.style.cursor = 'zoom-in';
 
         imagen.onerror = function () {
             imagen.style.display = 'none';
@@ -3173,7 +3254,474 @@ function mostrarImagenGaleriaSic(visorId) {
     if (siguiente) {
         siguiente.style.display = hayVarias ? 'flex' : 'none';
     }
+    }
+
+    function aplicarZoomGaleriaSic(visorId) {
+
+    var estado = sicGaleriasEstado[visorId];
+    var visor = document.getElementById(visorId);
+
+    if (!estado || !visor) {
+        return;
+    }
+
+    var imagen =
+        visor.querySelector('[data-sic-galeria-imagen]');
+
+    if (!imagen) {
+        return;
+    }
+
+    imagen.style.transform =
+        'translate(' +
+        estado.desplazamientoX +
+        'px, ' +
+        estado.desplazamientoY +
+        'px) scale(' +
+        estado.zoom +
+        ')';
+
+    imagen.style.cursor =
+        estado.zoom > 1
+            ? 'grab'
+            : 'zoom-in';
 }
+
+
+function cambiarZoomGaleriaSic(visorId, incremento) {
+
+    var estado = sicGaleriasEstado[visorId];
+
+    if (!estado) {
+        return;
+    }
+
+    var nuevoZoom =
+        estado.zoom + incremento;
+
+    if (nuevoZoom < 1) {
+        nuevoZoom = 1;
+    }
+
+    if (nuevoZoom > 5) {
+        nuevoZoom = 5;
+    }
+
+    estado.zoom =
+        Math.round(nuevoZoom * 10) / 10;
+
+    if (estado.zoom === 1) {
+        estado.desplazamientoX = 0;
+        estado.desplazamientoY = 0;
+    }
+
+    aplicarZoomGaleriaSic(visorId);
+}
+
+
+function reiniciarZoomGaleriaSic(visorId) {
+
+    var estado = sicGaleriasEstado[visorId];
+
+    if (!estado) {
+        return;
+    }
+
+    estado.zoom = 1;
+    estado.desplazamientoX = 0;
+    estado.desplazamientoY = 0;
+    estado.arrastrando = false;
+
+    aplicarZoomGaleriaSic(visorId);
+}
+
+
+    $(document)
+        .off('wheel.sicZoomGaleria')
+        .on(
+            'wheel.sicZoomGaleria',
+            '.sic-galeria-visor.activo [data-sic-galeria-imagen]',
+            function (e) {
+
+                e.preventDefault();
+
+                var visor =
+                    $(this).closest('.sic-galeria-visor');
+
+                if (visor.length === 0) {
+                    return;
+                }
+
+                var delta =
+                    e.originalEvent.deltaY;
+
+                cambiarZoomGaleriaSic(
+                    visor.attr('id'),
+                    delta < 0 ? 0.2 : -0.2
+                );
+            }
+        );
+
+
+    $(document)
+        .off('dblclick.sicZoomGaleria')
+        .on(
+            'dblclick.sicZoomGaleria',
+            '.sic-galeria-visor.activo [data-sic-galeria-imagen]',
+            function (e) {
+
+                e.preventDefault();
+
+                var visor =
+                    $(this).closest('.sic-galeria-visor');
+
+                reiniciarZoomGaleriaSic(
+                    visor.attr('id')
+                );
+            }
+        );
+
+
+    $(document)
+        .off('mousedown.sicZoomGaleria')
+        .on(
+            'mousedown.sicZoomGaleria',
+            '.sic-galeria-visor.activo [data-sic-galeria-imagen]',
+            function (e) {
+
+                var visor =
+                    $(this).closest('.sic-galeria-visor');
+
+                var estado =
+                    sicGaleriasEstado[visor.attr('id')];
+
+                if (!estado || estado.zoom <= 1) {
+                    return;
+                }
+
+                e.preventDefault();
+
+                estado.arrastrando = true;
+
+                estado.inicioX =
+                    e.clientX - estado.desplazamientoX;
+
+                estado.inicioY =
+                    e.clientY - estado.desplazamientoY;
+
+                this.style.cursor = 'grabbing';
+            }
+        );
+
+
+    $(document)
+        .off('mousemove.sicZoomGaleria')
+        .on(
+            'mousemove.sicZoomGaleria',
+            function (e) {
+
+                var visor =
+                    document.querySelector(
+                        '.sic-galeria-visor.activo'
+                    );
+
+                if (!visor) {
+                    return;
+                }
+
+                var estado =
+                    sicGaleriasEstado[visor.id];
+
+                if (!estado || !estado.arrastrando) {
+                    return;
+                }
+
+                estado.desplazamientoX =
+                    e.clientX - estado.inicioX;
+
+                estado.desplazamientoY =
+                    e.clientY - estado.inicioY;
+
+                aplicarZoomGaleriaSic(
+                    visor.id
+                );
+            }
+        );
+
+
+    $(document)
+        .off('mouseup.sicZoomGaleria')
+        .on(
+            'mouseup.sicZoomGaleria',
+            function () {
+
+                var visor =
+                    document.querySelector(
+                        '.sic-galeria-visor.activo'
+                    );
+
+                if (!visor) {
+                    return;
+                }
+
+                var estado =
+                    sicGaleriasEstado[visor.id];
+
+                if (!estado) {
+                    return;
+                }
+
+                estado.arrastrando = false;
+
+                aplicarZoomGaleriaSic(
+                    visor.id
+                );
+            }
+        );
+
+
+
+    var sicZoomArrastre = null;
+
+    function reiniciarZoomFotoSic(imagen) {
+
+        if (!imagen) {
+            return;
+        }
+
+        imagen.dataset.zoom = '1';
+        imagen.dataset.zoomX = '0';
+        imagen.dataset.zoomY = '0';
+
+        imagen.style.transform =
+            'translate(0px, 0px) scale(1)';
+
+        imagen.style.transformOrigin =
+            'center center';
+
+        imagen.style.cursor =
+            'zoom-in';
+    }
+
+
+    function aplicarZoomFotoSic(imagen) {
+
+        if (!imagen) {
+            return;
+        }
+
+        var zoom =
+            parseFloat(imagen.dataset.zoom) || 1;
+
+        var x =
+            parseFloat(imagen.dataset.zoomX) || 0;
+
+        var y =
+            parseFloat(imagen.dataset.zoomY) || 0;
+
+        imagen.style.transform =
+            'translate(' +
+            x +
+            'px, ' +
+            y +
+            'px) scale(' +
+            zoom +
+            ')';
+
+        imagen.style.cursor =
+            zoom > 1
+                ? 'grab'
+                : 'zoom-in';
+    }
+
+    document.addEventListener(
+        'wheel',
+        function (e) {
+
+            var imagen =
+                e.target.closest(
+                    '#sicFotoExpandida, ' +
+                    '#sicFotoComparacionPrincipal, ' +
+                    '#sicFotoComparacionDetenido'
+                );
+
+            if (!imagen) {
+                return;
+            }
+
+            var visor =
+                document.getElementById('sicVisorFoto');
+
+            if (
+                !visor ||
+                !visor.classList.contains('activo')
+            ) {
+                return;
+            }
+
+            e.preventDefault();
+
+            var zoom =
+                parseFloat(
+                    imagen.dataset.zoom
+                ) || 1;
+
+            zoom +=
+                e.deltaY < 0
+                    ? 0.2
+                    : -0.2;
+
+            if (zoom < 1) {
+                zoom = 1;
+            }
+
+            if (zoom > 5) {
+                zoom = 5;
+            }
+
+            zoom =
+                Math.round(zoom * 10) / 10;
+
+            imagen.dataset.zoom =
+                zoom.toString();
+
+            if (zoom === 1) {
+
+                imagen.dataset.zoomX = '0';
+                imagen.dataset.zoomY = '0';
+            }
+
+            aplicarZoomFotoSic(
+                imagen
+            );
+        },
+        {
+            passive: false
+        }
+    );
+
+
+    document.addEventListener(
+        'dblclick',
+        function (e) {
+
+            var imagen =
+                e.target.closest(
+                    '#sicFotoExpandida, ' +
+                    '#sicFotoComparacionPrincipal, ' +
+                    '#sicFotoComparacionDetenido'
+                );
+
+            if (!imagen) {
+                return;
+            }
+
+            e.preventDefault();
+
+            reiniciarZoomFotoSic(
+                imagen
+            );
+        }
+    );
+
+
+    document.addEventListener(
+        'mousedown',
+        function (e) {
+
+            var imagen =
+                e.target.closest(
+                    '#sicFotoExpandida, ' +
+                    '#sicFotoComparacionPrincipal, ' +
+                    '#sicFotoComparacionDetenido'
+                );
+
+            if (!imagen) {
+                return;
+            }
+
+            var zoom =
+                parseFloat(
+                    imagen.dataset.zoom
+                ) || 1;
+
+            if (zoom <= 1) {
+                return;
+            }
+
+            e.preventDefault();
+
+            sicZoomArrastre = {
+                imagen: imagen,
+
+                inicioX:
+                    e.clientX -
+                    (
+                        parseFloat(
+                            imagen.dataset.zoomX
+                        ) || 0
+                    ),
+
+                inicioY:
+                    e.clientY -
+                    (
+                        parseFloat(
+                            imagen.dataset.zoomY
+                        ) || 0
+                    )
+            };
+
+            imagen.style.cursor =
+                'grabbing';
+        }
+    );
+
+
+    document.addEventListener(
+        'mousemove',
+        function (e) {
+
+            if (!sicZoomArrastre) {
+                return;
+            }
+
+            var imagen =
+                sicZoomArrastre.imagen;
+
+            imagen.dataset.zoomX =
+                (
+                    e.clientX -
+                    sicZoomArrastre.inicioX
+                ).toString();
+
+            imagen.dataset.zoomY =
+                (
+                    e.clientY -
+                    sicZoomArrastre.inicioY
+                ).toString();
+
+            aplicarZoomFotoSic(
+                imagen
+            );
+        }
+    );
+
+
+    document.addEventListener(
+        'mouseup',
+        function () {
+
+            if (!sicZoomArrastre) {
+                return;
+            }
+
+            aplicarZoomFotoSic(
+                sicZoomArrastre.imagen
+            );
+
+            sicZoomArrastre = null;
+        }
+    );
 
 function navegarGaleriaSic(visorId, direccion) {
     var estado = sicGaleriasEstado[visorId];
@@ -3424,7 +3972,96 @@ $(document)
         }
     );
 
+    $(document)
+    .off('click.actualizarContenidoTabs', '#btnActualizarContenidoTabs')
+    .on('click.actualizarContenidoTabs', '#btnActualizarContenidoTabs', function (e) {
 
+        e.preventDefault();
+
+        var boton = $(this);
+
+        boton
+            .prop('disabled', true)
+            .find('i')
+            .addClass('fa-spin');
+
+        $.ajax({
+            url: '@Url.Action("DetalleDetenidoC5", "SIC")',
+            type: 'GET',
+            cache: false,
+
+            data: {
+                idDetenido: @Model.IDDETENIDO
+            },
+
+            success: function (html) {
+
+                /*
+                 * Convertimos la respuesta en HTML temporal.
+                 * NO reemplazamos la página.
+                 */
+                var respuesta = $('<div>').html(html);
+
+
+                /* CAPEA */
+                $('#tab-capea').html(
+                    respuesta.find('#tab-capea').html()
+                );
+
+
+                /* PERSONA DE INTERÉS */
+                $('#tab-persona-interes').html(
+                    respuesta.find('#tab-persona-interes').html()
+                );
+
+
+                /* MANDAMIENTOS */
+                $('#tab-mandamientos').html(
+                    respuesta.find('#tab-mandamientos').html()
+                );
+
+
+                /* OBJETIVOS PRIORITARIOS */
+                $('#tab-objetivos').html(
+                    respuesta.find('#tab-objetivos').html()
+                );
+
+
+                /* DETENIDOS FGEA */
+                $('#tab-fgea-detenidos').html(
+                    respuesta.find('#tab-fgea-detenidos').html()
+                );
+
+
+                /* DETENIDOS MUNICIPIOS */
+                $('#tab-detenidos-municipio').html(
+                    respuesta.find('#tab-detenidos-municipio').html()
+                );
+
+
+                boton
+                    .prop('disabled', false)
+                    .find('i')
+                    .removeClass('fa-spin');
+            },
+
+            error: function (xhr) {
+
+                console.log(xhr.responseText);
+
+                boton
+                    .prop('disabled', false)
+                    .find('i')
+                    .removeClass('fa-spin');
+
+                mostrarMensajeSIC(
+                    'No se pudo actualizar',
+                    'No fue posible actualizar las coincidencias.',
+                    'error'
+                );
+            }
+        });
+    });
 
 
 </script>

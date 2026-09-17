@@ -65,7 +65,7 @@
                             string detNumInt = ViewBag.TextoDetencion(detencion.NUMINT);
                             string detLatitud = ViewBag.TextoDetencion(detencion.Latitud);
                             string detLongitud = ViewBag.TextoDetencion(detencion.Longitud);
-                            string detCausa = ViewBag.TextoDetencion(detencion.CAUSA);
+                            string detCausa = ViewBag.TextoDetencion(detencion.FueroDescripcion);
 
                             string latMapa = detLatitud == "SIN INFORMACIÓN" ? "" : detLatitud.Replace(",", ".");
                             string lngMapa = detLongitud == "SIN INFORMACIÓN" ? "" : detLongitud.Replace(",", ".");

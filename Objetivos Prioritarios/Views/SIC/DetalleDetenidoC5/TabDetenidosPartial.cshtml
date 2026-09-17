@@ -326,32 +326,33 @@
         </div>
 
 
-        @if (detenidos.Rows.Count > 1)
-        {
+        <!--if (detenidos.Rows.Count > 1)
+        {-->
             <!-- =====================================================
                  NAVEGACIÓN FLOTANTE DEL CARRUSEL
                  ===================================================== -->
-            <button type="button"
-                    class="sic-detenidos-nav-flotante sic-detenidos-prev"
-                    title="Detenido anterior"
-                    aria-label="Detenido anterior">
-                <i class="fa fa-chevron-left"></i>
-            </button>
+    <!--<div class="sic-detenidos-top-controls">
+        <button type="button"
+                class="sic-detenidos-nav-flotante sic-detenidos-prev"
+                title="Detenido anterior"
+                aria-label="Detenido anterior">
+            <i class="fa fa-chevron-left"></i>
+        </button>
 
-            <button type="button"
-                    class="sic-detenidos-nav-flotante sic-detenidos-next"
-                    title="Siguiente detenido"
-                    aria-label="Siguiente detenido">
-                <i class="fa fa-chevron-right"></i>
-            </button>
+        <div class="sic-detenidos-counter-superior" aria-live="polite">
+            <span class="sic-detenidos-current">1</span>
+            <span class="sic-detenidos-counter-separator">/</span>
+            <span>@detenidos.Rows.Count</span>
+        </div>
 
-            <!-- CONTADOR FLOTANTE SUPERIOR -->
-            <div class="sic-detenidos-counter-superior" aria-live="polite">
-                <span class="sic-detenidos-current">1</span>
-                <span class="sic-detenidos-counter-separator">/</span>
-                <span>@detenidos.Rows.Count</span>
-            </div>
-        }
+        <button type="button"
+                class="sic-detenidos-nav-flotante sic-detenidos-next"
+                title="Siguiente detenido"
+                aria-label="Siguiente detenido">
+            <i class="fa fa-chevron-right"></i>
+        </button>
+    </div>
+        }-->
 
 
     </div>
@@ -383,33 +384,104 @@ else
      ================================================================ -->
 <script>
 
-    $(document)
-        .off(
-            'click.tabDetenidos',
-            '#tab-fgea-detenidos .sic-detenidos-prev, #tab-fgea-detenidos .sic-detenidos-next'
-        )
-        .on(
-            'click.tabDetenidos',
-            '#tab-fgea-detenidos .sic-detenidos-prev, #tab-fgea-detenidos .sic-detenidos-next',
-            function (e) {
+    (function () {
 
-                e.preventDefault();
+        function actualizarVisibilidadControlesDetenidos() {
 
-                var boton =
-                    $(this);
+            var tabDetenidosActivo =
+                $('.sic-source-tab[data-tab="tab-fgea-detenidos"]')
+                    .hasClass('active');
 
-                var direccion =
-                    boton.hasClass('sic-detenidos-next')
-                        ? 1
-                        : -1;
-
-                moverCarruselSic(
-                    boton,
-                    '.sic-detenido-slide',
-                    '.sic-detenidos-current',
-                    direccion
+            $('#sicDetenidosTopControls')
+                .toggleClass(
+                    'visible',
+                    tabDetenidosActivo
                 );
+        }
+
+
+        function moverCarruselDetenidos(direccion) {
+
+            var carousel =
+                $('#tab-fgea-detenidos .sic-detenidos-carousel');
+
+            var slides =
+                carousel.find('.sic-detenido-slide');
+
+            var total =
+                slides.length;
+
+            if (total <= 1) {
+                return;
             }
-        );
+
+            var indice =
+                slides.index(
+                    slides.filter('.active')
+                );
+
+            indice += direccion;
+
+            if (indice >= total) {
+                indice = 0;
+            }
+
+            if (indice < 0) {
+                indice = total - 1;
+            }
+
+            slides.removeClass('active');
+
+            slides.eq(indice)
+                .addClass('active');
+
+            $('#sicDetenidosTopControls .sic-detenidos-current')
+                .text(indice + 1);
+        }
+
+
+        $(document)
+            .off(
+                'click.tabDetenidos',
+                '#sicDetenidosTopControls .sic-detenidos-prev, #sicDetenidosTopControls .sic-detenidos-next'
+            )
+            .on(
+                'click.tabDetenidos',
+                '#sicDetenidosTopControls .sic-detenidos-prev, #sicDetenidosTopControls .sic-detenidos-next',
+                function (e) {
+
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    moverCarruselDetenidos(
+                        $(this).hasClass('sic-detenidos-next')
+                            ? 1
+                            : -1
+                    );
+                }
+            );
+
+
+        $(document)
+            .off(
+                'click.tabDetenidosVisibilidad',
+                '.sic-source-tab'
+            )
+            .on(
+                'click.tabDetenidosVisibilidad',
+                '.sic-source-tab',
+                function () {
+
+                    setTimeout(
+                        actualizarVisibilidadControlesDetenidos,
+                        0
+                    );
+                }
+            );
+
+
+        actualizarVisibilidadControlesDetenidos();
+
+    })();
 
 </script>

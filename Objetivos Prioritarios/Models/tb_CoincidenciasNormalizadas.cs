@@ -19,5 +19,7 @@ namespace Objetivos_Prioritarios.Models
         public int DetenidoCoincidenciaId { get; set; }
         public string TipoCoincidencia { get; set; }
         public System.DateTime FechaRegistro { get; set; }
+        public bool Activo { get; set; }
+        public Nullable<System.DateTime> FechaModificacion { get; set; }
     }
 }

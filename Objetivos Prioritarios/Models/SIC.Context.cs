@@ -25,12 +25,9 @@ namespace Objetivos_Prioritarios.Models
             throw new UnintentionalCodeFirstException();
         }
     
-        public virtual DbSet<COINCIDENCIA> COINCIDENCIA { get; set; }
         public virtual DbSet<DETENCION> DETENCION { get; set; }
         public virtual DbSet<DETENIDO> DETENIDO { get; set; }
-        public virtual DbSet<FOTO> FOTO { get; set; }
         public virtual DbSet<Modulos> Modulos { get; set; }
         public virtual DbSet<Usuario> Usuario { get; set; }
-        public virtual DbSet<Usuario_Modulos> Usuario_Modulos { get; set; }
     }
 }

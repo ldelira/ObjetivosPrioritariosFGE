@@ -34,9 +34,11 @@ namespace Objetivos_Prioritarios.Models
         public virtual DbSet<cat_TipoFoto> cat_TipoFoto { get; set; }
         public virtual DbSet<cat_TipoSena> cat_TipoSena { get; set; }
         public virtual DbSet<cat_ZonaCuerpo> cat_ZonaCuerpo { get; set; }
-        public virtual DbSet<sysdiagrams> sysdiagrams { get; set; }
+        public virtual DbSet<COINCIDENCIA> COINCIDENCIA { get; set; }
         public virtual DbSet<tb_Alerta> tb_Alerta { get; set; }
-        public virtual DbSet<tb_Detencion> tb_Detencion { get; set; }
+        public virtual DbSet<tb_COINCIDENCIA> tb_COINCIDENCIA { get; set; }
+        public virtual DbSet<tb_CoincidenciasNormalizadas> tb_CoincidenciasNormalizadas { get; set; }
+        public virtual DbSet<tb_DETENCION_C5> tb_DETENCION_C5 { get; set; }
         public virtual DbSet<tb_DETENIDO_C5> tb_DETENIDO_C5 { get; set; }
         public virtual DbSet<tb_Domicilio> tb_Domicilio { get; set; }
         public virtual DbSet<tb_FichaDecadactilar> tb_FichaDecadactilar { get; set; }
@@ -47,14 +49,11 @@ namespace Objetivos_Prioritarios.Models
         public virtual DbSet<tb_PersonaAlias> tb_PersonaAlias { get; set; }
         public virtual DbSet<tb_PersonaPeriodoBusqueda> tb_PersonaPeriodoBusqueda { get; set; }
         public virtual DbSet<tb_SenasParticulares> tb_SenasParticulares { get; set; }
+        public virtual DbSet<tb_Usuario> tb_Usuario { get; set; }
         public virtual DbSet<cat_Contactos_Municipios> cat_Contactos_Municipios { get; set; }
         public virtual DbSet<tb_PersonaBusqueda> tb_PersonaBusqueda { get; set; }
         public virtual DbSet<tb_PersonaEmbedding> tb_PersonaEmbedding { get; set; }
         public virtual DbSet<tb_PersonaSourceAFIS> tb_PersonaSourceAFIS { get; set; }
-        public virtual DbSet<tb_DETENCION_C5> tb_DETENCION_C5 { get; set; }
-        public virtual DbSet<COINCIDENCIA> COINCIDENCIA { get; set; }
-        public virtual DbSet<tb_CoincidenciasNormalizadas> tb_CoincidenciasNormalizadas { get; set; }
-        public virtual DbSet<Usuario> Usuario { get; set; }
     
         public virtual ObjectResult<sp_BuscarDetenido_Result> sp_BuscarDetenido(Nullable<int> iDDETENIDO)
         {

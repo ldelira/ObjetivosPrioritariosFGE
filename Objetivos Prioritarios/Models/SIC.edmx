@@ -4,17 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-      <Schema Namespace="SICModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
-        <EntityType Name="COINCIDENCIA">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="DetenidoId" Type="int" Nullable="false" />
-          <Property Name="DetenidoCoincidenciaId" Type="int" Nullable="false" />
-          <Property Name="TipoCoincidencia" Type="nvarchar" MaxLength="50" />
-          <Property Name="FechaRegistro" Type="datetime2" Precision="7" Nullable="false" />
-        </EntityType>
+    <Schema Namespace="SICModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="DETENCION">
           <Key>
             <PropertyRef Name="IDDETENCION" />
@@ -83,17 +73,6 @@
           <Property Name="RFC" Type="varchar" MaxLength="20" />
           <Property Name="CURP" Type="varchar" MaxLength="20" />
         </EntityType>
-        <EntityType Name="FOTO">
-          <Key>
-            <PropertyRef Name="IDFOTO" />
-          </Key>
-          <Property Name="IDFOTO" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="IDDETENIDO" Type="int" />
-          <Property Name="FOTO" Type="varchar(max)" />
-          <Property Name="FEHCA" Type="date" />
-          <Property Name="TIPO" Type="varchar" MaxLength="150" />
-          <Property Name="VECTOR_EMBEDDING" Type="nvarchar(max)" />
-        </EntityType>
         <EntityType Name="Modulos">
           <Key>
             <PropertyRef Name="idModulo" />
@@ -122,38 +101,22 @@
           <Property Name="Cedula" Type="varchar" MaxLength="50" />
           <Property Name="SSA" Type="varchar" MaxLength="50" />
         </EntityType>
-        <EntityType Name="Usuario_Modulos">
-          <Key>
-            <PropertyRef Name="idUsuarioModulo" />
-          </Key>
-          <Property Name="idUsuarioModulo" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="idUsuario" Type="int" />
-          <Property Name="idModulo" Type="int" />
-        </EntityType>
         <EntityContainer Name="SICModelStoreContainer">
-          <EntitySet Name="COINCIDENCIA" EntityType="Self.COINCIDENCIA" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="DETENCION" EntityType="Self.DETENCION" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="DETENIDO" EntityType="Self.DETENIDO" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="FOTO" EntityType="Self.FOTO" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Modulos" EntityType="Self.Modulos" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Usuario" EntityType="Self.Usuario" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="Usuario_Modulos" EntityType="Self.Usuario_Modulos" Schema="dbo" store:Type="Tables" />
         </EntityContainer>
-      </Schema>
-    </edmx:StorageModels>
+      </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="SICModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
-        <EntityType Name="COINCIDENCIA">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="DetenidoId" Type="Int32" Nullable="false" />
-          <Property Name="DetenidoCoincidenciaId" Type="Int32" Nullable="false" />
-          <Property Name="TipoCoincidencia" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="FechaRegistro" Type="DateTime" Nullable="false" Precision="7" />
-        </EntityType>
+        <EntityContainer Name="SICEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="DETENCION" EntityType="SICModel.DETENCION" />
+          <EntitySet Name="DETENIDO" EntityType="SICModel.DETENIDO" />
+          <EntitySet Name="Modulos" EntityType="SICModel.Modulos" />
+          <EntitySet Name="Usuario" EntityType="SICModel.Usuario" />
+        </EntityContainer>
         <EntityType Name="DETENCION">
           <Key>
             <PropertyRef Name="IDDETENCION" />
@@ -222,17 +185,6 @@
           <Property Name="RFC" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
           <Property Name="CURP" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
         </EntityType>
-        <EntityType Name="FOTO">
-          <Key>
-            <PropertyRef Name="IDFOTO" />
-          </Key>
-          <Property Name="IDFOTO" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="IDDETENIDO" Type="Int32" />
-          <Property Name="FOTO1" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="FEHCA" Type="DateTime" Precision="0" />
-          <Property Name="TIPO" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
-          <Property Name="VECTOR_EMBEDDING" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-        </EntityType>
         <EntityType Name="Modulos">
           <Key>
             <PropertyRef Name="idModulo" />
@@ -261,158 +213,109 @@
           <Property Name="Cedula" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="SSA" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
         </EntityType>
-        <EntityType Name="Usuario_Modulos">
-          <Key>
-            <PropertyRef Name="idUsuarioModulo" />
-          </Key>
-          <Property Name="idUsuarioModulo" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="idUsuario" Type="Int32" />
-          <Property Name="idModulo" Type="Int32" />
-        </EntityType>
-        <EntityContainer Name="SICEntities" annotation:LazyLoadingEnabled="true">
-          <EntitySet Name="COINCIDENCIA" EntityType="Self.COINCIDENCIA" />
-          <EntitySet Name="DETENCION" EntityType="Self.DETENCION" />
-          <EntitySet Name="DETENIDO" EntityType="Self.DETENIDO" />
-          <EntitySet Name="FOTO" EntityType="Self.FOTO" />
-          <EntitySet Name="Modulos" EntityType="Self.Modulos" />
-          <EntitySet Name="Usuario" EntityType="Self.Usuario" />
-          <EntitySet Name="Usuario_Modulos" EntityType="Self.Usuario_Modulos" />
-        </EntityContainer>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
     <edmx:Mappings>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
         <EntityContainerMapping StorageEntityContainer="SICModelStoreContainer" CdmEntityContainer="SICEntities">
-          <EntitySetMapping Name="COINCIDENCIA">
-            <EntityTypeMapping TypeName="SICModel.COINCIDENCIA">
-              <MappingFragment StoreEntitySet="COINCIDENCIA">
-                <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="DetenidoId" ColumnName="DetenidoId" />
-                <ScalarProperty Name="DetenidoCoincidenciaId" ColumnName="DetenidoCoincidenciaId" />
-                <ScalarProperty Name="TipoCoincidencia" ColumnName="TipoCoincidencia" />
-                <ScalarProperty Name="FechaRegistro" ColumnName="FechaRegistro" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
           <EntitySetMapping Name="DETENCION">
             <EntityTypeMapping TypeName="SICModel.DETENCION">
               <MappingFragment StoreEntitySet="DETENCION">
-                <ScalarProperty Name="IDDETENCION" ColumnName="IDDETENCION" />
-                <ScalarProperty Name="SERIE_MUNICIPIO" ColumnName="SERIE_MUNICIPIO" />
-                <ScalarProperty Name="CONSECUTIVO" ColumnName="CONSECUTIVO" />
-                <ScalarProperty Name="ANO" ColumnName="ANO" />
-                <ScalarProperty Name="FECHA_DETENCION" ColumnName="FECHA_DETENCION" />
-                <ScalarProperty Name="HORA_DETENCION" ColumnName="HORA_DETENCION" />
-                <ScalarProperty Name="FUERO" ColumnName="FUERO" />
-                <ScalarProperty Name="NoDETENIDOS" ColumnName="NoDETENIDOS" />
-                <ScalarProperty Name="CALLE" ColumnName="CALLE" />
-                <ScalarProperty Name="COLONIA" ColumnName="COLONIA" />
-                <ScalarProperty Name="CP" ColumnName="CP" />
-                <ScalarProperty Name="MUNICIPIO" ColumnName="MUNICIPIO" />
-                <ScalarProperty Name="HECHO" ColumnName="HECHO" />
-                <ScalarProperty Name="CAUSA" ColumnName="CAUSA" />
-                <ScalarProperty Name="OBSERVACIONES" ColumnName="OBSERVACIONES" />
-                <ScalarProperty Name="VECHICULO" ColumnName="VECHICULO" />
-                <ScalarProperty Name="NUMEXT" ColumnName="NUMEXT" />
-                <ScalarProperty Name="NUMINT" ColumnName="NUMINT" />
-                <ScalarProperty Name="Gramos" ColumnName="Gramos" />
-                <ScalarProperty Name="Mes" ColumnName="Mes" />
-                <ScalarProperty Name="Dia" ColumnName="Dia" />
-                <ScalarProperty Name="Feria" ColumnName="Feria" />
-                <ScalarProperty Name="Latitud" ColumnName="Latitud" />
-                <ScalarProperty Name="Longitud" ColumnName="Longitud" />
-                <ScalarProperty Name="Aseguramientos" ColumnName="Aseguramientos" />
-                <ScalarProperty Name="Envoltorios" ColumnName="Envoltorios" />
-                <ScalarProperty Name="Armas" ColumnName="Armas" />
-                <ScalarProperty Name="Cartuchos" ColumnName="Cartuchos" />
-                <ScalarProperty Name="FueroDescripcion" ColumnName="FueroDescripcion" />
-                <ScalarProperty Name="Cargadores" ColumnName="Cargadores" />
                 <ScalarProperty Name="OficialTraslada" ColumnName="OficialTraslada" />
+                <ScalarProperty Name="Cargadores" ColumnName="Cargadores" />
+                <ScalarProperty Name="FueroDescripcion" ColumnName="FueroDescripcion" />
+                <ScalarProperty Name="Cartuchos" ColumnName="Cartuchos" />
+                <ScalarProperty Name="Armas" ColumnName="Armas" />
+                <ScalarProperty Name="Envoltorios" ColumnName="Envoltorios" />
+                <ScalarProperty Name="Aseguramientos" ColumnName="Aseguramientos" />
+                <ScalarProperty Name="Longitud" ColumnName="Longitud" />
+                <ScalarProperty Name="Latitud" ColumnName="Latitud" />
+                <ScalarProperty Name="Feria" ColumnName="Feria" />
+                <ScalarProperty Name="Dia" ColumnName="Dia" />
+                <ScalarProperty Name="Mes" ColumnName="Mes" />
+                <ScalarProperty Name="Gramos" ColumnName="Gramos" />
+                <ScalarProperty Name="NUMINT" ColumnName="NUMINT" />
+                <ScalarProperty Name="NUMEXT" ColumnName="NUMEXT" />
+                <ScalarProperty Name="VECHICULO" ColumnName="VECHICULO" />
+                <ScalarProperty Name="OBSERVACIONES" ColumnName="OBSERVACIONES" />
+                <ScalarProperty Name="CAUSA" ColumnName="CAUSA" />
+                <ScalarProperty Name="HECHO" ColumnName="HECHO" />
+                <ScalarProperty Name="MUNICIPIO" ColumnName="MUNICIPIO" />
+                <ScalarProperty Name="CP" ColumnName="CP" />
+                <ScalarProperty Name="COLONIA" ColumnName="COLONIA" />
+                <ScalarProperty Name="CALLE" ColumnName="CALLE" />
+                <ScalarProperty Name="NoDETENIDOS" ColumnName="NoDETENIDOS" />
+                <ScalarProperty Name="FUERO" ColumnName="FUERO" />
+                <ScalarProperty Name="HORA_DETENCION" ColumnName="HORA_DETENCION" />
+                <ScalarProperty Name="FECHA_DETENCION" ColumnName="FECHA_DETENCION" />
+                <ScalarProperty Name="ANO" ColumnName="ANO" />
+                <ScalarProperty Name="CONSECUTIVO" ColumnName="CONSECUTIVO" />
+                <ScalarProperty Name="SERIE_MUNICIPIO" ColumnName="SERIE_MUNICIPIO" />
+                <ScalarProperty Name="IDDETENCION" ColumnName="IDDETENCION" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="DETENIDO">
             <EntityTypeMapping TypeName="SICModel.DETENIDO">
               <MappingFragment StoreEntitySet="DETENIDO">
-                <ScalarProperty Name="IDDETENIDO" ColumnName="IDDETENIDO" />
-                <ScalarProperty Name="IDDETENCION" ColumnName="IDDETENCION" />
-                <ScalarProperty Name="NOMBRE" ColumnName="NOMBRE" />
-                <ScalarProperty Name="ALIAS" ColumnName="ALIAS" />
-                <ScalarProperty Name="EDAD" ColumnName="EDAD" />
-                <ScalarProperty Name="ORIGINARIO" ColumnName="ORIGINARIO" />
-                <ScalarProperty Name="SEXO" ColumnName="SEXO" />
-                <ScalarProperty Name="FECHA_NACIMIENTO" ColumnName="FECHA_NACIMIENTO" />
-                <ScalarProperty Name="CALLE" ColumnName="CALLE" />
-                <ScalarProperty Name="COLONIA" ColumnName="COLONIA" />
-                <ScalarProperty Name="CP" ColumnName="CP" />
-                <ScalarProperty Name="MUNICIPIO" ColumnName="MUNICIPIO" />
-                <ScalarProperty Name="NUMEXT" ColumnName="NUMEXT" />
-                <ScalarProperty Name="NUMINT" ColumnName="NUMINT" />
-                <ScalarProperty Name="Ap_Paterno" ColumnName="Ap_Paterno" />
-                <ScalarProperty Name="Ap_Materno" ColumnName="Ap_Materno" />
-                <ScalarProperty Name="Ocupacion" ColumnName="Ocupacion" />
-                <ScalarProperty Name="CaracteristicasDetenido" ColumnName="CaracteristicasDetenido" />
-                <ScalarProperty Name="Estado" ColumnName="Estado" />
-                <ScalarProperty Name="Folio" ColumnName="Folio" />
-                <ScalarProperty Name="Situacion" ColumnName="Situacion" />
-                <ScalarProperty Name="Telefono" ColumnName="Telefono" />
-                <ScalarProperty Name="Estatus" ColumnName="Estatus" />
-                <ScalarProperty Name="FechaRegistro" ColumnName="FechaRegistro" />
-                <ScalarProperty Name="UsuarioRegistro" ColumnName="UsuarioRegistro" />
-                <ScalarProperty Name="RFC" ColumnName="RFC" />
                 <ScalarProperty Name="CURP" ColumnName="CURP" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="FOTO">
-            <EntityTypeMapping TypeName="SICModel.FOTO">
-              <MappingFragment StoreEntitySet="FOTO">
-                <ScalarProperty Name="IDFOTO" ColumnName="IDFOTO" />
+                <ScalarProperty Name="RFC" ColumnName="RFC" />
+                <ScalarProperty Name="UsuarioRegistro" ColumnName="UsuarioRegistro" />
+                <ScalarProperty Name="FechaRegistro" ColumnName="FechaRegistro" />
+                <ScalarProperty Name="Estatus" ColumnName="Estatus" />
+                <ScalarProperty Name="Telefono" ColumnName="Telefono" />
+                <ScalarProperty Name="Situacion" ColumnName="Situacion" />
+                <ScalarProperty Name="Folio" ColumnName="Folio" />
+                <ScalarProperty Name="Estado" ColumnName="Estado" />
+                <ScalarProperty Name="CaracteristicasDetenido" ColumnName="CaracteristicasDetenido" />
+                <ScalarProperty Name="Ocupacion" ColumnName="Ocupacion" />
+                <ScalarProperty Name="Ap_Materno" ColumnName="Ap_Materno" />
+                <ScalarProperty Name="Ap_Paterno" ColumnName="Ap_Paterno" />
+                <ScalarProperty Name="NUMINT" ColumnName="NUMINT" />
+                <ScalarProperty Name="NUMEXT" ColumnName="NUMEXT" />
+                <ScalarProperty Name="MUNICIPIO" ColumnName="MUNICIPIO" />
+                <ScalarProperty Name="CP" ColumnName="CP" />
+                <ScalarProperty Name="COLONIA" ColumnName="COLONIA" />
+                <ScalarProperty Name="CALLE" ColumnName="CALLE" />
+                <ScalarProperty Name="FECHA_NACIMIENTO" ColumnName="FECHA_NACIMIENTO" />
+                <ScalarProperty Name="SEXO" ColumnName="SEXO" />
+                <ScalarProperty Name="ORIGINARIO" ColumnName="ORIGINARIO" />
+                <ScalarProperty Name="EDAD" ColumnName="EDAD" />
+                <ScalarProperty Name="ALIAS" ColumnName="ALIAS" />
+                <ScalarProperty Name="NOMBRE" ColumnName="NOMBRE" />
+                <ScalarProperty Name="IDDETENCION" ColumnName="IDDETENCION" />
                 <ScalarProperty Name="IDDETENIDO" ColumnName="IDDETENIDO" />
-                <ScalarProperty Name="FOTO1" ColumnName="FOTO" />
-                <ScalarProperty Name="FEHCA" ColumnName="FEHCA" />
-                <ScalarProperty Name="TIPO" ColumnName="TIPO" />
-                <ScalarProperty Name="VECTOR_EMBEDDING" ColumnName="VECTOR_EMBEDDING" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Modulos">
             <EntityTypeMapping TypeName="SICModel.Modulos">
               <MappingFragment StoreEntitySet="Modulos">
-                <ScalarProperty Name="idModulo" ColumnName="idModulo" />
                 <ScalarProperty Name="Modulo" ColumnName="Modulo" />
+                <ScalarProperty Name="idModulo" ColumnName="idModulo" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Usuario">
             <EntityTypeMapping TypeName="SICModel.Usuario">
               <MappingFragment StoreEntitySet="Usuario">
-                <ScalarProperty Name="idUsuario" ColumnName="idUsuario" />
-                <ScalarProperty Name="Usuario1" ColumnName="Usuario" />
-                <ScalarProperty Name="Contrasena" ColumnName="Contrasena" />
-                <ScalarProperty Name="App" ColumnName="App" />
-                <ScalarProperty Name="Apm" ColumnName="Apm" />
-                <ScalarProperty Name="Nombre" ColumnName="Nombre" />
-                <ScalarProperty Name="Grupo" ColumnName="Grupo" />
-                <ScalarProperty Name="Unidad" ColumnName="Unidad" />
-                <ScalarProperty Name="Corporacion" ColumnName="Corporacion" />
-                <ScalarProperty Name="Municipio" ColumnName="Municipio" />
-                <ScalarProperty Name="Turno" ColumnName="Turno" />
-                <ScalarProperty Name="Grado" ColumnName="Grado" />
-                <ScalarProperty Name="Rol" ColumnName="Rol" />
-                <ScalarProperty Name="Estatus" ColumnName="Estatus" />
-                <ScalarProperty Name="Cedula" ColumnName="Cedula" />
                 <ScalarProperty Name="SSA" ColumnName="SSA" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="Usuario_Modulos">
-            <EntityTypeMapping TypeName="SICModel.Usuario_Modulos">
-              <MappingFragment StoreEntitySet="Usuario_Modulos">
-                <ScalarProperty Name="idUsuarioModulo" ColumnName="idUsuarioModulo" />
+                <ScalarProperty Name="Cedula" ColumnName="Cedula" />
+                <ScalarProperty Name="Estatus" ColumnName="Estatus" />
+                <ScalarProperty Name="Rol" ColumnName="Rol" />
+                <ScalarProperty Name="Grado" ColumnName="Grado" />
+                <ScalarProperty Name="Turno" ColumnName="Turno" />
+                <ScalarProperty Name="Municipio" ColumnName="Municipio" />
+                <ScalarProperty Name="Corporacion" ColumnName="Corporacion" />
+                <ScalarProperty Name="Unidad" ColumnName="Unidad" />
+                <ScalarProperty Name="Grupo" ColumnName="Grupo" />
+                <ScalarProperty Name="Nombre" ColumnName="Nombre" />
+                <ScalarProperty Name="Apm" ColumnName="Apm" />
+                <ScalarProperty Name="App" ColumnName="App" />
+                <ScalarProperty Name="Contrasena" ColumnName="Contrasena" />
+                <ScalarProperty Name="Usuario1" ColumnName="Usuario" />
                 <ScalarProperty Name="idUsuario" ColumnName="idUsuario" />
-                <ScalarProperty Name="idModulo" ColumnName="idModulo" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

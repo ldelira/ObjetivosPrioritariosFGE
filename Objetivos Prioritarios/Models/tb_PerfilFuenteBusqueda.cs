@@ -22,7 +22,7 @@ namespace Objetivos_Prioritarios.Models
         public Nullable<System.DateTime> date_fecha_modificacion { get; set; }
         public string nvarchar_usuario_modificacion { get; set; }
     
-        public virtual cat_FuenteBusqueda cat_FuenteBusqueda { get; set; }
         public virtual cat_Perfil cat_Perfil { get; set; }
+        public virtual cat_FuenteBusqueda cat_FuenteBusqueda { get; set; }
     }
 }

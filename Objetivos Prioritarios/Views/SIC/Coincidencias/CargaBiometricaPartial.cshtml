@@ -37,21 +37,31 @@
                  data-tipo-biometrico="fotografia">
 
             @Html.TextBoxFor(
-                     model => model.Fotografia,
-                     new
-                     {
-                         type = "file",
-                         id = "Fotografia",
-                         @class = "sic-file-input js-biometrico-input",
-                         accept = ".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp",
-                         data_tipo = "fotografia",
-                         data_preview = "previewFotografia",
-                         data_vacio = "estadoVacioFotografia",
-                         data_quitar = "btnQuitarFotografia"
-                     }
-                 )
+                    model => model.Fotografia,
+                    new
+                    {
+                        type = "file",
+                        id = "Fotografia",
+                        @class = "sic-file-input js-biometrico-input",
+                        accept = ".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp",
+                        data_tipo = "fotografia",
+                        data_preview = "previewFotografia",
+                        data_vacio = "estadoVacioFotografia",
+                        data_quitar = "btnQuitarFotografia"
+                    }
+                )
+
+            @* Input exclusivo para abrir cámara en tablet/móvil *@
+            <input type="file"
+                   id="FotografiaCamara"
+                   class="sic-file-input"
+                   accept="image/*"
+                   capture="environment" />
 
 
+            @* ============================================================
+        ZONA DE PREVIEW / ARRASTRE
+        ============================================================ *@
             <label for="Fotografia"
                    id="dropzoneFotografia"
                    class="sic-biometrico-preview-zona sic-dropzone"
@@ -66,12 +76,15 @@
                         Fotografía
                     </strong>
 
-                    <span>
+                    <span class="sic-foto-instruccion-desktop">
                         Seleccione o arrastre
                     </span>
 
-                </div>
+                    <span class="sic-foto-instruccion-tablet">
+                        Seleccione una fotografía
+                    </span>
 
+                </div>
 
                 <img id="previewFotografia"
                      class="sic-biometrico-preview sic-biometrico-preview-foto"
@@ -82,6 +95,9 @@
             </label>
 
 
+            @* ============================================================
+        INFORMACIÓN
+        ============================================================ *@
             <div class="sic-biometrico-informacion">
 
                 <div class="sic-biometrico-titulo-fila">
@@ -110,7 +126,16 @@
                 </small>
 
 
-                <div class="sic-biometrico-acciones">
+                @* ========================================================
+            ACCIONES
+
+            PC:
+            [ SELECCIONAR ] [ QUITAR ]
+
+            TABLET:
+            [ GALERÍA ] [ CÁMARA ] [ QUITAR ]
+            ======================================================== *@
+                <div class="sic-biometrico-acciones sic-biometrico-acciones-foto">
 
                     <button type="button"
                             class="sic-btn-biometrico sic-btn-seleccionar js-seleccionar-biometrico"
@@ -118,8 +143,25 @@
 
                         <i class="fa fa-folder-open"></i>
 
-                        <span>
+                        <span class="sic-texto-foto-desktop">
                             Seleccionar
+                        </span>
+
+                        <span class="sic-texto-foto-tablet">
+                            Galería
+                        </span>
+
+                    </button>
+
+
+                    <button type="button"
+                            id="btnTomarFotografia"
+                            class="sic-btn-biometrico sic-btn-camara">
+
+                        <i class="fa fa-camera"></i>
+
+                        <span>
+                            Cámara
                         </span>
 
                     </button>
@@ -144,7 +186,6 @@
             </div>
 
         </article>
-
 
 
         <!-- ============================================================

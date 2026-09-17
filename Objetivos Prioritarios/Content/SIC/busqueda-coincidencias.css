@@ -2,7 +2,6 @@
    VARIABLES Y BASE
    ================================================================ */
 
-@import url('busqueda-coincidencias.css');
 .sic-busqueda-page {
     --sic-azul: #1746b5;
     --sic-azul-medio: #3557d4;
@@ -11194,5 +11193,650 @@ body.sic-modal-abierto {
         width: 100%;
         transform: none;
         margin-top: -4px;
+    }
+}
+/* ================================================================
+   IDENTIDAD CONSOLIDADA
+   ================================================================ */
+
+.sic-panel-identidad {
+    color: var(--sic-texto);
+    min-width: 0;
+    padding: 14px;
+}
+
+    .sic-panel-identidad > h3 {
+        color: var(--sic-azul-oscuro);
+        font-size: 17px;
+        font-weight: 900;
+        margin: 0 0 11px;
+    }
+
+.sic-identidad-tabs,
+.sic-identidad-selector {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin-bottom: 12px;
+}
+
+.sic-panel-identidad [hidden] {
+    display: none !important;
+}
+
+.sic-identidad-tabs button,
+.sic-identidad-selector button {
+    background: #f7f9fd;
+    border: 1px solid #cfdaeb;
+    border-radius: 8px;
+    color: #42536d;
+    cursor: pointer;
+    transition: .18s ease;
+}
+
+    .sic-identidad-tabs button:hover,
+    .sic-identidad-selector button:hover {
+        background: var(--sic-azul-suave);
+        border-color: #91aae8;
+        color: var(--sic-azul);
+    }
+
+.sic-panel-identidad button.active {
+    background: linear-gradient(135deg, #3557d4, #1746b5);
+    border-color: #3557d4;
+    color: #ffffff;
+}
+
+.sic-panel-identidad button:focus-visible {
+    outline: 2px solid #7aa2f7;
+    outline-offset: 2px;
+}
+
+
+/* RESUMEN */
+
+.sic-identidad-resumen {
+    background: #ffffff;
+    border: 1px solid var(--sic-borde);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.sic-identidad-hero {
+    align-items: stretch;
+    display: grid;
+    gap: 17px;
+    grid-template-columns: 150px minmax(0, 1fr);
+    padding: 17px;
+}
+
+.sic-identidad-foto-col {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+}
+
+.sic-identidad-foto {
+    background: #f7f9fc;
+    border: 1px solid var(--sic-borde);
+    border-radius: 10px;
+    cursor: pointer;
+    overflow: hidden;
+    padding: 0;
+    width: 142px;
+}
+
+    .sic-identidad-foto img {
+        display: block;
+        height: 174px;
+        object-fit: contain;
+        width: 140px;
+    }
+
+.sic-identidad-principal-badge {
+    align-items: center;
+    background: var(--sic-azul-suave);
+    border: 1px solid #bfd0fa;
+    border-radius: 12px;
+    color: var(--sic-azul);
+    display: inline-flex;
+    font-size: 10px;
+    font-weight: 900;
+    gap: 4px;
+    margin-top: 7px;
+    padding: 4px 7px;
+    text-transform: uppercase;
+}
+
+.sic-identidad-datos-principales {
+    min-width: 0;
+}
+
+.sic-identidad-etiqueta-superior {
+    align-items: center;
+    color: var(--sic-azul);
+    display: flex;
+    font-size: 11px;
+    font-weight: 900;
+    gap: 5px;
+    letter-spacing: .3px;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+}
+
+.sic-identidad-datos-principales h2 {
+    color: var(--sic-azul-oscuro);
+    font-size: 22px;
+    font-weight: 900;
+    line-height: 1.2;
+    margin: 0;
+}
+
+.sic-identidad-alias {
+    align-items: center;
+    color: #5d6c82;
+    display: flex;
+    font-size: 13px;
+    gap: 5px;
+    margin-top: 6px;
+}
+
+    .sic-identidad-alias i {
+        color: var(--sic-morado);
+    }
+
+.sic-identidad-origen {
+    align-items: center;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 7px;
+    color: #52627a;
+    display: inline-flex;
+    font-size: 11px;
+    font-weight: 800;
+    gap: 5px;
+    margin-top: 9px;
+    padding: 5px 8px;
+}
+
+.sic-identidad-evidencia-bloque {
+    border-top: 1px solid #e7edf5;
+    margin-top: 13px;
+    padding-top: 11px;
+}
+
+.sic-identidad-seccion-label {
+    color: #64748b;
+    display: block;
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: .45px;
+    margin-bottom: 7px;
+    text-transform: uppercase;
+}
+
+.sic-identidad-evidencias {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+}
+
+.sic-identidad-evidencia {
+    align-items: center;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    display: inline-flex;
+    font-size: 12px;
+    font-weight: 800;
+    gap: 6px;
+    padding: 7px 9px;
+}
+
+    .sic-identidad-evidencia strong {
+        font-size: 13px;
+        font-weight: 900;
+    }
+
+.sic-identidad-evidencia-foto {
+    background: #ecfdf3;
+    border-color: #b5e5c5;
+    color: #16723a;
+}
+
+.sic-identidad-evidencia-huella {
+    background: #f5f3ff;
+    border-color: #d8ccff;
+    color: #6d28d9;
+}
+
+.sic-identidad-evidencia-nombre {
+    background: #ecfeff;
+    border-color: #a5e9ef;
+    color: #0f6f76;
+}
+
+.sic-identidad-huellas {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 8px;
+}
+
+    .sic-identidad-huellas > span {
+        color: #64748b;
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+    .sic-identidad-huellas > strong {
+        align-items: center;
+        background: #ede9fe;
+        border: 1px solid #d8ccff;
+        border-radius: 50%;
+        color: #6d28d9;
+        display: inline-flex;
+        font-size: 11px;
+        height: 23px;
+        justify-content: center;
+        width: 23px;
+    }
+
+
+/* INFORMACIÓN DISPONIBLE */
+
+.sic-identidad-disponibilidad {
+    background: #f8fafc;
+    border-top: 1px solid var(--sic-borde);
+    padding: 14px 17px;
+}
+
+.sic-identidad-seccion-header {
+    align-items: center;
+    display: flex;
+    gap: 12px;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+    .sic-identidad-seccion-header .sic-identidad-seccion-label {
+        margin-bottom: 3px;
+    }
+
+    .sic-identidad-seccion-header strong {
+        color: var(--sic-azul-oscuro);
+        display: block;
+        font-size: 12px;
+    }
+
+.sic-identidad-total-fuentes {
+    background: #ffffff;
+    border: 1px solid var(--sic-borde);
+    border-radius: 14px;
+    color: #52627a;
+    font-size: 11px;
+    font-weight: 800;
+    padding: 5px 8px;
+}
+
+.sic-identidad-fuentes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.sic-identidad-fuente-card {
+    align-items: center;
+    background: #ffffff;
+    border: 1px solid var(--sic-borde);
+    border-radius: 9px;
+    display: flex;
+    gap: 8px;
+    min-width: 155px;
+    padding: 9px 10px;
+}
+
+.sic-identidad-fuente-icono {
+    align-items: center;
+    border-radius: 8px;
+    display: flex;
+    flex: 0 0 31px;
+    height: 31px;
+    justify-content: center;
+    width: 31px;
+}
+
+.sic-identidad-fuente-card span {
+    display: block;
+    font-size: 11px;
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+.sic-identidad-fuente-card strong {
+    display: block;
+    font-size: 13px;
+    margin-top: 2px;
+}
+
+.sic-identidad-fuente-c5 {
+    border-color: #b9d1f4;
+    color: #18549b;
+}
+
+    .sic-identidad-fuente-c5 .sic-identidad-fuente-icono {
+        background: #eaf2ff;
+    }
+
+.sic-identidad-fuente-fgea {
+    border-color: #edca82;
+    color: #815600;
+}
+
+    .sic-identidad-fuente-fgea .sic-identidad-fuente-icono {
+        background: #fff3da;
+    }
+
+.sic-identidad-fuente-objetivo {
+    border-color: #efb7bd;
+    color: #9f1239;
+}
+
+    .sic-identidad-fuente-objetivo .sic-identidad-fuente-icono {
+        background: #fdebed;
+    }
+
+.sic-identidad-fuente-generica {
+    color: #475569;
+}
+
+    .sic-identidad-fuente-generica .sic-identidad-fuente-icono {
+        background: #f1f5f9;
+    }
+
+
+/* ALERTAS */
+
+.sic-identidad-alertas {
+    border-top: 1px solid var(--sic-borde);
+    padding: 14px 17px 16px;
+}
+
+.sic-identidad-alerta-mandamiento {
+    align-items: center;
+    background: #fff9e8;
+    border: 1px solid #e9c45f;
+    border-radius: 9px;
+    display: grid;
+    gap: 9px;
+    grid-template-columns: 36px minmax(0, 1fr) auto;
+    padding: 9px 11px;
+}
+
+.sic-identidad-alerta-icono {
+    align-items: center;
+    background: #f5d47e;
+    border-radius: 50%;
+    color: #805500;
+    display: flex;
+    height: 34px;
+    justify-content: center;
+    width: 34px;
+}
+
+.sic-identidad-alerta-mandamiento strong {
+    color: #694a00;
+    display: block;
+    font-size: 13px;
+}
+
+.sic-identidad-alerta-mandamiento div:nth-child(2) span {
+    color: #7d6631;
+    display: block;
+    font-size: 12px;
+    margin-top: 2px;
+}
+
+.sic-identidad-alerta-total {
+    align-items: center;
+    background: #b67b00;
+    border-radius: 50%;
+    color: #ffffff;
+    display: flex;
+    font-size: 11px;
+    font-weight: 900;
+    height: 24px;
+    justify-content: center;
+    min-width: 24px;
+}
+
+
+/* FICHA CARGADA POR AJAX */
+
+.sic-identidad-ficha {
+    min-width: 0;
+}
+
+.sic-identidad-tipo {
+    background: #f4f7fd;
+    border-radius: 8px;
+    color: #304d80;
+    font-weight: 600;
+    padding: 8px 12px;
+}
+
+
+/* RESPONSIVE */
+
+@media (max-width: 900px) {
+    .sic-identidad-hero {
+        grid-template-columns: 110px minmax(0, 1fr);
+    }
+
+    .sic-identidad-foto {
+        width: 102px;
+    }
+
+        .sic-identidad-foto img {
+            height: 130px;
+            width: 100px;
+        }
+
+    .sic-identidad-datos-principales h2 {
+        font-size: 18px;
+    }
+}
+
+@media (max-width: 620px) {
+    .sic-identidad-hero {
+        grid-template-columns: 1fr;
+    }
+
+    .sic-identidad-foto-col {
+        align-items: flex-start;
+    }
+
+    .sic-identidad-fuentes {
+        display: grid;
+        grid-template-columns: 1fr;
+    }
+
+    .sic-identidad-fuente-card {
+        width: 100%;
+    }
+}
+#sicModalComparacionFoto, #sicModalFotoGrande { z-index: 120010; }
+
+
+.sic-identidad-tabs .js-identidad-tab {
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 210px;
+    width: 210px;
+    min-width: 135px;
+    height: 40px;
+    padding: 0 10px;
+    font-size: 12px;
+    font-weight: 900;
+    line-height: 1.2;
+    white-space: nowrap;
+}
+
+.sic-identidad-selector .js-identidad-registro {
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 105px;
+    height: 37px;
+    padding: 0 11px;
+    font-size: 11px;
+    font-weight: 800;
+    line-height: 1.2;
+}
+
+@media (max-width: 620px) {
+    .sic-identidad-tabs .js-identidad-tab {
+        flex: 1 1 210px;
+        width: auto;
+        min-width: 0;
+        white-space: normal;
+    }
+}
+
+
+
+/* ================================================================
+   FOTOGRAFÍA - ESCRITORIO / TABLET
+   ================================================================ */
+
+/* ================================================================
+   ESCRITORIO
+   ================================================================ */
+
+/* En PC sólo Seleccionar + Quitar */
+.sic-biometrico-acciones-foto {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+/* Cámara oculta en PC */
+.sic-btn-camara {
+    display: none;
+}
+
+/* En PC dice Seleccionar */
+.sic-texto-foto-desktop {
+    display: inline;
+}
+
+.sic-texto-foto-tablet {
+    display: none;
+}
+
+
+/* ================================================================
+   TABLET / DISPOSITIVO TÁCTIL
+   ================================================================ */
+
+@media (hover: none) and (pointer: coarse) {
+
+    /* En tablet:
+       Galería | Cámara | Quitar */
+    .sic-biometrico-acciones-foto {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .sic-btn-camara {
+        align-items: center;
+        display: inline-flex;
+        justify-content: center;
+        background: #eef3ff;
+        border: 1px solid #7898e7;
+        color: var(--sic-azul);
+    }
+
+        .sic-btn-camara:hover,
+        .sic-btn-camara:focus {
+            background: #dfe8ff;
+            border-color: var(--sic-azul);
+            color: var(--sic-azul);
+        }
+
+    /* Cambiar Seleccionar -> Galería */
+    .sic-texto-foto-desktop {
+        display: none;
+    }
+
+    .sic-texto-foto-tablet {
+        display: inline;
+    }
+}
+
+/* Texto del área de fotografía */
+.sic-foto-instruccion-desktop {
+    display: inline;
+}
+
+.sic-foto-instruccion-tablet {
+    display: none;
+}
+
+
+/* ================================================================
+   FOTOGRAFÍA - PC
+   ================================================================ */
+
+.sic-biometrico-acciones-foto {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.sic-btn-camara {
+    display: none;
+}
+
+.sic-texto-foto-desktop {
+    display: inline;
+}
+
+.sic-texto-foto-tablet {
+    display: none;
+}
+
+
+/* ================================================================
+   FOTOGRAFÍA - TABLET / TOUCH
+   ================================================================ */
+
+@media (hover: none) and (pointer: coarse) {
+
+    .sic-biometrico-acciones-foto {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .sic-btn-camara {
+        align-items: center;
+        display: inline-flex;
+        justify-content: center;
+        background: #eef3ff;
+        border: 1px solid #7898e7;
+        color: var(--sic-azul);
+    }
+
+    .sic-texto-foto-desktop {
+        display: none;
+    }
+
+    .sic-texto-foto-tablet {
+        display: inline;
+    }
+
+    .sic-foto-instruccion-desktop {
+        display: none;
+    }
+
+    .sic-foto-instruccion-tablet {
+        display: inline;
     }
 }

@@ -1,0 +1,254 @@
+@model Objetivos_Prioritarios.Models.Extends.PanelIdentidadViewModel
+@using System.Linq
+@using System.Collections.Generic
+@using Objetivos_Prioritarios.Models.Extends
+@{
+    var principal = Model.Principal;
+    var identidades = (principal.IdentidadConsolidada.Identidades ?? new List<IdentidadRelacionadaViewModel>())
+        .Where(i => i != null && i.IdTbFuente != 4)
+        .GroupBy(i => new { i.IdTbFuente, i.IdPersona }).Select(g => g.First()).ToList();
+    var fuentes = identidades.GroupBy(i => i.IdTbFuente).ToList();
+    var nombresFuentes = new Dictionary<int, string>
+    {
+        { 1, "C5 Detenidos" },
+        { 2, "CAPEA / FEMDLP" },
+        { 3, "Personas de Interés" },
+        { 5, "Objetivos Prioritarios" },
+        { 6, "FGEA" },
+        { 7, "Alerta Amber" },
+        { 8, "Protocolo Alba" }
+    };
+    var ordenFuentes = new[] { 1, 6, 5, 3, 8, 7, 2 };
+    var fuentesNavegables = fuentes
+        .Where(f => nombresFuentes.ContainsKey(f.Key))
+        .OrderBy(f => System.Array.IndexOf(ordenFuentes, f.Key))
+        .ToList();
+    var foto = Url.Content(string.IsNullOrWhiteSpace(principal.FotoUrl) ? "~/Content/imagenes/Nodisponible.jpg" : principal.FotoUrl);
+    bool comparar = Model.TieneFotografiaConsulta && principal.PorcentajeFoto > 0;
+}
+<section class="sic-panel-identidad" data-origen="@principal.IdCoincidencia">
+    <h3>Identidad consolidada</h3>
+    <div class="sic-identidad-tabs" role="group" aria-label="Fuentes de información">
+        <button type="button" class="js-identidad-tab active" data-fuente="0" aria-pressed="true">Resumen</button>
+        @foreach (var fuente in fuentesNavegables)
+        {
+            <button type="button" class="js-identidad-tab" data-fuente="@fuente.Key" aria-pressed="false">@nombresFuentes[fuente.Key] (@fuente.Count())</button>
+        }
+    </div>
+    @foreach (var fuente in fuentesNavegables)
+    {
+        <div class="sic-identidad-selector" data-fuente="@fuente.Key" role="group" aria-label="Registros de la fuente" hidden>
+            @*foreach (var registro in fuente)
+                {
+                    <button type="button" class="js-identidad-registro" data-fuente="@registro.IdTbFuente" data-persona="@registro.IdPersona" aria-pressed="false">Registro @registro.IdPersona</button>
+                }*@
+            @foreach (var registro in fuente
+    .OrderByDescending(r =>
+        r.IdTbFuente == principal.IdTbFuente &&
+        r.IdPersona == principal.IdPersona)
+    .ThenBy(r => r.IdPersona))
+            {
+                <button type="button"
+                        class="js-identidad-registro"
+                        data-fuente="@registro.IdTbFuente"
+                        data-persona="@registro.IdPersona"
+                        aria-pressed="false">
+                    Registro @registro.IdPersona
+                </button>
+            }
+        </div>
+    }
+    <div class="sic-identidad-resumen">
+
+        <div class="sic-identidad-hero">
+
+            <div class="sic-identidad-foto-col">
+                <button type="button"
+                        class="sic-identidad-foto @(comparar ? "js-abrir-comparacion-foto" : "js-ampliar-foto")"
+                        data-foto="@foto"
+                        data-foto-candidato="@foto"
+                        data-nombre="@principal.NombreCompleto"
+                        data-fuente="@principal.NombreFuente"
+                        data-porcentaje="@principal.PorcentajeFoto.ToString("0")"
+                        aria-label="@(comparar ? "Comparar fotografía del registro principal" : "Ampliar fotografía del registro principal")">
+                    <img src="@foto"
+                         alt="Fotografía principal"
+                         onerror="this.onerror=null;this.src='@Url.Content("~/Content/imagenes/Nodisponible.jpg")';" />
+                </button>
+
+                <span class="sic-identidad-principal-badge">
+                    <i class="fa fa-star"></i>
+                    Registro principal
+                </span>
+            </div>
+
+            <div class="sic-identidad-datos-principales">
+
+                <div class="sic-identidad-etiqueta-superior">
+                    <i class="fa fa-link"></i>
+                    Identidad consolidada
+                </div>
+
+                <h2>@principal.NombreCompleto</h2>
+
+                @if (!string.IsNullOrWhiteSpace(principal.Alias))
+                {
+                    <div class="sic-identidad-alias">
+                        <i class="fa fa-user-secret"></i>
+                        Alias: <strong>@principal.Alias</strong>
+                    </div>
+                }
+
+                <div class="sic-identidad-origen">
+                    <i class="fa fa-database"></i>
+                    @principal.NombreFuente
+                </div>
+
+                <div class="sic-identidad-evidencia-bloque">
+                    <span class="sic-identidad-seccion-label">
+                        Evidencia de b&uacute;squeda
+                    </span>
+
+                    <div class="sic-identidad-evidencias">
+                        @if (principal.PorcentajeFoto > 0)
+                        {
+                            <span class="sic-identidad-evidencia sic-identidad-evidencia-foto">
+                                <i class="fa fa-camera"></i>
+                                Fotograf&iacute;a
+                                <strong>@principal.PorcentajeFoto.ToString("0")%</strong>
+                            </span>
+                        }
+
+                        @if (principal.PorcentajeHuella > 0)
+                        {
+                            <span class="sic-identidad-evidencia sic-identidad-evidencia-huella">
+                                <i class="fa fa-hand-pointer-o"></i>
+                                Huella
+                                <strong>@principal.PorcentajeHuella.ToString("0")%</strong>
+                            </span>
+                        }
+
+                        @if (principal.PorcentajeNombre > 0)
+                        {
+                            <span class="sic-identidad-evidencia sic-identidad-evidencia-nombre">
+                                <i class="fa fa-user"></i>
+                                Nombre
+                                <strong>@principal.PorcentajeNombre.ToString("0")%</strong>
+                            </span>
+                        }
+
+                        @if (principal.PorcentajeAlias > 0)
+                        {
+                            <span class="sic-identidad-evidencia sic-identidad-evidencia-nombre">
+                                <i class="fa fa-user-secret"></i>
+                                Alias
+                                <strong>@principal.PorcentajeAlias.ToString("0")%</strong>
+                            </span>
+                        }
+                    </div>
+
+                    @if (principal.HuellasCoincidentes != null &&
+                         principal.HuellasCoincidentes.Any())
+                    {
+                        <div class="sic-identidad-huellas">
+                            <span>
+                                @(principal.HuellasCoincidentes.Count == 1
+                                ? "Huella coincidente"
+                                : "Huellas coincidentes")
+                            </span>
+
+                            @foreach (var huella in principal.HuellasCoincidentes.OrderBy(h => h.Huella))
+                            {
+                                <strong>@huella.Huella</strong>
+                            }
+                        </div>
+                    }
+                </div>
+
+            </div>
+        </div>
+
+        <div class="sic-identidad-disponibilidad">
+
+            <div class="sic-identidad-seccion-header">
+                <div>
+                    <span class="sic-identidad-seccion-label">
+                        Informaci&oacute;n disponible
+                    </span>
+
+                    <strong>
+                        @identidades.Count registro@(identidades.Count == 1 ? "" : "s") vinculado@(identidades.Count == 1 ? "" : "s")
+                    </strong>
+                </div>
+
+                <span class="sic-identidad-total-fuentes">
+                    @fuentes.Count fuente@(fuentes.Count == 1 ? "" : "s")
+                </span>
+            </div>
+
+            <div class="sic-identidad-fuentes">
+
+                @foreach (var fuente in fuentes.OrderBy(f => f.Key))
+                {
+                    string claseFuente =
+                        fuente.Key == 1 ? "sic-identidad-fuente-c5" :
+                        fuente.Key == 6 ? "sic-identidad-fuente-fgea" :
+                        fuente.Key == 5 ? "sic-identidad-fuente-objetivo" :
+                        "sic-identidad-fuente-generica";
+
+                    string nombreFuente =
+                        fuente.Key == 6
+                            ? "FGEA Detenidos"
+                            : nombresFuentes.ContainsKey(fuente.Key)
+                            ? nombresFuentes[fuente.Key]
+                            : "Fuente " + fuente.Key;
+
+                    <div class="sic-identidad-fuente-card @claseFuente">
+                        <div class="sic-identidad-fuente-icono">
+                            <i class="fa fa-database"></i>
+                        </div>
+
+                        <div>
+                            <span>@nombreFuente</span>
+                            <strong>
+                                @fuente.Count()
+                                @(fuente.Count() == 1 ? "registro" : "registros")
+                            </strong>
+                        </div>
+                    </div>
+                }
+
+            </div>
+        </div>
+
+        @if (principal.TieneAvisoMandamientos)
+        {
+            <div class="sic-identidad-alertas">
+
+                <span class="sic-identidad-seccion-label">
+                    Alertas
+                </span>
+
+                <div class="sic-identidad-alerta-mandamiento">
+                    <div class="sic-identidad-alerta-icono">
+                        <i class="fa fa-exclamation-triangle"></i>
+                    </div>
+
+                    <div>
+                        <strong>Mandamientos Judiciales</strong>
+                        <span>
+                            Coincidencia nominal detectada
+                        </span>
+                    </div>
+
+                    <span class="sic-identidad-alerta-total">
+                        @principal.TotalMandamientos
+                    </span>
+                </div>
+
+            </div>
+        }
+
+    </div>
+    <div class="sic-identidad-ficha" aria-live="polite" aria-busy="false" hidden></div>
+</section>

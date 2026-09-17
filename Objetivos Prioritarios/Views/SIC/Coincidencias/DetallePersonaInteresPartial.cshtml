@@ -2,8 +2,11 @@
 
 @using System
 @using System.Linq
+@using Objetivos_Prioritarios.Models.Extends
 
 @{
+    var contextoIdentidad = ViewBag.ContextoRegistroIdentidad as RegistroIdentidadViewModel;
+    bool puedeCompararFoto = contextoIdentidad != null && contextoIdentidad.PuedeCompararFotografia;
     var coincidencia =
         Model == null
             ? null
@@ -276,7 +279,6 @@
 
 
 @if (
-    coincidencia == null ||
     persona == null
 )
 {
@@ -295,6 +297,10 @@
 else
 {
     <div class="sic-fgea-detalle sic-pi-detalle">
+        @if (contextoIdentidad != null)
+        {
+            <p class="sic-identidad-tipo">@(contextoIdentidad.EsCoincidenciaDirecta ? "Coincidencia directa" : "Identidad relacionada confirmada")</p>
+        }
 
 
         <!-- ============================================================
@@ -308,11 +314,13 @@ else
 
 
                 <button type="button"
-                        class="sic-fgea-btn-foto js-ampliar-foto"
+                        class="sic-fgea-btn-foto @(puedeCompararFoto ? "js-abrir-comparacion-foto" : "js-ampliar-foto")"
+                        data-foto-candidato="@fotoUrl"
+                        data-porcentaje="@(puedeCompararFoto ? coincidencia.PorcentajeFoto.ToString("0") : "")"
                         data-foto="@fotoUrl"
                         data-nombre="@nombre"
                         data-fuente="FGEA - PERSONAS DE INTERÉS"
-                        title="Ver fotografía en grande">
+                        title="@(puedeCompararFoto ? "Comparar fotografía" : "Ver fotografía en grande")">
 
                     <img src="@fotoUrl"
                          alt="@nombre"
@@ -429,6 +437,8 @@ else
              EVIDENCIA PRINCIPAL
              ============================================================ -->
 
+        @if (coincidencia != null)
+        {
         <div class="sic-fgea-evidencia">
 
 
@@ -467,7 +477,7 @@ else
              DESGLOSE DE EVIDENCIAS
              ============================================================ -->
 
-        @if (
+        if (
             coincidencia.PorcentajeNombre > 0 ||
             coincidencia.PorcentajeAlias > 0 ||
             coincidencia.PorcentajeFoto > 0 ||
@@ -574,6 +584,7 @@ else
 
 
             </div>
+        }
         }
 
 

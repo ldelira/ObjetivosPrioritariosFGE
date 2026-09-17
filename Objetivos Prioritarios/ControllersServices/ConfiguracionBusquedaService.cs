@@ -11,70 +11,71 @@ namespace Objetivos_Prioritarios.ControllersServices
 
         public int ObtenerTiempoEspera()
         {
-            
-                var usuario =
-                    dbqa.tb_Usuarios
-                        .AsNoTracking()
-                        .FirstOrDefault(x =>
-                            x.nvarchar_no_interno.ToUpper() == LoginConfiguracion
-                        );
 
-                if (
-                    usuario == null ||
-                    !usuario.Valor.HasValue
-                )
-                {
-                    return 0;
-                }
+            //var usuario =
+            //    dbqa.tb_Usuarios
+            //        .AsNoTracking()
+            //        .FirstOrDefault(x =>
+            //            x.nvarchar_no_interno.ToUpper() == LoginConfiguracion
+            //        );
 
-                int valor =
-                    usuario.Valor.Value;
+            //if (
+            //    usuario == null ||
+            //    !usuario.Valor.HasValue
+            //)
+            //{
+            //    return 0;
+            //}
 
-                if (valor < 0)
-                {
-                    return 0;
-                }
+            //int valor =
+            //    usuario.Valor.Value;
 
-                /*
-                 * Tope de seguridad.
-                 * Máximo 5 minutos.
-                 */
-                if (valor > 300)
-                {
-                    return 300;
-                }
+            //if (valor < 0)
+            //{
+            //    return 0;
+            //}
 
-                return valor;
+            ///*
+            // * Tope de seguridad.
+            // * Máximo 5 minutos.
+            // */
+            //if (valor > 300)
+            //{
+            //    return 300;
+            //}
+
+            //return valor;
+            return 0;
             
         }
 
 
         public bool ActualizarTiempoEspera(int valor)
         {
-            if (
-                valor < 0 ||
-                valor > 300
-            )
-            {
-                return false;
-            }
+            //if (
+            //    valor < 0 ||
+            //    valor > 300
+            //)
+            //{
+            //    return false;
+            //}
 
-            dbqa = new Objetivos_PrioritariosEntitiesQA();
-                var usuario =
-                    dbqa.tb_Usuarios
-                        .FirstOrDefault(x =>
-                            x.nvarchar_no_interno.ToUpper() == LoginConfiguracion
-                        );
+            //dbqa = new Objetivos_PrioritariosEntitiesQA();
+            //    var usuario =
+            //        dbqa.tb_Usuarios
+            //            .FirstOrDefault(x =>
+            //                x.nvarchar_no_interno.ToUpper() == LoginConfiguracion
+            //            );
 
-                if (usuario == null)
-                {
-                    return false;
-                }
+            //    if (usuario == null)
+            //    {
+            //        return false;
+            //    }
 
-                usuario.Valor =
-                    valor;
+            //    usuario.Valor =
+            //        valor;
 
-                dbqa.SaveChanges();
+            //    dbqa.SaveChanges();
 
                 return true;
             

@@ -406,11 +406,11 @@ namespace Objetivos_Prioritarios.ControllersServices
                     (
                         from u in db.Usuarios
 
-                        join m in db.Ministerios
-                            on u.Cve_Usuario equals m.Cve_Usuario
+                        //join m in db.Ministerios
+                        //    on u.Cve_Usuario equals m.Cve_Usuario
 
-                        join a in db.Agencias
-                            on m.Cve_Age equals a.Cve_age
+                        //join a in db.Agencias
+                        //    on m.Cve_Age equals a.Cve_age
 
                         where
                             u.Login != null &&
@@ -427,13 +427,13 @@ namespace Objetivos_Prioritarios.ControllersServices
                             u.Area,
 
                             CveAgencia =
-                                m.Cve_Age,
+                                "",
 
                             Agencia =
-                                a.Agencia,
+                                "",
 
                             UnidadID =
-                                a.UnidadID
+                                ""
                         }
                     )
                     .FirstOrDefault();
@@ -478,33 +478,34 @@ namespace Objetivos_Prioritarios.ControllersServices
                  * Catalogos.dbo.CT_UnidadesInvestigacion.ID
                  * ============================================================
                  */
+                int idUnidad = 0;
+                string nombreUnidad = "";
+                //int idUnidad =
+                //    Convert.ToInt32(
+                //        usuario.UnidadID
+                //    );
 
-                int idUnidad =
-                    Convert.ToInt32(
-                        usuario.UnidadID
-                    );
+                //string nombreUnidad =
+                //    "";
 
-                string nombreUnidad =
-                    "";
-
-                if (idUnidad > 0)
-                {
-                    using (CatalogosEntities dbCatalogos = new CatalogosEntities())
-                    {
-                        nombreUnidad =
-                            dbCatalogos
-                                .CT_UnidadesInvestigacion
-                                .AsNoTracking()
-                                .Where(x =>
-                                    x.ID == idUnidad
-                                )
-                                .Select(x =>
-                                    x.Unidad
-                                )
-                                .FirstOrDefault()
-                                ?? "";
-                    }
-                }
+                //if (idUnidad > 0)
+                //{
+                //    using (CatalogosEntities dbCatalogos = new CatalogosEntities())
+                //    {
+                //        nombreUnidad =
+                //            dbCatalogos
+                //                .CT_UnidadesInvestigacion
+                //                .AsNoTracking()
+                //                .Where(x =>
+                //                    x.ID == idUnidad
+                //                )
+                //                .Select(x =>
+                //                    x.Unidad
+                //                )
+                //                .FirstOrDefault()
+                //                ?? "";
+                //    }
+                //}
 
 
                 /*

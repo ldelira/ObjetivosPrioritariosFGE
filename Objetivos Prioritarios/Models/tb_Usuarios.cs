@@ -28,7 +28,6 @@ namespace Objetivos_Prioritarios.Models
         public Nullable<bool> bit_status { get; set; }
         public Nullable<System.DateTime> date_fecha_modificacion { get; set; }
         public string nvarchar_usuario_modificacion { get; set; }
-        public Nullable<int> Valor { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<tb_UsuarioPerfil> tb_UsuarioPerfil { get; set; }

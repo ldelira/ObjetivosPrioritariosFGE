@@ -2359,6 +2359,38 @@ namespace Objetivos_Prioritarios.Controllers
                 return HttpNotFound("No se encontró la coincidencia solicitada.");
             }
 
+            bool fuenteIdentidadSoportada =
+                coincidencia.IdTbFuente == 1 ||
+                coincidencia.IdTbFuente == 2 ||
+                coincidencia.IdTbFuente == 3 ||
+                coincidencia.IdTbFuente == 5 ||
+                coincidencia.IdTbFuente == 6 ||
+                coincidencia.IdTbFuente == 7 ||
+                coincidencia.IdTbFuente == 8;
+
+            if (fuenteIdentidadSoportada &&
+                coincidencia.IdentidadConsolidada != null &&
+                coincidencia.IdentidadConsolidada.Relaciones != null &&
+                coincidencia.IdentidadConsolidada.Relaciones.Count > 0)
+            {
+                return PartialView("Coincidencias/PanelIdentidadPartial", new PanelIdentidadViewModel
+                {
+                    Principal = coincidencia,
+                    TieneFotografiaConsulta = resultados.TieneFotografiaConsulta
+                });
+            }
+
+            //if (coincidencia.IdentidadConsolidada != null &&
+            //    coincidencia.IdentidadConsolidada.Relaciones != null &&
+            //    coincidencia.IdentidadConsolidada.Relaciones.Count > 0)
+            //{
+            //    return PartialView("Coincidencias/PanelIdentidadPartial", new PanelIdentidadViewModel
+            //    {
+            //        Principal = coincidencia,
+            //        TieneFotografiaConsulta = resultados.TieneFotografiaConsulta
+            //    });
+            //}
+
 
             /*
              * ============================================================
@@ -2638,6 +2670,105 @@ namespace Objetivos_Prioritarios.Controllers
                 "Coincidencias/DetalleCoincidenciaPartial",
                 modelo
             );
+        }
+
+        [HttpGet]
+        public async Task<ActionResult> DetalleRegistroIdentidadPartial(int idCoincidenciaOrigen, int idTbFuente, int idPersona)
+        {
+            var resultados = Session[SessionResultadosCoincidencias] as ResultadosCoincidenciasViewModel;
+            if (resultados == null)
+                return new HttpStatusCodeResult(409, "La búsqueda ya no está disponible.");
+
+            var origen = resultados.Coincidencias?.FirstOrDefault(c => c.IdCoincidencia == idCoincidenciaOrigen);
+            if (origen == null) return HttpNotFound();
+
+            bool pertenece = (origen.IdTbFuente == idTbFuente && origen.IdPersona == idPersona) ||
+                (origen.IdentidadConsolidada?.Identidades?.Any(i => i != null &&
+                    i.IdTbFuente == idTbFuente && i.IdPersona == idPersona) == true);
+            if (!pertenece) return new HttpStatusCodeResult(403);
+            bool fuenteSoportada =
+                idTbFuente == 1 ||
+                idTbFuente == 2 ||
+                idTbFuente == 3 ||
+                idTbFuente == 5 ||
+                idTbFuente == 6 ||
+                idTbFuente == 7 ||
+                idTbFuente == 8;
+            if (idPersona <= 0 || !fuenteSoportada)
+                return new HttpStatusCodeResult(400, "Fuente o registro no soportado.");
+
+            var contexto = new RegistroIdentidadViewModel
+            {
+                IdTbFuente = idTbFuente,
+                IdPersona = idPersona,
+                CoincidenciaDirecta = resultados.Coincidencias.FirstOrDefault(c =>
+                    c.IdTbFuente == idTbFuente && c.IdPersona == idPersona),
+                TieneFotografiaConsulta = resultados.TieneFotografiaConsulta,
+                FotoUrl = idTbFuente == 1
+                    ? Url.Action("FotoDetenidoC5", new { idDetenido = idPersona })
+                    : idTbFuente == 5
+                        ? Url.Action("FotoObjetivoBiometria", new { idObjetivo = idPersona })
+                        : idTbFuente == 6
+                            ? Url.Action("FotoDetenidoFiliacion", new { clavePerso = idPersona })
+                            : idTbFuente == 3
+                                ? Url.Action("VerFotoPrincipalPersonaInteres", "PersonasInteres", new { idPersona = idPersona })
+                                : null
+            };
+            try
+            {
+                string partial;
+                switch (idTbFuente)
+                {
+                    case 1:
+                        contexto.DetalleInstitucional = await CoincidenciasBiometricasService.ObtenerDetalleC5Async(idPersona);
+                        partial = "Coincidencias/DetalleC5CoincidenciaPartial";
+                        break;
+                    case 3:
+                        contexto.DetalleInstitucional = await CoincidenciasBiometricasService.ObtenerDetallePersonaInteresAsync(idPersona);
+                        partial = "Coincidencias/DetallePersonaInteresPartial";
+                        break;
+                    case 5:
+                        contexto.DetalleInstitucional = await CoincidenciasBiometricasService.ObtenerDetalleObjetivoAsync(idPersona);
+                        partial = "Coincidencias/DetalleObjetivoCoincidenciaPartial";
+                        break;
+                    case 6:
+                        contexto.DetalleInstitucional = await CoincidenciasBiometricasService.ObtenerDetalleFGEADetenidoAsync(idPersona);
+                        partial = "Coincidencias/DetalleFGEADetenidoCoincidenciaPartial";
+                        break;
+                    default:
+                        var detalleFiscalia = await CoincidenciasBiometricasService.ObtenerDetalleFiscaliaWebAsync(idTbFuente, idPersona);
+                        contexto.DetalleInstitucional = detalleFiscalia;
+                        contexto.FotoUrl = detalleFiscalia == null ? null : detalleFiscalia.FotoUrl;
+                        partial = "Coincidencias/DetalleFiscaliaWebCoincidenciaPartial";
+                        break;
+                }
+                if (contexto.DetalleInstitucional == null) return HttpNotFound();
+                ViewBag.ContextoRegistroIdentidad = contexto;
+                ViewBag.Coincidencia = contexto.CoincidenciaDirecta;
+                if (idTbFuente == 3)
+                {
+                    return PartialView(partial, new DetalleCoincidenciaViewModel
+                    {
+                        Coincidencia = contexto.CoincidenciaDirecta,
+                        TieneFotografiaConsulta = resultados.TieneFotografiaConsulta,
+                        TieneHuellaConsulta = resultados.TieneHuellaConsulta,
+                        PersonaInteres = (DetallePersonaInteresApiDto)contexto.DetalleInstitucional
+                    });
+                }
+                return PartialView(partial, contexto.DetalleInstitucional);
+            }
+            catch (TaskCanceledException)
+            {
+                return new HttpStatusCodeResult(504, "Se agotó el tiempo de consulta.");
+            }
+            catch (System.Net.Http.HttpRequestException)
+            {
+                return new HttpStatusCodeResult(503, "No fue posible consultar la ficha.");
+            }
+            catch (InvalidOperationException)
+            {
+                return new HttpStatusCodeResult(502, "No fue posible obtener la ficha.");
+            }
         }
 
         [HttpGet]

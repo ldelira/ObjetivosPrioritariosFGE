@@ -33,9 +33,11 @@
 
                 int idDetenidoMunicipio = row["IDDETENIDO"] == DBNull.Value ? 0 : Convert.ToInt32(row["IDDETENIDO"]);
 
+                var coincidenciasMunicipio = ViewBag.ObtenerCoincidenciasAlerta( new int[] { idDetenidoMunicipio }, new int[] { 1 } ) as System.Collections.ArrayList;
+
                 int idDetenidoC5Actual = ViewBag.IdDetenidoC5 == null
-                    ? 0
-                    : Convert.ToInt32(ViewBag.IdDetenidoC5);
+                ? 0
+                : Convert.ToInt32(ViewBag.IdDetenidoC5);
 
                 int estatusAlertaMunicipio =
                     row.Table.Columns.Contains("EstatusAlerta") &&
@@ -116,11 +118,24 @@
                                                 Detenido registrado en municipio
                                             </div>
 
-                                            @if (!string.IsNullOrWhiteSpace(porcentajeCoincidenciaTexto))
+                                            @if (coincidenciasMunicipio != null && coincidenciasMunicipio.Count > 0)
                                             {
-                                                <span class="sic-porcentaje-coincidencia">
-                                                    @porcentajeCoincidenciaTexto de coincidencia en @ViewBag.Texto(nombreTipoAlerta)
-                                                </span>
+                                                <div class="sic-coincidencias-tipos">
+                                                    @foreach (object[] coincidencia in coincidenciasMunicipio)
+                                                    {
+                                                        int estatusCoincidencia = Convert.ToInt32(coincidencia[1]);
+                                                        int porcentajeCoincidencia = Convert.ToInt32(coincidencia[2]);
+                                                        int idTipoCoincidencia = Convert.ToInt32(coincidencia[3]);
+                                                        string nombreTipoCoincidencia = Convert.ToString(coincidencia[4]);
+
+                                                        if (porcentajeCoincidencia > 0)
+                                                        {
+                                                            <span class="sic-porcentaje-coincidencia">
+                                                                @porcentajeCoincidencia% de coincidencia en @nombreTipoCoincidencia
+                                                            </span>
+                                                        }
+                                                    }
+                                                </div>
                                             }
                                         </div>
 

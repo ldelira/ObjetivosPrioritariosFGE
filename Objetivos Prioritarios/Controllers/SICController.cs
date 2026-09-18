@@ -225,10 +225,13 @@ namespace Objetivos_Prioritarios.Controllers
             var idsAlba = alertasTipo.Where(x => x.Item2 == 8)
                                       .Select(x => x.Item1)
                                       .Where(x => x > 0).Distinct().ToList();
-            var idsDetenidosMunicipiosFusionados = alertasTipo
+            var personasTiposFusionados = alertasTipo
     .Where(x => x.Item2 == 1 && x.Item3 == 2)
-    .Select(x => x.Item1)
-    .Where(x => x > 0)
+    .Select(x => new
+    {
+        IdPersonaFGEA = x.Item1,
+        IdTipoAlerta = x.Item5
+    })
     .Distinct()
     .ToList();
 
@@ -236,7 +239,9 @@ namespace Objetivos_Prioritarios.Controllers
                 .Where(x =>
                     x.Item2 == 1 &&
                     x.Item3 != 2 &&
-                    !idsDetenidosMunicipiosFusionados.Contains(x.Item1))
+                    !personasTiposFusionados.Any(f =>
+                        f.IdPersonaFGEA == x.Item1 &&
+                        f.IdTipoAlerta == x.Item5))
                 .Select(x => x.Item1)
                 .Where(x => x > 0)
                 .Distinct()

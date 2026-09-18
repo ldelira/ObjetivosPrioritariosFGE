@@ -1040,18 +1040,49 @@ namespace Objetivos_Prioritarios.ControllersServices
         {
             using (var db = new Filiacion_MunicipiosEntities())
             {
-                var idsDetenidos = db.tb_CoincidenciasNormalizadas
-                    .Where(x => x.DetenidoCoincidenciaId == idDetenido && x.Activo ==  true)
-                    .Select(x => x.DetenidoId)
-                    .Distinct()
+                var relaciones = db.tb_CoincidenciasNormalizadas
+                    .Where(x =>
+                        x.Activo == true &&
+                        x.DetenidoId != x.DetenidoCoincidenciaId)
+                    .Select(x => new
+                    {
+                        x.DetenidoId,
+                        x.DetenidoCoincidenciaId
+                    })
                     .ToList();
 
-                if (!idsDetenidos.Contains(idDetenido))
+                var idsRelacionados = new HashSet<int>();
+                var pendientes = new Queue<int>();
+
+                idsRelacionados.Add(idDetenido);
+                pendientes.Enqueue(idDetenido);
+
+                while (pendientes.Count > 0)
                 {
-                    idsDetenidos.Insert(0, idDetenido);
+                    int idActual = pendientes.Dequeue();
+
+                    // Busca relaciones en cualquiera de las dos columnas.
+                    var relacionados = relaciones
+                        .Where(x =>
+                            x.DetenidoId == idActual ||
+                            x.DetenidoCoincidenciaId == idActual)
+                        .Select(x =>
+                            x.DetenidoId == idActual
+                                ? x.DetenidoCoincidenciaId
+                                : x.DetenidoId)
+                        .Distinct();
+
+                    foreach (int relacionado in relacionados)
+                    {
+                        // Si es nuevo, se agrega y también se revisan sus relaciones.
+                        if (idsRelacionados.Add(relacionado))
+                        {
+                            pendientes.Enqueue(relacionado);
+                        }
+                    }
                 }
 
-                return idsDetenidos;
+                return idsRelacionados.ToList();
             }
         }
 
@@ -1410,32 +1441,18 @@ namespace Objetivos_Prioritarios.ControllersServices
 
         public int ActualizarEstatusNotificacion(int idDetenido, int idOrigen, int idFuente, int idTipoAlerta, int nuevoEstatus)
         {
-            var idsRelacionados = GetIdsDetenidosRelacionados(idDetenido);
-
-            if (nuevoEstatus != 0 &&
-                nuevoEstatus != 1 &&
-                nuevoEstatus != 2 &&
-                nuevoEstatus != 3)
+            // 0 = descartado, 1 = pendiente, 2 = confirmado, 3 = resguardo.
+            if (nuevoEstatus != 0 && nuevoEstatus != 1 && nuevoEstatus != 2 && nuevoEstatus != 3)
             {
                 throw new ArgumentException("El estatus recibido no es válido.");
             }
 
-            if (idDetenido <= 0 ||
-                idOrigen <= 0 ||
-                idFuente <= 0)
+            if (idDetenido <= 0 || idOrigen <= 0 || idFuente <= 0)
             {
                 return 0;
             }
 
-            /*
-             * FUENTE 6 tiene la particularidad de que:
-             *
-             * Tipo 1 = Nom_perso.id
-             * Tipo 2 = CLAVE_PERSO
-             * Tipo 3 = CLAVE_PERSO
-             *
-             * Se manda al método especializado.
-             */
+            // Fuente 6 usa una lógica especializada por la forma en que interpreta idOrigen.
             if (idFuente == 6)
             {
                 return ActualizarEstatusNotificacionDetenidos(
@@ -1446,79 +1463,84 @@ namespace Objetivos_Prioritarios.ControllersServices
                 );
             }
 
+            var idsRelacionados = GetIdsDetenidosRelacionados(idDetenido);
+
             using (var db = new Filiacion_MunicipiosEntities())
             {
-                /*
-                 * Se buscan las alertas de cualquiera de los IDDETENIDO
-                 * relacionados con la raíz.
-                 *
-                 * Una alerta se identifica por:
-                 * idPersonaFGEA
-                 * idTipoAlerta
-                 * IdTbFuente
-                 */
+                // Actualiza todas las alertas de la misma persona y fuente dentro del grupo relacionado.
+                // No se filtra por tipo porque una misma persona puede coincidir por nombre, foto, huella, etc.
                 var alertas = db.tb_Alerta
                     .Where(x =>
                         x.idDetenidoC5.HasValue &&
                         idsRelacionados.Contains(x.idDetenidoC5.Value) &&
                         x.idPersonaFGEA == idOrigen &&
-                        x.IdTbFuente == idFuente &&
-                        x.idTipoAlerta == idTipoAlerta)
+                        x.IdTbFuente == idFuente)
                     .ToList();
 
                 DateTime fechaModificacion = DateTime.Now;
+
                 foreach (var alerta in alertas)
                 {
                     alerta.Estatus = nuevoEstatus;
                     alerta.FechaModificacion = fechaModificacion;
                 }
 
-                /*
-                 * FUENTE 1 - DETENIDOS MUNICIPIOS
-                 *
-                 * Al confirmar identidad se genera la relación
-                 * entre el detenido coincidente y el detenido raíz.
-                 */
+                // Fuente 1 genera/fusiona relaciones cuando se confirma identidad.
                 if (idFuente == 1)
                 {
-                    if (nuevoEstatus == 2)
+                    if (nuevoEstatus == 2 && idDetenido != idOrigen)
                     {
-                        bool yaExisteRelacion = db.tb_CoincidenciasNormalizadas
-                            .Any(x => x.DetenidoId == idOrigen && x.Activo == true);
+                        int detenidoRaiz = Math.Min(idDetenido, idOrigen);
+                        int detenidoRelacionado = Math.Max(idDetenido, idOrigen);
 
-                        if (!yaExisteRelacion)
+                        // Se busca la relación en ambos sentidos para cubrir relaciones históricas inactivas.
+                        var relacionExistente = db.tb_CoincidenciasNormalizadas
+                            .FirstOrDefault(x =>
+                                (x.DetenidoId == detenidoRelacionado && x.DetenidoCoincidenciaId == detenidoRaiz) ||
+                                (x.DetenidoId == detenidoRaiz && x.DetenidoCoincidenciaId == detenidoRelacionado));
+
+                        if (relacionExistente == null)
                         {
                             var nuevaCoincidencia = new tb_CoincidenciasNormalizadas
                             {
-                                DetenidoId = idOrigen,
-                                DetenidoCoincidenciaId = idDetenido,
+                                DetenidoId = detenidoRelacionado,
+                                DetenidoCoincidenciaId = detenidoRaiz,
                                 TipoCoincidencia = "visual",
                                 FechaRegistro = DateTime.Now,
                                 Activo = true
                             };
 
-                            db.tb_CoincidenciasNormalizadas.Add(
-                                nuevaCoincidencia
-                            );
+                            db.tb_CoincidenciasNormalizadas.Add(nuevaCoincidencia);
+                        }
+                        else if (relacionExistente.Activo != true)
+                        {
+                            // Si ya existía inactiva, se reactiva y el trigger la normaliza.
+                            relacionExistente.Activo = true;
+                            relacionExistente.FechaModificacion = DateTime.Now;
                         }
                     }
 
                     db.SaveChanges();
 
+                    if (nuevoEstatus == 2)
+                    {
+                        // Después del trigger se vuelve a obtener TODO el grupo relacionado.
+                        var idsRelacionadosActualizados = GetIdsDetenidosRelacionados(idDetenido);
+
+                        // Se homologan personas repetidas entre diferentes detenidos relacionados.
+                        SincronizarAlertasRelacionadas(
+                            db,
+                            idsRelacionadosActualizados,
+                            idOrigen
+                        );
+                    }
+
                     return alertas.Count;
                 }
 
-                /*
-                 * Primero se guardan los nuevos estatus
-                 * de las alertas encontradas.
-                 */
                 db.SaveChanges();
 
-                /*
-                 * Se revisan las alertas de todos los IDDETENIDO
-                 * relacionados para determinar el estado general
-                 * del detenido raíz.
-                 */
+                // Se actualiza el estado general del detenido para fuentes normales.
                 if (nuevoEstatus == 2)
                 {
                     bool tieneConfirmada = db.tb_Alerta.Any(x =>
@@ -1530,10 +1552,7 @@ namespace Objetivos_Prioritarios.ControllersServices
 
                     if (tieneConfirmada)
                     {
-                        ActualizarEstatusDetenido(
-                            1,
-                            idDetenido
-                        );
+                        ActualizarEstatusDetenido(1, idDetenido);
                     }
                 }
                 else if (nuevoEstatus == 1)
@@ -1547,10 +1566,7 @@ namespace Objetivos_Prioritarios.ControllersServices
 
                     if (tienePendiente)
                     {
-                        ActualizarEstatusDetenido(
-                            3,
-                            idDetenido
-                        );
+                        ActualizarEstatusDetenido(3, idDetenido);
                     }
                 }
                 else if (nuevoEstatus == 0)
@@ -1565,10 +1581,7 @@ namespace Objetivos_Prioritarios.ControllersServices
 
                     if (tieneDescartada)
                     {
-                        ActualizarEstatusDetenido(
-                            2,
-                            idDetenido
-                        );
+                        ActualizarEstatusDetenido(2, idDetenido);
                     }
                 }
                 else if (nuevoEstatus == 3)
@@ -1582,15 +1595,66 @@ namespace Objetivos_Prioritarios.ControllersServices
 
                     if (tieneResguardo)
                     {
-                        ActualizarEstatusDetenido(
-                            4,
-                            idDetenido
-                        );
+                        ActualizarEstatusDetenido(4, idDetenido);
                     }
                 }
 
                 return alertas.Count;
             }
+        }
+
+        private int SincronizarAlertasRelacionadas(Filiacion_MunicipiosEntities db, List<int> idsRelacionados, int idPersonaCatalizadora)
+        {
+            if (idsRelacionados == null || idsRelacionados.Count == 0)
+            {
+                return 0;
+            }
+
+            // Solo se toman alertas del grupo fusionado y se excluye la persona que provocó la fusión.
+            var alertasRelacionadas = db.tb_Alerta
+                .Where(x =>
+                    x.idDetenidoC5.HasValue &&
+                    idsRelacionados.Contains(x.idDetenidoC5.Value) &&
+                    x.idPersonaFGEA.HasValue &&
+                    x.idPersonaFGEA.Value != idPersonaCatalizadora &&
+                    (x.Estatus == 0 || x.Estatus == 1 || x.Estatus == 2))
+                .ToList();
+
+            // Solo se procesan personas que aparezcan en más de un detenido diferente.
+            var gruposPersonas = alertasRelacionadas
+                .GroupBy(x => x.idPersonaFGEA.Value)
+                .Where(g => g.Select(x => x.idDetenidoC5.Value).Distinct().Count() > 1)
+                .ToList();
+
+            DateTime fechaModificacion = DateTime.Now;
+            int modificadas = 0;
+
+            foreach (var grupo in gruposPersonas)
+            {
+                // Prioridad definida: 2 > 0 > 1.
+                int estatusFinal = grupo.Any(x => x.Estatus == 2)
+                    ? 2
+                    : grupo.Any(x => x.Estatus == 0)
+                        ? 0
+                        : 1;
+
+                foreach (var alerta in grupo)
+                {
+                    if (alerta.Estatus != estatusFinal)
+                    {
+                        alerta.Estatus = estatusFinal;
+                        alerta.FechaModificacion = fechaModificacion;
+                        modificadas++;
+                    }
+                }
+            }
+
+            if (modificadas > 0)
+            {
+                db.SaveChanges();
+            }
+
+            return modificadas;
         }
 
         public int ActualizarEstatusNotificacionDetenidos(int idDetenido, int idOrigen, int idTipoAlerta, int nuevoEstatus)

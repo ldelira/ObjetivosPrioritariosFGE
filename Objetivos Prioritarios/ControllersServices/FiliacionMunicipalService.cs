@@ -574,26 +574,24 @@ namespace Objetivos_Prioritarios.ControllersServices
                     }
 
                     string sql = @"
-                SELECT
-                    NM.id AS IdOrigenAlerta,
-                    MJ.id,
-                    MJ.numero_control,
-                    MJ.numero_expediente,
-                    CONCAT(NM.nombre, ' ', NM.paterno, ' ', NM.materno) AS Nombre,
-                    TM.mandamiento,
-                    MJ.fecha_expedicion,
-                    MJ.fecha_alta,
-                    EP.tipo
-                FROM Mandamientos_Judiciales.dbo.mandamiento_judicial MJ
-                INNER JOIN Mandamientos_Judiciales.dbo.nombres_mandamiento NM
-                    ON MJ.id = NM.id_mandamiento_judicial
-                INNER JOIN Mandamientos_Judiciales.dbo.tipo_mandamiento_judicial TM
-                    ON MJ.id_tipo_mandato = TM.id_tipo_mandato
-                INNER JOIN Mandamientos_Judiciales.dbo.catalogo_estado_proceso EP
-                    ON MJ.id_estado_proceso = EP.id_estado_proceso
-                WHERE NM.id IN (" + string.Join(",", parametros) + @")
-                ORDER BY MJ.fecha_alta DESC;
-            ";
+SELECT NM.id AS IdOrigenAlerta, MJ.id, MJ.numero_control, MJ.numero_expediente,
+       CONCAT(NM.nombre, ' ', NM.paterno, ' ', NM.materno) AS Nombre,
+       TM.mandamiento, MJ.fecha_expedicion, MJ.fecha_alta, EP.tipo, D.Delitos
+FROM Mandamientos_Judiciales.dbo.mandamiento_judicial MJ
+INNER JOIN Mandamientos_Judiciales.dbo.nombres_mandamiento NM ON MJ.id = NM.id_mandamiento_judicial
+INNER JOIN Mandamientos_Judiciales.dbo.tipo_mandamiento_judicial TM ON MJ.id_tipo_mandato = TM.id_tipo_mandato
+INNER JOIN Mandamientos_Judiciales.dbo.catalogo_estado_proceso EP ON MJ.id_estado_proceso = EP.id_estado_proceso
+LEFT JOIN (
+    SELECT id_mandamiento_judicial, STRING_AGG(delito, ', ') AS Delitos
+    FROM (
+        SELECT DISTINCT DM.id_mandamiento_judicial, CD.delito
+        FROM Mandamientos_Judiciales.dbo.delitos_mandamiento DM
+        INNER JOIN Mandamientos_Judiciales.dbo.catalogo_delitos CD ON DM.id_delito = CD.id
+    ) X
+    GROUP BY id_mandamiento_judicial
+) D ON MJ.id = D.id_mandamiento_judicial
+WHERE NM.id IN (" + string.Join(",", parametros) + @")
+ORDER BY MJ.fecha_alta DESC;";
 
                     using (SqlCommand cmd = new SqlCommand(sql, cn))
                     {

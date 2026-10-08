@@ -755,19 +755,19 @@ ORDER BY MJ.fecha_alta DESC;";
             using (var db = new Filiacion_MunicipiosEntities())
             {
                 var query =
-                            from d in db.tb_DETENIDO_C5.AsNoTracking()
-                            join f in db.tb_FOTO_C5.AsNoTracking()
-                                .Where(x => x.FOTO.Contains("1.jpg")
-                                         && !x.FOTO.Contains("pertenencia")
-                                         && !x.FOTO.Contains("rasgo")
-                                         && !x.FOTO.Contains("Evidencia"))
+                            from d in db.tb_Detenido_C5.AsNoTracking()
+                            join f in db.tb_FotosDetenido_C5.AsNoTracking()
+                                .Where(x => x.RutaImagen.Contains("1.jpg")
+                                         && !x.RutaImagen.Contains("pertenencia")
+                                         && !x.RutaImagen.Contains("rasgo")
+                                         && !x.RutaImagen.Contains("Evidencia"))
                                 on d.IDDETENIDO equals f.IDDETENIDO into fotos
                             from f in fotos.DefaultIfEmpty()
                             where idsDetenidos.Contains(d.IDDETENIDO)
                             select new
                             {
                                 Detenido = d,
-                                FOTO = f == null ? null : f.FOTO
+                                FOTO = f == null ? null : f.RutaImagen
                             };
 
                 var detenidos = query
@@ -1098,7 +1098,7 @@ ORDER BY MJ.fecha_alta DESC;";
                     .Distinct()
                     .ToList();
 
-                var resultado = db.tb_DETENIDO_C5
+                var resultado = db.tb_Detenido_C5
                     .Where(x => idsDetenidos.Contains(x.IDDETENIDO))
                     .Where(x => x.IDDETENCION.HasValue)
                     .Select(x => x.IDDETENCION.Value)
@@ -1112,13 +1112,13 @@ ORDER BY MJ.fecha_alta DESC;";
         }
 
 
-        public List<tb_DETENCION_C5> GetDatosDetencionesC5(List<int> idsDetenciones)
+        public List<tb_Detencion_C5> GetDatosDetencionesC5(List<int> idsDetenciones)
         {
             using (var db = new Filiacion_MunicipiosEntities())
             {
                 if (idsDetenciones == null || idsDetenciones.Count == 0)
                 {
-                    return new List<tb_DETENCION_C5>();
+                    return new List<tb_Detencion_C5>();
                 }
 
                 idsDetenciones = idsDetenciones
@@ -1126,8 +1126,8 @@ ORDER BY MJ.fecha_alta DESC;";
                     .Distinct()
                     .ToList();
 
-                var resultado = db.tb_DETENCION_C5
-                    .Where(x => idsDetenciones.Contains(x.IDDETENCION))
+                var resultado = db.tb_Detencion_C5
+                    .Where(x => idsDetenciones.Contains((int)x.IDDETENCION))
                     .OrderByDescending(x => x.FECHA_DETENCION)
                     .ToList();
 
@@ -1137,13 +1137,13 @@ ORDER BY MJ.fecha_alta DESC;";
 
 
 
-        public List<tb_DETENIDO_C5> GetDatosDetenidoC5(List<int> idsDetenidos)
+        public List<tb_Detenido_C5> GetDatosDetenidoC5(List<int> idsDetenidos)
 {
     using (var db = new Filiacion_MunicipiosEntities())
     {
         if (idsDetenidos == null || idsDetenidos.Count == 0)
         {
-            return new List<tb_DETENIDO_C5>();
+            return new List<tb_Detenido_C5>();
         }
 
         idsDetenidos = idsDetenidos
@@ -1151,7 +1151,7 @@ ORDER BY MJ.fecha_alta DESC;";
             .Distinct()
             .ToList();
 
-        var resultado = db.tb_DETENIDO_C5
+        var resultado = db.tb_Detenido_C5
             .Where(x => idsDetenidos.Contains(x.IDDETENIDO))
             .OrderBy(x => x.IDDETENIDO)
             .ToList();
@@ -1161,13 +1161,13 @@ ORDER BY MJ.fecha_alta DESC;";
 }
 
 
-        public List<tb_FOTO_C5> GetFotosDetenidoC5(List<int> idsDetenidos)
+        public List<tb_FotosDetenido_C5> GetFotosDetenidoC5(List<int> idsDetenidos)
         {
             using (var db = new Filiacion_MunicipiosEntities())
             {
                 if (idsDetenidos == null || idsDetenidos.Count == 0)
                 {
-                    return new List<tb_FOTO_C5>();
+                    return new List<tb_FotosDetenido_C5>();
                 }
 
                 idsDetenidos = idsDetenidos
@@ -1175,14 +1175,16 @@ ORDER BY MJ.fecha_alta DESC;";
                     .Distinct()
                     .ToList();
 
-                var resultado = db.tb_FOTO_C5
+                var resultado = db.tb_FotosDetenido_C5
                     .Where(x =>
                         x.IDDETENIDO.HasValue &&
-                        idsDetenidos.Contains(x.IDDETENIDO.Value) &&
-                        x.TIPO != null &&
-                        x.TIPO.Contains("Foto") &&
-                        x.FOTO != null &&
-                        x.FOTO != "")
+                        idsDetenidos.Contains(x.IDDETENIDO.Value) 
+                        //&&
+                        //x.TIPO != null &&
+                        //x.TIPO.Contains("Foto") &&
+                        //x.FOTO != null &&
+                        //x.FOTO != ""
+                        )
                     .OrderBy(x => x.IDDETENIDO)
                     .ThenBy(x => x.IDFOTO)
                     .ToList();
@@ -1191,27 +1193,27 @@ ORDER BY MJ.fecha_alta DESC;";
             }
         }
 
-        public tb_FOTO_C5 GetFotoC5PorId(int idFoto)
+        public tb_FotosDetenido_C5 GetFotoC5PorId(int idFoto)
         {
             using (var db = new Filiacion_MunicipiosEntities())
             {
-                var resultado = db.tb_FOTO_C5
+                var resultado = db.tb_FotosDetenido_C5
                     .FirstOrDefault(x => x.IDFOTO == idFoto);
 
                 return resultado;
             }
         }
 
-        public List<tb_HUELLA_C5> GetHuellasDetenidoC5(int idDetenido)
+        public List<tb_Huella_C5> GetHuellasDetenidoC5(int idDetenido)
         {
             using (var db = new Filiacion_MunicipiosEntities())
             {
-                var resultado = db.tb_HUELLA_C5
+                var resultado = db.tb_Huella_C5
                     .Where(x => x.IdDetenido == idDetenido
-                             && x.Huellas != null)
+                             && x.RutaImagen != null)
                     .OrderBy(x => x.IdHuella)
                     .ToList()
-                    .Where(x => !string.IsNullOrWhiteSpace(x.Huellas))
+                    .Where(x => !string.IsNullOrWhiteSpace(x.RutaImagen))
                     .ToList();
 
                 return resultado;
@@ -1219,25 +1221,25 @@ ORDER BY MJ.fecha_alta DESC;";
 
         }
 
-        public tb_HUELLA_C5 GetHuellaC5PorId(int idHuella)
+        public tb_Huella_C5 GetHuellaC5PorId(int idHuella)
         {
             using (var db = new Filiacion_MunicipiosEntities())
             {
-                var resultado = db.tb_HUELLA_C5
+                var resultado = db.tb_Huella_C5
                     .FirstOrDefault(x => x.IdHuella == idHuella);
 
                 return resultado;
             }
         }
 
-        public List<tb_FOTO_C5> GetRasgosDetenidoC5(List<int> idsDetenidos)
+        public List<tb_FotosDetenido_C5> GetRasgosDetenidoC5(List<int> idsDetenidos)
         {
 
             using (var db = new Filiacion_MunicipiosEntities())
             {
                 if (idsDetenidos == null || idsDetenidos.Count == 0)
                 {
-                    return new List<tb_FOTO_C5>();
+                    return new List<tb_FotosDetenido_C5>();
                 }
 
                 idsDetenidos = idsDetenidos
@@ -1245,14 +1247,16 @@ ORDER BY MJ.fecha_alta DESC;";
                     .Distinct()
                     .ToList();
 
-                var resultado = db.tb_FOTO_C5
+                var resultado = db.tb_FotosDetenido_C5
                     .Where(x =>
                         x.IDDETENIDO.HasValue &&
-                        idsDetenidos.Contains(x.IDDETENIDO.Value) &&
-                        x.TIPO != null &&
-                        x.TIPO.Contains("Rasgo") &&
-                        x.FOTO != null &&
-                        x.FOTO != "")
+                        idsDetenidos.Contains(x.IDDETENIDO.Value) 
+                        //&&
+                        //x.TIPO != null &&
+                        //x.TIPO.Contains("Rasgo") &&
+                        //x.FOTO != null &&
+                        //x.FOTO != ""
+                        )
                     .OrderBy(x => x.IDDETENIDO)
                     .ThenBy(x => x.IDFOTO)
                     .ToList();

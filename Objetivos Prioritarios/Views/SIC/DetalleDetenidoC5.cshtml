@@ -52,15 +52,15 @@
 
     int fuenteCapea = ViewBag.FuenteCapea == null ? 0 : Convert.ToInt32(ViewBag.FuenteCapea);
 
-    var detencionesC5 = ViewBag.DetencionC5 as List<Objetivos_Prioritarios.Models.tb_DETENCION_C5> ?? new List<Objetivos_Prioritarios.Models.tb_DETENCION_C5>();
+    var detencionesC5 = ViewBag.DetencionC5 as List<Objetivos_Prioritarios.Models.tb_Detencion_C5> ?? new List<Objetivos_Prioritarios.Models.tb_Detencion_C5>();
     var detencionC5 = detencionesC5.Count > 0 ? detencionesC5[0] : null;
     int totalDetenciones = detencionesC5.Count;
     var idsRelacionadosHero = ViewBag.idsrelacionados as List<int> ?? new List<int>();
 
-    var datosDetenidoC5 = ViewBag.DatosDetenidoC5 as Objetivos_Prioritarios.Models.tb_DETENIDO_C5;
-    var fotosC5 = ViewBag.FotosC5 as List<Objetivos_Prioritarios.Models.tb_FOTO_C5> ?? new List<Objetivos_Prioritarios.Models.tb_FOTO_C5>();
-    var huellasC5 = ViewBag.HuellasC5 as List<Objetivos_Prioritarios.Models.tb_HUELLA_C5> ?? new List<Objetivos_Prioritarios.Models.tb_HUELLA_C5>();
-    var rasgosC5 = ViewBag.RasgosC5 as List<Objetivos_Prioritarios.Models.tb_FOTO_C5> ?? new List<Objetivos_Prioritarios.Models.tb_FOTO_C5>();
+    var datosDetenidoC5 = ViewBag.DatosDetenidoC5 as Objetivos_Prioritarios.Models.tb_Detenido_C5;
+    var fotosC5 = ViewBag.FotosC5 as List<Objetivos_Prioritarios.Models.tb_FotosDetenido_C5> ?? new List<Objetivos_Prioritarios.Models.tb_FotosDetenido_C5>();
+    var huellasC5 = ViewBag.HuellasC5 as List<Objetivos_Prioritarios.Models.tb_Huella_C5> ?? new List<Objetivos_Prioritarios.Models.tb_Huella_C5>();
+    var rasgosC5 = ViewBag.RasgosC5 as List<Objetivos_Prioritarios.Models.tb_FotosDetenido_C5> ?? new List<Objetivos_Prioritarios.Models.tb_FotosDetenido_C5>();
     var alertasTipo = ViewBag.AlertasTipo as List<Tuple<int, int, int, int, int, string>> ?? new List<Tuple<int, int, int, int, int, string>>();
     var alertasPersonaInteres = ViewBag.AlertasPersonaInteres as List<Tuple<int, int, int, int, int, string>> ?? new List<Tuple<int, int, int, int, int, string>>();
 

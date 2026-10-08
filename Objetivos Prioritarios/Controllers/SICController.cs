@@ -924,7 +924,7 @@ namespace Objetivos_Prioritarios.Controllers
             {
                 return HttpNotFound();
             }
-            string rutaFotoBD = foto.FOTO;
+            string rutaFotoBD = foto.RutaImagen;
 
             if (string.IsNullOrWhiteSpace(rutaFotoBD))
             {
@@ -969,7 +969,7 @@ namespace Objetivos_Prioritarios.Controllers
             {
                 return HttpNotFound();
             }
-            string rutaHuellaBD = huella.Huellas;
+            string rutaHuellaBD = huella.RutaImagen;
 
             if (string.IsNullOrWhiteSpace(rutaHuellaBD))
             {
@@ -1167,7 +1167,7 @@ namespace Objetivos_Prioritarios.Controllers
         #region Preparación de la vista y estado general
 
         private void PrepararViewBagDetalleDetenido(
-    List<tb_DETENCION_C5> detencionesC5,
+    List<tb_Detencion_C5> detencionesC5,
     List<Tuple<int, int, int, int, int, string>> alertasTipo,
     List<Tuple<int, int>> tiposAlertas)
         {

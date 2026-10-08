@@ -12,8 +12,14 @@ namespace Objetivos_Prioritarios.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class tb_DETENCION_C5
+    public partial class tb_Detencion_C5
     {
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
+        public tb_Detencion_C5()
+        {
+            this.tb_Detenido_C5 = new HashSet<tb_Detenido_C5>();
+        }
+    
         public int IDDETENCION { get; set; }
         public string SERIE_MUNICIPIO { get; set; }
         public string CONSECUTIVO { get; set; }
@@ -32,18 +38,17 @@ namespace Objetivos_Prioritarios.Models
         public Nullable<bool> VECHICULO { get; set; }
         public Nullable<int> NUMEXT { get; set; }
         public string NUMINT { get; set; }
-        public Nullable<decimal> Gramos { get; set; }
         public string Mes { get; set; }
         public string Dia { get; set; }
-        public Nullable<bool> Feria { get; set; }
         public string Latitud { get; set; }
         public string Longitud { get; set; }
-        public string Aseguramientos { get; set; }
-        public string Envoltorios { get; set; }
-        public string Armas { get; set; }
-        public string Cartuchos { get; set; }
         public string FueroDescripcion { get; set; }
-        public string Cargadores { get; set; }
-        public string OficialTraslada { get; set; }
+        public Nullable<int> idUsuarioCrea { get; set; }
+        public Nullable<int> idUsuarioTraslada { get; set; }
+    
+        public virtual tb_Usuario_C5 tb_Usuario_C5 { get; set; }
+        public virtual tb_Usuario_C5 tb_Usuario_C51 { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<tb_Detenido_C5> tb_Detenido_C5 { get; set; }
     }
 }

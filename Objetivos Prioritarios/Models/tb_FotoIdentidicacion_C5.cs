@@ -12,13 +12,14 @@ namespace Objetivos_Prioritarios.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class tb_FichaDecadactilar
+    public partial class tb_FotoIdentidicacion_C5
     {
-        public int idFicha { get; set; }
-        public int idPersona { get; set; }
-        public string RutaHuella { get; set; }
-        public Nullable<System.DateTime> FechaRegistro { get; set; }
-        public Nullable<bool> Activo { get; set; }
-        public Nullable<int> IdTbFuente { get; set; }
+        public int IdFotoIdentidicacion { get; set; }
+        public Nullable<int> IDDETENIDO { get; set; }
+        public string RutaImagen { get; set; }
+        public string DescripcionFoto { get; set; }
+        public Nullable<System.DateTime> FechaCaptura { get; set; }
+        public Nullable<int> idusuario { get; set; }
+        public string TipoIdentificacion { get; set; }
     }
 }

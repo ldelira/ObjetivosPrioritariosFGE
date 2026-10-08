@@ -12,10 +12,13 @@ namespace Objetivos_Prioritarios.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class tb_HUELLA_C5
+    public partial class tb_Huella_C5
     {
         public int IdHuella { get; set; }
         public Nullable<int> IdDetenido { get; set; }
-        public string Huellas { get; set; }
+        public string RutaImagen { get; set; }
+        public string DescripcionFoto { get; set; }
+    
+        public virtual tb_Detenido_C5 tb_Detenido_C5 { get; set; }
     }
 }

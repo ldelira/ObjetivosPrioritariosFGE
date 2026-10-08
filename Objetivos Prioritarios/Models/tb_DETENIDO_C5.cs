@@ -12,10 +12,22 @@ namespace Objetivos_Prioritarios.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class tb_DETENIDO_C5
+    public partial class tb_Detenido_C5
     {
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
+        public tb_Detenido_C5()
+        {
+            this.tb_Coicidencia_C5 = new HashSet<tb_Coicidencia_C5>();
+            this.tb_Coicidencia_C51 = new HashSet<tb_Coicidencia_C5>();
+            this.tb_FotoRasgos_C5 = new HashSet<tb_FotoRasgos_C5>();
+            this.tb_FotosDetenido_C5 = new HashSet<tb_FotosDetenido_C5>();
+            this.tb_Huella_C5 = new HashSet<tb_Huella_C5>();
+            this.tb_TrabajoSocial_C5 = new HashSet<tb_TrabajoSocial_C5>();
+        }
+    
         public int IDDETENIDO { get; set; }
         public Nullable<int> IDDETENCION { get; set; }
+        public string SERIE_MUNICIPIO { get; set; }
         public string NOMBRE { get; set; }
         public string ALIAS { get; set; }
         public string EDAD { get; set; }
@@ -38,8 +50,38 @@ namespace Objetivos_Prioritarios.Models
         public string Telefono { get; set; }
         public string Estatus { get; set; }
         public Nullable<System.DateTime> FechaRegistro { get; set; }
-        public string UsuarioRegistro { get; set; }
+        public Nullable<int> idusuario { get; set; }
         public string RFC { get; set; }
         public string CURP { get; set; }
+        public string estadoOrigen { get; set; }
+        public string Nacionalidad { get; set; }
+        public string TipoDocumentoIdentificacion { get; set; }
+        public string OtroDocumentoIdentificacion { get; set; }
+        public Nullable<bool> TieneLesionesVisibles { get; set; }
+        public string CualesLesiones { get; set; }
+        public Nullable<bool> EsGrupoVulnerable { get; set; }
+        public string CualGrupoVulnerable { get; set; }
+        public Nullable<bool> EsGrupoDelictivo { get; set; }
+        public string CualGrupoDelictivo { get; set; }
+        public Nullable<bool> TienePadecimiento { get; set; }
+        public string CualPadecimiento { get; set; }
+        public string FamiliarPrimerApellido { get; set; }
+        public string FamiliarSegundoApellido { get; set; }
+        public string FamiliarNombres { get; set; }
+    
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<tb_Coicidencia_C5> tb_Coicidencia_C5 { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<tb_Coicidencia_C5> tb_Coicidencia_C51 { get; set; }
+        public virtual tb_Detencion_C5 tb_Detencion_C5 { get; set; }
+        public virtual tb_Usuario_C5 tb_Usuario_C5 { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<tb_FotoRasgos_C5> tb_FotoRasgos_C5 { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<tb_FotosDetenido_C5> tb_FotosDetenido_C5 { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<tb_Huella_C5> tb_Huella_C5 { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<tb_TrabajoSocial_C5> tb_TrabajoSocial_C5 { get; set; }
     }
 }

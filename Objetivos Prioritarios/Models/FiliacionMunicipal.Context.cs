@@ -34,22 +34,28 @@ namespace Objetivos_Prioritarios.Models
         public virtual DbSet<cat_TipoFoto> cat_TipoFoto { get; set; }
         public virtual DbSet<cat_TipoSena> cat_TipoSena { get; set; }
         public virtual DbSet<cat_ZonaCuerpo> cat_ZonaCuerpo { get; set; }
-        public virtual DbSet<COINCIDENCIA> COINCIDENCIA { get; set; }
+        public virtual DbSet<sysdiagrams> sysdiagrams { get; set; }
         public virtual DbSet<tb_Alerta> tb_Alerta { get; set; }
-        public virtual DbSet<tb_COINCIDENCIA> tb_COINCIDENCIA { get; set; }
+        public virtual DbSet<tb_Coicidencia_C5> tb_Coicidencia_C5 { get; set; }
         public virtual DbSet<tb_CoincidenciasNormalizadas> tb_CoincidenciasNormalizadas { get; set; }
-        public virtual DbSet<tb_DETENCION_C5> tb_DETENCION_C5 { get; set; }
-        public virtual DbSet<tb_DETENIDO_C5> tb_DETENIDO_C5 { get; set; }
+        public virtual DbSet<tb_Detencion> tb_Detencion { get; set; }
+        public virtual DbSet<tb_Detencion_C5> tb_Detencion_C5 { get; set; }
+        public virtual DbSet<tb_Detenido_C5> tb_Detenido_C5 { get; set; }
         public virtual DbSet<tb_Domicilio> tb_Domicilio { get; set; }
         public virtual DbSet<tb_FichaDecadactilar> tb_FichaDecadactilar { get; set; }
-        public virtual DbSet<tb_FOTO_C5> tb_FOTO_C5 { get; set; }
         public virtual DbSet<tb_Fotografia> tb_Fotografia { get; set; }
-        public virtual DbSet<tb_HUELLA_C5> tb_HUELLA_C5 { get; set; }
+        public virtual DbSet<tb_FotoIdentidicacion_C5> tb_FotoIdentidicacion_C5 { get; set; }
+        public virtual DbSet<tb_FotoRasgos_C5> tb_FotoRasgos_C5 { get; set; }
+        public virtual DbSet<tb_FotosDetenido_C5> tb_FotosDetenido_C5 { get; set; }
+        public virtual DbSet<tb_Huella_C5> tb_Huella_C5 { get; set; }
+        public virtual DbSet<tb_PagoMulta_C5> tb_PagoMulta_C5 { get; set; }
         public virtual DbSet<tb_Persona> tb_Persona { get; set; }
         public virtual DbSet<tb_PersonaAlias> tb_PersonaAlias { get; set; }
         public virtual DbSet<tb_PersonaPeriodoBusqueda> tb_PersonaPeriodoBusqueda { get; set; }
         public virtual DbSet<tb_SenasParticulares> tb_SenasParticulares { get; set; }
-        public virtual DbSet<tb_Usuario> tb_Usuario { get; set; }
+        public virtual DbSet<tb_TrabajoSocial_C5> tb_TrabajoSocial_C5 { get; set; }
+        public virtual DbSet<tb_Usuario_C5> tb_Usuario_C5 { get; set; }
+        public virtual DbSet<tb_VisitaDetenido_C5> tb_VisitaDetenido_C5 { get; set; }
         public virtual DbSet<cat_Contactos_Municipios> cat_Contactos_Municipios { get; set; }
         public virtual DbSet<tb_PersonaBusqueda> tb_PersonaBusqueda { get; set; }
         public virtual DbSet<tb_PersonaEmbedding> tb_PersonaEmbedding { get; set; }
@@ -64,11 +70,6 @@ namespace Objetivos_Prioritarios.Models
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<sp_BuscarDetenido_Result>("sp_BuscarDetenido", iDDETENIDOParameter);
         }
     
-        public virtual ObjectResult<sp_Alertas_Result> sp_Alertas()
-        {
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<sp_Alertas_Result>("sp_Alertas");
-        }
-    
         public virtual ObjectResult<SP_SIC_ObtenerPersonas_Result> SP_SIC_ObtenerPersonas(string idsPersona)
         {
             var idsPersonaParameter = idsPersona != null ?
@@ -76,6 +77,11 @@ namespace Objetivos_Prioritarios.Models
                 new ObjectParameter("IdsPersona", typeof(string));
     
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<SP_SIC_ObtenerPersonas_Result>("SP_SIC_ObtenerPersonas", idsPersonaParameter);
+        }
+    
+        public virtual ObjectResult<sp_Alertas_Result> sp_Alertas()
+        {
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<sp_Alertas_Result>("sp_Alertas");
         }
     }
 }

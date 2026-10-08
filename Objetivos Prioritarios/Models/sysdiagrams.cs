@@ -12,13 +12,12 @@ namespace Objetivos_Prioritarios.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class tb_FichaDecadactilar
+    public partial class sysdiagrams
     {
-        public int idFicha { get; set; }
-        public int idPersona { get; set; }
-        public string RutaHuella { get; set; }
-        public Nullable<System.DateTime> FechaRegistro { get; set; }
-        public Nullable<bool> Activo { get; set; }
-        public Nullable<int> IdTbFuente { get; set; }
+        public string name { get; set; }
+        public int principal_id { get; set; }
+        public int diagram_id { get; set; }
+        public Nullable<int> version { get; set; }
+        public byte[] definition { get; set; }
     }
 }

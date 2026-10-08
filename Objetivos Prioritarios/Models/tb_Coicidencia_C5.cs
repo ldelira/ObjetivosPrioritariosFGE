@@ -12,12 +12,15 @@ namespace Objetivos_Prioritarios.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class tb_FOTO_C5
+    public partial class tb_Coicidencia_C5
     {
-        public int IDFOTO { get; set; }
-        public Nullable<int> IDDETENIDO { get; set; }
-        public string FOTO { get; set; }
-        public Nullable<System.DateTime> FEHCA { get; set; }
-        public string TIPO { get; set; }
+        public int Id { get; set; }
+        public int DetenidoId { get; set; }
+        public int DetenidoCoincidenciaId { get; set; }
+        public string TipoCoincidencia { get; set; }
+        public System.DateTime FechaRegistro { get; set; }
+    
+        public virtual tb_Detenido_C5 tb_Detenido_C5 { get; set; }
+        public virtual tb_Detenido_C5 tb_Detenido_C51 { get; set; }
     }
 }

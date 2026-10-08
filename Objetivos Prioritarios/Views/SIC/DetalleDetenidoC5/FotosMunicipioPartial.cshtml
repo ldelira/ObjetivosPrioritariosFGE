@@ -1,9 +1,9 @@
-﻿@model System.Collections.Generic.List<Objetivos_Prioritarios.Models.tb_FOTO_C5>
+﻿@model System.Collections.Generic.List<Objetivos_Prioritarios.Models.tb_FotosDetenido_C5>
 
 @using System
 
 @{
-    var fotosC5 = Model ?? new System.Collections.Generic.List<Objetivos_Prioritarios.Models.tb_FOTO_C5>();
+    var fotosC5 = Model ?? new System.Collections.Generic.List<Objetivos_Prioritarios.Models.tb_FotosDetenido_C5>();
 }
 
 <div class="sic-media-box sic-gallery-box">
@@ -35,7 +35,7 @@
 
                         <img class="sic-gallery-foto"
                              src="@Url.Action("FotoGaleriaC5", "SIC", new { idFoto = foto.IDFOTO })"
-                             alt="@ViewBag.Texto(foto.TIPO)"
+                             alt="@ViewBag.Texto(foto.DescripcionFoto)"
                              onerror="mostrarErrorFotoGaleria(this);" />
 
                         <div class="sic-gallery-image-error">
@@ -45,7 +45,7 @@
                     </div>
 
                     @{
-                        string tipoFoto = ViewBag.Texto(foto.TIPO);
+                        string tipoFoto = ViewBag.Texto(foto.DescripcionFoto);
 
                         if (tipoFoto.StartsWith("FOTO:", StringComparison.OrdinalIgnoreCase))
                         {

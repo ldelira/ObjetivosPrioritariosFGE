@@ -12,12 +12,17 @@ namespace Objetivos_Prioritarios.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class COINCIDENCIA
+    public partial class tb_VisitaDetenido_C5
     {
-        public int Id { get; set; }
-        public int DetenidoId { get; set; }
-        public int DetenidoCoincidenciaId { get; set; }
-        public string TipoCoincidencia { get; set; }
+        public int IdVisita { get; set; }
+        public int IdDetenido { get; set; }
+        public string NombreVisitante { get; set; }
+        public string Parentesco { get; set; }
+        public System.DateTime FechaVisita { get; set; }
+        public string HoraInicio { get; set; }
+        public string HoraFin { get; set; }
+        public string Observaciones { get; set; }
         public System.DateTime FechaRegistro { get; set; }
+        public string UsuarioRegistro { get; set; }
     }
 }

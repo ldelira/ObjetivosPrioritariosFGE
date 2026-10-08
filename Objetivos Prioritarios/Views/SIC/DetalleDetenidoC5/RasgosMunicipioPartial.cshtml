@@ -1,9 +1,9 @@
-﻿@model System.Collections.Generic.List<Objetivos_Prioritarios.Models.tb_FOTO_C5>
+﻿@model System.Collections.Generic.List<Objetivos_Prioritarios.Models.tb_FotosDetenido_C5>
 
 @using System
 
 @{
-    var rasgosC5 = Model ?? new System.Collections.Generic.List<Objetivos_Prioritarios.Models.tb_FOTO_C5>();
+    var rasgosC5 = Model ?? new System.Collections.Generic.List<Objetivos_Prioritarios.Models.tb_FotosDetenido_C5>();
 }
 
 <div class="sic-media-box sic-gallery-box">
@@ -35,7 +35,7 @@
 
                         <img class="sic-gallery-foto"
                              src="@Url.Action("FotoGaleriaC5", "SIC", new { idFoto = rasgo.IDFOTO })"
-                             alt="@ViewBag.Texto(rasgo.TIPO)"
+                             alt="@ViewBag.Texto(rasgo.DescripcionFoto)"
                              onerror="mostrarErrorFotoGaleria(this);" />
 
                         <div class="sic-gallery-image-error">
@@ -45,7 +45,7 @@
                     </div>
 
                     @{
-                        string tipoRasgo = ViewBag.Texto(rasgo.TIPO);
+                        string tipoRasgo = ViewBag.Texto(rasgo.DescripcionFoto);
 
                         if (tipoRasgo.StartsWith("RASGO: Punto Seleccionado:", StringComparison.OrdinalIgnoreCase))
                         {

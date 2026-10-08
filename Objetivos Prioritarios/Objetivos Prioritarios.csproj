@@ -403,9 +403,6 @@
     <Compile Include="Models\cat_ZonaCuerpo.cs">
       <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\COINCIDENCIA.cs">
-      <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
-    </Compile>
     <Compile Include="Models\Colonia.cs">
       <DependentUpon>Catalogos.tt</DependentUpon>
     </Compile>
@@ -667,6 +664,9 @@
     <Compile Include="Models\SP_SIC_ObtenerPersonas_Result.cs">
       <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\sysdiagrams.cs">
+      <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\tb_AlbumFichaObjetivo.cs">
       <DependentUpon>ObjetivosPrioritarios.tt</DependentUpon>
     </Compile>
@@ -688,13 +688,16 @@
     <Compile Include="Models\tb_CarpetasObjetivo.cs">
       <DependentUpon>ObjetivosPrioritarios.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\tb_COINCIDENCIA.cs">
+    <Compile Include="Models\tb_Coicidencia_C5.cs">
       <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\tb_CoincidenciasNormalizadas.cs">
       <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\tb_DETENCION_C5.cs">
+    <Compile Include="Models\tb_Detencion.cs">
+      <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\tb_Detencion_C5.cs">
       <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\tb_Detenido.cs">
@@ -703,7 +706,7 @@
     <Compile Include="Models\tb_Detenidos_DelitoIngreso.cs">
       <DependentUpon>ObjetivosPrioritarios.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\tb_DETENIDO_C5.cs">
+    <Compile Include="Models\tb_Detenido_C5.cs">
       <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\tb_Domicilio.cs">
@@ -721,7 +724,13 @@
     <Compile Include="Models\tb_Fotografia.cs">
       <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\tb_FOTO_C5.cs">
+    <Compile Include="Models\tb_FotoIdentidicacion_C5.cs">
+      <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\tb_FotoRasgos_C5.cs">
+      <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\tb_FotosDetenido_C5.cs">
       <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\tb_GrupoTipoActividadDelictiva.cs">
@@ -730,7 +739,7 @@
     <Compile Include="Models\tb_Grupo_Delictivo.cs">
       <DependentUpon>ObjetivosPrioritarios.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\tb_HUELLA_C5.cs">
+    <Compile Include="Models\tb_Huella_C5.cs">
       <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\tb_InformacionObjetivo.cs">
@@ -747,6 +756,9 @@
     </Compile>
     <Compile Include="Models\tb_OrdenAprehension.cs">
       <DependentUpon>ObjetivosPrioritarios.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\tb_PagoMulta_C5.cs">
+      <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\tb_PerfilFuenteBusqueda.cs">
       <DependentUpon>Objetivos_Perfiles.tt</DependentUpon>
@@ -778,7 +790,7 @@
     <Compile Include="Models\tb_SenasParticulares.cs">
       <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\tb_Usuario.cs">
+    <Compile Include="Models\tb_TrabajoSocial_C5.cs">
       <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\tb_UsuarioPerfil.cs">
@@ -787,8 +799,14 @@
     <Compile Include="Models\tb_Usuarios.cs">
       <DependentUpon>Objetivos_Perfiles.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\tb_Usuario_C5.cs">
+      <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\tb_Victimas.cs">
       <DependentUpon>ObjetivosPrioritarios.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\tb_VisitaDetenido_C5.cs">
+      <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Usuario.cs">
       <DependentUpon>SIC.tt</DependentUpon>

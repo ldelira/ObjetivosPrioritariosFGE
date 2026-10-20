@@ -60,7 +60,21 @@
     var datosDetenidoC5 = ViewBag.DatosDetenidoC5 as Objetivos_Prioritarios.Models.tb_Detenido_C5;
     var fotosC5 = ViewBag.FotosC5 as List<Objetivos_Prioritarios.Models.tb_FotosDetenido_C5> ?? new List<Objetivos_Prioritarios.Models.tb_FotosDetenido_C5>();
     var huellasC5 = ViewBag.HuellasC5 as List<Objetivos_Prioritarios.Models.tb_Huella_C5> ?? new List<Objetivos_Prioritarios.Models.tb_Huella_C5>();
-    var rasgosC5 = ViewBag.RasgosC5 as List<Objetivos_Prioritarios.Models.tb_FotosDetenido_C5> ?? new List<Objetivos_Prioritarios.Models.tb_FotosDetenido_C5>();
+    var rasgosC5 = ViewBag.RasgosC5 as List<Objetivos_Prioritarios.Models.tb_FotoRasgos_C5> ?? new List<Objetivos_Prioritarios.Models.tb_FotoRasgos_C5>();
+    string rutaIdentificacionFrenteC5 = Convert.ToString(ViewBag.IdentificacionFrenteC5);
+    string rutaIdentificacionReversoC5 = Convert.ToString(ViewBag.IdentificacionReversoC5);
+
+    bool tieneIdentificacionFrente = !string.IsNullOrWhiteSpace(rutaIdentificacionFrenteC5);
+    bool tieneIdentificacionReverso = !string.IsNullOrWhiteSpace(rutaIdentificacionReversoC5);
+
+    string fotoIdentificacionFrenteC5 = tieneIdentificacionFrente
+        ? Url.Action("FotoIdentificacionC5", "SIC", new { idDetenido = Model.IDDETENIDO, lado = 1 })
+        : null;
+
+    string fotoIdentificacionReversoC5 = tieneIdentificacionReverso
+        ? Url.Action("FotoIdentificacionC5", "SIC", new { idDetenido = Model.IDDETENIDO, lado = 2 })
+        : null;
+
     var alertasTipo = ViewBag.AlertasTipo as List<Tuple<int, int, int, int, int, string>> ?? new List<Tuple<int, int, int, int, int, string>>();
     var alertasPersonaInteres = ViewBag.AlertasPersonaInteres as List<Tuple<int, int, int, int, int, string>> ?? new List<Tuple<int, int, int, int, int, string>>();
 
@@ -193,13 +207,24 @@
             <div class="sic-hero-info">
                 <h2>@nombreCompleto</h2>
 
-
+                @if (tieneIdentificacionFrente)
+                {
+                    <div class="sic-hero-identificacion">
+                        <img id="sicFotoIdentificacionC5"
+                             src="@fotoIdentificacionFrenteC5"
+                             alt="Identificación del detenido"
+                             title="Presione para ver frente y reverso"
+                             role="button"
+                             tabindex="0"
+                             onclick="abrirIdentificacionC5();" />
+                    </div>
+                }
 
                 <div class="sic-hero-meta">
                     @*<span class="sic-pill sic-pill-alerta">
-                            <i class="fa fa-exclamation-triangle"></i>
-                            @totalAlertas Alerta(s) Totales
-                        </span>*@
+                <i class="fa fa-exclamation-triangle"></i>
+                @totalAlertas Alerta(s) Totales
+            </span>*@
 
                     <span class="sic-pill">
                         <i class="fa fa-id-card"></i>
@@ -266,62 +291,80 @@
                         <div>
                             <label>Fecha detención</label>
                             <strong>
-                                @(detencionC5 == null || string.IsNullOrWhiteSpace(Convert.ToString(detencionC5.FECHA_DETENCION))  ? "SIN INFORMACIÓN"  : Convert.ToDateTime(detencionC5.FECHA_DETENCION)  .ToString("dd/MM/yyyy hh:mm:ss tt"))
+                                @{
+                                    DateTime? fechaMostrar = null;
+
+                                    if (ViewBag.FechaRegistro != null)
+                                    {
+                                        fechaMostrar = Convert.ToDateTime(ViewBag.FechaRegistro);
+                                    }
+                                    else if (detencionC5 != null &&
+                                             !string.IsNullOrWhiteSpace(Convert.ToString(detencionC5.FECHA_DETENCION)))
+                                    {
+                                        fechaMostrar = Convert.ToDateTime(detencionC5.FECHA_DETENCION);
+                                    }
+                                }
+
+                                @(fechaMostrar.HasValue
+                                    ? fechaMostrar.Value.ToString("dd/MM/yyyy hh:mm:ss tt")
+                                    : "SIN INFORMACIÓN")
                             </strong>
                         </div>
                     </div>
 
                     @*<div class="sic-main-info-item">
-                            <div class="sic-main-info-icon">
-                                <i class="fa fa-user-secret"></i>
-                            </div>
-                            <div>
-                                <label>Alias</label>
-                                <strong>@alias</strong>
-                            </div>
-                        </div>
-
-                        <div class="sic-main-info-item">
-                            <div class="sic-main-info-icon">
-                                <i class="fa fa-venus-mars"></i>
-                            </div>
-                            <div>
-                                <label>Sexo</label>
-                                <strong>@sexo</strong>
-                            </div>
-                        </div>
-
-                        <div class="sic-main-info-item">
-                            <div class="sic-main-info-icon">
-                                <i class="fa fa-birthday-cake"></i>
-                            </div>
-                            <div>
-                                <label>Edad</label>
-                                <strong>@edad</strong>
-                            </div>
-                        </div>*@
-
-                    @*<div class="sic-main-info-item">
-                            <div class="sic-main-info-icon">
-                                <i class="fa fa-picture-o"></i>
-                            </div>
-                            <div>
-                                <label>Fotos en Municipio</label>
-                                <strong>@totalFotos</strong>
-                            </div>
-                        </div>
-
-                        <div class="sic-main-info-item">
-                            <div class="sic-main-info-icon">
-                                <i class="fa fa-hand-paper-o"></i>
-                            </div>
-                            <div>
-                                <label>Huellas</label>
-                                <strong>@totalHuellas</strong>
-                            </div>
-                        </div>*@
+                <div class="sic-main-info-icon">
+                    <i class="fa fa-user-secret"></i>
+                </div>
+                <div>
+                    <label>Alias</label>
+                    <strong>@alias</strong>
                 </div>
             </div>
+
+            <div class="sic-main-info-item">
+                <div class="sic-main-info-icon">
+                    <i class="fa fa-venus-mars"></i>
+                </div>
+                <div>
+                    <label>Sexo</label>
+                    <strong>@sexo</strong>
+                </div>
+            </div>
+
+            <div class="sic-main-info-item">
+                <div class="sic-main-info-icon">
+                    <i class="fa fa-birthday-cake"></i>
+                </div>
+                <div>
+                    <label>Edad</label>
+                    <strong>@edad</strong>
+                </div>
+            </div>*@
+
+                    @*<div class="sic-main-info-item">
+                <div class="sic-main-info-icon">
+                    <i class="fa fa-picture-o"></i>
+                </div>
+                <div>
+                    <label>Fotos en Municipio</label>
+                    <strong>@totalFotos</strong>
+                </div>
+            </div>
+
+            <div class="sic-main-info-item">
+                <div class="sic-main-info-icon">
+                    <i class="fa fa-hand-paper-o"></i>
+                </div>
+                <div>
+                    <label>Huellas</label>
+                    <strong>@totalHuellas</strong>
+                </div>
+            </div>*@
+                </div>
+            </div>
+
+           
 
             <div class="sic-hero-counters">
 
@@ -862,8 +905,10 @@
             <i class="fa fa-times"></i>
         </button>
 
-        <div id="sicVistaFotoUnica"
-             class="sic-vista-foto-unica">
+        <!-- =====================================================
+             FOTO ÚNICA
+             ===================================================== -->
+        <div id="sicVistaFotoUnica" class="sic-vista-foto-unica">
             <img id="sicFotoExpandida"
                  src=""
                  alt="Fotografía ampliada" />
@@ -872,39 +917,171 @@
                  class="sic-visor-foto-texto"></div>
         </div>
 
-        <div id="sicVistaComparacion"
-             class="sic-vista-comparacion">
+        <!-- =====================================================
+             IDENTIFICACIÓN: FRENTE / REVERSO
+             ===================================================== -->
+        <div id="sicVistaIdentificacion" class="sic-vista-identificacion">
+
+            <div class="sic-comparacion-panel">
+                <div class="sic-comparacion-titulo">
+                    <i class="fa fa-id-card"></i>
+                    Frente
+                </div>
+
+                <div class="sic-comparacion-imagen-wrap">
+                    <img id="sicIdentificacionFrenteExpandida"
+                         src=""
+                         alt="Frente de identificación" />
+
+                    <div class="sic-comparacion-zoom-controles">
+                        <button type="button"
+                                onclick="cambiarZoomFotoSic('sicIdentificacionFrenteExpandida', 0.2); event.stopPropagation();"
+                                title="Aumentar zoom"
+                                aria-label="Aumentar zoom">
+                            <i class="fa fa-search-plus"></i>
+                        </button>
+
+                        <button type="button"
+                                onclick="cambiarZoomFotoSic('sicIdentificacionFrenteExpandida', -0.2); event.stopPropagation();"
+                                title="Disminuir zoom"
+                                aria-label="Disminuir zoom">
+                            <i class="fa fa-search-minus"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="sicPanelIdentificacionReverso" class="sic-comparacion-panel">
+                <div class="sic-comparacion-titulo">
+                    <i class="fa fa-id-card"></i>
+                    Reverso
+                </div>
+
+                <div class="sic-comparacion-imagen-wrap">
+                    <img id="sicIdentificacionReversoExpandida"
+                         src=""
+                         alt="Reverso de identificación" />
+
+                    <div class="sic-comparacion-zoom-controles">
+                        <button type="button"
+                                onclick="cambiarZoomFotoSic('sicIdentificacionReversoExpandida', 0.2); event.stopPropagation();"
+                                title="Aumentar zoom"
+                                aria-label="Aumentar zoom">
+                            <i class="fa fa-search-plus"></i>
+                        </button>
+
+                        <button type="button"
+                                onclick="cambiarZoomFotoSic('sicIdentificacionReversoExpandida', -0.2); event.stopPropagation();"
+                                title="Disminuir zoom"
+                                aria-label="Disminuir zoom">
+                            <i class="fa fa-search-minus"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- =====================================================
+             COMPARACIÓN DE 3 IMÁGENES
+             ===================================================== -->
+        <div id="sicVistaComparacion" class="sic-vista-comparacion">
+
+            <div id="sicPanelComparacionIdentificacion" class="sic-comparacion-panel">
+                <div class="sic-comparacion-titulo">
+                    <i class="fa fa-id-card"></i>
+                    Identificación
+                </div>
+
+                <div class="sic-comparacion-imagen-wrap">
+                    <img id="sicFotoComparacionIdentificacion"
+                         src=""
+                         alt="Identificación del detenido"
+                         onerror="this.style.display='none';" />
+
+                    <div class="sic-comparacion-zoom-controles">
+                        <button type="button"
+                                onclick="cambiarZoomFotoSic('sicFotoComparacionIdentificacion', 0.2); event.stopPropagation();"
+                                title="Aumentar zoom"
+                                aria-label="Aumentar zoom">
+                            <i class="fa fa-search-plus"></i>
+                        </button>
+
+                        <button type="button"
+                                onclick="cambiarZoomFotoSic('sicFotoComparacionIdentificacion', -0.2); event.stopPropagation();"
+                                title="Disminuir zoom"
+                                aria-label="Disminuir zoom">
+                            <i class="fa fa-search-minus"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
 
             <div class="sic-comparacion-panel">
                 <div class="sic-comparacion-titulo">
                     <i class="fa fa-camera"></i>
                     Fotografía del detenido en municipio
                 </div>
+
                 <div class="sic-comparacion-imagen-wrap">
                     <img id="sicFotoComparacionPrincipal"
                          src=""
                          alt="Fotografía del detenido en municipio"
                          onerror="this.style.display='none';" />
+
+                    <div class="sic-comparacion-zoom-controles">
+                        <button type="button"
+                                onclick="cambiarZoomFotoSic('sicFotoComparacionPrincipal', 0.2); event.stopPropagation();"
+                                title="Aumentar zoom"
+                                aria-label="Aumentar zoom">
+                            <i class="fa fa-search-plus"></i>
+                        </button>
+
+                        <button type="button"
+                                onclick="cambiarZoomFotoSic('sicFotoComparacionPrincipal', -0.2); event.stopPropagation();"
+                                title="Disminuir zoom"
+                                aria-label="Disminuir zoom">
+                            <i class="fa fa-search-minus"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
 
             <div class="sic-comparacion-panel">
                 <div class="sic-comparacion-titulo">
-                    <i class="fa fa-id-card"></i>
+                    <i class="fa fa-user"></i>
                     Registro de detenidos FGEA
                 </div>
+
                 <div class="sic-comparacion-imagen-wrap">
                     <img id="sicFotoComparacionDetenido"
                          src=""
                          alt="Fotografía del registro de detenidos FGEA"
                          onerror="this.style.display='none';" />
+
+                    <div class="sic-comparacion-zoom-controles">
+                        <button type="button"
+                                onclick="cambiarZoomFotoSic('sicFotoComparacionDetenido', 0.2); event.stopPropagation();"
+                                title="Aumentar zoom"
+                                aria-label="Aumentar zoom">
+                            <i class="fa fa-search-plus"></i>
+                        </button>
+
+                        <button type="button"
+                                onclick="cambiarZoomFotoSic('sicFotoComparacionDetenido', -0.2); event.stopPropagation();"
+                                title="Disminuir zoom"
+                                aria-label="Disminuir zoom">
+                            <i class="fa fa-search-minus"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
 
         </div>
-    </div>
-</div>
 
+    </div>
+
+</div>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
@@ -918,6 +1095,12 @@
             })
         )
     );
+
+    var sicIdentificacionFrenteUrl = @Html.Raw(Json.Encode(fotoIdentificacionFrenteC5));
+    var sicIdentificacionReversoUrl = @Html.Raw(Json.Encode(fotoIdentificacionReversoC5));
+
+    console.log('FRENTE URL:', sicIdentificacionFrenteUrl);
+    console.log('REVERSO URL:', sicIdentificacionReversoUrl);
 </script>
 
 <script>
@@ -2931,7 +3114,9 @@ function abrirFotoExpandida(src, descripcion) {
             .removeClass('comparando');
 
         $('#sicVistaComparacion')
-            .hide();
+        .hide();
+
+    $('#sicVistaIdentificacion').hide();
 
         $('#sicVistaFotoUnica')
             .show();
@@ -2965,79 +3150,66 @@ function abrirFotoExpandida(src, descripcion) {
     }
 
 
-    function abrirComparacionFotos(
-        srcFotoDetenido,
-        descripcionDetenido
-    ) {
+    function abrirComparacionFotos(srcFotoDetenido, descripcionDetenido) {
+        if (!srcFotoDetenido) return;
 
-        if (!srcFotoDetenido) {
-            return;
-        }
+        var fotoIdentificacion = document.getElementById('sicFotoIdentificacionC5');
+        var fotoPrincipal = document.getElementById('sicFotoPrincipalC5');
 
-        var fotoPrincipal =
-            document.getElementById(
-                'sicFotoPrincipalC5'
-            );
-
-        var srcFotoPrincipal =
-            fotoPrincipal
-                ? fotoPrincipal.currentSrc ||
-                fotoPrincipal.src
-                : '';
+        var srcIdentificacion = fotoIdentificacion ? (fotoIdentificacion.currentSrc || fotoIdentificacion.src) : '';
+        var srcFotoPrincipal = fotoPrincipal ? (fotoPrincipal.currentSrc || fotoPrincipal.src) : '';
 
         if (!srcFotoPrincipal) {
-
-            abrirFotoExpandida(
-                srcFotoDetenido,
-                descripcionDetenido
-            );
-
+            abrirFotoExpandida(srcFotoDetenido, descripcionDetenido);
             return;
         }
 
-        $('#sicVisorFotoContenido')
-            .addClass('comparando');
+        $('#sicVisorFotoContenido').addClass('comparando');
+        $('#sicVistaFotoUnica').hide();
+        $('#sicVistaComparacion').css('display', 'grid');
 
-        $('#sicVistaFotoUnica')
-            .hide();
+        $('#sicVistaIdentificacion').hide();
 
-        $('#sicVistaComparacion')
-            .css('display', 'grid');
+        var imgIdentificacion = $('#sicFotoComparacionIdentificacion');
+        var panelIdentificacion = $('#sicPanelComparacionIdentificacion');
+        var vistaComparacion = $('#sicVistaComparacion');
 
-        $('#sicFotoComparacionPrincipal')
-            .css('display', 'block')
-            .attr('src', srcFotoPrincipal)
-            .attr(
-                'alt',
-                fotoPrincipal.alt ||
-                'Fotografía del detenido en municipio'
-            );
+        if (srcIdentificacion && fotoIdentificacion && fotoIdentificacion.naturalWidth > 0) {
 
-        $('#sicFotoComparacionDetenido')
-            .css('display', 'block')
-            .attr('src', srcFotoDetenido)
-            .attr(
-                'alt',
-                descripcionDetenido ||
-                'Fotografía del registro de detenidos FGEA'
-        );
+            panelIdentificacion.show();
 
-        reiniciarZoomFotoSic(
-            document.getElementById(
-                'sicFotoComparacionPrincipal'
-            )
-        );
+            vistaComparacion
+                .removeClass('dos-imagenes');
 
-        reiniciarZoomFotoSic(
-            document.getElementById(
-                'sicFotoComparacionDetenido'
-            )
-        );
+            imgIdentificacion
+                .css('display', 'block')
+                .attr('src', srcIdentificacion)
+                .attr(
+                    'alt',
+                    fotoIdentificacion.alt ||
+                    'Identificación del detenido'
+                );
 
-        $('#sicVisorFoto')
-            .addClass('activo')
-            .attr('aria-hidden', 'false');
+        } else {
 
+            imgIdentificacion
+                .hide()
+                .removeAttr('src');
+
+            panelIdentificacion.hide();
+
+            vistaComparacion
+                .addClass('dos-imagenes');
+        }
+
+        $('#sicFotoComparacionPrincipal').css('display', 'block').attr('src', srcFotoPrincipal).attr('alt', fotoPrincipal.alt || 'Fotografía del detenido en municipio');
+        $('#sicFotoComparacionDetenido').css('display', 'block').attr('src', srcFotoDetenido).attr('alt', descripcionDetenido || 'Fotografía del registro de detenidos FGEA');
+
+        reiniciarZoomFotoSic(document.getElementById('sicFotoComparacionIdentificacion'));
+        reiniciarZoomFotoSic(document.getElementById('sicFotoComparacionPrincipal'));
+        reiniciarZoomFotoSic(document.getElementById('sicFotoComparacionDetenido'));
+
+        $('#sicVisorFoto').addClass('activo').attr('aria-hidden', 'false');
         $('body').css('overflow', 'hidden');
     }
 
@@ -3059,12 +3231,17 @@ function abrirFotoExpandida(src, descripcion) {
         var fotoExpandida =
             document.getElementById('sicFotoExpandida');
 
-        var fotoPrincipal =
-            document.getElementById('sicFotoComparacionPrincipal');
+        var fotoIdentificacion = document.getElementById('sicFotoComparacionIdentificacion');
+        var fotoPrincipal = document.getElementById('sicFotoComparacionPrincipal');
+        var fotoDetenido = document.getElementById('sicFotoComparacionDetenido');
 
-        var fotoDetenido =
-            document.getElementById('sicFotoComparacionDetenido');
+        var vistaIdentificacion = document.getElementById('sicVistaIdentificacion');
+        var identificacionFrente = document.getElementById('sicIdentificacionFrenteExpandida');
+        var identificacionReverso = document.getElementById('sicIdentificacionReversoExpandida');
 
+        if (vistaIdentificacion) vistaIdentificacion.style.display = 'none';
+        if (identificacionFrente) identificacionFrente.removeAttribute('src');
+        if (identificacionReverso) identificacionReverso.removeAttribute('src');
 
         if (visor) {
             visor.classList.remove('activo');
@@ -3086,6 +3263,8 @@ function abrirFotoExpandida(src, descripcion) {
         if (fotoExpandida) {
             fotoExpandida.removeAttribute('src');
         }
+
+        if (fotoIdentificacion) fotoIdentificacion.removeAttribute('src');
 
         if (fotoPrincipal) {
             fotoPrincipal.removeAttribute('src');
@@ -3534,16 +3713,38 @@ function reiniciarZoomGaleriaSic(visorId) {
                 : 'zoom-in';
     }
 
+    function cambiarZoomFotoSic(idImagen, incremento) {
+        var imagen = document.getElementById(idImagen);
+        if (!imagen) return;
+
+        var zoom = parseFloat(imagen.dataset.zoom) || 1;
+        zoom += incremento;
+        if (zoom < 1) zoom = 1;
+        if (zoom > 5) zoom = 5;
+
+        zoom = Math.round(zoom * 10) / 10;
+        imagen.dataset.zoom = zoom.toString();
+
+        if (zoom === 1) {
+            imagen.dataset.zoomX = '0';
+            imagen.dataset.zoomY = '0';
+        }
+
+        aplicarZoomFotoSic(imagen);
+    }
+
     document.addEventListener(
         'wheel',
         function (e) {
 
-            var imagen =
-                e.target.closest(
-                    '#sicFotoExpandida, ' +
-                    '#sicFotoComparacionPrincipal, ' +
-                    '#sicFotoComparacionDetenido'
-                );
+            var imagen = e.target.closest(
+                '#sicFotoExpandida, ' +
+                '#sicIdentificacionFrenteExpandida, ' +
+                '#sicIdentificacionReversoExpandida, ' +
+                '#sicFotoComparacionIdentificacion, ' +
+                '#sicFotoComparacionPrincipal, ' +
+                '#sicFotoComparacionDetenido'
+            );
 
             if (!imagen) {
                 return;
@@ -3605,12 +3806,14 @@ function reiniciarZoomGaleriaSic(visorId) {
         'dblclick',
         function (e) {
 
-            var imagen =
-                e.target.closest(
-                    '#sicFotoExpandida, ' +
-                    '#sicFotoComparacionPrincipal, ' +
-                    '#sicFotoComparacionDetenido'
-                );
+            var imagen = e.target.closest(
+                '#sicFotoExpandida, ' +
+                '#sicIdentificacionFrenteExpandida, ' +
+                '#sicIdentificacionReversoExpandida, ' +
+                '#sicFotoComparacionIdentificacion, ' +
+                '#sicFotoComparacionPrincipal, ' +
+                '#sicFotoComparacionDetenido'
+            );
 
             if (!imagen) {
                 return;
@@ -3629,12 +3832,14 @@ function reiniciarZoomGaleriaSic(visorId) {
         'mousedown',
         function (e) {
 
-            var imagen =
-                e.target.closest(
-                    '#sicFotoExpandida, ' +
-                    '#sicFotoComparacionPrincipal, ' +
-                    '#sicFotoComparacionDetenido'
-                );
+            var imagen = e.target.closest(
+                '#sicFotoExpandida, ' +
+                '#sicIdentificacionFrenteExpandida, ' +
+                '#sicIdentificacionReversoExpandida, ' +
+                '#sicFotoComparacionIdentificacion, ' +
+                '#sicFotoComparacionPrincipal, ' +
+                '#sicFotoComparacionDetenido'
+            );
 
             if (!imagen) {
                 return;
@@ -4063,6 +4268,49 @@ $(document)
         });
     });
 
+    function abrirIdentificacionC5() {
+        console.log('Entró a abrirIdentificacionC5');
+        console.log('Frente:', sicIdentificacionFrenteUrl);
+        console.log('Reverso:', sicIdentificacionReversoUrl);
+
+        if (!sicIdentificacionFrenteUrl) {
+            console.log('No existe URL de frente');
+            return;
+        }
+
+        $('#sicVisorFotoContenido').removeClass('comparando');
+        $('#sicVistaFotoUnica').hide();
+        $('#sicVistaComparacion').hide();
+        $('#sicVistaIdentificacion').css('display', 'grid');
+
+        $('#sicIdentificacionFrenteExpandida')
+            .css('display', 'block')
+            .attr('src', sicIdentificacionFrenteUrl);
+
+        if (sicIdentificacionReversoUrl) {
+            console.log('Asignando reverso:', sicIdentificacionReversoUrl);
+
+            $('#sicPanelIdentificacionReverso').show();
+
+            $('#sicIdentificacionReversoExpandida')
+                .css('display', 'block')
+                .attr('src', sicIdentificacionReversoUrl);
+
+            $('#sicVistaIdentificacion').removeClass('una-sola');
+        } else {
+            console.log('No existe URL de reverso');
+
+            $('#sicPanelIdentificacionReverso').hide();
+            $('#sicIdentificacionReversoExpandida').removeAttr('src');
+            $('#sicVistaIdentificacion').addClass('una-sola');
+        }
+
+        reiniciarZoomFotoSic(document.getElementById('sicIdentificacionFrenteExpandida'));
+        reiniciarZoomFotoSic(document.getElementById('sicIdentificacionReversoExpandida'));
+
+        $('#sicVisorFoto').addClass('activo').attr('aria-hidden', 'false');
+        $('body').css('overflow', 'hidden');
+    }
 
 </script>
 

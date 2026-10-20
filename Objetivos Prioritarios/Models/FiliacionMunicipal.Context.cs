@@ -34,11 +34,9 @@ namespace Objetivos_Prioritarios.Models
         public virtual DbSet<cat_TipoFoto> cat_TipoFoto { get; set; }
         public virtual DbSet<cat_TipoSena> cat_TipoSena { get; set; }
         public virtual DbSet<cat_ZonaCuerpo> cat_ZonaCuerpo { get; set; }
-        public virtual DbSet<sysdiagrams> sysdiagrams { get; set; }
         public virtual DbSet<tb_Alerta> tb_Alerta { get; set; }
         public virtual DbSet<tb_Coicidencia_C5> tb_Coicidencia_C5 { get; set; }
         public virtual DbSet<tb_CoincidenciasNormalizadas> tb_CoincidenciasNormalizadas { get; set; }
-        public virtual DbSet<tb_Detencion> tb_Detencion { get; set; }
         public virtual DbSet<tb_Detencion_C5> tb_Detencion_C5 { get; set; }
         public virtual DbSet<tb_Detenido_C5> tb_Detenido_C5 { get; set; }
         public virtual DbSet<tb_Domicilio> tb_Domicilio { get; set; }
@@ -79,9 +77,13 @@ namespace Objetivos_Prioritarios.Models
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<SP_SIC_ObtenerPersonas_Result>("SP_SIC_ObtenerPersonas", idsPersonaParameter);
         }
     
-        public virtual ObjectResult<sp_Alertas_Result> sp_Alertas()
+        public virtual ObjectResult<sp_Alertas_Result> sp_Alertas(Nullable<bool> mostrarTodos)
         {
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<sp_Alertas_Result>("sp_Alertas");
+            var mostrarTodosParameter = mostrarTodos.HasValue ?
+                new ObjectParameter("MostrarTodos", mostrarTodos) :
+                new ObjectParameter("MostrarTodos", typeof(bool));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<sp_Alertas_Result>("sp_Alertas", mostrarTodosParameter);
         }
     }
 }

@@ -5873,11 +5873,14 @@
 
 .sic-vista-comparacion {
     display: none;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 18px;
-    width: min(1180px, 94vw);
-    max-height: 88vh;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    width: 100%;
 }
+
+    .sic-vista-comparacion.dos-imagenes {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
 
 .sic-comparacion-panel {
     min-width: 0;
@@ -11223,6 +11226,7 @@ body.sic-modal-abierto {
 
 
 #sicFotoExpandida,
+#sicFotoComparacionIdentificacion,
 #sicFotoComparacionPrincipal,
 #sicFotoComparacionDetenido {
     transform-origin: center center;
@@ -11910,5 +11914,103 @@ body.sic-modal-abierto {
 
     .sic-foto-instruccion-tablet {
         display: inline;
+    }
+}
+
+/* ================================================================
+   IDENTIFICACIÓN - FICHA DETENIDO
+   ================================================================ */
+
+.sic-hero-info {
+    position: relative;
+    min-width: 0;
+    padding-right: 250px; /* Reserva espacio para la identificación */
+}
+
+.sic-hero-identificacion {
+    position: absolute;
+    top: 80px;
+    right: 50px;
+    display: inline-block;
+    max-width: 230px;
+    padding: 3px;
+    border-radius: 8px;
+    background: rgba(255,255,255,.12);
+    box-shadow: 0 4px 12px rgba(0,0,0,.18);
+    line-height: 0;
+}
+
+    .sic-hero-identificacion img {
+        display: block;
+        width: auto;
+        height: auto;
+        max-width: 224px;
+        max-height: 145px;
+        border-radius: 6px;
+        cursor: pointer;
+    }
+
+
+.sic-comparacion-imagen-wrap {
+    position: relative;
+}
+
+.sic-comparacion-zoom-controles {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 5;
+    display: flex;
+    gap: 6px;
+}
+
+    .sic-comparacion-zoom-controles button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 34px;
+        height: 34px;
+        padding: 0;
+        border: 1px solid rgba(255,255,255,.28);
+        border-radius: 8px;
+        background: rgba(15,23,42,.82);
+        color: #ffffff;
+        font-size: 14px;
+        cursor: pointer;
+        box-shadow: 0 3px 10px rgba(0,0,0,.25);
+        transition: background .15s ease, transform .15s ease;
+    }
+
+        .sic-comparacion-zoom-controles button:hover {
+            background: rgba(37,99,235,.95);
+            transform: scale(1.05);
+        }
+
+        .sic-comparacion-zoom-controles button:active {
+            transform: scale(.94);
+        }
+
+.sic-visor-foto-contenido.comparando {
+    width: 95vw;
+    max-width: 1800px;
+}
+
+.sic-vista-identificacion {
+    display: none;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    width: min(1250px, 94vw);
+}
+
+    .sic-vista-identificacion.una-sola {
+        grid-template-columns: minmax(0, 620px);
+        justify-content: center;
+    }
+
+@media (max-width: 800px) {
+    .sic-vista-identificacion {
+        grid-template-columns: 1fr;
+        max-height: 88vh;
+        overflow-y: auto;
     }
 }

@@ -2662,7 +2662,9 @@
                                 }
 
                                 seleccionarResultadoDesdeElemento(
-                                    primerResultado
+                                    primerResultado,
+                                    undefined,
+                                    true
                                 );
                             },
                             100

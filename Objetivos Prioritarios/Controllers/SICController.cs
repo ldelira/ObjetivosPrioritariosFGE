@@ -873,7 +873,7 @@ namespace Objetivos_Prioritarios.Controllers
                 return HttpNotFound();
             }
             string rutaFotoBD = "";
-            var propiedadFoto = detenido.GetType().GetProperty("Foto");
+            var propiedadFoto = detenido.GetType().GetProperty("FotoOriginal");
 
             if (propiedadFoto != null)
             {

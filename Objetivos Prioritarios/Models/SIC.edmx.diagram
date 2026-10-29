@@ -4,7 +4,7 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="a2de8ffb9b4f45c39fb32c392d506612" Name="Diagram1">
+      <Diagram DiagramId="a2de8ffb9b4f45c39fb32c392d506612" Name="Diagram1" ZoomLevel="92">
         <EntityTypeShape EntityType="SICModel.DETENCION" Width="1.5" PointX="0.75" PointY="0.75" />
         <EntityTypeShape EntityType="SICModel.DETENIDO" Width="1.5" PointX="2.75" PointY="0.75" />
         <EntityTypeShape EntityType="SICModel.Modulos" Width="1.5" PointX="4.75" PointY="0.75" />

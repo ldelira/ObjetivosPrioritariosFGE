@@ -664,9 +664,6 @@
     <Compile Include="Models\SP_SIC_ObtenerPersonas_Result.cs">
       <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\sysdiagrams.cs">
-      <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
-    </Compile>
     <Compile Include="Models\tb_AlbumFichaObjetivo.cs">
       <DependentUpon>ObjetivosPrioritarios.tt</DependentUpon>
     </Compile>
@@ -692,9 +689,6 @@
       <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\tb_CoincidenciasNormalizadas.cs">
-      <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Models\tb_Detencion.cs">
       <DependentUpon>FiliacionMunicipal.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\tb_Detencion_C5.cs">

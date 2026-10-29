@@ -6,38 +6,36 @@
     <edmx:Diagrams>
       <Diagram DiagramId="82f06c76007843f18186f48163e54deb" Name="Diagram1" ZoomLevel="90">
         <EntityTypeShape EntityType="Filiacion_MunicipiosModel.cat_EstatusAlerta" Width="1.5" PointX="0.75" PointY="0.75" />
-        <EntityTypeShape EntityType="Filiacion_MunicipiosModel.cat_EstatusPeriodoBusqueda" Width="1.5" PointX="12.75" PointY="7.75" />
-        <EntityTypeShape EntityType="Filiacion_MunicipiosModel.cat_TbFuente" Width="1.5" PointX="17.75" PointY="21.25" />
-        <EntityTypeShape EntityType="Filiacion_MunicipiosModel.cat_TipoAlerta" Width="1.5" PointX="20.75" PointY="21.625" />
-        <EntityTypeShape EntityType="Filiacion_MunicipiosModel.cat_TipoFoto" Width="1.5" PointX="15.75" PointY="7.875" />
-        <EntityTypeShape EntityType="Filiacion_MunicipiosModel.cat_TipoSena" Width="1.5" PointX="15.75" PointY="5.125" />
-        <EntityTypeShape EntityType="Filiacion_MunicipiosModel.cat_ZonaCuerpo" Width="1.5" PointX="15.75" PointY="15.625" />
-        <EntityTypeShape EntityType="Filiacion_MunicipiosModel.sysdiagrams" Width="1.5" PointX="2.75" PointY="0.75" />
-        <EntityTypeShape EntityType="Filiacion_MunicipiosModel.tb_Alerta" Width="1.5" PointX="23" PointY="20.875" />
-        <EntityTypeShape EntityType="Filiacion_MunicipiosModel.tb_Coicidencia_C5" Width="1.5" PointX="7.5" PointY="16.5" />
-        <EntityTypeShape EntityType="Filiacion_MunicipiosModel.tb_CoincidenciasNormalizadas" Width="1.5" PointX="0.75" PointY="3.75" />
-        <EntityTypeShape EntityType="Filiacion_MunicipiosModel.tb_Detencion" Width="1.5" PointX="15" PointY="20.5" />
+        <EntityTypeShape EntityType="Filiacion_MunicipiosModel.cat_EstatusPeriodoBusqueda" Width="1.5" PointX="12.75" PointY="6" />
+        <EntityTypeShape EntityType="Filiacion_MunicipiosModel.cat_TbFuente" Width="1.5" PointX="17.75" PointY="19.25" />
+        <EntityTypeShape EntityType="Filiacion_MunicipiosModel.cat_TipoAlerta" Width="1.5" PointX="20.75" PointY="19.625" />
+        <EntityTypeShape EntityType="Filiacion_MunicipiosModel.cat_TipoFoto" Width="1.5" PointX="15.75" PointY="6.25" />
+        <EntityTypeShape EntityType="Filiacion_MunicipiosModel.cat_TipoSena" Width="1.5" PointX="15.75" PointY="16.5" />
+        <EntityTypeShape EntityType="Filiacion_MunicipiosModel.cat_ZonaCuerpo" Width="1.5" PointX="15.75" PointY="13.875" />
+        <EntityTypeShape EntityType="Filiacion_MunicipiosModel.tb_Alerta" Width="1.5" PointX="23" PointY="18.875" />
+        <EntityTypeShape EntityType="Filiacion_MunicipiosModel.tb_Coicidencia_C5" Width="1.5" PointX="7.5" PointY="19.25" />
+        <EntityTypeShape EntityType="Filiacion_MunicipiosModel.tb_CoincidenciasNormalizadas" Width="1.5" PointX="2.75" PointY="0.75" />
         <EntityTypeShape EntityType="Filiacion_MunicipiosModel.tb_Detencion_C5" Width="1.5" PointX="3" PointY="8.75" />
         <EntityTypeShape EntityType="Filiacion_MunicipiosModel.tb_Detenido_C5" Width="1.5" PointX="5.25" PointY="6.5" />
-        <EntityTypeShape EntityType="Filiacion_MunicipiosModel.tb_Domicilio" Width="1.5" PointX="15" PointY="23.625" />
+        <EntityTypeShape EntityType="Filiacion_MunicipiosModel.tb_Domicilio" Width="1.5" PointX="15" PointY="20.375" />
         <EntityTypeShape EntityType="Filiacion_MunicipiosModel.tb_FichaDecadactilar" Width="1.5" PointX="4.75" PointY="0.75" />
-        <EntityTypeShape EntityType="Filiacion_MunicipiosModel.tb_Fotografia" Width="1.5" PointX="18" PointY="7.375" />
-        <EntityTypeShape EntityType="Filiacion_MunicipiosModel.tb_FotoIdentidicacion_C5" Width="1.5" PointX="6.75" PointY="0.75" />
+        <EntityTypeShape EntityType="Filiacion_MunicipiosModel.tb_Fotografia" Width="1.5" PointX="18" PointY="5.625" />
+        <EntityTypeShape EntityType="Filiacion_MunicipiosModel.tb_FotoIdentidicacion_C5" Width="1.5" PointX="0.75" PointY="4.75" />
         <EntityTypeShape EntityType="Filiacion_MunicipiosModel.tb_FotoRasgos_C5" Width="1.5" PointX="10.5" PointY="10.625" />
         <EntityTypeShape EntityType="Filiacion_MunicipiosModel.tb_FotosDetenido_C5" Width="1.5" PointX="7.5" PointY="25.625" />
-        <EntityTypeShape EntityType="Filiacion_MunicipiosModel.tb_Huella_C5" Width="1.5" PointX="7.5" PointY="23" />
-        <EntityTypeShape EntityType="Filiacion_MunicipiosModel.tb_PagoMulta_C5" Width="1.5" PointX="8.75" PointY="0.75" />
-        <EntityTypeShape EntityType="Filiacion_MunicipiosModel.tb_Persona" Width="1.5" PointX="12.75" PointY="10.75" />
-        <EntityTypeShape EntityType="Filiacion_MunicipiosModel.tb_PersonaAlias" Width="1.5" PointX="15" PointY="27.125" />
-        <EntityTypeShape EntityType="Filiacion_MunicipiosModel.tb_PersonaPeriodoBusqueda" Width="1.5" PointX="15" PointY="11" />
-        <EntityTypeShape EntityType="Filiacion_MunicipiosModel.tb_SenasParticulares" Width="1.5" PointX="18" PointY="11" />
+        <EntityTypeShape EntityType="Filiacion_MunicipiosModel.tb_Huella_C5" Width="1.5" PointX="7.5" PointY="16.5" />
+        <EntityTypeShape EntityType="Filiacion_MunicipiosModel.tb_PagoMulta_C5" Width="1.5" PointX="6.75" PointY="0.75" />
+        <EntityTypeShape EntityType="Filiacion_MunicipiosModel.tb_Persona" Width="1.5" PointX="12.75" PointY="9.125" />
+        <EntityTypeShape EntityType="Filiacion_MunicipiosModel.tb_PersonaAlias" Width="1.5" PointX="15" PointY="23.875" />
+        <EntityTypeShape EntityType="Filiacion_MunicipiosModel.tb_PersonaPeriodoBusqueda" Width="1.5" PointX="15" PointY="9.25" />
+        <EntityTypeShape EntityType="Filiacion_MunicipiosModel.tb_SenasParticulares" Width="1.5" PointX="18" PointY="9.375" />
         <EntityTypeShape EntityType="Filiacion_MunicipiosModel.tb_TrabajoSocial_C5" Width="1.5" PointX="7.5" PointY="7" />
         <EntityTypeShape EntityType="Filiacion_MunicipiosModel.tb_Usuario_C5" Width="1.5" PointX="0.75" PointY="9.375" />
-        <EntityTypeShape EntityType="Filiacion_MunicipiosModel.tb_VisitaDetenido_C5" Width="1.5" PointX="9.75" PointY="5.75" />
-        <EntityTypeShape EntityType="Filiacion_MunicipiosModel.cat_Contactos_Municipios" Width="1.5" PointX="2.75" PointY="3.75" />
-        <EntityTypeShape EntityType="Filiacion_MunicipiosModel.tb_PersonaBusqueda" Width="1.5" PointX="20" PointY="18.375" />
-        <EntityTypeShape EntityType="Filiacion_MunicipiosModel.tb_PersonaEmbedding" Width="1.5" PointX="20" PointY="25.375" />
-        <EntityTypeShape EntityType="Filiacion_MunicipiosModel.tb_PersonaSourceAFIS" Width="1.5" PointX="20" PointY="28.25" />
+        <EntityTypeShape EntityType="Filiacion_MunicipiosModel.tb_VisitaDetenido_C5" Width="1.5" PointX="8.75" PointY="0.75" />
+        <EntityTypeShape EntityType="Filiacion_MunicipiosModel.cat_Contactos_Municipios" Width="1.5" PointX="9.75" PointY="4.75" />
+        <EntityTypeShape EntityType="Filiacion_MunicipiosModel.tb_PersonaBusqueda" Width="1.5" PointX="20" PointY="23.125" />
+        <EntityTypeShape EntityType="Filiacion_MunicipiosModel.tb_PersonaEmbedding" Width="1.5" PointX="20" PointY="16.375" />
+        <EntityTypeShape EntityType="Filiacion_MunicipiosModel.tb_PersonaSourceAFIS" Width="1.5" PointX="20" PointY="26.25" />
         <AssociationConnector Association="Filiacion_MunicipiosModel.FK_tb_PersonaPeriodoBusqueda_cat_EstatusPeriodoBusqueda" />
         <AssociationConnector Association="Filiacion_MunicipiosModel.FK_tb_PersonaBusqueda_cat_TbFuente" />
         <AssociationConnector Association="Filiacion_MunicipiosModel.FK_tb_PersonaEmbedding_cat_TbFuente" />
@@ -49,7 +47,6 @@
         <AssociationConnector Association="Filiacion_MunicipiosModel.FK_Sena_Zona" />
         <AssociationConnector Association="Filiacion_MunicipiosModel.FK_COINCIDENCIA_Detenido" />
         <AssociationConnector Association="Filiacion_MunicipiosModel.FK_COINCIDENCIA_DetenidoCoincidencia" />
-        <AssociationConnector Association="Filiacion_MunicipiosModel.FK_tb_Detencion_tb_Persona" />
         <AssociationConnector Association="Filiacion_MunicipiosModel.FK_DETENCION_UsuarioCrea" />
         <AssociationConnector Association="Filiacion_MunicipiosModel.FK_DETENCION_UsuarioTraslada" />
         <AssociationConnector Association="Filiacion_MunicipiosModel.FK_DETENIDO_DETENCION" />

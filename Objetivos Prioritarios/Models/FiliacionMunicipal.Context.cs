@@ -34,11 +34,9 @@ namespace Objetivos_Prioritarios.Models
         public virtual DbSet<cat_TipoFoto> cat_TipoFoto { get; set; }
         public virtual DbSet<cat_TipoSena> cat_TipoSena { get; set; }
         public virtual DbSet<cat_ZonaCuerpo> cat_ZonaCuerpo { get; set; }
-        public virtual DbSet<sysdiagrams> sysdiagrams { get; set; }
         public virtual DbSet<tb_Alerta> tb_Alerta { get; set; }
         public virtual DbSet<tb_Coicidencia_C5> tb_Coicidencia_C5 { get; set; }
         public virtual DbSet<tb_CoincidenciasNormalizadas> tb_CoincidenciasNormalizadas { get; set; }
-        public virtual DbSet<tb_Detencion> tb_Detencion { get; set; }
         public virtual DbSet<tb_Detencion_C5> tb_Detencion_C5 { get; set; }
         public virtual DbSet<tb_Detenido_C5> tb_Detenido_C5 { get; set; }
         public virtual DbSet<tb_Domicilio> tb_Domicilio { get; set; }
@@ -61,15 +59,6 @@ namespace Objetivos_Prioritarios.Models
         public virtual DbSet<tb_PersonaEmbedding> tb_PersonaEmbedding { get; set; }
         public virtual DbSet<tb_PersonaSourceAFIS> tb_PersonaSourceAFIS { get; set; }
     
-        public virtual ObjectResult<sp_BuscarDetenido_Result> sp_BuscarDetenido(Nullable<int> iDDETENIDO)
-        {
-            var iDDETENIDOParameter = iDDETENIDO.HasValue ?
-                new ObjectParameter("IDDETENIDO", iDDETENIDO) :
-                new ObjectParameter("IDDETENIDO", typeof(int));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<sp_BuscarDetenido_Result>("sp_BuscarDetenido", iDDETENIDOParameter);
-        }
-    
         public virtual ObjectResult<SP_SIC_ObtenerPersonas_Result> SP_SIC_ObtenerPersonas(string idsPersona)
         {
             var idsPersonaParameter = idsPersona != null ?
@@ -82,6 +71,15 @@ namespace Objetivos_Prioritarios.Models
         public virtual ObjectResult<sp_Alertas_Result> sp_Alertas()
         {
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<sp_Alertas_Result>("sp_Alertas");
+        }
+    
+        public virtual ObjectResult<sp_BuscarDetenido_Result> sp_BuscarDetenido(Nullable<int> iDDETENIDO)
+        {
+            var iDDETENIDOParameter = iDDETENIDO.HasValue ?
+                new ObjectParameter("IDDETENIDO", iDDETENIDO) :
+                new ObjectParameter("IDDETENIDO", typeof(int));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<sp_BuscarDetenido_Result>("sp_BuscarDetenido", iDDETENIDOParameter);
         }
     }
 }

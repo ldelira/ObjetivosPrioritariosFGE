@@ -26,6 +26,7 @@ namespace Objetivos_Prioritarios.Models
     
         public int idUsuario { get; set; }
         public string Usuario { get; set; }
+        public string Contrasena { get; set; }
         public string App { get; set; }
         public string Apm { get; set; }
         public string Nombre { get; set; }

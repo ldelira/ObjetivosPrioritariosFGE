@@ -27,5 +27,6 @@ namespace Objetivos_Prioritarios.Models
         public int TotalRegistrosDetenido { get; set; }
         public int TotalRegistroAlertas { get; set; }
         public string Foto { get; set; }
+        public string FotoOriginal { get; set; }
     }
 }

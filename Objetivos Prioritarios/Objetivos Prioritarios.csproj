@@ -485,6 +485,21 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>FiliacionMunicipal.edmx</DependentUpon>
     </Compile>
+    <Compile Include="Models\FiliacionMunicipalBitacoraQA.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>FiliacionMunicipalBitacoraQA.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\FiliacionMunicipalBitacoraQA.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>FiliacionMunicipalBitacoraQA.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\FiliacionMunicipalBitacoraQA.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>FiliacionMunicipalBitacoraQA.edmx</DependentUpon>
+    </Compile>
     <Compile Include="Models\FiscaliaWeb.Context.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -685,6 +700,12 @@
     </Compile>
     <Compile Include="Models\tb_AsuntoVictimas.cs">
       <DependentUpon>ObjetivosPrioritarios.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\tb_BitacoraAccesoResultado.cs">
+      <DependentUpon>FiliacionMunicipalBitacoraQA.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\tb_BitacoraBusqueda.cs">
+      <DependentUpon>FiliacionMunicipalBitacoraQA.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\tb_CarpetasObjetivo.cs">
       <DependentUpon>ObjetivosPrioritarios.tt</DependentUpon>
@@ -3037,6 +3058,16 @@
       <DependentUpon>Accesos.edmx</DependentUpon>
       <LastGenOutput>Accesos.cs</LastGenOutput>
     </Content>
+    <Content Include="Models\FiliacionMunicipalBitacoraQA.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>FiliacionMunicipalBitacoraQA.edmx</DependentUpon>
+      <LastGenOutput>FiliacionMunicipalBitacoraQA.Context.cs</LastGenOutput>
+    </Content>
+    <Content Include="Models\FiliacionMunicipalBitacoraQA.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>FiliacionMunicipalBitacoraQA.edmx</DependentUpon>
+      <LastGenOutput>FiliacionMunicipalBitacoraQA.cs</LastGenOutput>
+    </Content>
     <Content Include="Models\ModelObjetivoQA.Context.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <DependentUpon>ModelObjetivoQA.edmx</DependentUpon>
@@ -3549,6 +3580,13 @@
     </EntityDeploy>
     <Content Include="Models\Accesos.edmx.diagram">
       <DependentUpon>Accesos.edmx</DependentUpon>
+    </Content>
+    <EntityDeploy Include="Models\FiliacionMunicipalBitacoraQA.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>FiliacionMunicipalBitacoraQA.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <Content Include="Models\FiliacionMunicipalBitacoraQA.edmx.diagram">
+      <DependentUpon>FiliacionMunicipalBitacoraQA.edmx</DependentUpon>
     </Content>
     <None Include="Scripts\jquery-3.4.1.intellisense.js" />
     <Content Include="Scripts\DataTables\autoFill.bootstrap.js" />

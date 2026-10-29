@@ -4036,11 +4036,11 @@
     <Error Condition="!Exists('..\packages\OpenCvSharp4.runtime.win.4.13.0.20260627\build\netstandard\OpenCvSharp4.runtime.win.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\OpenCvSharp4.runtime.win.4.13.0.20260627\build\netstandard\OpenCvSharp4.runtime.win.targets'))" />
   </Target>
   <Import Project="..\packages\Microsoft.TypeScript.MSBuild.5.9.2\build\Microsoft.TypeScript.MSBuild.targets" Condition="Exists('..\packages\Microsoft.TypeScript.MSBuild.5.9.2\build\Microsoft.TypeScript.MSBuild.targets')" />
-  <Import Project="..\packages\OpenCvSharp4.runtime.win.4.13.0.20260627\build\netstandard\OpenCvSharp4.runtime.win.targets" Condition="Exists('..\packages\OpenCvSharp4.runtime.win.4.13.0.20260627\build\netstandard\OpenCvSharp4.runtime.win.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>
   <Target Name="AfterBuild">
   </Target> -->
+  <Import Project="..\packages\OpenCvSharp4.runtime.win.4.13.0.20260627\build\netstandard\OpenCvSharp4.runtime.win.targets" Condition="Exists('..\packages\OpenCvSharp4.runtime.win.4.13.0.20260627\build\netstandard\OpenCvSharp4.runtime.win.targets')" />
 </Project>

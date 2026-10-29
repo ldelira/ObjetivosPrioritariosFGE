@@ -2897,7 +2897,7 @@ ViewBag.idsrelacionados = idsrelacionados;
         //    }
 
         [HttpGet]
-        public async Task<ActionResult> DetalleCoincidenciaPartial(int idCoincidencia, bool tieneFotografiaConsulta = false, bool tieneHuellaConsulta = false)
+        public async Task<ActionResult> DetalleCoincidenciaPartial(int idCoincidencia, bool tieneFotografiaConsulta = false, bool tieneHuellaConsulta = false, bool registrarAcceso = false)
         {
             ResultadosCoincidenciasViewModel resultados = Session[SessionResultadosCoincidencias] as ResultadosCoincidenciasViewModel;
 
@@ -2922,6 +2922,18 @@ ViewBag.idsrelacionados = idsrelacionados;
             if (coincidencia == null)
             {
                 return HttpNotFound("No se encontró la coincidencia solicitada.");
+            }
+
+            if (registrarAcceso)
+            {
+                BitacoraBusquedaService.RegistrarAcceso(
+                    resultados.IdBitacoraBusqueda,
+                    coincidencia.IdTbFuente,
+                    coincidencia.IdPersona,
+                    coincidencia.IdCoincidencia,
+                    true,
+                    "VER_DETALLE"
+                );
             }
 
             bool fuenteIdentidadSoportada =
@@ -3314,7 +3326,7 @@ ViewBag.idsrelacionados = idsrelacionados;
                     idPersona,
                     idCoincidenciaOrigen,
                     contexto.CoincidenciaDirecta != null,
-                    "VER_DETALLE"
+                    "VER_DETALLE_FUENTE"
                 );
                 ViewBag.ContextoRegistroIdentidad = contexto;
                 ViewBag.Coincidencia = contexto.CoincidenciaDirecta;

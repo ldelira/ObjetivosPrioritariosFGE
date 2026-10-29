@@ -3326,7 +3326,7 @@ ViewBag.idsrelacionados = idsrelacionados;
                     idPersona,
                     idCoincidenciaOrigen,
                     contexto.CoincidenciaDirecta != null,
-                    "VER_DETALLE"
+                    "VER_DETALLE_FUENTE"
                 );
                 ViewBag.ContextoRegistroIdentidad = contexto;
                 ViewBag.Coincidencia = contexto.CoincidenciaDirecta;

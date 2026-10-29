@@ -3067,7 +3067,9 @@
                         $(this)
                             .closest(
                                 '.sic-resultado-persona'
-                            )
+                            ),
+                        undefined,
+                        true
                     );
                 }
             );
@@ -3092,7 +3094,9 @@
                     }
 
                     seleccionarResultadoDesdeElemento(
-                        $(this)
+                        $(this),
+                        undefined,
+                        true
                     );
                 }
             );
@@ -3116,7 +3120,9 @@
                     evento.preventDefault();
 
                     seleccionarResultadoDesdeElemento(
-                        $(this)
+                        $(this),
+                        undefined,
+                        true
                     );
                 }
             );
@@ -3533,7 +3539,8 @@
 
     function seleccionarResultadoDesdeElemento(
         elementoResultado,
-        abrirDetalle
+        abrirDetalle,
+        registrarAcceso
     ) {
         if (
             !elementoResultado ||
@@ -3550,14 +3557,16 @@
                 10
             ),
             elementoResultado,
-            abrirDetalle
+            abrirDetalle,
+            registrarAcceso
         );
     }
 
     function seleccionarCoincidencia(
         idCoincidencia,
         elementoResultado,
-        abrirDetalle
+        abrirDetalle,
+        registrarAcceso
     ) {
         if (
             isNaN(idCoincidencia) ||
@@ -3593,7 +3602,8 @@
 
                 cargarDetalleCoincidencia(
                     idCoincidencia,
-                    true
+                    true,
+                    registrarAcceso === true
                 );
             }
 
@@ -3602,7 +3612,8 @@
 
         cargarDetalleCoincidencia(
             idCoincidencia,
-            false
+            false,
+            registrarAcceso === true
         );
     }
 
@@ -3715,7 +3726,8 @@
 
     function cargarDetalleCoincidencia(
         idCoincidencia,
-        usarModalTablet
+        usarModalTablet,
+        registrarAcceso
     ) {
         const configuracion =
             window.sicCoincidenciasConfig || {};
@@ -3792,7 +3804,10 @@
                     tieneHuellaConsulta:
                         contexto.attr(
                             'data-tiene-huella'
-                        ) === 'true'
+                        ) === 'true',
+
+                    registrarAcceso:
+                        registrarAcceso === true
                 },
 
                 success:

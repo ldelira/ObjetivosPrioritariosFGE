@@ -9,6 +9,11 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Mvc;
+using OpenCvSharp;
+using CvPoint = OpenCvSharp.Point;
+using CvPoint2f = OpenCvSharp.Point2f;
+using IOPath = System.IO.Path;
+
 
 namespace Objetivos_Prioritarios.Controllers
 {
@@ -38,16 +43,20 @@ namespace Objetivos_Prioritarios.Controllers
         }
 
         [HttpGet]
-        public JsonResult ObtenerSIC()
+        public JsonResult ObtenerSIC(bool mostrarTodos = false)
         {
             try
             {
-                var registros = _filiacionService.GetAlertas() ?? new List<sp_Alertas_Result>();
+                // false = trae 1000
+                // true  = trae todos
+                var registros = _filiacionService.GetAlertas(mostrarTodos) ?? new List<sp_Alertas_Result>();
+
                 var idsDetenidos = registros
                     .Select(x => Convert.ToInt32(x.IdDetenidoC5))
                     .Where(x => x > 0)
                     .Distinct()
                     .ToList();
+
                 using (var db = new Filiacion_MunicipiosEntities())
                 {
                     // Se consultan todas las alertas reales porque un detenido puede tener varias.
@@ -60,18 +69,40 @@ namespace Objetivos_Prioritarios.Controllers
                             x.Estatus
                         })
                         .ToList();
+
                     var resumenPorDetenido = alertasDetalle
                         .GroupBy(x => Convert.ToInt32(x.idDetenidoC5))
                         .ToDictionary(
                             grupo => grupo.Key,
                             grupo => new
                             {
-                                TieneConfirmacionDetenidos = grupo.Any(x => (Convert.ToInt32(x.IdTbFuente) == 6 || Convert.ToInt32(x.IdTbFuente) == 1) && (Convert.ToInt32(x.Estatus) == 2)),
-                                TieneObjetivoConfirmado = grupo.Any(x => Convert.ToInt32(x.IdTbFuente) != 6 && Convert.ToInt32(x.IdTbFuente) != 1 && Convert.ToInt32(x.Estatus) == 2),
-                                TieneDetenidoResguardo = grupo.Any(x => Convert.ToInt32(x.IdTbFuente) != 6 && Convert.ToInt32(x.Estatus) == 3),
-                                TieneFuente6Activa = grupo.Any(x => (Convert.ToInt32(x.IdTbFuente) == 6 || Convert.ToInt32(x.IdTbFuente) == 1) && Convert.ToInt32(x.Estatus) != 0),
-                                TieneOtraFuenteActiva = grupo.Any(x => Convert.ToInt32(x.IdTbFuente) != 6 && Convert.ToInt32(x.IdTbFuente) != 1 && Convert.ToInt32(x.Estatus) != 0),
-                                TienePendiente = grupo.Any(x => Convert.ToInt32(x.Estatus) == 1),
+                                TieneConfirmacionDetenidos = grupo.Any(x =>
+                                    (Convert.ToInt32(x.IdTbFuente) == 6 ||
+                                     Convert.ToInt32(x.IdTbFuente) == 1) &&
+                                    Convert.ToInt32(x.Estatus) == 2),
+
+                                TieneObjetivoConfirmado = grupo.Any(x =>
+                                    Convert.ToInt32(x.IdTbFuente) != 6 &&
+                                    Convert.ToInt32(x.IdTbFuente) != 1 &&
+                                    Convert.ToInt32(x.Estatus) == 2),
+
+                                TieneDetenidoResguardo = grupo.Any(x =>
+                                    Convert.ToInt32(x.IdTbFuente) != 6 &&
+                                    Convert.ToInt32(x.Estatus) == 3),
+
+                                TieneFuente6Activa = grupo.Any(x =>
+                                    (Convert.ToInt32(x.IdTbFuente) == 6 ||
+                                     Convert.ToInt32(x.IdTbFuente) == 1) &&
+                                    Convert.ToInt32(x.Estatus) != 0),
+
+                                TieneOtraFuenteActiva = grupo.Any(x =>
+                                    Convert.ToInt32(x.IdTbFuente) != 6 &&
+                                    Convert.ToInt32(x.IdTbFuente) != 1 &&
+                                    Convert.ToInt32(x.Estatus) != 0),
+
+                                TienePendiente = grupo.Any(x =>
+                                    Convert.ToInt32(x.Estatus) == 1),
+
                                 FuentesActivas = string.Join(
                                     ",",
                                     grupo
@@ -82,11 +113,15 @@ namespace Objetivos_Prioritarios.Controllers
                                 )
                             }
                         );
+
                     var resultado = registros
                         .Select(registro =>
                         {
                             int idDetenidoC5 = Convert.ToInt32(registro.IdDetenidoC5);
-                            var resumen = resumenPorDetenido.ContainsKey(idDetenidoC5) ? resumenPorDetenido[idDetenidoC5] : null;
+
+                            var resumen = resumenPorDetenido.ContainsKey(idDetenidoC5)
+                                ? resumenPorDetenido[idDetenidoC5]
+                                : null;
 
                             return new
                             {
@@ -97,8 +132,17 @@ namespace Objetivos_Prioritarios.Controllers
                                 registro.TotalAlertas,
 
                                 // Campos anteriores conservados para no romper el JavaScript actual.
-                                Fuente = resumen != null ? resumen.FuentesActivas : Convert.ToString(registro.Fuente),
-                                Estatus = resumen == null ? Convert.ToInt32(registro.Estatus) : resumen.TieneConfirmacionDetenidos ? 2 : resumen.TienePendiente ? 1 : 0,
+                                Fuente = resumen != null
+                                    ? resumen.FuentesActivas
+                                    : Convert.ToString(registro.Fuente),
+
+                                Estatus = resumen == null
+                                    ? Convert.ToInt32(registro.Estatus)
+                                    : resumen.TieneConfirmacionDetenidos
+                                        ? 2
+                                        : resumen.TienePendiente
+                                            ? 1
+                                            : 0,
 
                                 // Indicadores calculados con todas las alertas reales del detenido.
                                 TieneConfirmacionDetenidos = resumen != null && resumen.TieneConfirmacionDetenidos,
@@ -109,6 +153,7 @@ namespace Objetivos_Prioritarios.Controllers
                             };
                         })
                         .ToList();
+
                     return Json(
                         new
                         {
@@ -151,23 +196,30 @@ namespace Objetivos_Prioritarios.Controllers
             var fotosC5 = _filiacionService.GetFotosDetenidoC5(idsrelacionados);
             var huellasC5 = _filiacionService.GetHuellasDetenidoC5(detenidoraiz);
             var rasgosC5 = _filiacionService.GetRasgosDetenidoC5(idsrelacionados);
+            var identificacionesC5 = _filiacionService.GetRutasIdentificacionDetenidoC5(idDetenido);
+            var pruebaFrente = identificacionesC5.Item1;
+            var pruebaReverso = identificacionesC5.Item2;
+            var FechaRegistro = _filiacionService.GetFechaRegistroDetenidoC5(idDetenido);
+            ViewBag.IdentificacionFrenteC5 = pruebaFrente;
+            ViewBag.IdentificacionReversoC5 = pruebaReverso;
             var conteoAlertas = _filiacionService.GetConteoAlertasPorEstatus(idsrelacionados);
-            var tiposAlertas = _filiacionService.GetTiposAlertas(idsrelacionados);
-            var datosDetenidoC5 = _filiacionService.GetDatosDetenidoC5(idsrelacionados);
-            var alertasTipo = _filiacionService.GetAlertaTipo(idsrelacionados);
+var tiposAlertas = _filiacionService.GetTiposAlertas(idsrelacionados);
+var datosDetenidoC5 = _filiacionService.GetDatosDetenidoC5(idsrelacionados);
+var alertasTipo = _filiacionService.GetAlertaTipo(idsrelacionados);
 
-            ViewBag.DetencionC5 = detencionesC5;
-            ViewBag.FotosC5 = fotosC5;
-            ViewBag.HuellasC5 = huellasC5;
-            ViewBag.RasgosC5 = rasgosC5;
-            ViewBag.TotalAlertasActivas = conteoAlertas.Item1;
-            ViewBag.TotalAlertasRevisadas = conteoAlertas.Item2;
-            ViewBag.TotalCoincidenciasConfirmadas = conteoAlertas.Item3;
-            ViewBag.TiposAlertas = tiposAlertas;
-            ViewBag.DatosDetenidoC5 = datosDetenidoC5;
-            ViewBag.IdDetenidoRaiz = detenidoraiz;
-            ViewBag.AlertasTipo = alertasTipo;
-            ViewBag.idsrelacionados = idsrelacionados;
+ViewBag.DetencionC5 = detencionesC5;
+            ViewBag.FechaRegistro = FechaRegistro;
+ViewBag.FotosC5 = fotosC5;
+ViewBag.HuellasC5 = huellasC5;
+ViewBag.RasgosC5 = rasgosC5;
+ViewBag.TotalAlertasActivas = conteoAlertas.Item1;
+ViewBag.TotalAlertasRevisadas = conteoAlertas.Item2;
+ViewBag.TotalCoincidenciasConfirmadas = conteoAlertas.Item3;
+ViewBag.TiposAlertas = tiposAlertas;
+ViewBag.DatosDetenidoC5 = datosDetenidoC5;
+ViewBag.IdDetenidoRaiz = detenidoraiz;
+ViewBag.AlertasTipo = alertasTipo;
+ViewBag.idsrelacionados = idsrelacionados;
             bool identidadConfirmada = false;
             bool esDeInteres = false;
 
@@ -916,9 +968,478 @@ namespace Objetivos_Prioritarios.Controllers
             }
         }
 
+        public ActionResult FotoIdentificacionC5(int idDetenido, int lado = 1)
+        {
+            var rutas = _filiacionService.GetRutasIdentificacionDetenidoC5(idDetenido);
+            string rutaRelativa = lado == 2 ? rutas.Item2 : rutas.Item1;
+
+            if (string.IsNullOrWhiteSpace(rutaRelativa))
+                return HttpNotFound();
+
+            rutaRelativa = rutaRelativa
+                .Replace('/', '\\')
+                .TrimStart('\\');
+
+            var rutaCompleta = IOPath.Combine(RutaBaseFotosC5, rutaRelativa);
+
+            if (!System.IO.File.Exists(rutaCompleta))
+                return HttpNotFound();
+
+            try
+            {
+                byte[] imagenOriginal = System.IO.File.ReadAllBytes(rutaCompleta);
+                byte[] identificacionRecortada;
+
+                if (TryRecortarIdentificacion(imagenOriginal, out identificacionRecortada))
+                    return File(identificacionRecortada, "image/jpeg");
+
+                string extension = IOPath.GetExtension(rutaCompleta).ToLowerInvariant();
+                string contentType = extension == ".png" ? "image/png" : "image/jpeg";
+
+                return File(imagenOriginal, contentType);
+            }
+            catch
+            {
+                return HttpNotFound();
+            }
+        }
+
+        public ActionResult DiagnosticoOpenCv()
+        {
+            string binAspNet = System.Web.HttpRuntime.BinDirectory;
+            string rutaEsperada = System.IO.Path.Combine(binAspNet, "OpenCvSharpExtern.dll");
+            string baseApp = AppDomain.CurrentDomain.BaseDirectory;
+
+            string[] encontrados = System.IO.Directory.Exists(binAspNet)
+                ? System.IO.Directory.GetFiles(binAspNet, "*OpenCvSharp*", System.IO.SearchOption.AllDirectories)
+                : new string[0];
+
+            string resultado =
+                "Base aplicación: " + baseApp + Environment.NewLine +
+                "BIN ASP.NET: " + binAspNet + Environment.NewLine +
+                "DLL esperada: " + rutaEsperada + Environment.NewLine +
+                "Existe DLL esperada: " + System.IO.File.Exists(rutaEsperada) + Environment.NewLine +
+                "Proceso 64 bits: " + Environment.Is64BitProcess + Environment.NewLine +
+                "SO 64 bits: " + Environment.Is64BitOperatingSystem + Environment.NewLine +
+                Environment.NewLine +
+                "Archivos OpenCvSharp encontrados:" + Environment.NewLine +
+                string.Join(Environment.NewLine, encontrados);
+
+            return Content(resultado, "text/plain");
+        }
+
+        private bool TryRecortarIdentificacion(byte[] imagenOriginal, out byte[] imagenRecortada)
+        {
+            imagenRecortada = null;
+
+            try
+            {
+                string dllOpenCv = Server.MapPath("~/bin/OpenCvSharpExtern.dll");
+                bool existeDllOpenCv = System.IO.File.Exists(dllOpenCv);
+
+                using (Mat original = Cv2.ImDecode(imagenOriginal, ImreadModes.Color))
+                {
+                    if (original.Empty()) return false;
+
+                    double escala = 1.0;
+                    int dimensionMaxima = Math.Max(original.Width, original.Height);
+                    if (dimensionMaxima > 1400) escala = 1400.0 / dimensionMaxima;
+
+                    using (Mat trabajo = new Mat())
+                    {
+                        if (escala < 1.0) Cv2.Resize(original, trabajo, new OpenCvSharp.Size(0, 0), escala, escala, InterpolationFlags.Area);
+                        else original.CopyTo(trabajo);
+
+                        using (Mat gris = new Mat())
+                        using (Mat blur = new Mat())
+                        using (Mat bordes = new Mat())
+                        using (Mat morfologia = new Mat())
+                        {
+                            Cv2.CvtColor(trabajo, gris, ColorConversionCodes.BGR2GRAY);
+                            Cv2.GaussianBlur(gris, blur, new OpenCvSharp.Size(5, 5), 0);
+                            Cv2.Canny(blur, bordes, 40, 130);
+
+                            using (Mat kernel = Cv2.GetStructuringElement(MorphShapes.Rect, new OpenCvSharp.Size(7, 7)))
+                            {
+                                Cv2.MorphologyEx(bordes, morfologia, MorphTypes.Close, kernel);
+                            }
+
+                            Point[][] contornos;
+                            HierarchyIndex[] jerarquia;
+
+                            Cv2.FindContours(morfologia, out contornos, out jerarquia, RetrievalModes.External, ContourApproximationModes.ApproxSimple);
+
+                            RotatedRect mejorRectangulo = new RotatedRect();
+                            double mejorPuntaje = 0;
+                            double areaImagen = trabajo.Width * trabajo.Height;
+
+                            foreach (Point[] contorno in contornos)
+                            {
+                                double areaContorno = Math.Abs(Cv2.ContourArea(contorno));
+                                if (areaContorno < areaImagen * 0.05) continue;
+
+                                RotatedRect rect = Cv2.MinAreaRect(contorno);
+
+                                double ancho = Math.Max(rect.Size.Width, rect.Size.Height);
+                                double alto = Math.Min(rect.Size.Width, rect.Size.Height);
+
+                                if (alto <= 0) continue;
+
+                                double proporcion = ancho / alto;
+                                if (proporcion < 1.30 || proporcion > 1.95) continue;
+
+                                double areaRectangulo = ancho * alto;
+                                if (areaRectangulo <= 0) continue;
+
+                                double rectangularidad = areaContorno / areaRectangulo;
+                                if (rectangularidad < 0.45) continue;
+
+                                double diferenciaRatio = Math.Abs(proporcion - 1.586);
+                                double puntaje = areaContorno * rectangularidad / (1.0 + diferenciaRatio * 2.0);
+
+                                if (puntaje > mejorPuntaje)
+                                {
+                                    mejorPuntaje = puntaje;
+                                    mejorRectangulo = rect;
+                                }
+                            }
+
+                            if (mejorPuntaje <= 0) return false;
+
+                            Point2f[] puntosTrabajo = mejorRectangulo.Points();
+                            Point2f[] puntosOriginal = puntosTrabajo.Select(p => new Point2f((float)(p.X / escala), (float)(p.Y / escala))).ToArray();
+                            Point2f[] ordenados = OrdenarEsquinas(puntosOriginal);
+
+                            float anchoSuperior = Distancia(ordenados[0], ordenados[1]);
+                            float anchoInferior = Distancia(ordenados[3], ordenados[2]);
+                            int anchoFinal = (int)Math.Max(anchoSuperior, anchoInferior);
+
+                            if (anchoFinal < 300) anchoFinal = 300;
+
+                            int altoFinal = (int)(anchoFinal / 1.586);
+
+                            Point2f[] destino =
+                            {
+                        new Point2f(0, 0),
+                        new Point2f(anchoFinal - 1, 0),
+                        new Point2f(anchoFinal - 1, altoFinal - 1),
+                        new Point2f(0, altoFinal - 1)
+                    };
+
+                            using (Mat matriz = Cv2.GetPerspectiveTransform(ordenados, destino))
+                            using (Mat resultado = new Mat())
+                            {
+                                Cv2.WarpPerspective(original, resultado, matriz, new OpenCvSharp.Size(anchoFinal, altoFinal), InterpolationFlags.Cubic, BorderTypes.Replicate);
+                                imagenRecortada = resultado.ImEncode(".jpg", new ImageEncodingParam(ImwriteFlags.JpegQuality, 94));
+                                return imagenRecortada != null && imagenRecortada.Length > 0;
+                            }
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                imagenRecortada = null;
+                return false;
+            }
+        }
+
+        //private bool DetectarEsquinasPorLineas(Mat bordes, int anchoImagen, int altoImagen, out Point2f[] mejoresEsquinas)
+        //{
+        //    mejoresEsquinas = null;
+
+        //    double longitudMinima = Math.Min(anchoImagen, altoImagen) * 0.18;
+        //    LineSegmentPoint[] lineas = Cv2.HoughLinesP(bordes, 1, Math.PI / 180.0, 40, longitudMinima, 20);
+
+        //    if (lineas == null || lineas.Length < 4) return false;
+
+        //    List<LineSegmentPoint> horizontales = lineas.Where(EsLineaHorizontal).OrderByDescending(LongitudLinea).Take(20).ToList();
+        //    List<LineSegmentPoint> verticales = lineas.Where(EsLineaVertical).OrderByDescending(LongitudLinea).Take(20).ToList();
+
+        //    if (horizontales.Count < 2 || verticales.Count < 2) return false;
+
+        //    double mejorPuntaje = 0;
+        //    double areaImagen = anchoImagen * altoImagen;
+
+        //    for (int h1 = 0; h1 < horizontales.Count - 1; h1++)
+        //    {
+        //        for (int h2 = h1 + 1; h2 < horizontales.Count; h2++)
+        //        {
+        //            LineSegmentPoint lineaH1 = horizontales[h1];
+        //            LineSegmentPoint lineaH2 = horizontales[h2];
+
+        //            if (Math.Abs(CentroY(lineaH1) - CentroY(lineaH2)) < altoImagen * 0.18) continue;
+
+        //            LineSegmentPoint superior = CentroY(lineaH1) < CentroY(lineaH2) ? lineaH1 : lineaH2;
+        //            LineSegmentPoint inferior = CentroY(lineaH1) < CentroY(lineaH2) ? lineaH2 : lineaH1;
+
+        //            for (int v1 = 0; v1 < verticales.Count - 1; v1++)
+        //            {
+        //                for (int v2 = v1 + 1; v2 < verticales.Count; v2++)
+        //                {
+        //                    LineSegmentPoint lineaV1 = verticales[v1];
+        //                    LineSegmentPoint lineaV2 = verticales[v2];
+
+        //                    if (Math.Abs(CentroX(lineaV1) - CentroX(lineaV2)) < anchoImagen * 0.18) continue;
+
+        //                    LineSegmentPoint izquierda = CentroX(lineaV1) < CentroX(lineaV2) ? lineaV1 : lineaV2;
+        //                    LineSegmentPoint derecha = CentroX(lineaV1) < CentroX(lineaV2) ? lineaV2 : lineaV1;
+
+        //                    Point2f superiorIzquierda;
+        //                    Point2f superiorDerecha;
+        //                    Point2f inferiorDerecha;
+        //                    Point2f inferiorIzquierda;
+
+        //                    if (!ObtenerInterseccion(superior, izquierda, out superiorIzquierda)) continue;
+        //                    if (!ObtenerInterseccion(superior, derecha, out superiorDerecha)) continue;
+        //                    if (!ObtenerInterseccion(inferior, derecha, out inferiorDerecha)) continue;
+        //                    if (!ObtenerInterseccion(inferior, izquierda, out inferiorIzquierda)) continue;
+
+        //                    Point2f[] puntos =
+        //                    {
+        //                superiorIzquierda,
+        //                superiorDerecha,
+        //                inferiorDerecha,
+        //                inferiorIzquierda
+        //            };
+
+        //                    puntos = OrdenarEsquinas(puntos);
+
+        //                    if (!EsCuadrilateroValido(puntos, anchoImagen, altoImagen)) continue;
+
+        //                    double area = AreaCuadrilatero(puntos);
+        //                    if (area < areaImagen * 0.10 || area > areaImagen * 0.88) continue;
+
+        //                    double anchoSuperior = Distancia(puntos[0], puntos[1]);
+        //                    double anchoInferior = Distancia(puntos[3], puntos[2]);
+        //                    double altoIzquierdo = Distancia(puntos[0], puntos[3]);
+        //                    double altoDerecho = Distancia(puntos[1], puntos[2]);
+
+        //                    double anchoPromedio = (anchoSuperior + anchoInferior) / 2.0;
+        //                    double altoPromedio = (altoIzquierdo + altoDerecho) / 2.0;
+
+        //                    if (altoPromedio <= 0) continue;
+
+        //                    double ratio = anchoPromedio / altoPromedio;
+        //                    if (ratio < 1.20 || ratio > 2.15) continue;
+
+        //                    double diferenciaRatio = Math.Abs(ratio - 1.586);
+        //                    double similitudLados = Math.Min(anchoSuperior, anchoInferior) / Math.Max(anchoSuperior, anchoInferior);
+        //                    similitudLados *= Math.Min(altoIzquierdo, altoDerecho) / Math.Max(altoIzquierdo, altoDerecho);
+
+        //                    double longitudBordes = LongitudLinea(superior) + LongitudLinea(inferior) + LongitudLinea(izquierda) + LongitudLinea(derecha);
+        //                    double puntaje = area * similitudLados * (1.0 / (1.0 + diferenciaRatio * 2.0)) + longitudBordes * 50.0;
+
+        //                    if (puntaje > mejorPuntaje)
+        //                    {
+        //                        mejorPuntaje = puntaje;
+        //                        mejoresEsquinas = puntos;
+        //                    }
+        //                }
+        //            }
+        //        }
+        //    }
+
+        //    return mejoresEsquinas != null;
+        //}
+
+        //private bool EsLineaHorizontal(LineSegmentPoint linea)
+        //{
+        //    double dx = linea.P2.X - linea.P1.X;
+        //    double dy = linea.P2.Y - linea.P1.Y;
+        //    double angulo = Math.Abs(Math.Atan2(dy, dx) * 180.0 / Math.PI);
+        //    if (angulo > 90) angulo = 180 - angulo;
+        //    return angulo <= 35;
+        //}
+
+        //private bool EsLineaVertical(LineSegmentPoint linea)
+        //{
+        //    double dx = linea.P2.X - linea.P1.X;
+        //    double dy = linea.P2.Y - linea.P1.Y;
+        //    double angulo = Math.Abs(Math.Atan2(dy, dx) * 180.0 / Math.PI);
+        //    if (angulo > 90) angulo = 180 - angulo;
+        //    return angulo >= 55;
+        //}
+
+        //private double LongitudLinea(LineSegmentPoint linea)
+        //{
+        //    double dx = linea.P2.X - linea.P1.X;
+        //    double dy = linea.P2.Y - linea.P1.Y;
+        //    return Math.Sqrt(dx * dx + dy * dy);
+        //}
+
+        //private double CentroX(LineSegmentPoint linea)
+        //{
+        //    return (linea.P1.X + linea.P2.X) / 2.0;
+        //}
+
+        //private double CentroY(LineSegmentPoint linea)
+        //{
+        //    return (linea.P1.Y + linea.P2.Y) / 2.0;
+        //}
+
+        //private bool ObtenerInterseccion(LineSegmentPoint linea1, LineSegmentPoint linea2, out Point2f punto)
+        //{
+        //    punto = new Point2f();
+
+        //    double x1 = linea1.P1.X;
+        //    double y1 = linea1.P1.Y;
+        //    double x2 = linea1.P2.X;
+        //    double y2 = linea1.P2.Y;
+
+        //    double x3 = linea2.P1.X;
+        //    double y3 = linea2.P1.Y;
+        //    double x4 = linea2.P2.X;
+        //    double y4 = linea2.P2.Y;
+
+        //    double denominador = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
+        //    if (Math.Abs(denominador) < 0.0001) return false;
+
+        //    double determinante1 = x1 * y2 - y1 * x2;
+        //    double determinante2 = x3 * y4 - y3 * x4;
+
+        //    double px = (determinante1 * (x3 - x4) - (x1 - x2) * determinante2) / denominador;
+        //    double py = (determinante1 * (y3 - y4) - (y1 - y2) * determinante2) / denominador;
+
+        //    if (double.IsNaN(px) || double.IsNaN(py) || double.IsInfinity(px) || double.IsInfinity(py)) return false;
+
+        //    punto = new Point2f((float)px, (float)py);
+        //    return true;
+        //}
+
+        //private bool EsCuadrilateroValido(Point2f[] puntos, int ancho, int alto)
+        //{
+        //    if (puntos == null || puntos.Length != 4) return false;
+
+        //    float margenX = ancho * 0.12f;
+        //    float margenY = alto * 0.12f;
+
+        //    foreach (Point2f p in puntos)
+        //    {
+        //        if (p.X < -margenX || p.Y < -margenY || p.X > ancho + margenX || p.Y > alto + margenY) return false;
+        //    }
+
+        //    CvPoint[] enteros = puntos.Select(p => new CvPoint((int)Math.Round(p.X), (int)Math.Round(p.Y))).ToArray();
+        //    if (!Cv2.IsContourConvex(enteros)) return false;
+
+        //    float anchoSuperior = Distancia(puntos[0], puntos[1]);
+        //    float anchoInferior = Distancia(puntos[3], puntos[2]);
+        //    float altoIzquierdo = Distancia(puntos[0], puntos[3]);
+        //    float altoDerecho = Distancia(puntos[1], puntos[2]);
+
+        //    if (anchoSuperior < ancho * 0.20f || anchoInferior < ancho * 0.20f) return false;
+        //    if (altoIzquierdo < alto * 0.12f || altoDerecho < alto * 0.12f) return false;
+
+        //    double diferenciaAnchos = Math.Max(anchoSuperior, anchoInferior) / Math.Max(1.0, Math.Min(anchoSuperior, anchoInferior));
+        //    double diferenciaAltos = Math.Max(altoIzquierdo, altoDerecho) / Math.Max(1.0, Math.Min(altoIzquierdo, altoDerecho));
+
+        //    if (diferenciaAnchos > 1.80 || diferenciaAltos > 1.80) return false;
+
+        //    return true;
+        //}
+
+        //private double AreaCuadrilatero(Point2f[] puntos)
+        //{
+        //    double area = 0;
+
+        //    for (int i = 0; i < puntos.Length; i++)
+        //    {
+        //        Point2f actual = puntos[i];
+        //        Point2f siguiente = puntos[(i + 1) % puntos.Length];
+        //        area += actual.X * siguiente.Y - siguiente.X * actual.Y;
+        //    }
+
+        //    return Math.Abs(area) / 2.0;
+        //}
+
+        private Point2f[] OrdenarEsquinas(Point2f[] puntos)
+        {
+            Point2f[] resultado = new Point2f[4];
+            resultado[0] = puntos.OrderBy(p => p.X + p.Y).First();
+            resultado[2] = puntos.OrderByDescending(p => p.X + p.Y).First();
+            resultado[1] = puntos.OrderByDescending(p => p.X - p.Y).First();
+            resultado[3] = puntos.OrderBy(p => p.X - p.Y).First();
+            return resultado;
+        }
+
+        private float Distancia(Point2f punto1, Point2f punto2)
+        {
+            double x = punto1.X - punto2.X;
+            double y = punto1.Y - punto2.Y;
+            return (float)Math.Sqrt(x * x + y * y);
+        }
+
+        //private Point2f[] ExpandirCuadrilatero(Point2f[] puntos, float factor)
+        //{
+        //    float centroX = puntos.Average(p => p.X);
+        //    float centroY = puntos.Average(p => p.Y);
+
+        //    Point2f[] resultado = new Point2f[puntos.Length];
+
+        //    for (int i = 0; i < puntos.Length; i++)
+        //    {
+        //        float x = centroX + (puntos[i].X - centroX) * factor;
+        //        float y = centroY + (puntos[i].Y - centroY) * factor;
+        //        resultado[i] = new Point2f(x, y);
+        //    }
+
+        //    return resultado;
+        //}
+
+        //private Point2f[] LimitarPuntosImagen(Point2f[] puntos, int ancho, int alto)
+        //{
+        //    return puntos.Select(p => new Point2f(Math.Max(0, Math.Min(ancho - 1, p.X)), Math.Max(0, Math.Min(alto - 1, p.Y)))).ToArray();
+        //}
+
+
         public ActionResult FotoGaleriaC5(int idFoto)
         {
             var foto = _filiacionService.GetFotoC5PorId(idFoto);
+
+            if (foto == null)
+            {
+                return HttpNotFound();
+            }
+            string rutaFotoBD = foto.RutaImagen;
+
+            if (string.IsNullOrWhiteSpace(rutaFotoBD))
+            {
+                return HttpNotFound();
+            }
+            rutaFotoBD = rutaFotoBD
+                .Trim()
+                .Trim('"')
+                .Trim()
+                .TrimStart('/', '\\')
+                .Replace("/", "\\");
+            string rutaCompleta = Path.Combine(RutaBaseFotosC5, rutaFotoBD);
+            string extension = Path.GetExtension(rutaCompleta).ToLower();
+            string contentType = ObtenerContentType(extension);
+
+            try
+            {
+                byte[] fileBytes;
+                // Se abre la conexión con credenciales
+                using (new NetworkConnection(RutaBaseFotosC5, @"Fiscalia1", "A1b2c3d4"))
+                {
+                    if (!System.IO.File.Exists(rutaCompleta))
+                    {
+                        return HttpNotFound();
+                    }
+                    // Se lee el archivo mientras la conexión está activa
+                    fileBytes = System.IO.File.ReadAllBytes(rutaCompleta);
+                }
+                return File(fileBytes, contentType);
+            }
+            catch (Exception)
+            {
+                return HttpNotFound("Error al acceder al servidor de imágenes C5.");
+            }
+        }
+
+        public ActionResult RasgoGaleriaC5(int idFoto)
+        {
+            var foto = _filiacionService.GetRasgoC5PorId(idFoto);
 
             if (foto == null)
             {

@@ -1,9 +1,9 @@
-﻿@model System.Collections.Generic.List<Objetivos_Prioritarios.Models.tb_FotosDetenido_C5>
+﻿@model System.Collections.Generic.List<Objetivos_Prioritarios.Models.tb_FotoRasgos_C5>
 
 @using System
 
 @{
-    var rasgosC5 = Model ?? new System.Collections.Generic.List<Objetivos_Prioritarios.Models.tb_FotosDetenido_C5>();
+    var rasgosC5 = Model ?? new System.Collections.Generic.List<Objetivos_Prioritarios.Models.tb_FotoRasgos_C5>();
 }
 
 <div class="sic-media-box sic-gallery-box">
@@ -34,7 +34,7 @@
                     <div class="sic-gallery-image-wrap">
 
                         <img class="sic-gallery-foto"
-                             src="@Url.Action("FotoGaleriaC5", "SIC", new { idFoto = rasgo.IDFOTO })"
+                             src="@Url.Action("RasgoGaleriaC5", "SIC", new { idFoto = rasgo.IdFotoRasgos})"
                              alt="@ViewBag.Texto(rasgo.DescripcionFoto)"
                              onerror="mostrarErrorFotoGaleria(this);" />
 

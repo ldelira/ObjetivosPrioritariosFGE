@@ -68,9 +68,13 @@ namespace Objetivos_Prioritarios.Models
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<SP_SIC_ObtenerPersonas_Result>("SP_SIC_ObtenerPersonas", idsPersonaParameter);
         }
     
-        public virtual ObjectResult<sp_Alertas_Result> sp_Alertas()
+        public virtual ObjectResult<sp_Alertas_Result> sp_Alertas(Nullable<bool> mostrarTodos)
         {
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<sp_Alertas_Result>("sp_Alertas");
+            var mostrarTodosParameter = mostrarTodos.HasValue ?
+                new ObjectParameter("MostrarTodos", mostrarTodos) :
+                new ObjectParameter("MostrarTodos", typeof(bool));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<sp_Alertas_Result>("sp_Alertas", mostrarTodosParameter);
         }
     
         public virtual ObjectResult<sp_BuscarDetenido_Result> sp_BuscarDetenido(Nullable<int> iDDETENIDO)

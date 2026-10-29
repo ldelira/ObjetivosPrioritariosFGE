@@ -775,7 +775,9 @@ advertencia 6002: La tabla o vista 'Filiacion_Municipios.dbo.tb_PersonaSourceAFI
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Function Name="sp_Alertas" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
+        <Function Name="sp_Alertas" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="MostrarTodos" Type="bit" Mode="In" />
+        </Function>
         <Function Name="sp_BuscarDetenido" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
           <Parameter Name="IDDETENIDO" Type="int" Mode="In" />
         </Function>
@@ -953,12 +955,14 @@ advertencia 6002: La tabla o vista 'Filiacion_Municipios.dbo.tb_PersonaSourceAFI
     <edmx:ConceptualModels>
       <Schema Namespace="Filiacion_MunicipiosModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
         <EntityContainer Name="Filiacion_MunicipiosEntities" annotation:LazyLoadingEnabled="true">
+          <FunctionImport Name="sp_BuscarDetenido" ReturnType="Collection(Filiacion_MunicipiosModel.sp_BuscarDetenido_Result)">
+          <Parameter Name="IDDETENIDO" Mode="In" Type="Int32" />
+          </FunctionImport>
           <FunctionImport Name="SP_SIC_ObtenerPersonas" ReturnType="Collection(Filiacion_MunicipiosModel.SP_SIC_ObtenerPersonas_Result)">
             <Parameter Name="IdsPersona" Mode="In" Type="String" />
           </FunctionImport>
-          <FunctionImport Name="sp_Alertas" ReturnType="Collection(Filiacion_MunicipiosModel.sp_Alertas_Result)" />
-          <FunctionImport Name="sp_BuscarDetenido" ReturnType="Collection(Filiacion_MunicipiosModel.sp_BuscarDetenido_Result)">
-          <Parameter Name="IDDETENIDO" Mode="In" Type="Int32" />
+          <FunctionImport Name="sp_Alertas" ReturnType="Collection(Filiacion_MunicipiosModel.sp_Alertas_Result)">
+          <Parameter Name="MostrarTodos" Mode="In" Type="Boolean" />
           </FunctionImport>
           <EntitySet Name="cat_EstatusAlerta" EntityType="Filiacion_MunicipiosModel.cat_EstatusAlerta" />
           <EntitySet Name="cat_EstatusPeriodoBusqueda" EntityType="Filiacion_MunicipiosModel.cat_EstatusPeriodoBusqueda" />
@@ -1096,6 +1100,22 @@ advertencia 6002: La tabla o vista 'Filiacion_Municipios.dbo.tb_PersonaSourceAFI
             <End Role="tb_TrabajoSocial_C5" EntitySet="tb_TrabajoSocial_C5" />
           </AssociationSet>
           </EntityContainer>
+        <ComplexType Name="sp_BuscarDetenido_Result">
+          <Property Type="Int32" Name="IDDETENIDO" Nullable="false" />
+          <Property Type="Int32" Name="IDDETENCION" Nullable="true" />
+          <Property Type="String" Name="Nombre" Nullable="false" MaxLength="162" />
+          <Property Type="String" Name="ALIAS" Nullable="true" MaxLength="100" />
+          <Property Type="String" Name="EDAD" Nullable="true" MaxLength="3" />
+          <Property Type="String" Name="SEXO" Nullable="true" MaxLength="200" />
+          <Property Type="String" Name="Folio" Nullable="true" MaxLength="50" />
+          <Property Type="String" Name="SiglasMunicipio" Nullable="true" MaxLength="50" />
+          <Property Type="String" Name="MunicipioDetencion" Nullable="false" MaxLength="25" />
+          <Property Type="Int32" Name="TotalFotos" Nullable="false" />
+          <Property Type="Int32" Name="TotalHuellas" Nullable="false" />
+          <Property Type="Int32" Name="TotalRegistrosDetenido" Nullable="false" />
+          <Property Type="Int32" Name="TotalRegistroAlertas" Nullable="false" />
+          <Property Type="String" Name="Foto" Nullable="true" />
+        </ComplexType>
         <ComplexType Name="SP_SIC_ObtenerPersonas_Result">
           <Property Type="Int32" Name="idPersona" Nullable="false" />
           <Property Type="String" Name="NombreCompleto" Nullable="false" MaxLength="302" />
@@ -1121,28 +1141,11 @@ advertencia 6002: La tabla o vista 'Filiacion_Municipios.dbo.tb_PersonaSourceAFI
         <ComplexType Name="sp_Alertas_Result">
           <Property Type="Int32" Name="IdDetenidoC5" Nullable="false" />
           <Property Type="String" Name="NombrePersona" Nullable="false" MaxLength="202" />
-          <Property Type="String" Name="MunicipioDetencion" Nullable="false" MaxLength="4" />
+          <Property Type="String" Name="MunicipioDetencion" Nullable="true" MaxLength="25" />
           <Property Type="Int32" Name="TotalAlertas" Nullable="true" />
           <Property Type="DateTime" Name="FechaDetencion" Nullable="true" />
           <Property Type="Int32" Name="Estatus" Nullable="true" />
           <Property Type="String" Name="Fuente" Nullable="true" MaxLength="8000" />
-        </ComplexType>
-        <ComplexType Name="sp_BuscarDetenido_Result">
-          <Property Type="Int32" Name="IDDETENIDO" Nullable="false" />
-          <Property Type="Int32" Name="IDDETENCION" Nullable="true" />
-          <Property Type="String" Name="Nombre" Nullable="false" MaxLength="202" />
-          <Property Type="String" Name="ALIAS" Nullable="true" MaxLength="100" />
-          <Property Type="String" Name="EDAD" Nullable="true" MaxLength="3" />
-          <Property Type="String" Name="SEXO" Nullable="true" MaxLength="20" />
-          <Property Type="String" Name="Folio" Nullable="true" MaxLength="50" />
-          <Property Type="String" Name="SiglasMunicipio" Nullable="true" MaxLength="50" />
-          <Property Type="String" Name="MunicipioDetencion" Nullable="false" MaxLength="25" />
-          <Property Type="Int32" Name="TotalFotos" Nullable="false" />
-          <Property Type="Int32" Name="TotalHuellas" Nullable="false" />
-          <Property Type="Int32" Name="TotalRegistrosDetenido" Nullable="false" />
-          <Property Type="Int32" Name="TotalRegistroAlertas" Nullable="false" />
-          <Property Type="String" Name="Foto" Nullable="true" MaxLength="1000" />
-          <Property Type="String" Name="FotoOriginal" Nullable="true" MaxLength="1000" />
         </ComplexType>
         <EntityType Name="cat_EstatusAlerta">
           <Key>
@@ -1964,19 +1967,6 @@ advertencia 6002: La tabla o vista 'Filiacion_Municipios.dbo.tb_PersonaSourceAFI
     <edmx:Mappings>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
         <EntityContainerMapping StorageEntityContainer="Filiacion_MunicipiosModelStoreContainer" CdmEntityContainer="Filiacion_MunicipiosEntities">
-          <FunctionImportMapping FunctionImportName="sp_Alertas" FunctionName="Filiacion_MunicipiosModel.Store.sp_Alertas">
-            <ResultMapping>
-              <ComplexTypeMapping TypeName="Filiacion_MunicipiosModel.sp_Alertas_Result">
-                <ScalarProperty Name="IdDetenidoC5" ColumnName="IdDetenidoC5" />
-                <ScalarProperty Name="NombrePersona" ColumnName="NombrePersona" />
-                <ScalarProperty Name="MunicipioDetencion" ColumnName="MunicipioDetencion" />
-                <ScalarProperty Name="TotalAlertas" ColumnName="TotalAlertas" />
-                <ScalarProperty Name="FechaDetencion" ColumnName="FechaDetencion" />
-                <ScalarProperty Name="Estatus" ColumnName="Estatus" />
-                <ScalarProperty Name="Fuente" ColumnName="Fuente" />
-              </ComplexTypeMapping>
-            </ResultMapping>
-          </FunctionImportMapping>
           <FunctionImportMapping FunctionImportName="sp_BuscarDetenido" FunctionName="Filiacion_MunicipiosModel.Store.sp_BuscarDetenido">
             <ResultMapping>
               <ComplexTypeMapping TypeName="Filiacion_MunicipiosModel.sp_BuscarDetenido_Result">
@@ -1994,7 +1984,19 @@ advertencia 6002: La tabla o vista 'Filiacion_Municipios.dbo.tb_PersonaSourceAFI
                 <ScalarProperty Name="TotalRegistrosDetenido" ColumnName="TotalRegistrosDetenido" />
                 <ScalarProperty Name="TotalRegistroAlertas" ColumnName="TotalRegistroAlertas" />
                 <ScalarProperty Name="Foto" ColumnName="Foto" />
-                <ScalarProperty Name="FotoOriginal" ColumnName="FotoOriginal" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="sp_Alertas" FunctionName="Filiacion_MunicipiosModel.Store.sp_Alertas">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="Filiacion_MunicipiosModel.sp_Alertas_Result">
+                <ScalarProperty Name="IdDetenidoC5" ColumnName="IdDetenidoC5" />
+                <ScalarProperty Name="NombrePersona" ColumnName="NombrePersona" />
+                <ScalarProperty Name="MunicipioDetencion" ColumnName="MunicipioDetencion" />
+                <ScalarProperty Name="TotalAlertas" ColumnName="TotalAlertas" />
+                <ScalarProperty Name="FechaDetencion" ColumnName="FechaDetencion" />
+                <ScalarProperty Name="Estatus" ColumnName="Estatus" />
+                <ScalarProperty Name="Fuente" ColumnName="Fuente" />
               </ComplexTypeMapping>
             </ResultMapping>
           </FunctionImportMapping>

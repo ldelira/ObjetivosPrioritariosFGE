@@ -18,14 +18,32 @@ namespace Objetivos_Prioritarios.ControllersServices
 {
     public class FiliacionMunicipalService : BaseService
     {
-        public List<sp_Alertas_Result> GetAlertas()
+        public List<sp_Alertas_Result> GetAlertas(bool mostrarTodos = false)
         {
-            return dbFiliMuni.sp_Alertas().ToList();
+            return dbFiliMuni.sp_Alertas(mostrarTodos).ToList();
         }
 
         public sp_BuscarDetenido_Result GetInfoDetenido(int idDetenido)
         {
             return dbFiliMuni.sp_BuscarDetenido(idDetenido).FirstOrDefault();
+        }
+
+        public DateTime? GetFechaRegistroDetenidoC5(int idDetenido)
+        {
+            if (idDetenido <= 0)
+                return null;
+
+            using (var db = new Filiacion_MunicipiosEntities())
+            {
+                var fechaRegistro = db.tb_Detenido_C5
+                    .Where(x => x.IDDETENIDO == idDetenido)
+                    .Select(x => x.FechaRegistro)
+                    .FirstOrDefault();
+
+                return fechaRegistro.HasValue
+                    ? fechaRegistro.Value.Date
+                    : (DateTime?)null;
+            }
         }
 
         public List<Tuple<int, int, int, int, int, string>> GetAlertaTipo(List<int> idsDetenidos)
@@ -1197,8 +1215,21 @@ ORDER BY MJ.fecha_alta DESC;";
         {
             using (var db = new Filiacion_MunicipiosEntities())
             {
+
                 var resultado = db.tb_FotosDetenido_C5
                     .FirstOrDefault(x => x.IDFOTO == idFoto);
+
+                return resultado;
+            }
+        }
+
+        public tb_FotoRasgos_C5 GetRasgoC5PorId(int idFoto)
+        {
+            using (var db = new Filiacion_MunicipiosEntities())
+            {
+
+                var resultado = db.tb_FotoRasgos_C5
+                    .FirstOrDefault(x => x.IdFotoRasgos == idFoto);
 
                 return resultado;
             }
@@ -1232,14 +1263,14 @@ ORDER BY MJ.fecha_alta DESC;";
             }
         }
 
-        public List<tb_FotosDetenido_C5> GetRasgosDetenidoC5(List<int> idsDetenidos)
+        public List<tb_FotoRasgos_C5> GetRasgosDetenidoC5(List<int> idsDetenidos)
         {
 
             using (var db = new Filiacion_MunicipiosEntities())
             {
                 if (idsDetenidos == null || idsDetenidos.Count == 0)
                 {
-                    return new List<tb_FotosDetenido_C5>();
+                    return new List<tb_FotoRasgos_C5>();
                 }
 
                 idsDetenidos = idsDetenidos
@@ -1247,7 +1278,7 @@ ORDER BY MJ.fecha_alta DESC;";
                     .Distinct()
                     .ToList();
 
-                var resultado = db.tb_FotosDetenido_C5
+                var resultado = db.tb_FotoRasgos_C5
                     .Where(x =>
                         x.IDDETENIDO.HasValue &&
                         idsDetenidos.Contains(x.IDDETENIDO.Value) 
@@ -1258,13 +1289,54 @@ ORDER BY MJ.fecha_alta DESC;";
                         //x.FOTO != ""
                         )
                     .OrderBy(x => x.IDDETENIDO)
-                    .ThenBy(x => x.IDFOTO)
+                    .ThenBy(x => x.IdFotoRasgos)
                     .ToList();
 
                 return resultado;
             }
 
         }
+
+
+        public Tuple<string, string> GetRutasIdentificacionDetenidoC5(int idDetenido)
+        {
+            if (idDetenido <= 0) return Tuple.Create<string, string>(null, null);
+
+            using (var db = new Filiacion_MunicipiosEntities())
+            {
+                var fotos = db.tb_FotoIdentidicacion_C5
+                    .Where(x => x.IDDETENIDO.HasValue && x.IDDETENIDO.Value == idDetenido && x.RutaImagen != null && x.RutaImagen != "")
+                    .Select(x => new
+                    {
+                        x.IdFotoIdentidicacion,
+                        x.RutaImagen,
+                        x.DescripcionFoto
+                    })
+                    .ToList();
+
+                var frente = fotos.FirstOrDefault(x =>
+                    !string.IsNullOrWhiteSpace(x.DescripcionFoto) &&
+                    (x.DescripcionFoto.IndexOf("FRENTE", StringComparison.OrdinalIgnoreCase) >= 0));
+
+                var reverso = fotos.FirstOrDefault(x =>
+                    !string.IsNullOrWhiteSpace(x.DescripcionFoto) &&
+                    x.DescripcionFoto.IndexOf("REVERSO", StringComparison.OrdinalIgnoreCase) >= 0);
+
+                if (frente == null)
+                    frente = fotos.FirstOrDefault(x =>
+                        System.IO.Path.GetFileNameWithoutExtension(x.RutaImagen).EndsWith("_1", StringComparison.OrdinalIgnoreCase));
+
+                if (reverso == null)
+                    reverso = fotos.FirstOrDefault(x =>
+                        System.IO.Path.GetFileNameWithoutExtension(x.RutaImagen).EndsWith("_2", StringComparison.OrdinalIgnoreCase));
+
+                return Tuple.Create(
+                    frente != null ? frente.RutaImagen : null,
+                    reverso != null ? reverso.RutaImagen : null
+                );
+            }
+        }
+
 
         public Capea_boletin_busqueda GetCapeaPorId(int idCapea)
         {

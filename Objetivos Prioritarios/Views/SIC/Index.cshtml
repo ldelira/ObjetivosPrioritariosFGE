@@ -576,7 +576,70 @@
 
     .sic-toolbar-longitud {
         justify-self: start;
+        display: flex;
+        align-items: center;
+        gap: 90px;
     }
+
+    .sic-switch-todos {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        margin: 0;
+        color: #334155;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        user-select: none;
+    }
+
+        .sic-switch-todos input {
+            display: none;
+        }
+
+    .sic-contador-superior {
+        display: inline-block;
+        margin-left: 600px;
+        padding: 0;
+        background: transparent;
+        border: none;
+        border-radius: 0;
+        box-shadow: none;
+        color: #64748b;
+        font-size: 12px;
+        font-weight: 400;
+        white-space: nowrap;
+    }
+
+    .sic-switch-control {
+        position: relative;
+        width: 38px;
+        height: 20px;
+        background-color: #cbd5e1;
+        border-radius: 999px;
+        transition: background-color .2s ease;
+    }
+
+        .sic-switch-control::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 14px;
+            height: 14px;
+            background-color: #ffffff;
+            border-radius: 50%;
+            transition: transform .2s ease;
+            box-shadow: 0 1px 3px rgba(15, 23, 42, .25);
+        }
+
+    .sic-switch-todos input:checked + .sic-switch-control {
+        background-color: #003e8b;
+    }
+
+        .sic-switch-todos input:checked + .sic-switch-control::after {
+            transform: translateX(18px);
+        }
 
     .sic-toolbar-busqueda {
         justify-self: end;
@@ -1452,6 +1515,29 @@
             }
         );
 
+        function actualizarContadorSuperiorSIC() {
+
+            if (!tablaSIC) {
+                return;
+            }
+
+            var info = tablaSIC.page.info();
+
+            if (!info) {
+                return;
+            }
+
+            var cantidadMostrada = info.end - info.start;
+            var totalRegistros = info.recordsDisplay;
+
+            $('#sicContadorSuperior').text(
+                'Mostrando ' +
+                cantidadMostrada.toLocaleString('es-MX') +
+                ' de ' +
+                totalRegistros.toLocaleString('es-MX') +
+                ' registros'
+            );
+        }
 
         $(document).ready(function () {
 
@@ -1513,25 +1599,33 @@
 
                 ajax: {
 
-                    url: '@Url.Action("ObtenerSIC", "SIC")',
+                        url: '@Url.Action("ObtenerSIC", "SIC")',
 
-                    type: 'GET',
+                        type: 'GET',
 
-                    dataSrc: function (json) {
+                        data: function (d) {
 
-                        if (!json || json.success === false) {
+                            d.mostrarTodos =
+                                $('#switchMostrarTodos').is(':checked');
+                        },
 
-                            console.log(json ? json.message : 'No se recibió respuesta.');
+                        dataSrc: function (json) {
 
-                            return [];
+                            if (!json || json.success === false) {
 
+                                console.log(
+                                    json
+                                        ? json.message
+                                        : 'No se recibió respuesta.'
+                                );
+
+                                return [];
+                            }
+
+                            return json.data || [];
                         }
 
-                        return json.data || [];
-
-                    }
-
-                },
+                    },
 
                 columns: [
 
@@ -1695,10 +1789,44 @@
 
                     }
 
+                },
+                initComplete: function () {
+
+                    if ($('#switchMostrarTodos').length === 0) {
+
+                        $('.sic-toolbar-longitud').append(
+                            '<label class="sic-switch-todos" for="switchMostrarTodos">' +
+                            '<span>Mostrar todos</span>' +
+                            '<input type="checkbox" id="switchMostrarTodos">' +
+                            '<span class="sic-switch-control"></span>' +
+                            '</label>' +
+                            '<span id="sicContadorSuperior" class="sic-contador-superior"></span>'
+                        );
+                    }
+
+                    actualizarContadorSuperiorSIC();
+                },
+
+                drawCallback: function () {
+
+                    actualizarContadorSuperiorSIC();
                 }
 
             });
 
+            $(document)
+                .off('change.sicMostrarTodos', '#switchMostrarTodos')
+                .on(
+                    'change.sicMostrarTodos',
+                    '#switchMostrarTodos',
+                    function () {
+
+                        if (tablaSIC) {
+
+                            tablaSIC.ajax.reload(null, true);
+                        }
+                    }
+                );
 
             $(window).on('resize', function () {
 

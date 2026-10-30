@@ -41,7 +41,20 @@ namespace Objetivos_Prioritarios.Controllers
             ViewBag.Title = "SIC";
             ViewBag.ContactosMunicipios = _filiacionService.GetContactosMunicipios();
             return View();
+
+
         }
+        //public ActionResult Index()
+        //{
+        //    tb_Usuarios usuario = Session["User"] as tb_Usuarios;
+
+        //    if (usuario != null && string.Equals(usuario.nvarchar_no_interno, "ESALAS", StringComparison.OrdinalIgnoreCase))
+        //        return Redirect("https://tenor.com/es/view/mono-que-saca-el-dedo-gif-135373404158097339");
+
+        //    ViewBag.Title = "SIC";
+        //    ViewBag.ContactosMunicipios = _filiacionService.GetContactosMunicipios();
+        //    return View();
+        //}
 
         [HttpGet]
         public JsonResult ObtenerSIC(bool mostrarTodos = false)
@@ -185,6 +198,11 @@ namespace Objetivos_Prioritarios.Controllers
 
         public ActionResult DetalleDetenidoC5(int idDetenido)
         {
+            tb_Usuarios usuario = Session["User"] as tb_Usuarios;
+
+            //if (usuario != null && string.Equals(usuario.nvarchar_no_interno, "ESALAS", StringComparison.OrdinalIgnoreCase))
+            //    return Redirect("https://tenor.com/es/view/mono-que-saca-el-dedo-gif-135373404158097339");
+
             var detenido = _filiacionService.GetInfoDetenido(idDetenido);
             var detenidoraiz = detenido.IDDETENIDO;
 

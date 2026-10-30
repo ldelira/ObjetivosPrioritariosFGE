@@ -122,8 +122,6 @@ namespace Objetivos_Prioritarios.Models.Extends
 
         public string TipoMandamiento { get; set; }
 
-        public int IdEstadoProceso { get; set; }
-
         public string EstadoProceso { get; set; }
 
         public string Delito { get; set; }

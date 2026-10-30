@@ -1213,9 +1213,6 @@ namespace Objetivos_Prioritarios.ControllersServices
                     TipoMandamiento =
                         x.TipoMandamiento,
 
-                    IdEstadoProceso =
-                        x.IdEstadoProceso,
-
                     EstadoProceso =
                         x.EstadoProceso,
 

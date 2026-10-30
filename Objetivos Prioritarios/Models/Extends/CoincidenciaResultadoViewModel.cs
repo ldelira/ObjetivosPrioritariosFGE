@@ -190,7 +190,14 @@ namespace Objetivos_Prioritarios.Models.Extends
             {
                 return MandamientosJudiciales == null
                     ? 0
-                    : MandamientosJudiciales.Count(x => x.IdEstadoProceso == 6);
+                    : MandamientosJudiciales.Count(x =>
+                        !string.IsNullOrWhiteSpace(x.EstadoProceso) &&
+                        string.Equals(
+                            x.EstadoProceso.Trim(),
+                            "VIGENTE",
+                            StringComparison.OrdinalIgnoreCase
+                        )
+                    );
             }
         }
 

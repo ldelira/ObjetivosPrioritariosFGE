@@ -43,6 +43,25 @@ namespace Objetivos_Prioritarios.Models.Extends
     public class BitacoraBusquedaDetalleViewModel : BitacoraBusquedaListadoViewModel
     {
         public List<BitacoraAccesoResultadoViewModel> Accesos { get; set; } = new List<BitacoraAccesoResultadoViewModel>();
+        public List<BitacoraBusquedaArchivoViewModel> Archivos { get; set; } = new List<BitacoraBusquedaArchivoViewModel>();
+    }
+
+    public class BitacoraBusquedaArchivoViewModel
+    {
+        public long IdBitacoraArchivo { get; set; }
+        public long IdBitacoraBusqueda { get; set; }
+        public string TipoArchivo { get; set; }
+        public int? NumeroArchivo { get; set; }
+        public string RutaRelativa { get; set; }
+        public string NombreOriginal { get; set; }
+        public DateTime FechaRegistro { get; set; }
+    }
+
+    public class BitacoraArchivoContenidoViewModel
+    {
+        public byte[] Contenido { get; set; }
+        public string NombreArchivo { get; set; }
+        public string ContentType { get; set; }
     }
 
     public class BitacoraAccesoResultadoViewModel

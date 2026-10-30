@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Objetivos_Prioritarios.Models.Extends
 {
@@ -182,6 +183,24 @@ namespace Objetivos_Prioritarios.Models.Extends
             get;
             set;
         } = new List<MandamientoJudicialViewModel>();
+
+        public int TotalMandamientosActivos
+        {
+            get
+            {
+                return MandamientosJudiciales == null
+                    ? 0
+                    : MandamientosJudiciales.Count(x => x.IdEstadoProceso == 6);
+            }
+        }
+
+        public bool TieneMandamientoJudicialActivo
+        {
+            get
+            {
+                return TotalMandamientosActivos > 0;
+            }
+        }
 
 
         /*

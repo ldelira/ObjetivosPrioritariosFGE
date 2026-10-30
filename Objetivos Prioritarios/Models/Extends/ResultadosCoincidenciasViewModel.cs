@@ -4,6 +4,8 @@ namespace Objetivos_Prioritarios.Models.Extends
 {
     public class ResultadosCoincidenciasViewModel
     {
+        public long IdBitacoraBusqueda { get; set; }
+
         public int TotalCoincidencias { get; set; }
 
         public int TotalTexto { get; set; }

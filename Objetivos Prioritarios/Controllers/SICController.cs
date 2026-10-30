@@ -4,6 +4,7 @@ using Objetivos_Prioritarios.Models;
 using Objetivos_Prioritarios.Models.Extends;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Data;
 using System.IO;
 using System.Linq;
@@ -2516,17 +2517,24 @@ ViewBag.idsrelacionados = idsrelacionados;
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> BuscarCoincidencias(BusquedaCoincidenciasViewModel modelo)
         {
+            long idBitacoraBusqueda = 0;
+            Stopwatch swBitacora = Stopwatch.StartNew();
+
             try
             {
-
                 tb_Usuarios usuario = Session["User"] as tb_Usuarios;
-                string nombreUsuario = usuario != null? usuario.nvarchar_no_interno.ToUpper(): "";
+                string nombreUsuario = usuario != null ? usuario.nvarchar_no_interno.ToUpper() : "";
+
+                idBitacoraBusqueda = BitacoraBusquedaService.RegistrarInicio(
+                    modelo,
+                    nombreUsuario,
+                    Request.UserHostAddress,
+                    Request.UserAgent
+                );
+
                 if (nombreUsuario == ConfiguracionBusquedaService.LoginConfiguracion)
-                  //if (nombreUsuario == "LDELIRA")
-
-                    {
-
-                        int segundosEspera = ConfiguracionBusquedaService.ObtenerTiempoEspera();
+                {
+                    int segundosEspera = ConfiguracionBusquedaService.ObtenerTiempoEspera();
 
                     if (segundosEspera > 0)
                     {
@@ -2544,17 +2552,23 @@ ViewBag.idsrelacionados = idsrelacionados;
                             modelo
                         );
 
+                swBitacora.Stop();
+
+                resultado.IdBitacoraBusqueda = idBitacoraBusqueda;
+
+                BitacoraBusquedaService.RegistrarExito(
+                    idBitacoraBusqueda,
+                    resultado.TotalCoincidencias,
+                    swBitacora.ElapsedMilliseconds
+                );
+
                 /*
                  * Conservamos los resultados reales para que
-                 * el botón Ver detalle no vuelva a utilizar
-                 * las coincidencias simuladas.
+                 * el botón Ver detalle utilice exactamente
+                 * la misma búsqueda y la misma bitácora.
                  */
-                Session[
-                    SessionResultadosCoincidencias
-                ] = resultado;
-
-                // Conserva los resultados reales para que Ver detalle use la misma búsqueda.
                 Session[SessionResultadosCoincidencias] = resultado;
+
                 return PartialView(
                     "Coincidencias/ResultadosCoincidenciasPartial",
                     resultado
@@ -2562,6 +2576,7 @@ ViewBag.idsrelacionados = idsrelacionados;
             }
             catch (ArgumentException ex)
             {
+                RegistrarErrorBitacora(idBitacoraBusqueda, swBitacora, ex.Message);
                 Response.StatusCode = 400;
                 return Content(
                     ex.Message,
@@ -2570,7 +2585,7 @@ ViewBag.idsrelacionados = idsrelacionados;
             }
             catch (InvalidOperationException ex)
             {
-                // Errores devueltos por la API o por su configuración.
+                RegistrarErrorBitacora(idBitacoraBusqueda, swBitacora, ex.Message);
                 Response.StatusCode = 502;
                 return Content(
                     ex.Message,
@@ -2579,6 +2594,7 @@ ViewBag.idsrelacionados = idsrelacionados;
             }
             catch (System.Net.Http.HttpRequestException ex)
             {
+                RegistrarErrorBitacora(idBitacoraBusqueda, swBitacora, ex.Message);
                 Response.StatusCode = 503;
                 return Content(
                     "No fue posible comunicarse con la API biométrica. " +
@@ -2586,21 +2602,44 @@ ViewBag.idsrelacionados = idsrelacionados;
                     "text/plain"
                 );
             }
-            catch (TaskCanceledException)
+            catch (TaskCanceledException ex)
             {
+                RegistrarErrorBitacora(idBitacoraBusqueda, swBitacora, ex.Message);
                 Response.StatusCode = 504;
                 return Content(
                     "La API biométrica superó el tiempo máximo de espera.",
                     "text/plain"
                 );
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                RegistrarErrorBitacora(idBitacoraBusqueda, swBitacora, ex.Message);
                 Response.StatusCode = 500;
                 return Content(
                     "Ocurrió un error al buscar las coincidencias biométricas.",
                     "text/plain"
                 );
+            }
+        }
+
+        private static void RegistrarErrorBitacora(long idBitacoraBusqueda, Stopwatch swBitacora, string error)
+        {
+            if (swBitacora != null && swBitacora.IsRunning) swBitacora.Stop();
+
+            try
+            {
+                BitacoraBusquedaService.RegistrarError(
+                    idBitacoraBusqueda,
+                    swBitacora == null ? 0 : swBitacora.ElapsedMilliseconds,
+                    error
+                );
+            }
+            catch
+            {
+                /*
+                 * No sustituimos el error original de la búsqueda
+                 * por un segundo error al actualizar la bitácora.
+                 */
             }
         }
 
@@ -2858,7 +2897,7 @@ ViewBag.idsrelacionados = idsrelacionados;
         //    }
 
         [HttpGet]
-        public async Task<ActionResult> DetalleCoincidenciaPartial(int idCoincidencia, bool tieneFotografiaConsulta = false, bool tieneHuellaConsulta = false)
+        public async Task<ActionResult> DetalleCoincidenciaPartial(int idCoincidencia, bool tieneFotografiaConsulta = false, bool tieneHuellaConsulta = false, bool registrarAcceso = false)
         {
             ResultadosCoincidenciasViewModel resultados = Session[SessionResultadosCoincidencias] as ResultadosCoincidenciasViewModel;
 
@@ -2883,6 +2922,18 @@ ViewBag.idsrelacionados = idsrelacionados;
             if (coincidencia == null)
             {
                 return HttpNotFound("No se encontró la coincidencia solicitada.");
+            }
+
+            if (registrarAcceso)
+            {
+                BitacoraBusquedaService.RegistrarAcceso(
+                    resultados.IdBitacoraBusqueda,
+                    coincidencia.IdTbFuente,
+                    coincidencia.IdPersona,
+                    coincidencia.IdCoincidencia,
+                    true,
+                    "VER_DETALLE"
+                );
             }
 
             bool fuenteIdentidadSoportada =
@@ -3269,6 +3320,14 @@ ViewBag.idsrelacionados = idsrelacionados;
                         break;
                 }
                 if (contexto.DetalleInstitucional == null) return HttpNotFound();
+                BitacoraBusquedaService.RegistrarAcceso(
+                    resultados.IdBitacoraBusqueda,
+                    idTbFuente,
+                    idPersona,
+                    idCoincidenciaOrigen,
+                    contexto.CoincidenciaDirecta != null,
+                    "VER_DETALLE_FUENTE"
+                );
                 ViewBag.ContextoRegistroIdentidad = contexto;
                 ViewBag.Coincidencia = contexto.CoincidenciaDirecta;
                 if (idTbFuente == 3)

@@ -659,12 +659,12 @@ else
                             </div>
                         }
 
-                        @if (item.TieneAvisoMandamientos)
+                        @if (item.TieneMandamientoJudicialActivo)
                         {
                             <div class="sic-aviso-mandamiento-listado">
                                 <i class="fa fa-exclamation-triangle"></i>
-                                <span>Coincidencia nominal en Mandamientos Judiciales</span>
-                                <strong>@item.TotalMandamientos</strong>
+                                <span>@(item.TotalMandamientosActivos == 1 ? "Mandamiento Judicial Vigente" : "Mandamientos Judiciales Vigentes")</span>
+                                <strong>@item.TotalMandamientosActivos</strong>
                             </div>
                         }
 

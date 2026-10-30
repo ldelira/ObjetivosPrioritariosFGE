@@ -221,7 +221,7 @@
             </div>
         </div>
 
-        @if (principal.TieneAvisoMandamientos)
+        @if (principal.TieneMandamientoJudicialActivo)
         {
             <div class="sic-identidad-alertas">
 
@@ -235,14 +235,12 @@
                     </div>
 
                     <div>
-                        <strong>Mandamientos Judiciales</strong>
-                        <span>
-                            Coincidencia nominal detectada
-                        </span>
+                        <strong>@(principal.TotalMandamientosActivos == 1 ? "Mandamiento Judicial Vigente" : "Mandamientos Judiciales Vigentes")</strong>
+                        <span>Coincidencia nominal con mandamiento vigente</span>
                     </div>
 
                     <span class="sic-identidad-alerta-total">
-                        @principal.TotalMandamientos
+                        @principal.TotalMandamientosActivos
                     </span>
                 </div>
 

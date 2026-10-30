@@ -284,6 +284,7 @@
     <Compile Include="ControllersServices\FichaObjetivoService.cs" />
     <Compile Include="ControllersServices\ObjetivoService.cs" />
     <Compile Include="ControllersServices\CoincidenciasBiometricasService.cs" />
+    <Compile Include="ControllersServices\BitacoraBusquedaService.cs" />
     <Compile Include="ControllersServices\ReporteService.cs" />
     <Compile Include="Controllers\ABaseController.cs" />
     <Compile Include="Controllers\AccesosController.cs" />

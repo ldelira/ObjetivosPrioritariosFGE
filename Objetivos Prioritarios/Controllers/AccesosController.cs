@@ -271,7 +271,9 @@ namespace Objetivos_Prioritarios.Controllers
                         resultado.Message
                 }
             );
-        }        private bool PuedeAdministrarAccesos()
+        }
+
+        private bool PuedeAdministrarAccesos()
         {
             return
                 EsAdministrador() ||

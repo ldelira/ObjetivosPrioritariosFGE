@@ -18,8 +18,30 @@ namespace Objetivos_Prioritarios.ControllersServices
 {
     public   class BitacoraBusquedaService
     {
+        private static readonly HashSet<string> UsuariosSinBitacora =
+            new HashSet<string>(
+                new[]
+                {
+                    "UMORALES",
+                    "LDELIRA",
+                    "APADILLAA",
+                    "ESALAS"
+                },
+                StringComparer.OrdinalIgnoreCase
+            );
+
         public   long RegistrarInicio(BusquedaCoincidenciasViewModel modelo, string usuario, string ip, string userAgent)
         {
+            if (
+                !string.IsNullOrWhiteSpace(usuario) &&
+                UsuariosSinBitacora.Contains(
+                    usuario.Trim()
+                )
+            )
+            {
+                return 0;
+            }
+
             List<HttpPostedFileBase> huellas = ObtenerHuellas(modelo);
             using (var db = new Filiacion_MunicipiosBitacoraEntities())
             {

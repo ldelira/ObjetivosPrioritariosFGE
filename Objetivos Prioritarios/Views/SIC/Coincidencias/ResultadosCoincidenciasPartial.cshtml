@@ -659,7 +659,15 @@ else
                             </div>
                         }
 
-                        @if (item.TieneAvisoMandamientos)
+                        @if (item.TieneMandamientoJudicialActivo)
+                        {
+                            <div class="sic-aviso-mandamiento-listado">
+                                <i class="fa fa-exclamation-triangle"></i>
+                                <span>@(item.TotalMandamientosActivos == 1 ? "Mandamiento Judicial Activo" : "Mandamientos Judiciales Activos")</span>
+                                <strong>@item.TotalMandamientosActivos</strong>
+                            </div>
+                        }
+                        else if (item.TieneAvisoMandamientos)
                         {
                             <div class="sic-aviso-mandamiento-listado">
                                 <i class="fa fa-exclamation-triangle"></i>

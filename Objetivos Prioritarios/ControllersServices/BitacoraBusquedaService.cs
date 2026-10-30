@@ -11,9 +11,9 @@ using System.Web;
 
 namespace Objetivos_Prioritarios.ControllersServices
 {
-    public static class BitacoraBusquedaService
+    public   class BitacoraBusquedaService
     {
-        public static long RegistrarInicio(BusquedaCoincidenciasViewModel modelo, string usuario, string ip, string userAgent)
+        public   long RegistrarInicio(BusquedaCoincidenciasViewModel modelo, string usuario, string ip, string userAgent)
         {
             List<HttpPostedFileBase> huellas = ObtenerHuellas(modelo);
             using (var db = new Filiacion_MunicipiosBitacoraEntities())
@@ -51,7 +51,7 @@ namespace Objetivos_Prioritarios.ControllersServices
             }
         }
 
-        public static void RegistrarExito(long idBitacoraBusqueda, int totalCoincidencias, long tiempoMs)
+        public   void RegistrarExito(long idBitacoraBusqueda, int totalCoincidencias, long tiempoMs)
         {
             if (idBitacoraBusqueda <= 0) return;
             using (var db = new Filiacion_MunicipiosBitacoraEntities())
@@ -66,7 +66,7 @@ namespace Objetivos_Prioritarios.ControllersServices
             }
         }
 
-        public static void RegistrarError(long idBitacoraBusqueda, long tiempoMs, string error)
+        public void RegistrarError(long idBitacoraBusqueda, long tiempoMs, string error)
         {
             if (idBitacoraBusqueda <= 0) return;
             using (var db = new Filiacion_MunicipiosBitacoraEntities())
@@ -80,7 +80,7 @@ namespace Objetivos_Prioritarios.ControllersServices
             }
         }
 
-        public static void RegistrarAcceso(long idBitacoraBusqueda, int idTbFuente, int idPersona, int? idCoincidencia, bool esCoincidenciaDirecta, string tipoAccion)
+        public   void RegistrarAcceso(long idBitacoraBusqueda, int idTbFuente, int idPersona, int? idCoincidencia, bool esCoincidenciaDirecta, string tipoAccion)
         {
             if (idBitacoraBusqueda <= 0) return;
             using (var db = new Filiacion_MunicipiosBitacoraEntities())
@@ -99,7 +99,7 @@ namespace Objetivos_Prioritarios.ControllersServices
             }
         }
 
-        public static List<BitacoraBusquedaListadoViewModel> ObtenerBitacora(string usuario = null, int limite = 200)
+        public   List<BitacoraBusquedaListadoViewModel> ObtenerBitacora(string usuario = null, int limite = 200)
         {
             limite = Math.Max(1, Math.Min(limite, 500));
 
@@ -163,7 +163,7 @@ namespace Objetivos_Prioritarios.ControllersServices
             }
         }
 
-        public static BitacoraBusquedaDetalleViewModel ObtenerDetalle(long idBitacoraBusqueda)
+        public   BitacoraBusquedaDetalleViewModel ObtenerDetalle(long idBitacoraBusqueda)
         {
             if (idBitacoraBusqueda <= 0) return null;
 
@@ -234,7 +234,7 @@ namespace Objetivos_Prioritarios.ControllersServices
             }
         }
 
-        public static string ObtenerRutaFotografiaConsulta(long idBitacoraBusqueda)
+        public   string ObtenerRutaFotografiaConsulta(long idBitacoraBusqueda)
         {
             if (idBitacoraBusqueda <= 0 || HttpContext.Current == null) return null;
 
@@ -254,7 +254,7 @@ namespace Objetivos_Prioritarios.ControllersServices
             return archivos.FirstOrDefault();
         }
 
-        private static void GuardarFotografiaConsulta(long idBitacoraBusqueda, HttpPostedFileBase fotografia)
+        private   void GuardarFotografiaConsulta(long idBitacoraBusqueda, HttpPostedFileBase fotografia)
         {
             if (
                 idBitacoraBusqueda <= 0 ||
@@ -328,7 +328,7 @@ namespace Objetivos_Prioritarios.ControllersServices
             }
         }
 
-        private static string ObtenerNombreFuente(int idTbFuente)
+        private   string ObtenerNombreFuente(int idTbFuente)
         {
             switch (idTbFuente)
             {
@@ -354,7 +354,7 @@ namespace Objetivos_Prioritarios.ControllersServices
         }
 
 
-        private static List<HttpPostedFileBase> ObtenerHuellas(BusquedaCoincidenciasViewModel modelo)
+        private   List<HttpPostedFileBase> ObtenerHuellas(BusquedaCoincidenciasViewModel modelo)
         {
             var huellas = new List<HttpPostedFileBase>();
             if (modelo?.Huellas != null) huellas.AddRange(modelo.Huellas.Where(x => x != null && x.ContentLength > 0));
@@ -362,14 +362,14 @@ namespace Objetivos_Prioritarios.ControllersServices
             return huellas;
         }
 
-        private static string ObtenerTextoBusqueda(BusquedaCoincidenciasViewModel modelo)
+        private   string ObtenerTextoBusqueda(BusquedaCoincidenciasViewModel modelo)
         {
             if (modelo == null) return null;
             if (!string.IsNullOrWhiteSpace(modelo.NombreBusqueda)) return modelo.NombreBusqueda.Trim();
             return string.IsNullOrWhiteSpace(modelo.TextoBusqueda) ? null : modelo.TextoBusqueda.Trim();
         }
 
-        private static string CalcularHash(HttpPostedFileBase archivo)
+        private   string CalcularHash(HttpPostedFileBase archivo)
         {
             if (archivo == null || archivo.ContentLength <= 0 || archivo.InputStream == null || !archivo.InputStream.CanSeek) return null;
             Stream stream = archivo.InputStream;
@@ -391,7 +391,7 @@ namespace Objetivos_Prioritarios.ControllersServices
             }
         }
 
-        private static string Limitar(string valor, int longitud)
+        private   string Limitar(string valor, int longitud)
         {
             if (string.IsNullOrWhiteSpace(valor)) return null;
             valor = valor.Trim();

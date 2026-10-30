@@ -2640,7 +2640,7 @@ ViewBag.idsrelacionados = idsrelacionados;
             }
         }
 
-        private static void RegistrarErrorBitacora(long idBitacoraBusqueda, Stopwatch swBitacora, string error)
+        private  void RegistrarErrorBitacora(long idBitacoraBusqueda, Stopwatch swBitacora, string error)
         {
             if (swBitacora != null && swBitacora.IsRunning) swBitacora.Stop();
 

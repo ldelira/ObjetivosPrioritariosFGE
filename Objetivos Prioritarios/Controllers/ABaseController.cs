@@ -275,6 +275,18 @@ namespace Objetivos_Prioritarios.Controllers
                 return accesoService;
             }
         }
+        private BitacoraBusquedaService bitacoraBusquedaService = null;
+        public BitacoraBusquedaService BitacoraBusquedaService
+        {
+            get
+            {
+                if (bitacoraBusquedaService == null)
+                    bitacoraBusquedaService = new BitacoraBusquedaService();
+                return bitacoraBusquedaService;
+            }
+        }
+
+        
 
     }
 }

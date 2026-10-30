@@ -4,6 +4,28 @@
 
 <div class="container-fluid">
 
+    <ul class="nav nav-tabs mb-3" id="tabsAdministracionAccesos" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="tabAdministrar" data-bs-toggle="tab" data-bs-target="#panelAdministrar" type="button" role="tab">
+                <i class="fa fa-user-plus"></i> Administrar usuario
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="tabUsuarios" data-bs-toggle="tab" data-bs-target="#panelUsuarios" type="button" role="tab">
+                <i class="fa fa-users"></i> Usuarios registrados
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="tabBitacora" data-bs-toggle="tab" data-bs-target="#panelBitacora" type="button" role="tab">
+                <i class="fa fa-history"></i> Bitácora
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content">
+
+        <div class="tab-pane fade show active" id="panelAdministrar" role="tabpanel">
+
     <div class="card mb-3">
         <div class="card-body">
 
@@ -192,6 +214,143 @@
 
     </div>
 
+        </div>
+
+        <div class="tab-pane fade" id="panelUsuarios" role="tabpanel">
+
+            <div class="card">
+                <div class="card-body">
+
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <h5 class="card-title mb-1">
+                                <i class="fa fa-users"></i>
+                                Usuarios registrados
+                            </h5>
+                            <p class="text-muted mb-0">
+                                Usuarios dados de alta en Objetivos Prioritarios y perfiles asignados.
+                            </p>
+                        </div>
+
+                        <button type="button" id="btnRecargarUsuarios" class="btn btn-outline-primary btn-sm">
+                            <i class="fa fa-refresh"></i> Actualizar
+                        </button>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle" id="tablaUsuariosSistema">
+                            <thead>
+                                <tr>
+                                    <th>Estado</th>
+                                    <th>Login</th>
+                                    <th>Nombre</th>
+                                    <th>Puesto</th>
+                                    <th>Perfiles</th>
+                                    <th>Fecha alta</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="7" class="text-center text-muted">Seleccione la pestaña para cargar los usuarios.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+        <div class="tab-pane fade" id="panelBitacora" role="tabpanel">
+
+            <div class="card">
+                <div class="card-body">
+
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <h5 class="card-title mb-1">
+                                <i class="fa fa-history"></i>
+                                Bitácora de Búsqueda Intencionada
+                            </h5>
+                            <p class="text-muted mb-0">
+                                Consulte búsquedas realizadas y resultados abiertos por los usuarios.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="row g-2 mb-3">
+                        <div class="col-md-5 col-lg-4">
+                            <input type="text"
+                                   id="txtFiltroUsuarioBitacora"
+                                   class="form-control"
+                                   placeholder="Filtrar por login"
+                                   autocomplete="off" />
+                        </div>
+
+                        <div class="col-md-3 col-lg-2">
+                            <select id="ddlLimiteBitacora" class="form-select">
+                                <option value="100">Últimas 100</option>
+                                <option value="200" selected>Últimas 200</option>
+                                <option value="500">Últimas 500</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-4 col-lg-3">
+                            <button type="button" id="btnBuscarBitacora" class="btn btn-primary">
+                                <i class="fa fa-search"></i> Consultar
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle" id="tablaBitacora">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Usuario</th>
+                                    <th>Búsqueda</th>
+                                    <th>Biometría</th>
+                                    <th>Resultados</th>
+                                    <th>Consultados</th>
+                                    <th>Tiempo</th>
+                                    <th>Estado</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="9" class="text-center text-muted">Seleccione la pestaña para cargar la bitácora.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<div class="modal fade" id="modalDetalleBitacora" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fa fa-history"></i>
+                    Detalle de búsqueda
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body" id="contenidoDetalleBitacora">
+            </div>
+        </div>
+    </div>
 </div>
 
 
@@ -704,5 +863,595 @@
         );
 
     });
+
+
+
+    var usuariosRegistradosCargados = false;
+    var bitacoraCargada = false;
+
+
+    $("#tabUsuarios").on("shown.bs.tab", function () {
+
+        if (!usuariosRegistradosCargados) {
+            cargarUsuariosRegistrados();
+        }
+
+    });
+
+
+    $("#tabBitacora").on("shown.bs.tab", function () {
+
+        if (!bitacoraCargada) {
+            cargarBitacora();
+        }
+
+    });
+
+
+    $("#btnRecargarUsuarios").click(function () {
+
+        cargarUsuariosRegistrados();
+
+    });
+
+
+    $("#btnBuscarBitacora").click(function () {
+
+        cargarBitacora();
+
+    });
+
+
+    $("#txtFiltroUsuarioBitacora").keypress(function (e) {
+
+        if (e.which === 13) {
+            cargarBitacora();
+        }
+
+    });
+
+
+    function cargarUsuariosRegistrados() {
+
+        $("#tablaUsuariosSistema tbody").html(
+            '<tr><td colspan="7" class="text-center text-muted">Cargando usuarios...</td></tr>'
+        );
+
+        $.ajax({
+
+            url:
+                '@Url.Action("ListarUsuarios", "Accesos")',
+
+            type:
+                "GET",
+
+            success: function (respuesta) {
+
+                if (!respuesta.success) {
+
+                    swal(
+                        "Error",
+                        respuesta.message || "No fue posible consultar los usuarios.",
+                        "error"
+                    );
+
+                    return;
+                }
+
+                var html = "";
+
+                $.each(respuesta.usuarios || [], function (index, usuario) {
+
+                    var estado =
+                        usuario.Activo
+                            ? '<span class="badge bg-success">ACTIVO</span>'
+                            : '<span class="badge bg-danger">INACTIVO</span>';
+
+                    var perfiles = "";
+
+                    $.each(usuario.Perfiles || [], function (i, perfil) {
+
+                        perfiles +=
+                            '<span class="badge bg-light text-dark border me-1 mb-1">' +
+                            escaparHtml(perfil) +
+                            '</span>';
+
+                    });
+
+                    if (!perfiles) {
+                        perfiles = '<span class="text-muted">Sin perfil</span>';
+                    }
+
+                    html +=
+                        '<tr>' +
+                            '<td>' + estado + '</td>' +
+                            '<td class="fw-bold">' + escaparHtml(usuario.Login) + '</td>' +
+                            '<td>' + escaparHtml(usuario.Nombre) + '</td>' +
+                            '<td>' + escaparHtml(usuario.Puesto || "") + '</td>' +
+                            '<td>' + perfiles + '</td>' +
+                            '<td>' + formatearFecha(usuario.FechaAlta) + '</td>' +
+                            '<td class="text-end">' +
+                                '<button type="button" class="btn btn-outline-primary btn-sm btn-administrar-usuario" data-login="' + escaparAtributo(usuario.Login) + '">' +
+                                    '<i class="fa fa-pencil"></i> Administrar' +
+                                '</button>' +
+                            '</td>' +
+                        '</tr>';
+
+                });
+
+                if (!html) {
+                    html = '<tr><td colspan="7" class="text-center text-muted">No hay usuarios registrados.</td></tr>';
+                }
+
+                $("#tablaUsuariosSistema tbody").html(html);
+                usuariosRegistradosCargados = true;
+
+            },
+
+            error: function () {
+
+                $("#tablaUsuariosSistema tbody").html(
+                    '<tr><td colspan="7" class="text-center text-danger">No fue posible consultar los usuarios.</td></tr>'
+                );
+
+            }
+
+        });
+
+    }
+
+
+    $(document).on("click", ".btn-administrar-usuario", function () {
+
+        var login =
+            $(this).attr("data-login") || "";
+
+        $("#txtLoginUsuario").val(login);
+
+        var tabAdministrar =
+            new bootstrap.Tab(
+                document.getElementById("tabAdministrar")
+            );
+
+        tabAdministrar.show();
+
+        buscarUsuario();
+
+    });
+
+
+    function cargarBitacora() {
+
+        $("#tablaBitacora tbody").html(
+            '<tr><td colspan="9" class="text-center text-muted">Cargando bitácora...</td></tr>'
+        );
+
+        $.ajax({
+
+            url:
+                '@Url.Action("ListarBitacora", "Accesos")',
+
+            type:
+                "GET",
+
+            data:
+                {
+                    usuario:
+                        $("#txtFiltroUsuarioBitacora").val().trim(),
+
+                    limite:
+                        parseInt(
+                            $("#ddlLimiteBitacora").val(),
+                            10
+                        ) || 200
+                },
+
+            success: function (respuesta) {
+
+                if (!respuesta.success) {
+
+                    swal(
+                        "Error",
+                        respuesta.message || "No fue posible consultar la bitácora.",
+                        "error"
+                    );
+
+                    return;
+                }
+
+                var html = "";
+
+                $.each(respuesta.registros || [], function (index, item) {
+
+                    var busqueda = [];
+
+                    if (item.TextoBusqueda) {
+                        busqueda.push('<strong>' + escaparHtml(item.TextoBusqueda) + '</strong>');
+                    }
+
+                    if (item.AliasBusqueda) {
+                        busqueda.push('Alias: ' + escaparHtml(item.AliasBusqueda));
+                    }
+
+                    if (busqueda.length === 0) {
+                        busqueda.push('<span class="text-muted">Sólo biometría</span>');
+                    }
+
+                    var biometria = [];
+
+                    if (item.TieneFotografia) {
+                        biometria.push('<span class="badge bg-success"><i class="fa fa-camera"></i> Foto</span>');
+                    }
+
+                    if (item.CantidadHuellas > 0) {
+                        biometria.push('<span class="badge bg-primary"><i class="fa fa-hand-pointer-o"></i> ' + item.CantidadHuellas + ' huella(s)</span>');
+                    }
+
+                    if (biometria.length === 0) {
+                        biometria.push('<span class="text-muted">Sin biometría</span>');
+                    }
+
+                    var estado =
+                        item.Exito
+                            ? '<span class="badge bg-success">OK</span>'
+                            : '<span class="badge bg-danger">ERROR</span>';
+
+                    var tiempo =
+                        item.TiempoMs === null || item.TiempoMs === undefined
+                            ? ""
+                            : formatearTiempo(item.TiempoMs);
+
+                    html +=
+                        '<tr>' +
+                            '<td class="text-nowrap">' + formatearFecha(item.FechaBusqueda) + '</td>' +
+                            '<td class="fw-bold">' + escaparHtml(item.Usuario) + '</td>' +
+                            '<td>' + busqueda.join('<br />') + '</td>' +
+                            '<td>' + biometria.join(' ') + '</td>' +
+                            '<td class="text-center">' + item.TotalCoincidencias + '</td>' +
+                            '<td class="text-center">' + item.TotalAccesos + '</td>' +
+                            '<td class="text-nowrap">' + tiempo + '</td>' +
+                            '<td>' + estado + '</td>' +
+                            '<td class="text-end">' +
+                                '<button type="button" class="btn btn-outline-primary btn-sm btn-detalle-bitacora" data-id="' + item.IdBitacoraBusqueda + '">' +
+                                    '<i class="fa fa-eye"></i> Ver' +
+                                '</button>' +
+                            '</td>' +
+                        '</tr>';
+
+                });
+
+                if (!html) {
+                    html = '<tr><td colspan="9" class="text-center text-muted">No se encontraron búsquedas.</td></tr>';
+                }
+
+                $("#tablaBitacora tbody").html(html);
+                bitacoraCargada = true;
+
+            },
+
+            error: function () {
+
+                $("#tablaBitacora tbody").html(
+                    '<tr><td colspan="9" class="text-center text-danger">No fue posible consultar la bitácora.</td></tr>'
+                );
+
+            }
+
+        });
+
+    }
+
+
+    $(document).on("click", ".btn-detalle-bitacora", function () {
+
+        var id =
+            parseInt(
+                $(this).attr("data-id"),
+                10
+            );
+
+        if (!id) {
+            return;
+        }
+
+        $("#contenidoDetalleBitacora").html(
+            '<div class="text-center text-muted py-5">Cargando detalle...</div>'
+        );
+
+        var modal =
+            new bootstrap.Modal(
+                document.getElementById("modalDetalleBitacora")
+            );
+
+        modal.show();
+
+        $.ajax({
+
+            url:
+                '@Url.Action("DetalleBitacora", "Accesos")',
+
+            type:
+                "GET",
+
+            data:
+                {
+                    idBitacoraBusqueda: id
+                },
+
+            success: function (respuesta) {
+
+                if (!respuesta.success) {
+
+                    $("#contenidoDetalleBitacora").html(
+                        '<div class="alert alert-warning">' +
+                        escaparHtml(respuesta.message || "No se encontró la búsqueda.") +
+                        '</div>'
+                    );
+
+                    return;
+                }
+
+                renderizarDetalleBitacora(
+                    respuesta.detalle
+                );
+
+            },
+
+            error: function () {
+
+                $("#contenidoDetalleBitacora").html(
+                    '<div class="alert alert-danger">No fue posible consultar el detalle de la bitácora.</div>'
+                );
+
+            }
+
+        });
+
+    });
+
+
+    function renderizarDetalleBitacora(detalle) {
+
+        var fotoHtml = "";
+
+        if (detalle.TieneFotografia) {
+
+            if (detalle.FotografiaDisponible) {
+
+                fotoHtml =
+                    '<div class="col-lg-4">' +
+                        '<div class="border rounded p-3 h-100">' +
+                            '<div class="small text-muted mb-2">Fotografía utilizada</div>' +
+                            '<img src="@Url.Action("FotoBitacora", "Accesos")?idBitacoraBusqueda=' + detalle.IdBitacoraBusqueda + '&v=' + new Date().getTime() + '" ' +
+                                 'class="img-fluid rounded d-block mx-auto" ' +
+                                 'style="max-height:320px;" />' +
+                        '</div>' +
+                    '</div>';
+
+            }
+            else {
+
+                fotoHtml =
+                    '<div class="col-lg-4">' +
+                        '<div class="alert alert-secondary h-100 mb-0">' +
+                            '<strong>Fotografía utilizada</strong><br />' +
+                            'La búsqueda usó una fotografía, pero no existe copia visual. Esto es normal para registros creados antes de habilitar el resguardo.' +
+                        '</div>' +
+                    '</div>';
+
+            }
+
+        }
+
+        var accesosHtml = "";
+
+        $.each(detalle.Accesos || [], function (index, acceso) {
+
+            accesosHtml +=
+                '<tr>' +
+                    '<td class="text-nowrap">' + formatearFecha(acceso.FechaAcceso) + '</td>' +
+                    '<td>' + escaparHtml(acceso.Fuente) + '</td>' +
+                    '<td>' + acceso.IdPersona + '</td>' +
+                    '<td>' + escaparHtml(acceso.TipoAccion) + '</td>' +
+                    '<td>' + (acceso.EsCoincidenciaDirecta ? 'Directa' : 'Relacionada') + '</td>' +
+                '</tr>';
+
+        });
+
+        if (!accesosHtml) {
+            accesosHtml = '<tr><td colspan="5" class="text-center text-muted">No se registraron aperturas de resultados.</td></tr>';
+        }
+
+        var textoBusqueda =
+            detalle.TextoBusqueda ||
+            detalle.AliasBusqueda ||
+            "Sólo biometría";
+
+        var html =
+            '<div class="row g-3 mb-3">' +
+
+                '<div class="' + (detalle.TieneFotografia ? 'col-lg-8' : 'col-12') + '">' +
+                    '<div class="border rounded p-3 h-100">' +
+
+                        '<div class="row g-3">' +
+
+                            '<div class="col-md-4">' +
+                                '<div class="small text-muted">Usuario</div>' +
+                                '<div class="fw-bold">' + escaparHtml(detalle.Usuario) + '</div>' +
+                            '</div>' +
+
+                            '<div class="col-md-4">' +
+                                '<div class="small text-muted">Fecha</div>' +
+                                '<div class="fw-bold">' + formatearFecha(detalle.FechaBusqueda) + '</div>' +
+                            '</div>' +
+
+                            '<div class="col-md-4">' +
+                                '<div class="small text-muted">Estado</div>' +
+                                '<div class="fw-bold">' + (detalle.Exito ? 'Correcta' : 'Error') + '</div>' +
+                            '</div>' +
+
+                            '<div class="col-md-6">' +
+                                '<div class="small text-muted">Búsqueda</div>' +
+                                '<div class="fw-bold">' + escaparHtml(textoBusqueda) + '</div>' +
+                            '</div>' +
+
+                            '<div class="col-md-3">' +
+                                '<div class="small text-muted">Porcentaje mínimo</div>' +
+                                '<div class="fw-bold">' + (detalle.PorcentajeMinimo || 0) + '%</div>' +
+                            '</div>' +
+
+                            '<div class="col-md-3">' +
+                                '<div class="small text-muted">Coincidencias</div>' +
+                                '<div class="fw-bold">' + detalle.TotalCoincidencias + '</div>' +
+                            '</div>' +
+
+                            '<div class="col-md-4">' +
+                                '<div class="small text-muted">Fotografía</div>' +
+                                '<div class="fw-bold">' + (detalle.TieneFotografia ? 'Sí' : 'No') + '</div>' +
+                            '</div>' +
+
+                            '<div class="col-md-4">' +
+                                '<div class="small text-muted">Huellas</div>' +
+                                '<div class="fw-bold">' + detalle.CantidadHuellas + '</div>' +
+                            '</div>' +
+
+                            '<div class="col-md-4">' +
+                                '<div class="small text-muted">Tiempo</div>' +
+                                '<div class="fw-bold">' + formatearTiempo(detalle.TiempoMs || 0) + '</div>' +
+                            '</div>' +
+
+                            '<div class="col-12">' +
+                                '<div class="small text-muted">IP</div>' +
+                                '<div>' + escaparHtml(detalle.Ip || "") + '</div>' +
+                            '</div>' +
+
+                            (detalle.HashFotografia
+                                ? '<div class="col-12"><div class="small text-muted">SHA-256 fotografía</div><div class="small text-break">' + escaparHtml(detalle.HashFotografia) + '</div></div>'
+                                : '') +
+
+                            (detalle.Error
+                                ? '<div class="col-12"><div class="alert alert-danger mb-0">' + escaparHtml(detalle.Error) + '</div></div>'
+                                : '') +
+
+                        '</div>' +
+
+                    '</div>' +
+                '</div>' +
+
+                fotoHtml +
+
+            '</div>' +
+
+            '<h6 class="fw-bold mt-3">Resultados consultados</h6>' +
+
+            '<div class="table-responsive">' +
+                '<table class="table table-sm table-hover align-middle">' +
+                    '<thead>' +
+                        '<tr>' +
+                            '<th>Fecha</th>' +
+                            '<th>Fuente</th>' +
+                            '<th>Id persona</th>' +
+                            '<th>Acción</th>' +
+                            '<th>Tipo</th>' +
+                        '</tr>' +
+                    '</thead>' +
+                    '<tbody>' +
+                        accesosHtml +
+                    '</tbody>' +
+                '</table>' +
+            '</div>';
+
+        $("#contenidoDetalleBitacora").html(
+            html
+        );
+
+    }
+
+
+    function formatearFecha(valor) {
+
+        if (!valor) {
+            return "";
+        }
+
+        var fecha;
+
+        if (typeof valor === "string" && valor.indexOf("/Date(") === 0) {
+
+            var milisegundos =
+                parseInt(
+                    valor.replace(/[^0-9-]/g, ""),
+                    10
+                );
+
+            fecha =
+                new Date(
+                    milisegundos
+                );
+
+        }
+        else {
+
+            fecha =
+                new Date(
+                    valor
+                );
+
+        }
+
+        if (isNaN(fecha.getTime())) {
+            return "";
+        }
+
+        return fecha.toLocaleString(
+            "es-MX"
+        );
+
+    }
+
+
+    function formatearTiempo(milisegundos) {
+
+        milisegundos =
+            parseInt(
+                milisegundos,
+                10
+            ) || 0;
+
+        if (milisegundos < 1000) {
+            return milisegundos + " ms";
+        }
+
+        return (
+            milisegundos / 1000
+        )
+        .toFixed(2) +
+        " s";
+
+    }
+
+
+    function escaparHtml(valor) {
+
+        return $("<div>")
+            .text(
+                valor === null || valor === undefined
+                    ? ""
+                    : valor
+            )
+            .html();
+
+    }
+
+
+    function escaparAtributo(valor) {
+
+        return escaparHtml(
+            valor
+        )
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+
+    }
 
 </script>

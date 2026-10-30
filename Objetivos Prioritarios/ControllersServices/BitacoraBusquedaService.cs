@@ -1,6 +1,7 @@
 ﻿using Objetivos_Prioritarios.Models;
 using Objetivos_Prioritarios.Models.Extends;
 using Objetivos_Prioritarios.Helpers;
+using Microsoft.Win32.SafeHandles;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -9,6 +10,7 @@ using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
+using System.Security.Principal;
 using System.Text;
 using System.Web;
 
@@ -235,45 +237,51 @@ namespace Objetivos_Prioritarios.ControllersServices
         {
             try
             {
-                string rutaShare = ConfigurationManager.AppSettings["Bitacora.RutaShare"];
-                string rutaBase = ConfigurationManager.AppSettings["Bitacora.RutaBaseArchivos"];
-                string usuarioRed = ConfigurationManager.AppSettings["PersonasInteres.UsuarioRed"];
+                string rutaBase = (ConfigurationManager.AppSettings["Bitacora.RutaBaseArchivos"] ?? "").Trim().TrimEnd('\\');
+                string dominioRed = (ConfigurationManager.AppSettings["PersonasInteres.DominioRed"] ?? "").Trim();
+                string usuarioRed = (ConfigurationManager.AppSettings["PersonasInteres.UsuarioRed"] ?? "").Trim();
                 string passwordRed = ConfigurationManager.AppSettings["PersonasInteres.PasswordRed"];
-                string dominioRed = ConfigurationManager.AppSettings["PersonasInteres.DominioRed"];
-
-                if (string.IsNullOrWhiteSpace(rutaShare))
-                    return new BasicOperationResponse { IsSuccess = false, Message = "Bitacora.RutaShare no está configurada." };
 
                 if (string.IsNullOrWhiteSpace(rutaBase))
                     return new BasicOperationResponse { IsSuccess = false, Message = "Bitacora.RutaBaseArchivos no está configurada." };
 
-                if (string.IsNullOrWhiteSpace(usuarioRed) || string.IsNullOrWhiteSpace(passwordRed))
-                    return new BasicOperationResponse { IsSuccess = false, Message = "No están configuradas las credenciales de red." };
+                if (string.IsNullOrWhiteSpace(dominioRed))
+                    return new BasicOperationResponse { IsSuccess = false, Message = "PersonasInteres.DominioRed no está configurado." };
 
-                string usuarioConexion =
-                    string.IsNullOrWhiteSpace(dominioRed)
-                        ? usuarioRed
-                        : dominioRed + "\\" + usuarioRed;
+                if (string.IsNullOrWhiteSpace(usuarioRed))
+                    return new BasicOperationResponse { IsSuccess = false, Message = "PersonasInteres.UsuarioRed no está configurado." };
 
-                using (new NetworkConnection(rutaShare, usuarioConexion, passwordRed))
+                if (string.IsNullOrWhiteSpace(passwordRed))
+                    return new BasicOperationResponse { IsSuccess = false, Message = "PersonasInteres.PasswordRed no está configurado." };
+
+                var credentials = new UserCredentials(
+                    dominioRed,
+                    usuarioRed,
+                    passwordRed
+                );
+
+                using (SafeAccessTokenHandle userHandle = credentials.LogonUser(LogonType.NewCredentials))
                 {
-                    Directory.CreateDirectory(rutaBase);
+                    WindowsIdentity.RunImpersonated(userHandle, () =>
+                    {
+                        Directory.CreateDirectory(rutaBase);
 
-                    string rutaPrueba =
-                        Path.Combine(
-                            rutaBase,
-                            "__prueba_bitacora_" + Guid.NewGuid().ToString("N") + ".tmp"
+                        string rutaPrueba =
+                            Path.Combine(
+                                rutaBase,
+                                "__prueba_bitacora_" + Guid.NewGuid().ToString("N") + ".tmp"
+                            );
+
+                        File.WriteAllText(
+                            rutaPrueba,
+                            DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
                         );
 
-                    File.WriteAllText(
-                        rutaPrueba,
-                        DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
-                    );
+                        if (!File.Exists(rutaPrueba))
+                            throw new IOException("Se intentó crear el archivo de prueba, pero no apareció en el recurso.");
 
-                    if (!File.Exists(rutaPrueba))
-                        return new BasicOperationResponse { IsSuccess = false, Message = "Se intentó crear el archivo de prueba, pero no apareció en el recurso." };
-
-                    File.Delete(rutaPrueba);
+                        File.Delete(rutaPrueba);
+                    });
                 }
 
                 return new BasicOperationResponse
@@ -328,45 +336,31 @@ namespace Objetivos_Prioritarios.ControllersServices
                 return null;
             }
 
-            string rutaShare =
-                ConfigurationManager.AppSettings[
-                    "Bitacora.RutaShare"
-                ];
-
             string rutaBase =
-                ConfigurationManager.AppSettings[
-                    "Bitacora.RutaBaseArchivos"
-                ];
-
-            string usuarioRed =
-                ConfigurationManager.AppSettings[
-                    "PersonasInteres.UsuarioRed"
-                ];
-
-            string passwordRed =
-                ConfigurationManager.AppSettings[
-                    "PersonasInteres.PasswordRed"
-                ];
+                (ConfigurationManager.AppSettings["Bitacora.RutaBaseArchivos"] ?? "")
+                    .Trim()
+                    .TrimEnd('\\');
 
             string dominioRed =
-                ConfigurationManager.AppSettings[
-                    "PersonasInteres.DominioRed"
-                ];
+                (ConfigurationManager.AppSettings["PersonasInteres.DominioRed"] ?? "")
+                    .Trim();
+
+            string usuarioRed =
+                (ConfigurationManager.AppSettings["PersonasInteres.UsuarioRed"] ?? "")
+                    .Trim();
+
+            string passwordRed =
+                ConfigurationManager.AppSettings["PersonasInteres.PasswordRed"];
 
             if (
-                string.IsNullOrWhiteSpace(rutaShare) ||
                 string.IsNullOrWhiteSpace(rutaBase) ||
+                string.IsNullOrWhiteSpace(dominioRed) ||
                 string.IsNullOrWhiteSpace(usuarioRed) ||
                 string.IsNullOrWhiteSpace(passwordRed)
             )
             {
                 return null;
             }
-
-            string usuarioConexion =
-                string.IsNullOrWhiteSpace(dominioRed)
-                    ? usuarioRed
-                    : dominioRed + "\\" + usuarioRed;
 
             string rutaCompleta =
                 Path.GetFullPath(
@@ -394,39 +388,49 @@ namespace Objetivos_Prioritarios.ControllersServices
                 return null;
             }
 
-            using (
-                new NetworkConnection(
-                    rutaShare,
-                    usuarioConexion,
-                    passwordRed
-                )
-            )
+            var credentials = new UserCredentials(
+                dominioRed,
+                usuarioRed,
+                passwordRed
+            );
+
+            byte[] contenido = null;
+
+            using (SafeAccessTokenHandle userHandle = credentials.LogonUser(LogonType.NewCredentials))
             {
-                if (!File.Exists(rutaCompleta))
+                WindowsIdentity.RunImpersonated(userHandle, () =>
                 {
-                    return null;
-                }
-
-                return new BitacoraArchivoContenidoViewModel
-                {
-                    Contenido =
-                        File.ReadAllBytes(
-                            rutaCompleta
-                        ),
-
-                    NombreArchivo =
-                        string.IsNullOrWhiteSpace(
-                            archivo.NombreOriginal
-                        )
-                            ? Path.GetFileName(rutaCompleta)
-                            : archivo.NombreOriginal,
-
-                    ContentType =
-                        MimeMapping.GetMimeMapping(
-                            rutaCompleta
-                        )
-                };
+                    if (File.Exists(rutaCompleta))
+                    {
+                        contenido =
+                            File.ReadAllBytes(
+                                rutaCompleta
+                            );
+                    }
+                });
             }
+
+            if (contenido == null || contenido.Length == 0)
+            {
+                return null;
+            }
+
+            return new BitacoraArchivoContenidoViewModel
+            {
+                Contenido = contenido,
+
+                NombreArchivo =
+                    string.IsNullOrWhiteSpace(
+                        archivo.NombreOriginal
+                    )
+                        ? Path.GetFileName(rutaCompleta)
+                        : archivo.NombreOriginal,
+
+                ContentType =
+                    MimeMapping.GetMimeMapping(
+                        rutaCompleta
+                    )
+            };
         }
 
         private List<BitacoraBusquedaArchivoViewModel> ObtenerArchivos(long idBitacoraBusqueda)
@@ -488,45 +492,31 @@ namespace Objetivos_Prioritarios.ControllersServices
                 return;
             }
 
-            string rutaShare =
-                ConfigurationManager.AppSettings[
-                    "Bitacora.RutaShare"
-                ];
-
             string rutaBase =
-                ConfigurationManager.AppSettings[
-                    "Bitacora.RutaBaseArchivos"
-                ];
-
-            string usuarioRed =
-                ConfigurationManager.AppSettings[
-                    "PersonasInteres.UsuarioRed"
-                ];
-
-            string passwordRed =
-                ConfigurationManager.AppSettings[
-                    "PersonasInteres.PasswordRed"
-                ];
+                (ConfigurationManager.AppSettings["Bitacora.RutaBaseArchivos"] ?? "")
+                    .Trim()
+                    .TrimEnd('\\');
 
             string dominioRed =
-                ConfigurationManager.AppSettings[
-                    "PersonasInteres.DominioRed"
-                ];
+                (ConfigurationManager.AppSettings["PersonasInteres.DominioRed"] ?? "")
+                    .Trim();
+
+            string usuarioRed =
+                (ConfigurationManager.AppSettings["PersonasInteres.UsuarioRed"] ?? "")
+                    .Trim();
+
+            string passwordRed =
+                ConfigurationManager.AppSettings["PersonasInteres.PasswordRed"];
 
             if (
-                string.IsNullOrWhiteSpace(rutaShare) ||
                 string.IsNullOrWhiteSpace(rutaBase) ||
+                string.IsNullOrWhiteSpace(dominioRed) ||
                 string.IsNullOrWhiteSpace(usuarioRed) ||
                 string.IsNullOrWhiteSpace(passwordRed)
             )
             {
                 return;
             }
-
-            string usuarioConexion =
-                string.IsNullOrWhiteSpace(dominioRed)
-                    ? usuarioRed
-                    : dominioRed + "\\" + usuarioRed;
 
             string anio =
                 fechaBusqueda.ToString("yyyy");
@@ -550,76 +540,78 @@ namespace Objetivos_Prioritarios.ControllersServices
                     "Huellas"
                 );
 
+            var credentials = new UserCredentials(
+                dominioRed,
+                usuarioRed,
+                passwordRed
+            );
+
             try
             {
-                using (
-                    new NetworkConnection(
-                        rutaShare,
-                        usuarioConexion,
-                        passwordRed
-                    )
-                )
+                using (SafeAccessTokenHandle userHandle = credentials.LogonUser(LogonType.NewCredentials))
                 {
-                    if (tieneFoto)
+                    WindowsIdentity.RunImpersonated(userHandle, () =>
                     {
-                        Directory.CreateDirectory(
-                            carpetaFotos
-                        );
-
-                        GuardarArchivoConsulta(
-                            idBitacoraBusqueda,
-                            fotografia,
-                            "FOTO",
-                            1,
-                            Path.Combine(
-                                anio,
-                                mes,
-                                "Fotos"
-                            ),
-                            carpetaFotos,
-                            idBitacoraBusqueda.ToString()
-                        );
-                    }
-
-                    if (huellasValidas.Count > 0)
-                    {
-                        Directory.CreateDirectory(
-                            carpetaHuellas
-                        );
-
-                        for (
-                            int i = 0;
-                            i < huellasValidas.Count;
-                            i++
-                        )
+                        if (tieneFoto)
                         {
-                            int numeroHuella = i + 1;
+                            Directory.CreateDirectory(
+                                carpetaFotos
+                            );
 
                             GuardarArchivoConsulta(
                                 idBitacoraBusqueda,
-                                huellasValidas[i],
-                                "HUELLA",
-                                numeroHuella,
+                                fotografia,
+                                "FOTO",
+                                1,
                                 Path.Combine(
                                     anio,
                                     mes,
-                                    "Huellas"
+                                    "Fotos"
                                 ),
-                                carpetaHuellas,
-                                idBitacoraBusqueda +
-                                "_" +
-                                numeroHuella.ToString("00")
+                                carpetaFotos,
+                                idBitacoraBusqueda.ToString()
                             );
                         }
-                    }
+
+                        if (huellasValidas.Count > 0)
+                        {
+                            Directory.CreateDirectory(
+                                carpetaHuellas
+                            );
+
+                            for (
+                                int i = 0;
+                                i < huellasValidas.Count;
+                                i++
+                            )
+                            {
+                                int numeroHuella = i + 1;
+
+                                GuardarArchivoConsulta(
+                                    idBitacoraBusqueda,
+                                    huellasValidas[i],
+                                    "HUELLA",
+                                    numeroHuella,
+                                    Path.Combine(
+                                        anio,
+                                        mes,
+                                        "Huellas"
+                                    ),
+                                    carpetaHuellas,
+                                    idBitacoraBusqueda +
+                                    "_" +
+                                    numeroHuella.ToString("00")
+                                );
+                            }
+                        }
+                    });
                 }
             }
             catch
             {
                 /*
-                 * La búsqueda y la bitácora principal ya existen.
-                 * Si el servidor de archivos no está disponible,
-                 * no bloqueamos la consulta biométrica.
+                 * No bloqueamos la búsqueda biométrica si falla
+                 * el resguardo visual de foto o huellas.
                  */
             }
         }

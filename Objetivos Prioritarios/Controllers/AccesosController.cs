@@ -3,6 +3,7 @@ using Objetivos_Prioritarios.Models.Extends;
 using Objetivos_Prioritarios.Utils;
 using System;
 using System.Collections.Generic;
+using System.Web;
 using System.Web.Mvc;
 
 namespace Objetivos_Prioritarios.Controllers
@@ -11,7 +12,110 @@ namespace Objetivos_Prioritarios.Controllers
     {
         public ActionResult Index()
         {
+            if (!PuedeAdministrarAccesos())
+            {
+                return new HttpStatusCodeResult(403);
+            }
+
             return View();
+        }
+
+        [HttpGet]
+        public JsonResult ListarUsuarios()
+        {
+            if (!PuedeAdministrarAccesos())
+            {
+                Response.StatusCode = 403;
+                return Json(new { success = false, message = "No tiene permiso para administrar accesos." }, JsonRequestBehavior.AllowGet);
+            }
+
+            return Json(
+                new
+                {
+                    success = true,
+                    usuarios = AccesoService.ObtenerUsuariosRegistrados()
+                },
+                JsonRequestBehavior.AllowGet
+            );
+        }
+
+        [HttpGet]
+        public JsonResult ListarBitacora(string usuario = "", int limite = 200)
+        {
+            if (!PuedeAdministrarAccesos())
+            {
+                Response.StatusCode = 403;
+                return Json(new { success = false, message = "No tiene permiso para consultar la bitácora." }, JsonRequestBehavior.AllowGet);
+            }
+
+            return Json(
+                new
+                {
+                    success = true,
+                    registros = BitacoraBusquedaService.ObtenerBitacora(usuario, limite)
+                },
+                JsonRequestBehavior.AllowGet
+            );
+        }
+
+        [HttpGet]
+        public JsonResult DetalleBitacora(long idBitacoraBusqueda)
+        {
+            if (!PuedeAdministrarAccesos())
+            {
+                Response.StatusCode = 403;
+                return Json(new { success = false, message = "No tiene permiso para consultar la bitácora." }, JsonRequestBehavior.AllowGet);
+            }
+
+            BitacoraBusquedaDetalleViewModel detalle =
+                BitacoraBusquedaService.ObtenerDetalle(
+                    idBitacoraBusqueda
+                );
+
+            if (detalle == null)
+            {
+                return Json(
+                    new
+                    {
+                        success = false,
+                        message = "No se encontró la búsqueda solicitada."
+                    },
+                    JsonRequestBehavior.AllowGet
+                );
+            }
+
+            return Json(
+                new
+                {
+                    success = true,
+                    detalle
+                },
+                JsonRequestBehavior.AllowGet
+            );
+        }
+
+        [HttpGet]
+        public ActionResult FotoBitacora(long idBitacoraBusqueda)
+        {
+            if (!PuedeAdministrarAccesos())
+            {
+                return new HttpStatusCodeResult(403);
+            }
+
+            string ruta =
+                BitacoraBusquedaService.ObtenerRutaFotografiaConsulta(
+                    idBitacoraBusqueda
+                );
+
+            if (string.IsNullOrWhiteSpace(ruta))
+            {
+                return HttpNotFound();
+            }
+
+            return File(
+                ruta,
+                MimeMapping.GetMimeMapping(ruta)
+            );
         }
 
         [HttpGet]
@@ -167,6 +271,13 @@ namespace Objetivos_Prioritarios.Controllers
                         resultado.Message
                 }
             );
+        }        private bool PuedeAdministrarAccesos()
+        {
+            return
+                EsAdministrador() ||
+                TieneModulo("ADMIN_ACCESOS");
         }
+
+
     }
 }

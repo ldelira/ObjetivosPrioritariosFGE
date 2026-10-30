@@ -235,14 +235,20 @@
                     </div>
 
                     <div>
-                        <strong>Mandamientos Judiciales</strong>
-                        <span>
-                            Coincidencia nominal detectada
-                        </span>
+                        @if (principal.TieneMandamientoJudicialActivo)
+                        {
+                            <strong>@(principal.TotalMandamientosActivos == 1 ? "Mandamiento Judicial Activo" : "Mandamientos Judiciales Activos")</strong>
+                            <span>Coincidencia nominal con mandamiento activo</span>
+                        }
+                        else
+                        {
+                            <strong>Mandamientos Judiciales</strong>
+                            <span>Coincidencia nominal detectada</span>
+                        }
                     </div>
 
                     <span class="sic-identidad-alerta-total">
-                        @principal.TotalMandamientos
+                        @(principal.TieneMandamientoJudicialActivo ? principal.TotalMandamientosActivos : principal.TotalMandamientos)
                     </span>
                 </div>
 

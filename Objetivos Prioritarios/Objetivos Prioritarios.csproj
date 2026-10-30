@@ -436,6 +436,7 @@
       <DependentUpon>Catalogos.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Extends\AdministracionUsuarioViewModel.cs" />
+    <Compile Include="Models\Extends\AdministracionAccesosListadoViewModel.cs" />
     <Compile Include="Models\Extends\ApiBusquedaBiometricaResponse.cs" />
     <Compile Include="Models\Extends\ApiErrorBiometrico.cs" />
     <Compile Include="Models\Extends\BusquedaCoincidenciasViewModel.cs" />

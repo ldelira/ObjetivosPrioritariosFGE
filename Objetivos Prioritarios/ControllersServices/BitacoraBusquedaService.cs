@@ -2,6 +2,7 @@
 using Objetivos_Prioritarios.Models.Extends;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
@@ -40,6 +41,12 @@ namespace Objetivos_Prioritarios.ControllersServices
 
                 db.tb_BitacoraBusqueda.Add(registro);
                 db.SaveChanges();
+
+                GuardarFotografiaConsulta(
+                    registro.IdBitacoraBusqueda,
+                    modelo?.Fotografia
+                );
+
                 return registro.IdBitacoraBusqueda;
             }
         }
@@ -91,6 +98,261 @@ namespace Objetivos_Prioritarios.ControllersServices
                 db.SaveChanges();
             }
         }
+
+        public static List<BitacoraBusquedaListadoViewModel> ObtenerBitacora(string usuario = null, int limite = 200)
+        {
+            limite = Math.Max(1, Math.Min(limite, 500));
+
+            using (var db = new Filiacion_MunicipiosBitacoraEntities())
+            {
+                var consulta =
+                    db.tb_BitacoraBusqueda
+                        .AsNoTracking()
+                        .AsQueryable();
+
+                if (!string.IsNullOrWhiteSpace(usuario))
+                {
+                    string usuarioFiltro = usuario.Trim().ToUpper();
+
+                    consulta =
+                        consulta.Where(x =>
+                            x.Usuario != null &&
+                            x.Usuario.ToUpper().Contains(usuarioFiltro)
+                        );
+                }
+
+                List<BitacoraBusquedaListadoViewModel> resultado =
+                    consulta
+                        .OrderByDescending(x => x.IdBitacoraBusqueda)
+                        .Take(limite)
+                        .Select(x => new BitacoraBusquedaListadoViewModel
+                        {
+                            IdBitacoraBusqueda = x.IdBitacoraBusqueda,
+                            Usuario = x.Usuario,
+                            FechaBusqueda = x.FechaBusqueda,
+                            ModoBusquedaTexto = x.ModoBusquedaTexto,
+                            ModoCombinacion = x.ModoCombinacion,
+                            TextoBusqueda = x.TextoBusqueda,
+                            AliasBusqueda = x.AliasBusqueda,
+                            PorcentajeMinimo = x.PorcentajeMinimo,
+                            TieneFotografia = x.TieneFotografia,
+                            CantidadHuellas = x.CantidadHuellas,
+                            HashFotografia = x.HashFotografia,
+                            HashHuellas = x.HashHuellas,
+                            TotalCoincidencias = x.TotalCoincidencias,
+                            TiempoMs = x.TiempoMs,
+                            Exito = x.Exito,
+                            Error = x.Error,
+                            Ip = x.Ip,
+                            UserAgent = x.UserAgent,
+                            TotalAccesos = x.tb_BitacoraAccesoResultado.Count()
+                        })
+                        .ToList();
+
+                foreach (BitacoraBusquedaListadoViewModel item in resultado)
+                {
+                    item.FotografiaDisponible =
+                        !string.IsNullOrWhiteSpace(
+                            ObtenerRutaFotografiaConsulta(
+                                item.IdBitacoraBusqueda
+                            )
+                        );
+                }
+
+                return resultado;
+            }
+        }
+
+        public static BitacoraBusquedaDetalleViewModel ObtenerDetalle(long idBitacoraBusqueda)
+        {
+            if (idBitacoraBusqueda <= 0) return null;
+
+            using (var db = new Filiacion_MunicipiosBitacoraEntities())
+            {
+                tb_BitacoraBusqueda registro =
+                    db.tb_BitacoraBusqueda
+                        .AsNoTracking()
+                        .FirstOrDefault(x =>
+                            x.IdBitacoraBusqueda == idBitacoraBusqueda
+                        );
+
+                if (registro == null) return null;
+
+                BitacoraBusquedaDetalleViewModel resultado =
+                    new BitacoraBusquedaDetalleViewModel
+                    {
+                        IdBitacoraBusqueda = registro.IdBitacoraBusqueda,
+                        Usuario = registro.Usuario,
+                        FechaBusqueda = registro.FechaBusqueda,
+                        ModoBusquedaTexto = registro.ModoBusquedaTexto,
+                        ModoCombinacion = registro.ModoCombinacion,
+                        TextoBusqueda = registro.TextoBusqueda,
+                        AliasBusqueda = registro.AliasBusqueda,
+                        PorcentajeMinimo = registro.PorcentajeMinimo,
+                        TieneFotografia = registro.TieneFotografia,
+                        FotografiaDisponible =
+                            !string.IsNullOrWhiteSpace(
+                                ObtenerRutaFotografiaConsulta(
+                                    registro.IdBitacoraBusqueda
+                                )
+                            ),
+                        CantidadHuellas = registro.CantidadHuellas,
+                        HashFotografia = registro.HashFotografia,
+                        HashHuellas = registro.HashHuellas,
+                        TotalCoincidencias = registro.TotalCoincidencias,
+                        TiempoMs = registro.TiempoMs,
+                        Exito = registro.Exito,
+                        Error = registro.Error,
+                        Ip = registro.Ip,
+                        UserAgent = registro.UserAgent
+                    };
+
+                resultado.Accesos =
+                    db.tb_BitacoraAccesoResultado
+                        .AsNoTracking()
+                        .Where(x =>
+                            x.IdBitacoraBusqueda == idBitacoraBusqueda
+                        )
+                        .OrderBy(x => x.FechaAcceso)
+                        .ToList()
+                        .Select(x => new BitacoraAccesoResultadoViewModel
+                        {
+                            IdBitacoraAcceso = x.IdBitacoraAcceso,
+                            FechaAcceso = x.FechaAcceso,
+                            IdTbFuente = x.IdTbFuente,
+                            Fuente = ObtenerNombreFuente(x.IdTbFuente),
+                            IdPersona = x.IdPersona,
+                            IdCoincidencia = x.IdCoincidencia,
+                            EsCoincidenciaDirecta = x.EsCoincidenciaDirecta,
+                            TipoAccion = x.TipoAccion
+                        })
+                        .ToList();
+
+                resultado.TotalAccesos = resultado.Accesos.Count;
+
+                return resultado;
+            }
+        }
+
+        public static string ObtenerRutaFotografiaConsulta(long idBitacoraBusqueda)
+        {
+            if (idBitacoraBusqueda <= 0 || HttpContext.Current == null) return null;
+
+            string carpeta =
+                HttpContext.Current.Server.MapPath(
+                    "~/App_Data/BitacoraBusquedaFotos"
+                );
+
+            if (!Directory.Exists(carpeta)) return null;
+
+            string[] archivos =
+                Directory.GetFiles(
+                    carpeta,
+                    idBitacoraBusqueda + ".*"
+                );
+
+            return archivos.FirstOrDefault();
+        }
+
+        private static void GuardarFotografiaConsulta(long idBitacoraBusqueda, HttpPostedFileBase fotografia)
+        {
+            if (
+                idBitacoraBusqueda <= 0 ||
+                fotografia == null ||
+                fotografia.ContentLength <= 0 ||
+                fotografia.InputStream == null ||
+                HttpContext.Current == null
+            )
+            {
+                return;
+            }
+
+            try
+            {
+                string extension =
+                    Path.GetExtension(
+                        fotografia.FileName ?? ""
+                    )
+                    .ToLowerInvariant();
+
+                string[] extensionesPermitidas =
+                {
+                    ".jpg",
+                    ".jpeg",
+                    ".png",
+                    ".webp"
+                };
+
+                if (!extensionesPermitidas.Contains(extension))
+                {
+                    extension = ".jpg";
+                }
+
+                string carpeta =
+                    HttpContext.Current.Server.MapPath(
+                        "~/App_Data/BitacoraBusquedaFotos"
+                    );
+
+                Directory.CreateDirectory(carpeta);
+
+                string ruta =
+                    Path.Combine(
+                        carpeta,
+                        idBitacoraBusqueda + extension
+                    );
+
+                Stream stream = fotografia.InputStream;
+                long posicionOriginal = stream.CanSeek ? stream.Position : 0;
+
+                try
+                {
+                    if (stream.CanSeek) stream.Position = 0;
+
+                    using (FileStream destino = File.Create(ruta))
+                    {
+                        stream.CopyTo(destino);
+                    }
+                }
+                finally
+                {
+                    if (stream.CanSeek) stream.Position = posicionOriginal;
+                }
+            }
+            catch
+            {
+                /*
+                 * La bitácora principal y el hash ya quedaron guardados.
+                 * Un problema al conservar la copia visual no debe
+                 * impedir la búsqueda biométrica.
+                 */
+            }
+        }
+
+        private static string ObtenerNombreFuente(int idTbFuente)
+        {
+            switch (idTbFuente)
+            {
+                case 1:
+                    return "C5 - Detenidos";
+                case 2:
+                    return "CAPEA / FEMDLP";
+                case 3:
+                    return "Personas de Interés";
+                case 4:
+                    return "Mandamientos Judiciales";
+                case 5:
+                    return "Objetivos Prioritarios";
+                case 6:
+                    return "FGEA - Detenidos";
+                case 7:
+                    return "Alerta Amber";
+                case 8:
+                    return "Protocolo Alba";
+                default:
+                    return "Fuente " + idTbFuente;
+            }
+        }
+
 
         private static List<HttpPostedFileBase> ObtenerHuellas(BusquedaCoincidenciasViewModel modelo)
         {

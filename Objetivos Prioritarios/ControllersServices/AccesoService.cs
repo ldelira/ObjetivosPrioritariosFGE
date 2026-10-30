@@ -870,6 +870,63 @@ namespace Objetivos_Prioritarios.ControllersServices
         }
 
 
+        public List<UsuarioSistemaListadoViewModel> ObtenerUsuariosRegistrados()
+        {
+            using (Objetivos_Prioritarios_Perfiles_Entities db = new Objetivos_Prioritarios_Perfiles_Entities())
+            {
+                var usuarios =
+                    db.tb_Usuarios
+                        .AsNoTracking()
+                        .OrderByDescending(x => x.bit_status == true)
+                        .ThenBy(x => x.nvarchar_nombre_usuario)
+                        .ToList();
+
+                List<int> idsUsuarios =
+                    usuarios
+                        .Select(x => x.int_id_usuario)
+                        .ToList();
+
+                var perfiles =
+                    (
+                        from up in db.tb_UsuarioPerfil.AsNoTracking()
+                        join p in db.cat_Perfil.AsNoTracking()
+                            on up.int_id_perfil equals p.int_id_perfil
+                        where
+                            idsUsuarios.Contains(up.int_id_usuario) &&
+                            up.bit_status == true &&
+                            p.bit_status == true
+                        select new
+                        {
+                            up.int_id_usuario,
+                            p.nvarchar_nombre
+                        }
+                    )
+                    .ToList();
+
+                return usuarios
+                    .Select(x => new UsuarioSistemaListadoViewModel
+                    {
+                        IdUsuario = x.int_id_usuario,
+                        Login = x.nvarchar_no_interno ?? "",
+                        Nombre = x.nvarchar_nombre_usuario ?? "",
+                        Puesto = x.nvarchar_puesto ?? "",
+                        Activo = x.bit_status == true,
+                        FechaAlta = x.date_fecha_alta,
+                        FechaModificacion = x.date_fecha_modificacion,
+                        UsuarioModificacion = x.nvarchar_usuario_modificacion ?? "",
+                        Perfiles = perfiles
+                            .Where(p => p.int_id_usuario == x.int_id_usuario)
+                            .Select(p => p.nvarchar_nombre)
+                            .Where(p => !string.IsNullOrWhiteSpace(p))
+                            .Distinct()
+                            .OrderBy(p => p)
+                            .ToList()
+                    })
+                    .ToList();
+            }
+        }
+
+
         public BasicOperationResponse CambiarEstatusUsuario(string login, bool activo, string usuarioModificacion)
         {
             try

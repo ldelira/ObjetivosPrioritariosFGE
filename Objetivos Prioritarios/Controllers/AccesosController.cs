@@ -95,6 +95,36 @@ namespace Objetivos_Prioritarios.Controllers
         }
 
         [HttpGet]
+        public JsonResult ProbarServidorArchivos()
+        {
+            if (!PuedeAdministrarAccesos())
+            {
+                Response.StatusCode = 403;
+                return Json(
+                    new
+                    {
+                        success = false,
+                        message = "No tiene permiso para probar el servidor de archivos."
+                    },
+                    JsonRequestBehavior.AllowGet
+                );
+            }
+
+            BasicOperationResponse resultado =
+                BitacoraBusquedaService.ProbarServidorArchivos();
+
+            return Json(
+                new
+                {
+                    success = resultado.IsSuccess,
+                    message = resultado.Message
+                },
+                JsonRequestBehavior.AllowGet
+            );
+        }
+
+
+        [HttpGet]
         public ActionResult ArchivoBitacora(long idBitacoraArchivo)
         {
             if (!PuedeAdministrarAccesos())

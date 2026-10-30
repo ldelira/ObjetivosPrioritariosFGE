@@ -95,26 +95,30 @@ namespace Objetivos_Prioritarios.Controllers
         }
 
         [HttpGet]
-        public ActionResult FotoBitacora(long idBitacoraBusqueda)
+        public ActionResult ArchivoBitacora(long idBitacoraArchivo)
         {
             if (!PuedeAdministrarAccesos())
             {
                 return new HttpStatusCodeResult(403);
             }
 
-            string ruta =
-                BitacoraBusquedaService.ObtenerRutaFotografiaConsulta(
-                    idBitacoraBusqueda
+            BitacoraArchivoContenidoViewModel archivo =
+                BitacoraBusquedaService.ObtenerArchivoContenido(
+                    idBitacoraArchivo
                 );
 
-            if (string.IsNullOrWhiteSpace(ruta))
+            if (
+                archivo == null ||
+                archivo.Contenido == null ||
+                archivo.Contenido.Length == 0
+            )
             {
                 return HttpNotFound();
             }
 
             return File(
-                ruta,
-                MimeMapping.GetMimeMapping(ruta)
+                archivo.Contenido,
+                archivo.ContentType
             );
         }
 

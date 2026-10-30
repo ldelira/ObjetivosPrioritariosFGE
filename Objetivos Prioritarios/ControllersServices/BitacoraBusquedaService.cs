@@ -231,6 +231,68 @@ namespace Objetivos_Prioritarios.ControllersServices
             }
         }
 
+        public BasicOperationResponse ProbarServidorArchivos()
+        {
+            try
+            {
+                string rutaShare = ConfigurationManager.AppSettings["Bitacora.RutaShare"];
+                string rutaBase = ConfigurationManager.AppSettings["Bitacora.RutaBaseArchivos"];
+                string usuarioRed = ConfigurationManager.AppSettings["PersonasInteres.UsuarioRed"];
+                string passwordRed = ConfigurationManager.AppSettings["PersonasInteres.PasswordRed"];
+                string dominioRed = ConfigurationManager.AppSettings["PersonasInteres.DominioRed"];
+
+                if (string.IsNullOrWhiteSpace(rutaShare))
+                    return new BasicOperationResponse { IsSuccess = false, Message = "Bitacora.RutaShare no está configurada." };
+
+                if (string.IsNullOrWhiteSpace(rutaBase))
+                    return new BasicOperationResponse { IsSuccess = false, Message = "Bitacora.RutaBaseArchivos no está configurada." };
+
+                if (string.IsNullOrWhiteSpace(usuarioRed) || string.IsNullOrWhiteSpace(passwordRed))
+                    return new BasicOperationResponse { IsSuccess = false, Message = "No están configuradas las credenciales de red." };
+
+                string usuarioConexion =
+                    string.IsNullOrWhiteSpace(dominioRed)
+                        ? usuarioRed
+                        : dominioRed + "\\" + usuarioRed;
+
+                using (new NetworkConnection(rutaShare, usuarioConexion, passwordRed))
+                {
+                    Directory.CreateDirectory(rutaBase);
+
+                    string rutaPrueba =
+                        Path.Combine(
+                            rutaBase,
+                            "__prueba_bitacora_" + Guid.NewGuid().ToString("N") + ".tmp"
+                        );
+
+                    File.WriteAllText(
+                        rutaPrueba,
+                        DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
+                    );
+
+                    if (!File.Exists(rutaPrueba))
+                        return new BasicOperationResponse { IsSuccess = false, Message = "Se intentó crear el archivo de prueba, pero no apareció en el recurso." };
+
+                    File.Delete(rutaPrueba);
+                }
+
+                return new BasicOperationResponse
+                {
+                    IsSuccess = true,
+                    Message = "Conexión y escritura correctas. Ruta base: " + rutaBase
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BasicOperationResponse
+                {
+                    IsSuccess = false,
+                    Message = ex.GetBaseException().Message
+                };
+            }
+        }
+
+
         public BitacoraArchivoContenidoViewModel ObtenerArchivoContenido(long idBitacoraArchivo)
         {
             if (idBitacoraArchivo <= 0) return null;

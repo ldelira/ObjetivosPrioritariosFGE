@@ -1212,34 +1212,101 @@
 
     function renderizarDetalleBitacora(detalle) {
 
+        var archivos =
+            detalle.Archivos || [];
+
+        var fotos =
+            $.grep(
+                archivos,
+                function (archivo) {
+                    return (
+                        archivo.TipoArchivo || ""
+                    )
+                    .toUpperCase() === "FOTO";
+                }
+            );
+
+        var huellas =
+            $.grep(
+                archivos,
+                function (archivo) {
+                    return (
+                        archivo.TipoArchivo || ""
+                    )
+                    .toUpperCase() === "HUELLA";
+                }
+            );
+
         var fotoHtml = "";
 
-        if (detalle.TieneFotografia) {
+        if (fotos.length > 0) {
 
-            if (detalle.FotografiaDisponible) {
+            fotoHtml =
+                '<div class="col-lg-4">' +
+                    '<div class="border rounded p-3 h-100">' +
+                        '<div class="small text-muted mb-2">Fotografía utilizada</div>' +
+                        '<img src="@Url.Action("ArchivoBitacora", "Accesos")?idBitacoraArchivo=' + fotos[0].IdBitacoraArchivo + '&v=' + new Date().getTime() + '" ' +
+                             'class="img-fluid rounded d-block mx-auto" ' +
+                             'style="max-height:320px;" />' +
+                    '</div>' +
+                '</div>';
 
-                fotoHtml =
-                    '<div class="col-lg-4">' +
-                        '<div class="border rounded p-3 h-100">' +
-                            '<div class="small text-muted mb-2">Fotografía utilizada</div>' +
-                            '<img src="@Url.Action("FotoBitacora", "Accesos")?idBitacoraBusqueda=' + detalle.IdBitacoraBusqueda + '&v=' + new Date().getTime() + '" ' +
-                                 'class="img-fluid rounded d-block mx-auto" ' +
-                                 'style="max-height:320px;" />' +
-                        '</div>' +
-                    '</div>';
+        }
+        else if (detalle.TieneFotografia) {
 
-            }
-            else {
+            fotoHtml =
+                '<div class="col-lg-4">' +
+                    '<div class="alert alert-secondary h-100 mb-0">' +
+                        '<strong>Fotografía utilizada</strong><br />' +
+                        'La búsqueda usó una fotografía, pero no existe copia visual asociada.' +
+                    '</div>' +
+                '</div>';
 
-                fotoHtml =
-                    '<div class="col-lg-4">' +
-                        '<div class="alert alert-secondary h-100 mb-0">' +
-                            '<strong>Fotografía utilizada</strong><br />' +
-                            'La búsqueda usó una fotografía, pero no existe copia visual. Esto es normal para registros creados antes de habilitar el resguardo.' +
-                        '</div>' +
-                    '</div>';
+        }
 
-            }
+        var huellasHtml = "";
+
+        if (huellas.length > 0) {
+
+            var tarjetasHuellas = "";
+
+            $.each(
+                huellas,
+                function (index, huella) {
+
+                    tarjetasHuellas +=
+                        '<div class="col-6 col-md-4 col-lg-3">' +
+                            '<div class="border rounded p-2 text-center h-100">' +
+                                '<div class="small fw-bold mb-2">Huella ' + (huella.NumeroArchivo || (index + 1)) + '</div>' +
+                                '<img src="@Url.Action("ArchivoBitacora", "Accesos")?idBitacoraArchivo=' + huella.IdBitacoraArchivo + '&v=' + new Date().getTime() + '" ' +
+                                     'class="img-fluid rounded" ' +
+                                     'style="max-height:220px;" />' +
+                                '<div class="small text-muted mt-2 text-truncate" title="' + escaparAtributo(huella.NombreOriginal || "") + '">' +
+                                    escaparHtml(huella.NombreOriginal || "") +
+                                '</div>' +
+                            '</div>' +
+                        '</div>';
+
+                }
+            );
+
+            huellasHtml =
+                '<div class="mt-3">' +
+                    '<h6 class="fw-bold">Huellas utilizadas</h6>' +
+                    '<div class="row g-2">' +
+                        tarjetasHuellas +
+                    '</div>' +
+                '</div>';
+
+        }
+        else if (detalle.CantidadHuellas > 0) {
+
+            huellasHtml =
+                '<div class="alert alert-secondary mt-3">' +
+                    '<strong>Huellas utilizadas:</strong> ' +
+                    detalle.CantidadHuellas +
+                    '. No existe copia visual asociada a este registro.' +
+                '</div>';
 
         }
 
@@ -1270,7 +1337,7 @@
         var html =
             '<div class="row g-3 mb-3">' +
 
-                '<div class="' + (detalle.TieneFotografia ? 'col-lg-8' : 'col-12') + '">' +
+                '<div class="' + (fotoHtml ? 'col-lg-8' : 'col-12') + '">' +
                     '<div class="border rounded p-3 h-100">' +
 
                         '<div class="row g-3">' +
@@ -1325,10 +1392,6 @@
                                 '<div>' + escaparHtml(detalle.Ip || "") + '</div>' +
                             '</div>' +
 
-                            (detalle.HashFotografia
-                                ? '<div class="col-12"><div class="small text-muted">SHA-256 fotografía</div><div class="small text-break">' + escaparHtml(detalle.HashFotografia) + '</div></div>'
-                                : '') +
-
                             (detalle.Error
                                 ? '<div class="col-12"><div class="alert alert-danger mb-0">' + escaparHtml(detalle.Error) + '</div></div>'
                                 : '') +
@@ -1342,7 +1405,9 @@
 
             '</div>' +
 
-            '<h6 class="fw-bold mt-3">Resultados consultados</h6>' +
+            huellasHtml +
+
+            '<h6 class="fw-bold mt-4">Resultados consultados</h6>' +
 
             '<div class="table-responsive">' +
                 '<table class="table table-sm table-hover align-middle">' +

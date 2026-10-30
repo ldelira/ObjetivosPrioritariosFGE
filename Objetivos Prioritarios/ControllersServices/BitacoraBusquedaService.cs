@@ -1,8 +1,11 @@
 ﻿using Objetivos_Prioritarios.Models;
 using Objetivos_Prioritarios.Models.Extends;
+using Objetivos_Prioritarios.Helpers;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Data.Entity;
+using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
@@ -42,9 +45,11 @@ namespace Objetivos_Prioritarios.ControllersServices
                 db.tb_BitacoraBusqueda.Add(registro);
                 db.SaveChanges();
 
-                GuardarFotografiaConsulta(
+                GuardarArchivosConsulta(
                     registro.IdBitacoraBusqueda,
-                    modelo?.Fotografia
+                    registro.FechaBusqueda,
+                    modelo?.Fotografia,
+                    huellas
                 );
 
                 return registro.IdBitacoraBusqueda;
@@ -149,16 +154,6 @@ namespace Objetivos_Prioritarios.ControllersServices
                         })
                         .ToList();
 
-                foreach (BitacoraBusquedaListadoViewModel item in resultado)
-                {
-                    item.FotografiaDisponible =
-                        !string.IsNullOrWhiteSpace(
-                            ObtenerRutaFotografiaConsulta(
-                                item.IdBitacoraBusqueda
-                            )
-                        );
-                }
-
                 return resultado;
             }
         }
@@ -190,12 +185,6 @@ namespace Objetivos_Prioritarios.ControllersServices
                         AliasBusqueda = registro.AliasBusqueda,
                         PorcentajeMinimo = registro.PorcentajeMinimo,
                         TieneFotografia = registro.TieneFotografia,
-                        FotografiaDisponible =
-                            !string.IsNullOrWhiteSpace(
-                                ObtenerRutaFotografiaConsulta(
-                                    registro.IdBitacoraBusqueda
-                                )
-                            ),
                         CantidadHuellas = registro.CantidadHuellas,
                         HashFotografia = registro.HashFotografia,
                         HashHuellas = registro.HashHuellas,
@@ -229,103 +218,497 @@ namespace Objetivos_Prioritarios.ControllersServices
                         .ToList();
 
                 resultado.TotalAccesos = resultado.Accesos.Count;
+                resultado.Archivos = ObtenerArchivos(idBitacoraBusqueda);
+                resultado.FotografiaDisponible = resultado.Archivos.Any(x =>
+                    string.Equals(
+                        x.TipoArchivo,
+                        "FOTO",
+                        StringComparison.OrdinalIgnoreCase
+                    )
+                );
 
                 return resultado;
             }
         }
 
-        public   string ObtenerRutaFotografiaConsulta(long idBitacoraBusqueda)
+        public BitacoraArchivoContenidoViewModel ObtenerArchivoContenido(long idBitacoraArchivo)
         {
-            if (idBitacoraBusqueda <= 0 || HttpContext.Current == null) return null;
+            if (idBitacoraArchivo <= 0) return null;
 
-            string carpeta =
-                HttpContext.Current.Server.MapPath(
-                    "~/App_Data/BitacoraBusquedaFotos"
+            BitacoraBusquedaArchivoViewModel archivo;
+
+            using (var db = new Filiacion_MunicipiosBitacoraEntities())
+            {
+                archivo = db.Database.SqlQuery<BitacoraBusquedaArchivoViewModel>(
+                    @"SELECT
+                          IdBitacoraArchivo,
+                          IdBitacoraBusqueda,
+                          TipoArchivo,
+                          NumeroArchivo,
+                          RutaRelativa,
+                          NombreOriginal,
+                          FechaRegistro
+                      FROM dbo.tb_BitacoraBusquedaArchivo
+                      WHERE IdBitacoraArchivo = @IdBitacoraArchivo",
+                    new SqlParameter(
+                        "@IdBitacoraArchivo",
+                        idBitacoraArchivo
+                    )
+                )
+                .FirstOrDefault();
+            }
+
+            if (
+                archivo == null ||
+                string.IsNullOrWhiteSpace(archivo.RutaRelativa)
+            )
+            {
+                return null;
+            }
+
+            string rutaShare =
+                ConfigurationManager.AppSettings[
+                    "Bitacora.RutaShare"
+                ];
+
+            string rutaBase =
+                ConfigurationManager.AppSettings[
+                    "Bitacora.RutaBaseArchivos"
+                ];
+
+            string usuarioRed =
+                ConfigurationManager.AppSettings[
+                    "PersonasInteres.UsuarioRed"
+                ];
+
+            string passwordRed =
+                ConfigurationManager.AppSettings[
+                    "PersonasInteres.PasswordRed"
+                ];
+
+            string dominioRed =
+                ConfigurationManager.AppSettings[
+                    "PersonasInteres.DominioRed"
+                ];
+
+            if (
+                string.IsNullOrWhiteSpace(rutaShare) ||
+                string.IsNullOrWhiteSpace(rutaBase) ||
+                string.IsNullOrWhiteSpace(usuarioRed) ||
+                string.IsNullOrWhiteSpace(passwordRed)
+            )
+            {
+                return null;
+            }
+
+            string usuarioConexion =
+                string.IsNullOrWhiteSpace(dominioRed)
+                    ? usuarioRed
+                    : dominioRed + "\\" + usuarioRed;
+
+            string rutaCompleta =
+                Path.GetFullPath(
+                    Path.Combine(
+                        rutaBase,
+                        archivo.RutaRelativa
+                    )
                 );
 
-            if (!Directory.Exists(carpeta)) return null;
+            string rutaBaseCompleta =
+                Path.GetFullPath(rutaBase)
+                    .TrimEnd(
+                        Path.DirectorySeparatorChar,
+                        Path.AltDirectorySeparatorChar
+                    ) +
+                Path.DirectorySeparatorChar;
 
-            string[] archivos =
-                Directory.GetFiles(
-                    carpeta,
-                    idBitacoraBusqueda + ".*"
-                );
+            if (
+                !rutaCompleta.StartsWith(
+                    rutaBaseCompleta,
+                    StringComparison.OrdinalIgnoreCase
+                )
+            )
+            {
+                return null;
+            }
 
-            return archivos.FirstOrDefault();
+            using (
+                new NetworkConnection(
+                    rutaShare,
+                    usuarioConexion,
+                    passwordRed
+                )
+            )
+            {
+                if (!File.Exists(rutaCompleta))
+                {
+                    return null;
+                }
+
+                return new BitacoraArchivoContenidoViewModel
+                {
+                    Contenido =
+                        File.ReadAllBytes(
+                            rutaCompleta
+                        ),
+
+                    NombreArchivo =
+                        string.IsNullOrWhiteSpace(
+                            archivo.NombreOriginal
+                        )
+                            ? Path.GetFileName(rutaCompleta)
+                            : archivo.NombreOriginal,
+
+                    ContentType =
+                        MimeMapping.GetMimeMapping(
+                            rutaCompleta
+                        )
+                };
+            }
         }
 
-        private   void GuardarFotografiaConsulta(long idBitacoraBusqueda, HttpPostedFileBase fotografia)
+        private List<BitacoraBusquedaArchivoViewModel> ObtenerArchivos(long idBitacoraBusqueda)
         {
+            using (var db = new Filiacion_MunicipiosBitacoraEntities())
+            {
+                return db.Database.SqlQuery<BitacoraBusquedaArchivoViewModel>(
+                    @"SELECT
+                          IdBitacoraArchivo,
+                          IdBitacoraBusqueda,
+                          TipoArchivo,
+                          NumeroArchivo,
+                          RutaRelativa,
+                          NombreOriginal,
+                          FechaRegistro
+                      FROM dbo.tb_BitacoraBusquedaArchivo
+                      WHERE IdBitacoraBusqueda = @IdBitacoraBusqueda
+                      ORDER BY
+                          CASE
+                              WHEN TipoArchivo = 'FOTO' THEN 0
+                              ELSE 1
+                          END,
+                          NumeroArchivo,
+                          IdBitacoraArchivo",
+                    new SqlParameter(
+                        "@IdBitacoraBusqueda",
+                        idBitacoraBusqueda
+                    )
+                )
+                .ToList();
+            }
+        }
+
+        private void GuardarArchivosConsulta(long idBitacoraBusqueda, DateTime fechaBusqueda, HttpPostedFileBase fotografia, List<HttpPostedFileBase> huellas)
+        {
+            if (idBitacoraBusqueda <= 0)
+            {
+                return;
+            }
+
+            bool tieneFoto =
+                fotografia != null &&
+                fotografia.ContentLength > 0 &&
+                fotografia.InputStream != null;
+
+            List<HttpPostedFileBase> huellasValidas =
+                huellas == null
+                    ? new List<HttpPostedFileBase>()
+                    : huellas
+                        .Where(x =>
+                            x != null &&
+                            x.ContentLength > 0 &&
+                            x.InputStream != null
+                        )
+                        .ToList();
+
+            if (!tieneFoto && huellasValidas.Count == 0)
+            {
+                return;
+            }
+
+            string rutaShare =
+                ConfigurationManager.AppSettings[
+                    "Bitacora.RutaShare"
+                ];
+
+            string rutaBase =
+                ConfigurationManager.AppSettings[
+                    "Bitacora.RutaBaseArchivos"
+                ];
+
+            string usuarioRed =
+                ConfigurationManager.AppSettings[
+                    "PersonasInteres.UsuarioRed"
+                ];
+
+            string passwordRed =
+                ConfigurationManager.AppSettings[
+                    "PersonasInteres.PasswordRed"
+                ];
+
+            string dominioRed =
+                ConfigurationManager.AppSettings[
+                    "PersonasInteres.DominioRed"
+                ];
+
             if (
-                idBitacoraBusqueda <= 0 ||
-                fotografia == null ||
-                fotografia.ContentLength <= 0 ||
-                fotografia.InputStream == null ||
-                HttpContext.Current == null
+                string.IsNullOrWhiteSpace(rutaShare) ||
+                string.IsNullOrWhiteSpace(rutaBase) ||
+                string.IsNullOrWhiteSpace(usuarioRed) ||
+                string.IsNullOrWhiteSpace(passwordRed)
             )
             {
                 return;
             }
 
+            string usuarioConexion =
+                string.IsNullOrWhiteSpace(dominioRed)
+                    ? usuarioRed
+                    : dominioRed + "\\" + usuarioRed;
+
+            string anio =
+                fechaBusqueda.ToString("yyyy");
+
+            string mes =
+                fechaBusqueda.ToString("MM");
+
+            string carpetaFotos =
+                Path.Combine(
+                    rutaBase,
+                    anio,
+                    mes,
+                    "Fotos"
+                );
+
+            string carpetaHuellas =
+                Path.Combine(
+                    rutaBase,
+                    anio,
+                    mes,
+                    "Huellas"
+                );
+
             try
             {
-                string extension =
-                    Path.GetExtension(
-                        fotografia.FileName ?? ""
+                using (
+                    new NetworkConnection(
+                        rutaShare,
+                        usuarioConexion,
+                        passwordRed
                     )
-                    .ToLowerInvariant();
-
-                string[] extensionesPermitidas =
+                )
                 {
-                    ".jpg",
-                    ".jpeg",
-                    ".png",
-                    ".webp"
-                };
-
-                if (!extensionesPermitidas.Contains(extension))
-                {
-                    extension = ".jpg";
-                }
-
-                string carpeta =
-                    HttpContext.Current.Server.MapPath(
-                        "~/App_Data/BitacoraBusquedaFotos"
-                    );
-
-                Directory.CreateDirectory(carpeta);
-
-                string ruta =
-                    Path.Combine(
-                        carpeta,
-                        idBitacoraBusqueda + extension
-                    );
-
-                Stream stream = fotografia.InputStream;
-                long posicionOriginal = stream.CanSeek ? stream.Position : 0;
-
-                try
-                {
-                    if (stream.CanSeek) stream.Position = 0;
-
-                    using (FileStream destino = File.Create(ruta))
+                    if (tieneFoto)
                     {
-                        stream.CopyTo(destino);
+                        Directory.CreateDirectory(
+                            carpetaFotos
+                        );
+
+                        GuardarArchivoConsulta(
+                            idBitacoraBusqueda,
+                            fotografia,
+                            "FOTO",
+                            1,
+                            Path.Combine(
+                                anio,
+                                mes,
+                                "Fotos"
+                            ),
+                            carpetaFotos,
+                            idBitacoraBusqueda.ToString()
+                        );
                     }
-                }
-                finally
-                {
-                    if (stream.CanSeek) stream.Position = posicionOriginal;
+
+                    if (huellasValidas.Count > 0)
+                    {
+                        Directory.CreateDirectory(
+                            carpetaHuellas
+                        );
+
+                        for (
+                            int i = 0;
+                            i < huellasValidas.Count;
+                            i++
+                        )
+                        {
+                            int numeroHuella = i + 1;
+
+                            GuardarArchivoConsulta(
+                                idBitacoraBusqueda,
+                                huellasValidas[i],
+                                "HUELLA",
+                                numeroHuella,
+                                Path.Combine(
+                                    anio,
+                                    mes,
+                                    "Huellas"
+                                ),
+                                carpetaHuellas,
+                                idBitacoraBusqueda +
+                                "_" +
+                                numeroHuella.ToString("00")
+                            );
+                        }
+                    }
                 }
             }
             catch
             {
                 /*
-                 * La bitácora principal y el hash ya quedaron guardados.
-                 * Un problema al conservar la copia visual no debe
-                 * impedir la búsqueda biométrica.
+                 * La búsqueda y la bitácora principal ya existen.
+                 * Si el servidor de archivos no está disponible,
+                 * no bloqueamos la consulta biométrica.
                  */
             }
+        }
+
+        private void GuardarArchivoConsulta(long idBitacoraBusqueda, HttpPostedFileBase archivo, string tipoArchivo, int numeroArchivo, string carpetaRelativa, string carpetaFisica, string nombreBase)
+        {
+            string extension =
+                ObtenerExtensionPermitida(
+                    archivo.FileName
+                );
+
+            string nombreArchivo =
+                nombreBase +
+                extension;
+
+            string rutaRelativa =
+                Path.Combine(
+                    carpetaRelativa,
+                    nombreArchivo
+                );
+
+            string rutaFisica =
+                Path.Combine(
+                    carpetaFisica,
+                    nombreArchivo
+                );
+
+            Stream stream =
+                archivo.InputStream;
+
+            long posicionOriginal =
+                stream.CanSeek
+                    ? stream.Position
+                    : 0;
+
+            try
+            {
+                if (stream.CanSeek)
+                {
+                    stream.Position = 0;
+                }
+
+                using (
+                    FileStream destino =
+                        File.Create(
+                            rutaFisica
+                        )
+                )
+                {
+                    stream.CopyTo(
+                        destino
+                    );
+                }
+
+                using (
+                    var db =
+                        new Filiacion_MunicipiosBitacoraEntities()
+                )
+                {
+                    db.Database.ExecuteSqlCommand(
+                        @"INSERT INTO dbo.tb_BitacoraBusquedaArchivo
+                          (
+                              IdBitacoraBusqueda,
+                              TipoArchivo,
+                              NumeroArchivo,
+                              RutaRelativa,
+                              NombreOriginal
+                          )
+                          VALUES
+                          (
+                              @IdBitacoraBusqueda,
+                              @TipoArchivo,
+                              @NumeroArchivo,
+                              @RutaRelativa,
+                              @NombreOriginal
+                          )",
+                        new SqlParameter(
+                            "@IdBitacoraBusqueda",
+                            idBitacoraBusqueda
+                        ),
+                        new SqlParameter(
+                            "@TipoArchivo",
+                            tipoArchivo
+                        ),
+                        new SqlParameter(
+                            "@NumeroArchivo",
+                            numeroArchivo
+                        ),
+                        new SqlParameter(
+                            "@RutaRelativa",
+                            rutaRelativa
+                        ),
+                        new SqlParameter(
+                            "@NombreOriginal",
+                            Limitar(
+                                Path.GetFileName(
+                                    archivo.FileName ?? ""
+                                ),
+                                255
+                            ) ?? nombreArchivo
+                        )
+                    );
+                }
+            }
+            catch
+            {
+                try
+                {
+                    if (File.Exists(rutaFisica))
+                    {
+                        File.Delete(
+                            rutaFisica
+                        );
+                    }
+                }
+                catch
+                {
+                }
+
+                throw;
+            }
+            finally
+            {
+                if (stream.CanSeek)
+                {
+                    stream.Position =
+                        posicionOriginal;
+                }
+            }
+        }
+
+        private string ObtenerExtensionPermitida(string nombreArchivo)
+        {
+            string extension =
+                Path.GetExtension(
+                    nombreArchivo ?? ""
+                )
+                .ToLowerInvariant();
+
+            string[] extensionesPermitidas =
+            {
+                ".jpg",
+                ".jpeg",
+                ".png",
+                ".webp",
+                ".bmp"
+            };
+
+            return extensionesPermitidas.Contains(extension)
+                ? extension
+                : ".jpg";
         }
 
         private   string ObtenerNombreFuente(int idTbFuente)

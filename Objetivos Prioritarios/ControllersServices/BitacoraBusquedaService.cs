@@ -13,10 +13,11 @@ using System.Security.Cryptography;
 using System.Security.Principal;
 using System.Text;
 using System.Web;
+using Objetivos_Prioritarios.Utils;
 
 namespace Objetivos_Prioritarios.ControllersServices
 {
-    public   class BitacoraBusquedaService
+    public   class BitacoraBusquedaService : BaseService
     {
         public   long RegistrarInicio(BusquedaCoincidenciasViewModel modelo, string usuario, string ip, string userAgent)
         {
@@ -272,15 +273,15 @@ namespace Objetivos_Prioritarios.ControllersServices
                                 "__prueba_bitacora_" + Guid.NewGuid().ToString("N") + ".tmp"
                             );
 
-                        File.WriteAllText(
+                        System.IO.File.WriteAllText(
                             rutaPrueba,
                             DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
                         );
 
-                        if (!File.Exists(rutaPrueba))
+                        if (!System.IO.File.Exists(rutaPrueba))
                             throw new IOException("Se intentó crear el archivo de prueba, pero no apareció en el recurso.");
 
-                        File.Delete(rutaPrueba);
+                        System.IO.File.Delete(rutaPrueba);
                     });
                 }
 
@@ -400,10 +401,10 @@ namespace Objetivos_Prioritarios.ControllersServices
             {
                 WindowsIdentity.RunImpersonated(userHandle, () =>
                 {
-                    if (File.Exists(rutaCompleta))
+                    if (System.IO.File.Exists(rutaCompleta))
                     {
                         contenido =
-                            File.ReadAllBytes(
+                            System.IO.File.ReadAllBytes(
                                 rutaCompleta
                             );
                     }
@@ -656,7 +657,7 @@ namespace Objetivos_Prioritarios.ControllersServices
 
                 using (
                     FileStream destino =
-                        File.Create(
+                        System.IO.File.Create(
                             rutaFisica
                         )
                 )
@@ -720,9 +721,9 @@ namespace Objetivos_Prioritarios.ControllersServices
             {
                 try
                 {
-                    if (File.Exists(rutaFisica))
+                    if (System.IO.File.Exists(rutaFisica))
                     {
-                        File.Delete(
+                        System.IO.File.Delete(
                             rutaFisica
                         );
                     }

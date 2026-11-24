@@ -1,0 +1,194 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="Filiacion_MunicipiosBitacoraModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="tb_BitacoraAccesoResultado">
+          <Key>
+            <PropertyRef Name="IdBitacoraAcceso" />
+          </Key>
+          <Property Name="IdBitacoraAcceso" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="IdBitacoraBusqueda" Type="bigint" Nullable="false" />
+          <Property Name="FechaAcceso" Type="datetime2" Precision="0" Nullable="false" />
+          <Property Name="IdTbFuente" Type="int" Nullable="false" />
+          <Property Name="IdPersona" Type="int" Nullable="false" />
+          <Property Name="IdCoincidencia" Type="int" />
+          <Property Name="EsCoincidenciaDirecta" Type="bit" Nullable="false" />
+          <Property Name="TipoAccion" Type="varchar" MaxLength="50" Nullable="false" />
+        </EntityType>
+        <EntityType Name="tb_BitacoraBusqueda">
+          <Key>
+            <PropertyRef Name="IdBitacoraBusqueda" />
+          </Key>
+          <Property Name="IdBitacoraBusqueda" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Usuario" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="FechaBusqueda" Type="datetime2" Precision="0" Nullable="false" />
+          <Property Name="ModoBusquedaTexto" Type="nvarchar" MaxLength="30" />
+          <Property Name="ModoCombinacion" Type="nvarchar" MaxLength="30" />
+          <Property Name="TextoBusqueda" Type="nvarchar" MaxLength="300" />
+          <Property Name="AliasBusqueda" Type="nvarchar" MaxLength="300" />
+          <Property Name="PorcentajeMinimo" Type="int" />
+          <Property Name="TieneFotografia" Type="bit" Nullable="false" />
+          <Property Name="CantidadHuellas" Type="int" Nullable="false" />
+          <Property Name="HashFotografia" Type="varchar" MaxLength="64" />
+          <Property Name="HashHuellas" Type="nvarchar(max)" />
+          <Property Name="TotalCoincidencias" Type="int" Nullable="false" />
+          <Property Name="TiempoMs" Type="bigint" />
+          <Property Name="Exito" Type="bit" Nullable="false" />
+          <Property Name="Error" Type="nvarchar" MaxLength="1000" />
+          <Property Name="Ip" Type="varchar" MaxLength="50" />
+          <Property Name="UserAgent" Type="nvarchar" MaxLength="500" />
+        </EntityType>
+        <Association Name="FK_SIC_BitacoraAcceso_Busqueda">
+          <End Role="tb_BitacoraBusqueda" Type="Self.tb_BitacoraBusqueda" Multiplicity="1" />
+          <End Role="tb_BitacoraAccesoResultado" Type="Self.tb_BitacoraAccesoResultado" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tb_BitacoraBusqueda">
+              <PropertyRef Name="IdBitacoraBusqueda" />
+            </Principal>
+            <Dependent Role="tb_BitacoraAccesoResultado">
+              <PropertyRef Name="IdBitacoraBusqueda" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="Filiacion_MunicipiosBitacoraModelStoreContainer">
+          <EntitySet Name="tb_BitacoraAccesoResultado" EntityType="Self.tb_BitacoraAccesoResultado" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tb_BitacoraBusqueda" EntityType="Self.tb_BitacoraBusqueda" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_SIC_BitacoraAcceso_Busqueda" Association="Self.FK_SIC_BitacoraAcceso_Busqueda">
+            <End Role="tb_BitacoraBusqueda" EntitySet="tb_BitacoraBusqueda" />
+            <End Role="tb_BitacoraAccesoResultado" EntitySet="tb_BitacoraAccesoResultado" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="Filiacion_MunicipiosBitacoraModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="tb_BitacoraAccesoResultado">
+          <Key>
+            <PropertyRef Name="IdBitacoraAcceso" />
+          </Key>
+          <Property Name="IdBitacoraAcceso" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="IdBitacoraBusqueda" Type="Int64" Nullable="false" />
+          <Property Name="FechaAcceso" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="IdTbFuente" Type="Int32" Nullable="false" />
+          <Property Name="IdPersona" Type="Int32" Nullable="false" />
+          <Property Name="IdCoincidencia" Type="Int32" />
+          <Property Name="EsCoincidenciaDirecta" Type="Boolean" Nullable="false" />
+          <Property Name="TipoAccion" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <NavigationProperty Name="tb_BitacoraBusqueda" Relationship="Self.FK_SIC_BitacoraAcceso_Busqueda" FromRole="tb_BitacoraAccesoResultado" ToRole="tb_BitacoraBusqueda" />
+        </EntityType>
+        <EntityType Name="tb_BitacoraBusqueda">
+          <Key>
+            <PropertyRef Name="IdBitacoraBusqueda" />
+          </Key>
+          <Property Name="IdBitacoraBusqueda" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Usuario" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="FechaBusqueda" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="ModoBusquedaTexto" Type="String" MaxLength="30" FixedLength="false" Unicode="true" />
+          <Property Name="ModoCombinacion" Type="String" MaxLength="30" FixedLength="false" Unicode="true" />
+          <Property Name="TextoBusqueda" Type="String" MaxLength="300" FixedLength="false" Unicode="true" />
+          <Property Name="AliasBusqueda" Type="String" MaxLength="300" FixedLength="false" Unicode="true" />
+          <Property Name="PorcentajeMinimo" Type="Int32" />
+          <Property Name="TieneFotografia" Type="Boolean" Nullable="false" />
+          <Property Name="CantidadHuellas" Type="Int32" Nullable="false" />
+          <Property Name="HashFotografia" Type="String" MaxLength="64" FixedLength="false" Unicode="false" />
+          <Property Name="HashHuellas" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="TotalCoincidencias" Type="Int32" Nullable="false" />
+          <Property Name="TiempoMs" Type="Int64" />
+          <Property Name="Exito" Type="Boolean" Nullable="false" />
+          <Property Name="Error" Type="String" MaxLength="1000" FixedLength="false" Unicode="true" />
+          <Property Name="Ip" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="UserAgent" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="tb_BitacoraAccesoResultado" Relationship="Self.FK_SIC_BitacoraAcceso_Busqueda" FromRole="tb_BitacoraBusqueda" ToRole="tb_BitacoraAccesoResultado" />
+        </EntityType>
+        <Association Name="FK_SIC_BitacoraAcceso_Busqueda">
+          <End Role="tb_BitacoraBusqueda" Type="Self.tb_BitacoraBusqueda" Multiplicity="1" />
+          <End Role="tb_BitacoraAccesoResultado" Type="Self.tb_BitacoraAccesoResultado" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tb_BitacoraBusqueda">
+              <PropertyRef Name="IdBitacoraBusqueda" />
+            </Principal>
+            <Dependent Role="tb_BitacoraAccesoResultado">
+              <PropertyRef Name="IdBitacoraBusqueda" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="Filiacion_MunicipiosBitacoraEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="tb_BitacoraAccesoResultado" EntityType="Self.tb_BitacoraAccesoResultado" />
+          <EntitySet Name="tb_BitacoraBusqueda" EntityType="Self.tb_BitacoraBusqueda" />
+          <AssociationSet Name="FK_SIC_BitacoraAcceso_Busqueda" Association="Self.FK_SIC_BitacoraAcceso_Busqueda">
+            <End Role="tb_BitacoraBusqueda" EntitySet="tb_BitacoraBusqueda" />
+            <End Role="tb_BitacoraAccesoResultado" EntitySet="tb_BitacoraAccesoResultado" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="Filiacion_MunicipiosBitacoraModelStoreContainer" CdmEntityContainer="Filiacion_MunicipiosBitacoraEntities">
+          <EntitySetMapping Name="tb_BitacoraAccesoResultado">
+            <EntityTypeMapping TypeName="Filiacion_MunicipiosBitacoraModel.tb_BitacoraAccesoResultado">
+              <MappingFragment StoreEntitySet="tb_BitacoraAccesoResultado">
+                <ScalarProperty Name="IdBitacoraAcceso" ColumnName="IdBitacoraAcceso" />
+                <ScalarProperty Name="IdBitacoraBusqueda" ColumnName="IdBitacoraBusqueda" />
+                <ScalarProperty Name="FechaAcceso" ColumnName="FechaAcceso" />
+                <ScalarProperty Name="IdTbFuente" ColumnName="IdTbFuente" />
+                <ScalarProperty Name="IdPersona" ColumnName="IdPersona" />
+                <ScalarProperty Name="IdCoincidencia" ColumnName="IdCoincidencia" />
+                <ScalarProperty Name="EsCoincidenciaDirecta" ColumnName="EsCoincidenciaDirecta" />
+                <ScalarProperty Name="TipoAccion" ColumnName="TipoAccion" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tb_BitacoraBusqueda">
+            <EntityTypeMapping TypeName="Filiacion_MunicipiosBitacoraModel.tb_BitacoraBusqueda">
+              <MappingFragment StoreEntitySet="tb_BitacoraBusqueda">
+                <ScalarProperty Name="IdBitacoraBusqueda" ColumnName="IdBitacoraBusqueda" />
+                <ScalarProperty Name="Usuario" ColumnName="Usuario" />
+                <ScalarProperty Name="FechaBusqueda" ColumnName="FechaBusqueda" />
+                <ScalarProperty Name="ModoBusquedaTexto" ColumnName="ModoBusquedaTexto" />
+                <ScalarProperty Name="ModoCombinacion" ColumnName="ModoCombinacion" />
+                <ScalarProperty Name="TextoBusqueda" ColumnName="TextoBusqueda" />
+                <ScalarProperty Name="AliasBusqueda" ColumnName="AliasBusqueda" />
+                <ScalarProperty Name="PorcentajeMinimo" ColumnName="PorcentajeMinimo" />
+                <ScalarProperty Name="TieneFotografia" ColumnName="TieneFotografia" />
+                <ScalarProperty Name="CantidadHuellas" ColumnName="CantidadHuellas" />
+                <ScalarProperty Name="HashFotografia" ColumnName="HashFotografia" />
+                <ScalarProperty Name="HashHuellas" ColumnName="HashHuellas" />
+                <ScalarProperty Name="TotalCoincidencias" ColumnName="TotalCoincidencias" />
+                <ScalarProperty Name="TiempoMs" ColumnName="TiempoMs" />
+                <ScalarProperty Name="Exito" ColumnName="Exito" />
+                <ScalarProperty Name="Error" ColumnName="Error" />
+                <ScalarProperty Name="Ip" ColumnName="Ip" />
+                <ScalarProperty Name="UserAgent" ColumnName="UserAgent" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="false" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="Ninguno" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

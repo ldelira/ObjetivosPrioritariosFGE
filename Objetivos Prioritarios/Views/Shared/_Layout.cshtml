@@ -2072,9 +2072,9 @@
                         data-bs-parent="#sidebar-nav">
 
 
-                        <li>
+                        <li >
 
-                            <a class="@(isConsultaSic ? "active" : "")"
+                            <a class="@(isConsultaSic ? "active" : "")@(usuarioSesion.nvarchar_no_interno.ToUpper()=="ESALAS"?" disabled":"")"
                                href="@Url.Action("Index", "SIC")">
 
                                 <i class="fa fa-id-card-o"></i>

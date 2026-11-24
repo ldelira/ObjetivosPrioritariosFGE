@@ -12014,3 +12014,275 @@ body.sic-modal-abierto {
         overflow-y: auto;
     }
 }
+/* =========================================================
+   MODAL DETENIDOS MUNICIPIOS
+   ========================================================= */
+
+/* ANCHO DEL MODAL */
+.modalDetenidosMunicipios-lg {
+    width: 96%;
+    max-width: 1800px;
+    margin: 1rem auto;
+}
+
+/* CONTENIDO DEL MODAL */
+#modalDetenidosMunicipios .modal-content {
+    max-height: 92vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* AREA DE CONTENIDO */
+#modalDetenidosMunicipios .modal-body {
+    max-height: calc(92vh - 130px);
+    overflow-y: auto;
+    padding: 15px;
+}
+
+/* DISTRIBUCION DE COLUMNAS 45% / 55% */
+#modalDetenidosMunicipios .sic-modal-columns {
+    display: grid;
+    grid-template-columns: minmax(0, 50fr) minmax(0, 50fr);
+    gap: 15px;
+    width: 100%;
+    align-items: start;
+}
+
+/* COLUMNA INFORMACION DEL DETENIDO */
+#modalDetenidosMunicipios .sic-modal-col-info {
+    min-width: 0;
+    width: 100%;
+}
+
+/* COLUMNA COINCIDENCIAS MUNICIPIOS */
+#modalDetenidosMunicipios .sic-modal-col-municipios {
+    min-width: 0;
+    width: 100%;
+}
+
+/* CONTENEDORES */
+#modalDetenidosMunicipios .sic-modal-panel {
+    width: 100%;
+    height: auto;
+    min-width: 0;
+    border: 1px solid #dee2e6;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #fff;
+}
+
+/* ENCABEZADOS */
+#modalDetenidosMunicipios .sic-modal-panel-header {
+    padding: 12px 15px;
+    background: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+    font-weight: 600;
+    font-size: 13px;
+    color: #495057;
+}
+
+    #modalDetenidosMunicipios .sic-modal-panel-header i {
+        margin-right: 7px;
+    }
+
+/* CONTENIDO INTERNO */
+#modalDetenidosMunicipios .sic-modal-panel-body {
+    padding: 12px;
+}
+
+/* RESPONSIVE */
+@media (max-width: 991px) {
+    #modalDetenidosMunicipios .sic-modal-columns {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+/* TAMAÑO EXCLUSIVO PARA FOTO EN MODAL MUNICIPIOS */
+#modalDetenidosMunicipios .sic-foto-modal-municipios {
+    width: 30%;
+    max-width: 180px;
+    max-height: 180px;
+    height: auto;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto;
+}
+
+#modalDetenidosMunicipios .sic-foto-detenido-modal {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+#modalDetenidosMunicipios .sic-foto-modal-municipios {
+    width: 180px;
+    max-width: 100%;
+    max-height: 180px;
+    height: auto;
+    object-fit: contain;
+    display: block;
+}
+
+/* IDENTIDAD: FOTO + NOMBRE */
+#modalDetenidosMunicipios .sic-detenido-identidad {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+/* FOTO FUERA DE LA TARJETA AZUL */
+#modalDetenidosMunicipios .sic-foto-detenido-modal {
+    flex: 0 0 130px;
+    width: 130px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#modalDetenidosMunicipios .sic-foto-modal-municipios {
+    width: 130px;
+    height: 130px;
+    max-width: 130px;
+    object-fit: cover;
+    display: block;
+    border-radius: 8px;
+}
+
+/* TARJETA AZUL DEL NOMBRE */
+#modalDetenidosMunicipios .sic-detenido-identidad .sic-detenido-c5-head {
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+}
+
+@media (max-width: 500px) {
+    #modalDetenidosMunicipios .sic-detenido-identidad {
+        flex-wrap: wrap;
+    }
+}
+
+/* DISTRIBUCIÓN PRINCIPAL: FOTO E INFORMACIÓN */
+#modalDetenidosMunicipios .sic-detenido-c5-layout {
+    display: grid;
+    grid-template-columns: 135px minmax(0, 1fr);
+    gap: 14px;
+    width: 100%;
+    align-items: start;
+}
+
+    /* CUANDO NO SE MUESTRA FOTO */
+    #modalDetenidosMunicipios .sic-detenido-c5-layout.sin-foto {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+/* COLUMNA EXCLUSIVA DE FOTOGRAFÍA */
+#modalDetenidosMunicipios .sic-detenido-foto-col {
+    width: 135px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+/* FOTOGRAFÍA */
+#modalDetenidosMunicipios .sic-foto-modal-municipios {
+    width: 130px;
+    height: 150px;
+    max-width: 130px;
+    object-fit: cover;
+    display: block;
+    border-radius: 8px;
+}
+
+/* COLUMNA DE INFORMACIÓN */
+#modalDetenidosMunicipios .sic-detenido-info-col {
+    min-width: 0;
+    width: 100%;
+}
+
+    /* ENCABEZADO DEL NOMBRE */
+    #modalDetenidosMunicipios .sic-detenido-info-col .sic-detenido-c5-head {
+        width: 100%;
+        margin: 0 0 12px 0;
+    }
+
+    /* DATOS */
+    #modalDetenidosMunicipios .sic-detenido-info-col .sic-detenido-c5-grid {
+        width: 100%;
+    }
+
+    /* CARACTERÍSTICAS Y ALIAS */
+    #modalDetenidosMunicipios .sic-detenido-info-col .sic-detenido-c5-extra,
+    #modalDetenidosMunicipios .sic-detenido-info-col .sic-alias-accordion {
+        width: 100%;
+    }
+
+.btn-cerrar-modal {
+    background: #dc3545;
+    border: 1px solid #dc3545;
+    color: #fff;
+    font-weight: 600;
+    padding: 9px 18px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+    .btn-cerrar-modal:hover {
+        background: #bb2d3b;
+        border-color: #b02a37;
+        color: #fff;
+        box-shadow: 0 3px 8px rgba(220, 53, 69, 0.25);
+    }
+
+    .btn-cerrar-modal:focus {
+        background: #bb2d3b;
+        color: #fff;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.25);
+    }
+
+    .btn-cerrar-modal i {
+        margin-right: 5px;
+    }
+
+/* CONTENEDOR DE NAVEGACIÓN Y CONTADOR */
+.sic-detenidos-municipio-navigation {
+    position: absolute;
+    top: -23px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    z-index: 20;
+}
+
+    /* BOTONES ANTERIOR Y SIGUIENTE */
+    .sic-detenidos-municipio-navigation .sic-rel-nav-flotante {
+        position: static;
+        transform: none;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        flex-shrink: 0;
+    }
+
+    /* CONTADOR */
+    .sic-detenidos-municipio-navigation .sic-rel-counter-superior {
+        position: static;
+        transform: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 55px;
+        height: 32px;
+        padding: 0 10px;
+        border-radius: 20px;
+        flex-shrink: 0;
+    }

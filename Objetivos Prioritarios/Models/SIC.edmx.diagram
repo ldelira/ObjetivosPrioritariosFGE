@@ -5,10 +5,14 @@
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
       <Diagram DiagramId="a2de8ffb9b4f45c39fb32c392d506612" Name="Diagram1">
-        <EntityTypeShape EntityType="SICModel.DETENCION" Width="1.5" PointX="0.75" PointY="0.75" />
-        <EntityTypeShape EntityType="SICModel.DETENIDO" Width="1.5" PointX="2.75" PointY="0.75" />
-        <EntityTypeShape EntityType="SICModel.Modulos" Width="1.5" PointX="4.75" PointY="0.75" />
-        <EntityTypeShape EntityType="SICModel.Usuario" Width="1.5" PointX="4.75" PointY="3.75" />
+        <EntityTypeShape EntityType="SICModel.Detencion" Width="1.5" PointX="3" PointY="3" />
+        <EntityTypeShape EntityType="SICModel.Detenido" Width="1.5" PointX="5.25" PointY="1.25" />
+        <EntityTypeShape EntityType="SICModel.Modulos" Width="1.5" PointX="0.75" PointY="0.75" />
+        <AssociationConnector Association="SICModel.FK_DETENIDO_DETENCION" />
+        <EntityTypeShape EntityType="SICModel.Usuario" Width="1.5" PointX="0.75" PointY="3.625" />
+        <AssociationConnector Association="SICModel.FK_DETENCION_UsuarioCrea" />
+        <AssociationConnector Association="SICModel.FK_DETENCION_UsuarioTraslada" />
+        <AssociationConnector Association="SICModel.FK_DETENIDO_Usuario" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

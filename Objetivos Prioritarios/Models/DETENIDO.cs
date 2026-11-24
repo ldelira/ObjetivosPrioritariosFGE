@@ -12,10 +12,11 @@ namespace Objetivos_Prioritarios.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class DETENIDO
+    public partial class Detenido
     {
         public int IDDETENIDO { get; set; }
         public Nullable<int> IDDETENCION { get; set; }
+        public string SERIE_MUNICIPIO { get; set; }
         public string NOMBRE { get; set; }
         public string ALIAS { get; set; }
         public string EDAD { get; set; }
@@ -38,8 +39,26 @@ namespace Objetivos_Prioritarios.Models
         public string Telefono { get; set; }
         public string Estatus { get; set; }
         public Nullable<System.DateTime> FechaRegistro { get; set; }
-        public string UsuarioRegistro { get; set; }
+        public Nullable<int> idusuario { get; set; }
         public string RFC { get; set; }
         public string CURP { get; set; }
+        public string estadoOrigen { get; set; }
+        public string Nacionalidad { get; set; }
+        public string TipoDocumentoIdentificacion { get; set; }
+        public string OtroDocumentoIdentificacion { get; set; }
+        public Nullable<bool> TieneLesionesVisibles { get; set; }
+        public string CualesLesiones { get; set; }
+        public Nullable<bool> EsGrupoVulnerable { get; set; }
+        public string CualGrupoVulnerable { get; set; }
+        public Nullable<bool> EsGrupoDelictivo { get; set; }
+        public string CualGrupoDelictivo { get; set; }
+        public Nullable<bool> TienePadecimiento { get; set; }
+        public string CualPadecimiento { get; set; }
+        public string FamiliarPrimerApellido { get; set; }
+        public string FamiliarSegundoApellido { get; set; }
+        public string FamiliarNombres { get; set; }
+    
+        public virtual Detencion Detencion { get; set; }
+        public virtual Usuario Usuario { get; set; }
     }
 }

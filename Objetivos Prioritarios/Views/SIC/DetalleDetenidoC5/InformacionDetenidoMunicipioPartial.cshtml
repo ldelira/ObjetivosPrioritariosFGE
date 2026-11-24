@@ -10,9 +10,13 @@
        DATOS RECIBIDOS
        ============================================================ */
 
+    bool mostrarFotoDetenido =
+    ViewData["MostrarFotoDetenido"] != null &&
+    Convert.ToBoolean(ViewData["MostrarFotoDetenido"]);
+
     var datosDetenidoC5 =
-        ViewBag.DatosDetenidoC5 as List<tb_Detenido_C5>
-        ?? new List<tb_Detenido_C5>();
+ViewBag.DatosDetenidoC5 as List<tb_Detenido_C5>
+?? new List<tb_Detenido_C5>();
 
     int idDetenidoRaiz =
         ViewBag.IdDetenidoRaiz == null
@@ -352,250 +356,275 @@
                 <!-- =================================================
                      CONTENEDOR PRINCIPAL
                      ================================================= -->
-                <div class="sic-detenido-c5">
+            <div class="sic-detenido-c5">
 
-                    <!-- =============================================
-                         NOMBRE / SEXO / EDAD
-                         ============================================= -->
-                    <div class="sic-detenido-c5-head">
+                <!-- DISTRIBUCIÓN: FOTO E INFORMACIÓN -->
+                <div class="sic-detenido-c5-layout @(mostrarFotoDetenido ? "con-foto" : "sin-foto")">
 
-                        <div class="sic-detenido-c5-icon">
-                            <i class="fa fa-user"></i>
-                        </div>
+                    @if (mostrarFotoDetenido)
+                    {
+                        string fotoPrincipalUrl = Url.Action(
+                            "FotoDetenidoC5",
+                            "SIC",
+                            new { idDetenido = Model.IDDETENIDO }
+                        );
 
-                        <div>
+                        <!-- COLUMNA IZQUIERDA: FOTOGRAFÍA -->
+                        <div class="sic-detenido-foto-col">
 
-                            <strong>
-                                @detNombreCompleto
-                            </strong>
-
-                            <span>
-
-                                @detSexo
-
-                                @if (detEdad != "SIN INFORMACIÓN")
-                                {
-                                    <text>
-                                        · @detEdad años
-                                    </text>
-                                }
-
-                            </span>
+                            <img src="@fotoPrincipalUrl"
+                                 alt="Fotografía del detenido"
+                                 class="sic-foto-expandible sic-foto-modal-municipios"
+                                 role="button"
+                                 tabindex="0"
+                                 title="Presione para ampliar"
+                                 onclick="abrirFotoExpandida(this.currentSrc || this.src, this.alt);"
+                                 onerror="mostrarFotoNoExiste(this);" />
 
                         </div>
+                    }
 
-                    </div>
+                    <!-- COLUMNA DERECHA: INFORMACIÓN COMPLETA -->
+                    <div class="sic-detenido-info-col">
 
-                    <!-- =============================================
-                         DATOS
-                         ALIAS YA NO VA AQUÍ
-                         ============================================= -->
-                    <div class="sic-detenido-c5-grid">
+                        <!-- NOMBRE / SEXO / EDAD -->
+                        <div class="sic-detenido-c5-head">
 
-                        <div class="sic-detenido-line">
+                            <div class="sic-detenido-c5-icon">
+                                <i class="fa fa-user"></i>
+                            </div>
 
-                            <label>
-                                Fecha nac.:
-                            </label>
-
-                            <strong>
-                                @detFechaNacimiento
-                            </strong>
-
-                        </div>
-
-                        <div class="sic-detenido-line">
-
-                            <label>
-                                Originario:
-                            </label>
-
-                            <strong>
-                                @detOriginario
-                            </strong>
-
-                        </div>
-
-                        <div class="sic-detenido-line">
-
-                            <label>
-                                Ocupación:
-                            </label>
-
-                            <strong>
-                                @detOcupacion
-                            </strong>
-
-                        </div>
-
-                        <div class="sic-detenido-line">
-
-                            <label>
-                                Estado:
-                            </label>
-
-                            <strong>
-                                @detEstado
-                            </strong>
-
-                        </div>
-
-                        <div class="sic-detenido-line">
-
-                            <label>
-                                Calle:
-                            </label>
-
-                            <strong>
-                                @detCalle
-                            </strong>
-
-                        </div>
-
-                        <div class="sic-detenido-line">
-
-                            <label>
-                                Colonia:
-                            </label>
-
-                            <strong>
-                                @detColonia
-                            </strong>
-
-                        </div>
-
-                        <div class="sic-detenido-line">
-
-                            <label>
-                                Núm. ext.:
-                            </label>
-
-                            <strong>
-                                @detNumExt
-                            </strong>
-
-                        </div>
-
-                        <div class="sic-detenido-line">
-
-                            <label>
-                                Núm. int.:
-                            </label>
-
-                            <strong>
-                                @detNumInt
-                            </strong>
-
-                        </div>
-
-                        <div class="sic-detenido-line">
-
-                            <label>
-                                C.P.:
-                            </label>
-
-                            <strong>
-                                @detCp
-                            </strong>
-
-                        </div>
-
-                        <div class="sic-detenido-line">
-
-                            <label>
-                                Municipio:
-                            </label>
-
-                            <strong>
-                                @detMunicipio
-                            </strong>
-
-                        </div>
-
-                    </div>
-
-                    <!-- =============================================
-                         CARACTERÍSTICAS
-                         ============================================= -->
-                    <div class="sic-detenido-c5-extra">
-
-                        <label>
-                            Características:
-                        </label>
-
-                        <strong>
-                            @detCaracteristicas
-                        </strong>
-
-                    </div>
-
-                    <!-- =============================================
-                         TODOS LOS ALIAS RELACIONADOS
-                         ============================================= -->
-                    <div class="sic-alias-accordion">
-
-                        <button type="button"
-                                class="sic-alias-header">
-
-                            <span class="sic-alias-header-left">
-
-                                <i class="fa fa-tag"></i>
-
+                            <div>
                                 <strong>
-                                    Alias registrados
+                                    @detNombreCompleto
                                 </strong>
 
-                                <span class="sic-alias-total">
-                                    @aliasRegistrados.Count
+                                <span>
+                                    @detSexo
+
+                                    @if (detEdad != "SIN INFORMACIÓN")
+                                    {
+                                        <text> · @detEdad años</text>
+                                    }
+                                </span>
+                            </div>
+
+                        </div>
+
+                        <!-- =============================================
+            DATOS
+            ALIAS YA NO VA AQUÍ
+            ============================================= -->
+                        <div class="sic-detenido-c5-grid">
+
+                            <div class="sic-detenido-line">
+
+                                <label>
+                                    Fecha nac.:
+                                </label>
+
+                                <strong>
+                                    @detFechaNacimiento
+                                </strong>
+
+                            </div>
+
+                            <div class="sic-detenido-line">
+
+                                <label>
+                                    Originario:
+                                </label>
+
+                                <strong>
+                                    @detOriginario
+                                </strong>
+
+                            </div>
+
+                            <div class="sic-detenido-line">
+
+                                <label>
+                                    Ocupación:
+                                </label>
+
+                                <strong>
+                                    @detOcupacion
+                                </strong>
+
+                            </div>
+
+                            <div class="sic-detenido-line">
+
+                                <label>
+                                    Estado:
+                                </label>
+
+                                <strong>
+                                    @detEstado
+                                </strong>
+
+                            </div>
+
+                            <div class="sic-detenido-line">
+
+                                <label>
+                                    Calle:
+                                </label>
+
+                                <strong>
+                                    @detCalle
+                                </strong>
+
+                            </div>
+
+                            <div class="sic-detenido-line">
+
+                                <label>
+                                    Colonia:
+                                </label>
+
+                                <strong>
+                                    @detColonia
+                                </strong>
+
+                            </div>
+
+                            <div class="sic-detenido-line">
+
+                                <label>
+                                    Núm. ext.:
+                                </label>
+
+                                <strong>
+                                    @detNumExt
+                                </strong>
+
+                            </div>
+
+                            <div class="sic-detenido-line">
+
+                                <label>
+                                    Núm. int.:
+                                </label>
+
+                                <strong>
+                                    @detNumInt
+                                </strong>
+
+                            </div>
+
+                            <div class="sic-detenido-line">
+
+                                <label>
+                                    C.P.:
+                                </label>
+
+                                <strong>
+                                    @detCp
+                                </strong>
+
+                            </div>
+
+                            <div class="sic-detenido-line">
+
+                                <label>
+                                    Municipio:
+                                </label>
+
+                                <strong>
+                                    @detMunicipio
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+                        <!-- =============================================
+            CARACTERÍSTICAS
+            ============================================= -->
+                        <div class="sic-detenido-c5-extra">
+
+                            <label>
+                                Características:
+                            </label>
+
+                            <strong>
+                                @detCaracteristicas
+                            </strong>
+
+                        </div>
+
+                        <!-- =============================================
+            TODOS LOS ALIAS RELACIONADOS
+            ============================================= -->
+                        <div class="sic-alias-accordion">
+
+                            <button type="button"
+                                    class="sic-alias-header">
+
+                                <span class="sic-alias-header-left">
+
+                                    <i class="fa fa-tag"></i>
+
+                                    <strong>
+                                        Alias registrados
+                                    </strong>
+
+                                    <span class="sic-alias-total">
+                                        @aliasRegistrados.Count
+                                    </span>
+
                                 </span>
 
-                            </span>
+                                <i class="fa fa-chevron-down sic-alias-chevron"></i>
 
-                            <i class="fa fa-chevron-down sic-alias-chevron"></i>
+                            </button>
 
-                        </button>
+                            <div class="sic-alias-body">
 
-                        <div class="sic-alias-body">
-
-                            @if (aliasRegistrados.Count > 0)
-                            {
-                                foreach (var alias in aliasRegistrados)
+                                @if (aliasRegistrados.Count > 0)
                                 {
-                                    <div class="sic-alias-item">
+                                    foreach (var alias in aliasRegistrados)
+                                    {
+                                        <div class="sic-alias-item">
 
-                                        <span>
-                                            @alias.Item1
-                                        </span>
+                                            <span>
+                                                @alias.Item1
+                                            </span>
 
-                                        <span class="sic-alias-count">
+                                            <span class="sic-alias-count">
 
-                                            @alias.Item2
+                                                @alias.Item2
 
-                                            @(alias.Item2 == 1
+                                                @(alias.Item2 == 1
                                                 ? "registro"
                                                 : "registros")
 
-                                        </span>
+                                            </span>
+
+                                        </div>
+                                    }
+                                }
+                                else
+                                {
+                                    <div class="sic-alias-empty">
+
+                                        <i class="fa fa-info-circle"></i>
+
+                                        Sin alias registrados.
 
                                     </div>
                                 }
-                            }
-                            else
-                            {
-                                <div class="sic-alias-empty">
 
-                                    <i class="fa fa-info-circle"></i>
-
-                                    Sin alias registrados.
-
-                                </div>
-                            }
+                            </div>
 
                         </div>
 
                     </div>
 
                 </div>
+
+            </div>
             }
             else
             {

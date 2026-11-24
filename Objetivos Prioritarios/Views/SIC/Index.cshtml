@@ -578,7 +578,6 @@
         justify-self: start;
         display: flex;
         align-items: center;
-        gap: 90px;
     }
 
     .sic-switch-todos {
@@ -643,6 +642,9 @@
 
     .sic-toolbar-busqueda {
         justify-self: end;
+        display: flex;
+        align-items: center;
+        gap: 80px;
     }
 
     .sic-toolbar-tabla .dataTables_length,
@@ -700,7 +702,10 @@
 
         .sic-toolbar-longitud,
         .sic-toolbar-busqueda {
-            justify-self: auto;
+            justify-self: end;
+            display: flex;
+            align-items: center;
+            gap: 80px;
         }
 
         .sic-toolbar-tabla .dataTables_filter {
@@ -1527,15 +1532,28 @@
                 return;
             }
 
-            var cantidadMostrada = info.end - info.start;
             var totalRegistros = info.recordsDisplay;
 
-            $('#sicContadorSuperior').text(
-                'Mostrando ' +
-                cantidadMostrada.toLocaleString('es-MX') +
-                ' de ' +
-                totalRegistros.toLocaleString('es-MX') +
-                ' registros'
+            var label =
+                $('.sic-toolbar-longitud .dataTables_length label');
+
+            var select =
+                label.find('select').detach();
+
+            label.empty();
+
+            label.append(
+                document.createTextNode('Mostrando ')
+            );
+
+            label.append(select);
+
+            label.append(
+                document.createTextNode(
+                    ' de ' +
+                    totalRegistros.toLocaleString('es-MX') +
+                    ' registros'
+                )
             );
         }
 
@@ -1557,25 +1575,34 @@
                     '.js-filtro-estado-sic',
                     function () {
 
-                        let boton =
-                            $(this);
+                        let boton = $(this);
 
                         filtroEstadoSic =
                             boton.attr('data-filtro') || '';
 
                         $('.js-filtro-estado-sic')
                             .removeClass('active')
-                            .attr(
-                                'aria-pressed',
-                                'false'
-                            );
+                            .attr('aria-pressed', 'false');
 
                         boton
                             .addClass('active')
-                            .attr(
-                                'aria-pressed',
-                                'true'
-                            );
+                            .attr('aria-pressed', 'true');
+
+                        let switchMostrarTodos =
+                            $('#switchMostrarTodos');
+
+                        if (
+                            switchMostrarTodos.length &&
+                            !switchMostrarTodos.is(':checked')
+                        ) {
+                            switchMostrarTodos.prop('checked', true);
+
+                            if (tablaSIC) {
+                                tablaSIC.ajax.reload(null, true);
+                            }
+
+                            return;
+                        }
 
                         if (tablaSIC) {
                             tablaSIC.draw();
@@ -1767,7 +1794,7 @@
 
                     infoFiltered: '(filtrado de _MAX_ registros totales)',
 
-                    lengthMenu: 'Mostrar _MENU_ registros',
+                    lengthMenu: '_MENU_',
 
                     loadingRecords: 'Cargando...',
 
@@ -1794,13 +1821,12 @@
 
                     if ($('#switchMostrarTodos').length === 0) {
 
-                        $('.sic-toolbar-longitud').append(
+                        $('.sic-toolbar-busqueda').prepend(
                             '<label class="sic-switch-todos" for="switchMostrarTodos">' +
                             '<span>Mostrar todos</span>' +
                             '<input type="checkbox" id="switchMostrarTodos">' +
                             '<span class="sic-switch-control"></span>' +
-                            '</label>' +
-                            '<span id="sicContadorSuperior" class="sic-contador-superior"></span>'
+                            '</label>'
                         );
                     }
 

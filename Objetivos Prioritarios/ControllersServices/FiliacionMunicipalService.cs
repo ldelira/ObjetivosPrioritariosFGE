@@ -968,7 +968,7 @@ ORDER BY MJ.fecha_alta DESC;";
 
             using (var db = new SICEntities())
             {
-                var registros = db.DETENIDO
+                var registros = db.Detenido
                     .Where(x => idsRelacionados.Contains(x.IDDETENIDO))
                     .ToList();
 

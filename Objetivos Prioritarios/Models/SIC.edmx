@@ -5,236 +5,388 @@
     <!-- SSDL content -->
     <edmx:StorageModels>
     <Schema Namespace="SICModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
-        <EntityType Name="DETENCION">
+        <EntityType Name="Detencion">
           <Key>
             <PropertyRef Name="IDDETENCION" />
           </Key>
           <Property Name="IDDETENCION" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="SERIE_MUNICIPIO" Type="varchar" MaxLength="5" />
+          <Property Name="SERIE_MUNICIPIO" Type="varchar" MaxLength="10" />
           <Property Name="CONSECUTIVO" Type="varchar" MaxLength="30" />
           <Property Name="ANO" Type="varchar" MaxLength="4" />
           <Property Name="FECHA_DETENCION" Type="date" />
-          <Property Name="HORA_DETENCION" Type="varchar" MaxLength="5" />
-          <Property Name="FUERO" Type="varchar" MaxLength="30" />
+          <Property Name="HORA_DETENCION" Type="varchar" MaxLength="8" />
+          <Property Name="FUERO" Type="varchar" MaxLength="50" />
           <Property Name="NoDETENIDOS" Type="int" />
           <Property Name="CALLE" Type="varchar" MaxLength="200" />
           <Property Name="COLONIA" Type="varchar" MaxLength="200" />
-          <Property Name="CP" Type="varchar" MaxLength="200" />
+          <Property Name="CP" Type="varchar" MaxLength="10" />
           <Property Name="MUNICIPIO" Type="varchar" MaxLength="200" />
-          <Property Name="HECHO" Type="varchar" MaxLength="5000" />
+          <Property Name="HECHO" Type="varchar(max)" />
           <Property Name="CAUSA" Type="varchar" MaxLength="200" />
-          <Property Name="OBSERVACIONES" Type="varchar" MaxLength="5000" />
+          <Property Name="OBSERVACIONES" Type="varchar(max)" />
           <Property Name="VECHICULO" Type="bit" />
           <Property Name="NUMEXT" Type="int" />
-          <Property Name="NUMINT" Type="varchar" MaxLength="5" />
-          <Property Name="Gramos" Type="numeric" Precision="8" Scale="4" />
+          <Property Name="NUMINT" Type="varchar" MaxLength="10" />
           <Property Name="Mes" Type="varchar" MaxLength="20" />
           <Property Name="Dia" Type="varchar" MaxLength="20" />
-          <Property Name="Feria" Type="bit" />
           <Property Name="Latitud" Type="varchar" MaxLength="20" />
           <Property Name="Longitud" Type="varchar" MaxLength="20" />
-          <Property Name="Aseguramientos" Type="varchar" MaxLength="3000" />
-          <Property Name="Envoltorios" Type="varchar" MaxLength="500" />
-          <Property Name="Armas" Type="varchar" MaxLength="500" />
-          <Property Name="Cartuchos" Type="varchar" MaxLength="500" />
           <Property Name="FueroDescripcion" Type="varchar(max)" />
-          <Property Name="Cargadores" Type="varchar" MaxLength="500" />
-          <Property Name="OficialTraslada" Type="varchar" MaxLength="200" />
+          <Property Name="idUsuarioCrea" Type="int" />
+          <Property Name="idUsuarioTraslada" Type="int" />
         </EntityType>
-        <EntityType Name="DETENIDO">
+        <EntityType Name="Detenido">
           <Key>
             <PropertyRef Name="IDDETENIDO" />
           </Key>
           <Property Name="IDDETENIDO" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="IDDETENCION" Type="int" />
+          <Property Name="SERIE_MUNICIPIO" Type="varchar" MaxLength="10" />
           <Property Name="NOMBRE" Type="varchar" MaxLength="100" />
           <Property Name="ALIAS" Type="varchar" MaxLength="100" />
           <Property Name="EDAD" Type="varchar" MaxLength="3" />
           <Property Name="ORIGINARIO" Type="varchar" MaxLength="200" />
-          <Property Name="SEXO" Type="varchar" MaxLength="200" />
-          <Property Name="FECHA_NACIMIENTO" Type="varchar" MaxLength="30" />
+          <Property Name="SEXO" Type="varchar" MaxLength="20" />
+          <Property Name="FECHA_NACIMIENTO" Type="varchar" MaxLength="50" />
           <Property Name="CALLE" Type="varchar" MaxLength="200" />
           <Property Name="COLONIA" Type="varchar" MaxLength="200" />
-          <Property Name="CP" Type="varchar" MaxLength="200" />
+          <Property Name="CP" Type="varchar" MaxLength="10" />
           <Property Name="MUNICIPIO" Type="varchar" MaxLength="200" />
           <Property Name="NUMEXT" Type="int" />
-          <Property Name="NUMINT" Type="varchar" MaxLength="5" />
-          <Property Name="Ap_Paterno" Type="varchar" MaxLength="30" />
-          <Property Name="Ap_Materno" Type="varchar" MaxLength="30" />
+          <Property Name="NUMINT" Type="varchar" MaxLength="10" />
+          <Property Name="Ap_Paterno" Type="varchar" MaxLength="50" />
+          <Property Name="Ap_Materno" Type="varchar" MaxLength="50" />
           <Property Name="Ocupacion" Type="varchar" MaxLength="100" />
-          <Property Name="CaracteristicasDetenido" Type="varchar" MaxLength="3000" />
+          <Property Name="CaracteristicasDetenido" Type="varchar(max)" />
           <Property Name="Estado" Type="varchar" MaxLength="50" />
           <Property Name="Folio" Type="varchar" MaxLength="50" />
-          <Property Name="Situacion" Type="varchar" MaxLength="1" />
+          <Property Name="Situacion" Type="varchar" MaxLength="10" />
           <Property Name="Telefono" Type="varchar" MaxLength="20" />
-          <Property Name="Estatus" Type="varchar" MaxLength="10" />
-          <Property Name="FechaRegistro" Type="datetime" />
-          <Property Name="UsuarioRegistro" Type="varchar" MaxLength="100" />
+          <Property Name="Estatus" Type="varchar" MaxLength="20" />
+          <Property Name="FechaRegistro" Type="datetime2" Precision="7" />
+          <Property Name="idusuario" Type="int" />
           <Property Name="RFC" Type="varchar" MaxLength="20" />
           <Property Name="CURP" Type="varchar" MaxLength="20" />
+          <Property Name="estadoOrigen" Type="varchar" MaxLength="100" />
+          <Property Name="Nacionalidad" Type="varchar" MaxLength="50" />
+          <Property Name="TipoDocumentoIdentificacion" Type="varchar" MaxLength="50" />
+          <Property Name="OtroDocumentoIdentificacion" Type="varchar" MaxLength="100" />
+          <Property Name="TieneLesionesVisibles" Type="bit" />
+          <Property Name="CualesLesiones" Type="varchar" MaxLength="200" />
+          <Property Name="EsGrupoVulnerable" Type="bit" />
+          <Property Name="CualGrupoVulnerable" Type="varchar" MaxLength="200" />
+          <Property Name="EsGrupoDelictivo" Type="bit" />
+          <Property Name="CualGrupoDelictivo" Type="varchar" MaxLength="200" />
+          <Property Name="TienePadecimiento" Type="bit" />
+          <Property Name="CualPadecimiento" Type="varchar" MaxLength="200" />
+          <Property Name="FamiliarPrimerApellido" Type="varchar" MaxLength="50" />
+          <Property Name="FamiliarSegundoApellido" Type="varchar" MaxLength="50" />
+          <Property Name="FamiliarNombres" Type="varchar" MaxLength="100" />
         </EntityType>
         <EntityType Name="Modulos">
           <Key>
             <PropertyRef Name="idModulo" />
           </Key>
           <Property Name="idModulo" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="Modulo" Type="varchar" MaxLength="50" />
+          <Property Name="Modulo" Type="varchar" MaxLength="100" Nullable="false" />
         </EntityType>
         <EntityType Name="Usuario">
           <Key>
             <PropertyRef Name="idUsuario" />
           </Key>
           <Property Name="idUsuario" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="Usuario" Type="varchar" MaxLength="50" />
-          <Property Name="Contrasena" Type="varchar" MaxLength="500" />
-          <Property Name="App" Type="varchar" MaxLength="180" />
-          <Property Name="Apm" Type="varchar" MaxLength="180" />
-          <Property Name="Nombre" Type="varchar" MaxLength="200" />
-          <Property Name="Grupo" Type="varchar" MaxLength="80" />
-          <Property Name="Unidad" Type="varchar" MaxLength="80" />
-          <Property Name="Corporacion" Type="varchar" MaxLength="80" />
-          <Property Name="Municipio" Type="varchar" MaxLength="80" />
-          <Property Name="Turno" Type="varchar" MaxLength="60" />
-          <Property Name="Grado" Type="varchar" MaxLength="80" />
-          <Property Name="Rol" Type="varchar" MaxLength="30" />
-          <Property Name="Estatus" Type="bit" />
+          <Property Name="Usuario" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="Contrasena" Type="varchar" MaxLength="500" Nullable="false" />
+          <Property Name="App" Type="varchar" MaxLength="50" />
+          <Property Name="Apm" Type="varchar" MaxLength="50" />
+          <Property Name="Nombre" Type="varchar" MaxLength="50" />
+          <Property Name="Grupo" Type="varchar" MaxLength="50" />
+          <Property Name="Unidad" Type="varchar" MaxLength="50" />
+          <Property Name="Corporacion" Type="varchar" MaxLength="50" />
+          <Property Name="Municipio" Type="varchar" MaxLength="50" />
+          <Property Name="Turno" Type="varchar" MaxLength="30" />
+          <Property Name="Grado" Type="varchar" MaxLength="50" />
+          <Property Name="Rol" Type="varchar" MaxLength="50" />
+          <Property Name="Estatus" Type="bit" Nullable="false" />
           <Property Name="Cedula" Type="varchar" MaxLength="50" />
           <Property Name="SSA" Type="varchar" MaxLength="50" />
+          <Property Name="NoEmpleado" Type="int" />
         </EntityType>
+        <Association Name="FK_DETENCION_UsuarioCrea">
+          <End Role="Usuario" Type="Self.Usuario" Multiplicity="0..1" />
+          <End Role="Detencion" Type="Self.Detencion" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Usuario">
+              <PropertyRef Name="idUsuario" />
+            </Principal>
+            <Dependent Role="Detencion">
+              <PropertyRef Name="idUsuarioCrea" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_DETENCION_UsuarioTraslada">
+          <End Role="Usuario" Type="Self.Usuario" Multiplicity="0..1" />
+          <End Role="Detencion" Type="Self.Detencion" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Usuario">
+              <PropertyRef Name="idUsuario" />
+            </Principal>
+            <Dependent Role="Detencion">
+              <PropertyRef Name="idUsuarioTraslada" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_DETENIDO_DETENCION">
+          <End Role="Detencion" Type="Self.Detencion" Multiplicity="0..1" />
+          <End Role="Detenido" Type="Self.Detenido" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Detencion">
+              <PropertyRef Name="IDDETENCION" />
+            </Principal>
+            <Dependent Role="Detenido">
+              <PropertyRef Name="IDDETENCION" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_DETENIDO_Usuario">
+          <End Role="Usuario" Type="Self.Usuario" Multiplicity="0..1" />
+          <End Role="Detenido" Type="Self.Detenido" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Usuario">
+              <PropertyRef Name="idUsuario" />
+            </Principal>
+            <Dependent Role="Detenido">
+              <PropertyRef Name="idusuario" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <EntityContainer Name="SICModelStoreContainer">
-          <EntitySet Name="DETENCION" EntityType="Self.DETENCION" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="DETENIDO" EntityType="Self.DETENIDO" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Detencion" EntityType="Self.Detencion" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Detenido" EntityType="Self.Detenido" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Modulos" EntityType="Self.Modulos" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Usuario" EntityType="Self.Usuario" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_DETENCION_UsuarioCrea" Association="Self.FK_DETENCION_UsuarioCrea">
+            <End Role="Usuario" EntitySet="Usuario" />
+            <End Role="Detencion" EntitySet="Detencion" />
+          </AssociationSet>
+          <AssociationSet Name="FK_DETENCION_UsuarioTraslada" Association="Self.FK_DETENCION_UsuarioTraslada">
+            <End Role="Usuario" EntitySet="Usuario" />
+            <End Role="Detencion" EntitySet="Detencion" />
+          </AssociationSet>
+          <AssociationSet Name="FK_DETENIDO_DETENCION" Association="Self.FK_DETENIDO_DETENCION">
+            <End Role="Detencion" EntitySet="Detencion" />
+            <End Role="Detenido" EntitySet="Detenido" />
+          </AssociationSet>
+          <AssociationSet Name="FK_DETENIDO_Usuario" Association="Self.FK_DETENIDO_Usuario">
+            <End Role="Usuario" EntitySet="Usuario" />
+            <End Role="Detenido" EntitySet="Detenido" />
+          </AssociationSet>
         </EntityContainer>
       </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="SICModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
         <EntityContainer Name="SICEntities" annotation:LazyLoadingEnabled="true">
-          <EntitySet Name="DETENCION" EntityType="SICModel.DETENCION" />
-          <EntitySet Name="DETENIDO" EntityType="SICModel.DETENIDO" />
+          <EntitySet Name="Detencion" EntityType="SICModel.Detencion" />
+          <EntitySet Name="Detenido" EntityType="SICModel.Detenido" />
           <EntitySet Name="Modulos" EntityType="SICModel.Modulos" />
+          <AssociationSet Name="FK_DETENIDO_DETENCION" Association="SICModel.FK_DETENIDO_DETENCION">
+            <End Role="Detencion" EntitySet="Detencion" />
+            <End Role="Detenido" EntitySet="Detenido" />
+          </AssociationSet>
           <EntitySet Name="Usuario" EntityType="SICModel.Usuario" />
+          <AssociationSet Name="FK_DETENCION_UsuarioCrea" Association="SICModel.FK_DETENCION_UsuarioCrea">
+            <End Role="Usuario" EntitySet="Usuario" />
+            <End Role="Detencion" EntitySet="Detencion" />
+          </AssociationSet>
+          <AssociationSet Name="FK_DETENCION_UsuarioTraslada" Association="SICModel.FK_DETENCION_UsuarioTraslada">
+            <End Role="Usuario" EntitySet="Usuario" />
+            <End Role="Detencion" EntitySet="Detencion" />
+          </AssociationSet>
+          <AssociationSet Name="FK_DETENIDO_Usuario" Association="SICModel.FK_DETENIDO_Usuario">
+            <End Role="Usuario" EntitySet="Usuario" />
+            <End Role="Detenido" EntitySet="Detenido" />
+          </AssociationSet>
         </EntityContainer>
-        <EntityType Name="DETENCION">
+        <EntityType Name="Detencion">
           <Key>
             <PropertyRef Name="IDDETENCION" />
           </Key>
           <Property Name="IDDETENCION" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="SERIE_MUNICIPIO" Type="String" MaxLength="5" FixedLength="false" Unicode="false" />
+          <Property Name="SERIE_MUNICIPIO" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
           <Property Name="CONSECUTIVO" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
           <Property Name="ANO" Type="String" MaxLength="4" FixedLength="false" Unicode="false" />
           <Property Name="FECHA_DETENCION" Type="DateTime" Precision="0" />
-          <Property Name="HORA_DETENCION" Type="String" MaxLength="5" FixedLength="false" Unicode="false" />
-          <Property Name="FUERO" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="HORA_DETENCION" Type="String" MaxLength="8" FixedLength="false" Unicode="false" />
+          <Property Name="FUERO" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="NoDETENIDOS" Type="Int32" />
           <Property Name="CALLE" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
           <Property Name="COLONIA" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
-          <Property Name="CP" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="CP" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
           <Property Name="MUNICIPIO" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
-          <Property Name="HECHO" Type="String" MaxLength="5000" FixedLength="false" Unicode="false" />
+          <Property Name="HECHO" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
           <Property Name="CAUSA" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
-          <Property Name="OBSERVACIONES" Type="String" MaxLength="5000" FixedLength="false" Unicode="false" />
+          <Property Name="OBSERVACIONES" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
           <Property Name="VECHICULO" Type="Boolean" />
           <Property Name="NUMEXT" Type="Int32" />
-          <Property Name="NUMINT" Type="String" MaxLength="5" FixedLength="false" Unicode="false" />
-          <Property Name="Gramos" Type="Decimal" Precision="8" Scale="4" />
+          <Property Name="NUMINT" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
           <Property Name="Mes" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
           <Property Name="Dia" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
-          <Property Name="Feria" Type="Boolean" />
           <Property Name="Latitud" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
           <Property Name="Longitud" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
-          <Property Name="Aseguramientos" Type="String" MaxLength="3000" FixedLength="false" Unicode="false" />
-          <Property Name="Envoltorios" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
-          <Property Name="Armas" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
-          <Property Name="Cartuchos" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
           <Property Name="FueroDescripcion" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="Cargadores" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
-          <Property Name="OficialTraslada" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="idUsuarioCrea" Type="Int32" />
+          <Property Name="idUsuarioTraslada" Type="Int32" />
+          <NavigationProperty Name="Detenido" Relationship="SICModel.FK_DETENIDO_DETENCION" FromRole="Detencion" ToRole="Detenido" />
+          <NavigationProperty Name="Usuario" Relationship="SICModel.FK_DETENCION_UsuarioCrea" FromRole="Detencion" ToRole="Usuario" />
+          <NavigationProperty Name="Usuario1" Relationship="SICModel.FK_DETENCION_UsuarioTraslada" FromRole="Detencion" ToRole="Usuario" />
         </EntityType>
-        <EntityType Name="DETENIDO">
+        <EntityType Name="Detenido">
           <Key>
             <PropertyRef Name="IDDETENIDO" />
           </Key>
           <Property Name="IDDETENIDO" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="IDDETENCION" Type="Int32" />
+          <Property Name="SERIE_MUNICIPIO" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
           <Property Name="NOMBRE" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
           <Property Name="ALIAS" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
           <Property Name="EDAD" Type="String" MaxLength="3" FixedLength="false" Unicode="false" />
           <Property Name="ORIGINARIO" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
-          <Property Name="SEXO" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
-          <Property Name="FECHA_NACIMIENTO" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="SEXO" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="FECHA_NACIMIENTO" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="CALLE" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
           <Property Name="COLONIA" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
-          <Property Name="CP" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="CP" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
           <Property Name="MUNICIPIO" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
           <Property Name="NUMEXT" Type="Int32" />
-          <Property Name="NUMINT" Type="String" MaxLength="5" FixedLength="false" Unicode="false" />
-          <Property Name="Ap_Paterno" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
-          <Property Name="Ap_Materno" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="NUMINT" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+          <Property Name="Ap_Paterno" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Ap_Materno" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="Ocupacion" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
-          <Property Name="CaracteristicasDetenido" Type="String" MaxLength="3000" FixedLength="false" Unicode="false" />
+          <Property Name="CaracteristicasDetenido" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
           <Property Name="Estado" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="Folio" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="Situacion" Type="String" MaxLength="1" FixedLength="false" Unicode="false" />
+          <Property Name="Situacion" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
           <Property Name="Telefono" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
-          <Property Name="Estatus" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
-          <Property Name="FechaRegistro" Type="DateTime" Precision="3" />
-          <Property Name="UsuarioRegistro" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="Estatus" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="FechaRegistro" Type="DateTime" Precision="7" />
+          <Property Name="idusuario" Type="Int32" />
           <Property Name="RFC" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
           <Property Name="CURP" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="estadoOrigen" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="Nacionalidad" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="TipoDocumentoIdentificacion" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="OtroDocumentoIdentificacion" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="TieneLesionesVisibles" Type="Boolean" />
+          <Property Name="CualesLesiones" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="EsGrupoVulnerable" Type="Boolean" />
+          <Property Name="CualGrupoVulnerable" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="EsGrupoDelictivo" Type="Boolean" />
+          <Property Name="CualGrupoDelictivo" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="TienePadecimiento" Type="Boolean" />
+          <Property Name="CualPadecimiento" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="FamiliarPrimerApellido" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="FamiliarSegundoApellido" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="FamiliarNombres" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="Detencion" Relationship="SICModel.FK_DETENIDO_DETENCION" FromRole="Detenido" ToRole="Detencion" />
+          <NavigationProperty Name="Usuario" Relationship="SICModel.FK_DETENIDO_Usuario" FromRole="Detenido" ToRole="Usuario" />
         </EntityType>
         <EntityType Name="Modulos">
           <Key>
             <PropertyRef Name="idModulo" />
           </Key>
           <Property Name="idModulo" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="Modulo" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Modulo" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
         </EntityType>
+        <Association Name="FK_DETENIDO_DETENCION">
+          <End Type="SICModel.Detencion" Role="Detencion" Multiplicity="0..1" />
+          <End Type="SICModel.Detenido" Role="Detenido" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Detencion">
+              <PropertyRef Name="IDDETENCION" />
+            </Principal>
+            <Dependent Role="Detenido">
+              <PropertyRef Name="IDDETENCION" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <EntityType Name="Usuario">
           <Key>
             <PropertyRef Name="idUsuario" />
           </Key>
           <Property Name="idUsuario" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="Usuario1" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="Contrasena" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
-          <Property Name="App" Type="String" MaxLength="180" FixedLength="false" Unicode="false" />
-          <Property Name="Apm" Type="String" MaxLength="180" FixedLength="false" Unicode="false" />
-          <Property Name="Nombre" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
-          <Property Name="Grupo" Type="String" MaxLength="80" FixedLength="false" Unicode="false" />
-          <Property Name="Unidad" Type="String" MaxLength="80" FixedLength="false" Unicode="false" />
-          <Property Name="Corporacion" Type="String" MaxLength="80" FixedLength="false" Unicode="false" />
-          <Property Name="Municipio" Type="String" MaxLength="80" FixedLength="false" Unicode="false" />
-          <Property Name="Turno" Type="String" MaxLength="60" FixedLength="false" Unicode="false" />
-          <Property Name="Grado" Type="String" MaxLength="80" FixedLength="false" Unicode="false" />
-          <Property Name="Rol" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
-          <Property Name="Estatus" Type="Boolean" />
+          <Property Name="Usuario1" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Contrasena" Type="String" Nullable="false" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="App" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Apm" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Nombre" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Grupo" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Unidad" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Corporacion" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Municipio" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Turno" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="Grado" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Rol" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Estatus" Type="Boolean" Nullable="false" />
           <Property Name="Cedula" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="SSA" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="NoEmpleado" Type="Int32" />
+          <NavigationProperty Name="Detencion" Relationship="SICModel.FK_DETENCION_UsuarioCrea" FromRole="Usuario" ToRole="Detencion" />
+          <NavigationProperty Name="Detencion1" Relationship="SICModel.FK_DETENCION_UsuarioTraslada" FromRole="Usuario" ToRole="Detencion" />
+          <NavigationProperty Name="Detenido" Relationship="SICModel.FK_DETENIDO_Usuario" FromRole="Usuario" ToRole="Detenido" />
         </EntityType>
-      </Schema>
+        <Association Name="FK_DETENCION_UsuarioCrea">
+          <End Type="SICModel.Usuario" Role="Usuario" Multiplicity="0..1" />
+          <End Type="SICModel.Detencion" Role="Detencion" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Usuario">
+              <PropertyRef Name="idUsuario" />
+            </Principal>
+            <Dependent Role="Detencion">
+              <PropertyRef Name="idUsuarioCrea" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_DETENCION_UsuarioTraslada">
+          <End Type="SICModel.Usuario" Role="Usuario" Multiplicity="0..1" />
+          <End Type="SICModel.Detencion" Role="Detencion" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Usuario">
+              <PropertyRef Name="idUsuario" />
+            </Principal>
+            <Dependent Role="Detencion">
+              <PropertyRef Name="idUsuarioTraslada" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_DETENIDO_Usuario">
+          <End Type="SICModel.Usuario" Role="Usuario" Multiplicity="0..1" />
+          <End Type="SICModel.Detenido" Role="Detenido" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Usuario">
+              <PropertyRef Name="idUsuario" />
+            </Principal>
+            <Dependent Role="Detenido">
+              <PropertyRef Name="idusuario" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
     <edmx:Mappings>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
         <EntityContainerMapping StorageEntityContainer="SICModelStoreContainer" CdmEntityContainer="SICEntities">
-          <EntitySetMapping Name="DETENCION">
-            <EntityTypeMapping TypeName="SICModel.DETENCION">
-              <MappingFragment StoreEntitySet="DETENCION">
-                <ScalarProperty Name="OficialTraslada" ColumnName="OficialTraslada" />
-                <ScalarProperty Name="Cargadores" ColumnName="Cargadores" />
+          <EntitySetMapping Name="Detencion">
+            <EntityTypeMapping TypeName="SICModel.Detencion">
+              <MappingFragment StoreEntitySet="Detencion">
+                <ScalarProperty Name="idUsuarioTraslada" ColumnName="idUsuarioTraslada" />
+                <ScalarProperty Name="idUsuarioCrea" ColumnName="idUsuarioCrea" />
                 <ScalarProperty Name="FueroDescripcion" ColumnName="FueroDescripcion" />
-                <ScalarProperty Name="Cartuchos" ColumnName="Cartuchos" />
-                <ScalarProperty Name="Armas" ColumnName="Armas" />
-                <ScalarProperty Name="Envoltorios" ColumnName="Envoltorios" />
-                <ScalarProperty Name="Aseguramientos" ColumnName="Aseguramientos" />
                 <ScalarProperty Name="Longitud" ColumnName="Longitud" />
                 <ScalarProperty Name="Latitud" ColumnName="Latitud" />
-                <ScalarProperty Name="Feria" ColumnName="Feria" />
                 <ScalarProperty Name="Dia" ColumnName="Dia" />
                 <ScalarProperty Name="Mes" ColumnName="Mes" />
-                <ScalarProperty Name="Gramos" ColumnName="Gramos" />
                 <ScalarProperty Name="NUMINT" ColumnName="NUMINT" />
                 <ScalarProperty Name="NUMEXT" ColumnName="NUMEXT" />
                 <ScalarProperty Name="VECHICULO" ColumnName="VECHICULO" />
@@ -256,12 +408,27 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="DETENIDO">
-            <EntityTypeMapping TypeName="SICModel.DETENIDO">
-              <MappingFragment StoreEntitySet="DETENIDO">
+          <EntitySetMapping Name="Detenido">
+            <EntityTypeMapping TypeName="SICModel.Detenido">
+              <MappingFragment StoreEntitySet="Detenido">
+                <ScalarProperty Name="FamiliarNombres" ColumnName="FamiliarNombres" />
+                <ScalarProperty Name="FamiliarSegundoApellido" ColumnName="FamiliarSegundoApellido" />
+                <ScalarProperty Name="FamiliarPrimerApellido" ColumnName="FamiliarPrimerApellido" />
+                <ScalarProperty Name="CualPadecimiento" ColumnName="CualPadecimiento" />
+                <ScalarProperty Name="TienePadecimiento" ColumnName="TienePadecimiento" />
+                <ScalarProperty Name="CualGrupoDelictivo" ColumnName="CualGrupoDelictivo" />
+                <ScalarProperty Name="EsGrupoDelictivo" ColumnName="EsGrupoDelictivo" />
+                <ScalarProperty Name="CualGrupoVulnerable" ColumnName="CualGrupoVulnerable" />
+                <ScalarProperty Name="EsGrupoVulnerable" ColumnName="EsGrupoVulnerable" />
+                <ScalarProperty Name="CualesLesiones" ColumnName="CualesLesiones" />
+                <ScalarProperty Name="TieneLesionesVisibles" ColumnName="TieneLesionesVisibles" />
+                <ScalarProperty Name="OtroDocumentoIdentificacion" ColumnName="OtroDocumentoIdentificacion" />
+                <ScalarProperty Name="TipoDocumentoIdentificacion" ColumnName="TipoDocumentoIdentificacion" />
+                <ScalarProperty Name="Nacionalidad" ColumnName="Nacionalidad" />
+                <ScalarProperty Name="estadoOrigen" ColumnName="estadoOrigen" />
                 <ScalarProperty Name="CURP" ColumnName="CURP" />
                 <ScalarProperty Name="RFC" ColumnName="RFC" />
-                <ScalarProperty Name="UsuarioRegistro" ColumnName="UsuarioRegistro" />
+                <ScalarProperty Name="idusuario" ColumnName="idusuario" />
                 <ScalarProperty Name="FechaRegistro" ColumnName="FechaRegistro" />
                 <ScalarProperty Name="Estatus" ColumnName="Estatus" />
                 <ScalarProperty Name="Telefono" ColumnName="Telefono" />
@@ -284,6 +451,7 @@
                 <ScalarProperty Name="EDAD" ColumnName="EDAD" />
                 <ScalarProperty Name="ALIAS" ColumnName="ALIAS" />
                 <ScalarProperty Name="NOMBRE" ColumnName="NOMBRE" />
+                <ScalarProperty Name="SERIE_MUNICIPIO" ColumnName="SERIE_MUNICIPIO" />
                 <ScalarProperty Name="IDDETENCION" ColumnName="IDDETENCION" />
                 <ScalarProperty Name="IDDETENIDO" ColumnName="IDDETENIDO" />
               </MappingFragment>
@@ -300,6 +468,7 @@
           <EntitySetMapping Name="Usuario">
             <EntityTypeMapping TypeName="SICModel.Usuario">
               <MappingFragment StoreEntitySet="Usuario">
+                <ScalarProperty Name="NoEmpleado" ColumnName="NoEmpleado" />
                 <ScalarProperty Name="SSA" ColumnName="SSA" />
                 <ScalarProperty Name="Cedula" ColumnName="Cedula" />
                 <ScalarProperty Name="Estatus" ColumnName="Estatus" />

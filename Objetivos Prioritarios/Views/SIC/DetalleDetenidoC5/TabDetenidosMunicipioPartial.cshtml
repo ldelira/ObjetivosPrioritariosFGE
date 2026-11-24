@@ -33,7 +33,7 @@
 
                 int idDetenidoMunicipio = row["IDDETENIDO"] == DBNull.Value ? 0 : Convert.ToInt32(row["IDDETENIDO"]);
 
-                var coincidenciasMunicipio = ViewBag.ObtenerCoincidenciasAlerta( new int[] { idDetenidoMunicipio }, new int[] { 1 } ) as System.Collections.ArrayList;
+                var coincidenciasMunicipio = ViewBag.ObtenerCoincidenciasAlerta(new int[] { idDetenidoMunicipio }, new int[] { 1 }) as System.Collections.ArrayList;
 
                 int idDetenidoC5Actual = ViewBag.IdDetenidoC5 == null
                 ? 0
@@ -277,28 +277,29 @@
 
         @if (detenidosMunicipios.Rows.Count > 1)
         {
-            <!-- =====================================================
-                 NAVEGACIÓN FLOTANTE DEL CARRUSEL
-                 ===================================================== -->
-            <button type="button"
-                    class="sic-rel-nav-flotante sic-rel-prev-flotante sic-detenidos-municipio-prev"
-                    title="Detenido anterior"
-                    aria-label="Detenido anterior">
-                <i class="fa fa-chevron-left"></i>
-            </button>
+            <!-- NAVEGACIÓN Y CONTADOR DEL CARRUSEL -->
+            <div class="sic-detenidos-municipio-navigation">
 
-            <button type="button"
-                    class="sic-rel-nav-flotante sic-rel-next-flotante sic-detenidos-municipio-next"
-                    title="Siguiente detenido"
-                    aria-label="Siguiente detenido">
-                <i class="fa fa-chevron-right"></i>
-            </button>
+                <button type="button"
+                        class="sic-rel-nav-flotante sic-detenidos-municipio-prev"
+                        title="Detenido anterior"
+                        aria-label="Detenido anterior">
+                    <i class="fa fa-chevron-left"></i>
+                </button>
 
-            <!-- CONTADOR FLOTANTE SUPERIOR -->
-            <div class="sic-rel-counter-superior" aria-live="polite">
-                <span class="sic-detenidos-municipio-current">1</span>
-                <span class="sic-rel-counter-separator">/</span>
-                <span>@detenidosMunicipios.Rows.Count</span>
+                <div class="sic-rel-counter-superior" aria-live="polite">
+                    <span class="sic-detenidos-municipio-current">1</span>
+                    <span class="sic-rel-counter-separator">/</span>
+                    <span>@detenidosMunicipios.Rows.Count</span>
+                </div>
+
+                <button type="button"
+                        class="sic-rel-nav-flotante sic-detenidos-municipio-next"
+                        title="Siguiente detenido"
+                        aria-label="Siguiente detenido">
+                    <i class="fa fa-chevron-right"></i>
+                </button>
+
             </div>
         }
 

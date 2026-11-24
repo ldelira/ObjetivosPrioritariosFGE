@@ -10,9 +10,9 @@ namespace Objetivos_Prioritarios.ControllersServices
 {
     public class ReporteService : BaseService
     {
-        public List<Detenido> ObtenerDatosDeTuBaseDeDatos(int int_id_album_ficha_objetivo)
+        public List<Utils.Detenido> ObtenerDatosDeTuBaseDeDatos(int int_id_album_ficha_objetivo)
         {
-            var listaObjetivosPrioritarios = new List<Detenido>();
+            var listaObjetivosPrioritarios = new List<Utils.Detenido>();
 
             try
             {
@@ -27,7 +27,7 @@ namespace Objetivos_Prioritarios.ControllersServices
                     if (ficha == null)
                     {
                         // Si no tiene ficha, agrega un objeto vacío para mantener estructura
-                        listaObjetivosPrioritarios.Add(new Detenido());
+                        listaObjetivosPrioritarios.Add(new Utils.Detenido());
                         continue;
                     }
 
@@ -287,7 +287,7 @@ namespace Objetivos_Prioritarios.ControllersServices
                     }
 
                     // 🧩 Crear objeto final
-                    var objDetenido = new Detenido
+                    var objDetenido = new Utils.Detenido
                     {
                         Nombre = nombreCompleto,
                         Cartel = cartelTexto,
@@ -313,7 +313,7 @@ namespace Objetivos_Prioritarios.ControllersServices
             {
                 Console.WriteLine($"⚠️ Error en ObtenerDatosDeTuBaseDeDatos: {ex.Message}");
                 // Devuelve al menos un objeto vacío para evitar que el PDF truene
-                listaObjetivosPrioritarios.Add(new Detenido());
+                listaObjetivosPrioritarios.Add(new Utils.Detenido());
             }
 
             return listaObjetivosPrioritarios;

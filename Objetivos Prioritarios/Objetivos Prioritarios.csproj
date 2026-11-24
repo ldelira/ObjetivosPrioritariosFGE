@@ -419,10 +419,10 @@
     <Compile Include="Models\Del_x_in.cs">
       <DependentUpon>Filiacion.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\DETENCION.cs">
+    <Compile Include="Models\Detencion.cs">
       <DependentUpon>SIC.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\DETENIDO.cs">
+    <Compile Include="Models\Detenido.cs">
       <DependentUpon>SIC.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Domicilios.cs">

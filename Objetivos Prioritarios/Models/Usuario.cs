@@ -14,6 +14,14 @@ namespace Objetivos_Prioritarios.Models
     
     public partial class Usuario
     {
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
+        public Usuario()
+        {
+            this.Detencion = new HashSet<Detencion>();
+            this.Detencion1 = new HashSet<Detencion>();
+            this.Detenido = new HashSet<Detenido>();
+        }
+    
         public int idUsuario { get; set; }
         public string Usuario1 { get; set; }
         public string Contrasena { get; set; }
@@ -27,8 +35,16 @@ namespace Objetivos_Prioritarios.Models
         public string Turno { get; set; }
         public string Grado { get; set; }
         public string Rol { get; set; }
-        public Nullable<bool> Estatus { get; set; }
+        public bool Estatus { get; set; }
         public string Cedula { get; set; }
         public string SSA { get; set; }
+        public Nullable<int> NoEmpleado { get; set; }
+    
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Detencion> Detencion { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Detencion> Detencion1 { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Detenido> Detenido { get; set; }
     }
 }

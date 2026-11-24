@@ -106,7 +106,11 @@
     string claseMandamientos = ObtenerClaseTab(new int[] { 4 }, mandamientos.Rows.Count);
     string claseObjetivos = ObtenerClaseTab(new int[] { 5 }, objetivosPrioritarios.Rows.Count);
     string claseDetenidos = ObtenerClaseTab(new int[] { 6 }, detenidos.Rows.Count);
-    string claseDetenidosMunicipios = ObtenerClaseTab(new int[] { 1 }, totalDetenidosMunicipios);
+    //string claseDetenidosMunicipios = ObtenerClaseTab(new int[] { 1 }, totalDetenidosMunicipios);
+
+    bool abrirModalDetenidosMunicipios =
+    totalDetenidosMunicipios > 0;
+
 }
 @{
     string rutaCss = Server.MapPath("~/Content/SIC/busqueda-coincidencias.css");
@@ -222,9 +226,9 @@
 
                 <div class="sic-hero-meta">
                     @*<span class="sic-pill sic-pill-alerta">
-                <i class="fa fa-exclamation-triangle"></i>
-                @totalAlertas Alerta(s) Totales
-            </span>*@
+                            <i class="fa fa-exclamation-triangle"></i>
+                            @totalAlertas Alerta(s) Totales
+                        </span>*@
 
                     <span class="sic-pill">
                         <i class="fa fa-id-card"></i>
@@ -313,58 +317,58 @@
                     </div>
 
                     @*<div class="sic-main-info-item">
-                <div class="sic-main-info-icon">
-                    <i class="fa fa-user-secret"></i>
-                </div>
-                <div>
-                    <label>Alias</label>
-                    <strong>@alias</strong>
-                </div>
-            </div>
+                            <div class="sic-main-info-icon">
+                                <i class="fa fa-user-secret"></i>
+                            </div>
+                            <div>
+                                <label>Alias</label>
+                                <strong>@alias</strong>
+                            </div>
+                        </div>
 
-            <div class="sic-main-info-item">
-                <div class="sic-main-info-icon">
-                    <i class="fa fa-venus-mars"></i>
-                </div>
-                <div>
-                    <label>Sexo</label>
-                    <strong>@sexo</strong>
-                </div>
-            </div>
+                        <div class="sic-main-info-item">
+                            <div class="sic-main-info-icon">
+                                <i class="fa fa-venus-mars"></i>
+                            </div>
+                            <div>
+                                <label>Sexo</label>
+                                <strong>@sexo</strong>
+                            </div>
+                        </div>
 
-            <div class="sic-main-info-item">
-                <div class="sic-main-info-icon">
-                    <i class="fa fa-birthday-cake"></i>
-                </div>
-                <div>
-                    <label>Edad</label>
-                    <strong>@edad</strong>
-                </div>
-            </div>*@
+                        <div class="sic-main-info-item">
+                            <div class="sic-main-info-icon">
+                                <i class="fa fa-birthday-cake"></i>
+                            </div>
+                            <div>
+                                <label>Edad</label>
+                                <strong>@edad</strong>
+                            </div>
+                        </div>*@
 
                     @*<div class="sic-main-info-item">
-                <div class="sic-main-info-icon">
-                    <i class="fa fa-picture-o"></i>
-                </div>
-                <div>
-                    <label>Fotos en Municipio</label>
-                    <strong>@totalFotos</strong>
+                            <div class="sic-main-info-icon">
+                                <i class="fa fa-picture-o"></i>
+                            </div>
+                            <div>
+                                <label>Fotos en Municipio</label>
+                                <strong>@totalFotos</strong>
+                            </div>
+                        </div>
+
+                        <div class="sic-main-info-item">
+                            <div class="sic-main-info-icon">
+                                <i class="fa fa-hand-paper-o"></i>
+                            </div>
+                            <div>
+                                <label>Huellas</label>
+                                <strong>@totalHuellas</strong>
+                            </div>
+                        </div>*@
                 </div>
             </div>
 
-            <div class="sic-main-info-item">
-                <div class="sic-main-info-icon">
-                    <i class="fa fa-hand-paper-o"></i>
-                </div>
-                <div>
-                    <label>Huellas</label>
-                    <strong>@totalHuellas</strong>
-                </div>
-            </div>*@
-                </div>
-            </div>
 
-           
 
             <div class="sic-hero-counters">
 
@@ -502,12 +506,6 @@
         </div>
     </div>
 
-    <button type="button"
-            id="btnActualizarContenidoTabs"
-            class="sic-btn-actualizar-tabs"
-            title="Actualizar coincidencias">
-        <i class="fa fa-refresh"></i>
-    </button>
 
     <div class="sic-section-grid sic-top-grid">
 
@@ -603,23 +601,23 @@
 
                         </button>
 
-                        <button type="button"
-                                class="sic-source-tab sic-source-tab-compact @claseDetenidosMunicipios"
-                                data-tab="tab-detenidos-municipio">
+                        @*<button type="button"
+                                    class="sic-source-tab sic-source-tab-compact @claseDetenidosMunicipios"
+                                    data-tab="tab-detenidos-municipio">
 
-                            <img src="@Url.Content("~/Content/image/SIC/icono_aguascalientes.png")"
-                                 class="sic-tab-icono-personalizado"
-                                 alt="" />
+                                <img src="@Url.Content("~/Content/image/SIC/icono_aguascalientes.png")"
+                                     class="sic-tab-icono-personalizado"
+                                     alt="" />
 
-                            <span class="sic-tab-compact-name">
-                                Detenidos Municipios
-                            </span>
+                                <span class="sic-tab-compact-name">
+                                    Detenidos Municipios
+                                </span>
 
-                            <span class="sic-tab-compact-count">
-                                (@totalDetenidosMunicipios)
-                            </span>
+                                <span class="sic-tab-compact-count">
+                                    (@totalDetenidosMunicipios)
+                                </span>
 
-                        </button>
+                            </button>*@
 
                     </div>
 
@@ -740,13 +738,12 @@
                 <!-- =================================================
                 TAB DETENIDOS Municipio
                 ================================================= -->
-
-                <div class="sic-source-tab-content" id="tab-detenidos-municipio">
-                    @Html.Partial(
-                                  "~/Views/SIC/DetalleDetenidoC5/TabDetenidosMunicipioPartial.cshtml",
-                                  detenidosMunicipios
-                              )
-                </div>
+                @*<div class="sic-source-tab-content" id="tab-detenidos-municipio">
+                        @Html.Partial(
+                                      "~/Views/SIC/DetalleDetenidoC5/TabDetenidosMunicipioPartial.cshtml",
+                                      detenidosMunicipios
+                                  )
+                    </div>*@
 
             </div>
 
@@ -803,71 +800,108 @@
     </div>
 </div>
 
-<div class="modal fade"
-     id="modalDetenidosObjetivo"
-     tabindex="-1"
-     role="dialog"
-     aria-labelledby="tituloModalDetenidosObjetivo"
-     aria-hidden="true">
+@if (totalDetenidosMunicipios > 0)
+{
+    <div class="modal fade"
+         id="modalDetenidosMunicipios"
+         tabindex="-1"
+         role="dialog"
+         aria-labelledby="tituloModalDetenidosMunicipios"
+         aria-hidden="true">
 
-    <div class="modal-dialog modal-xl modal-dialog-centered"
-         role="document">
+        <div class="modal-dialog modal-dialog-centered modalDetenidosMunicipios-lg" role="document">
 
-        <div class="modal-content">
+            <div class="modal-content">
 
-            <div class="modal-header">
+                <div class="modal-header">
 
-                <h5 class="modal-title"
-                    id="tituloModalDetenidosObjetivo">
+                    <h5 class="modal-title" id="tituloModalDetenidosMunicipios">
+                        <img src="@Url.Content("~/Content/image/SIC/icono_aguascalientes.png")"
+                             class="sic-tab-icono-personalizado"
+                             alt=""
+                             style="margin-right:8px;" />
+                        Posibles Reincidencias en Municipios (@totalDetenidosMunicipios)
+                    </h5>
 
-                    <i class="fa fa-id-card"></i>
+                    <div >
 
-                    Información del detenido
+                        <button type="button"
+                                class="btn btn-cerrar-modal"
+                                onclick="cerrarModalDetenidosMunicipios();">
+                            <i class="fa fa-times"></i> CERRAR
+                        </button>
 
-                </h5>
-
-                <button type="button"
-                        class="close js-cerrar-modal-detenido"
-                        aria-label="Cerrar"
-                        title="Cerrar">
-
-                    <span aria-hidden="true">&times;</span>
-
-                </button>
-
-            </div>
-
-            <div class="modal-body"
-                 id="contenidoDetenidosObjetivo">
-
-                <div class="sic-modal-detenido-cargando">
-
-                    <i class="fa fa-spinner fa-spin"></i>
-
-                    <div>
-                        Cargando información...
                     </div>
 
                 </div>
 
-            </div>
+                <div class="modal-body">
 
-            <div class="modal-footer">
+                    <div class="sic-modal-columns">
 
-                <button type="button"
-                        class="btn btn-secondary js-cerrar-modal-detenido">
+                        <!-- COLUMNA IZQUIERDA: INFORMACIÓN DEL DETENIDO -->
+                        <div class="sic-modal-col-info">
 
-                    CERRAR
+                            <div class="sic-modal-panel">
 
-                </button>
+                                <div class="sic-modal-panel-body">
+
+                                    @Html.Partial(
+                                        "~/Views/SIC/DetalleDetenidoC5/InformacionDetenidoMunicipioPartial.cshtml",
+                                        Model,
+                                        new ViewDataDictionary(ViewData)
+                                        {
+                                            { "MostrarFotoDetenido", true }
+                                        }
+                                    )
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <!-- COLUMNA DERECHA: COINCIDENCIAS MUNICIPIOS -->
+                        <div class="sic-modal-col-municipios">
+
+                            <div class="sic-modal-panel">
+
+                                <div class="sic-modal-panel-header">
+                                    <i class="fa fa-users"></i>
+                                    COINCIDENCIAS DETENIDOS MUNICIPIOS (@totalDetenidosMunicipios)
+                                </div>
+
+                                <div class="sic-modal-panel-body">
+
+                                    <div class="sic-source-tab-content active" id="contenidoModalDetenidosMunicipios">
+
+                                        @Html.Partial(
+                                            "~/Views/SIC/DetalleDetenidoC5/TabDetenidosMunicipioPartial.cshtml",
+                                            detenidosMunicipios
+                                        )
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+               
 
             </div>
 
         </div>
 
     </div>
+}
 
-</div>
+
 
 <div id="globoPersonaInteres"
      class="sic-globo-interes-wrap"
@@ -1099,11 +1133,128 @@
     var sicIdentificacionFrenteUrl = @Html.Raw(Json.Encode(fotoIdentificacionFrenteC5));
     var sicIdentificacionReversoUrl = @Html.Raw(Json.Encode(fotoIdentificacionReversoC5));
 
+    var sicAbrirModalDetenidosMunicipios =
+    @Html.Raw(Json.Encode(abrirModalDetenidosMunicipios));
+
     console.log('FRENTE URL:', sicIdentificacionFrenteUrl);
     console.log('REVERSO URL:', sicIdentificacionReversoUrl);
 </script>
 
 <script>
+
+    function abrirModalDetenidosMunicipios() {
+
+        var modal =
+            $('#modalDetenidosMunicipios');
+
+        if (modal.length === 0) {
+            return;
+        }
+
+        if (
+            $.fn.modal &&
+            typeof modal.modal === 'function'
+        ) {
+            modal.modal({
+                backdrop: 'static',
+                keyboard: false,
+                show: true
+            });
+
+            return;
+        }
+
+        var elemento =
+            document.getElementById(
+                'modalDetenidosMunicipios'
+            );
+
+        if (
+            window.bootstrap &&
+            window.bootstrap.Modal &&
+            elemento
+        ) {
+            var instancia =
+                window.bootstrap.Modal.getInstance(elemento);
+
+            if (!instancia) {
+                instancia =
+                    new window.bootstrap.Modal(
+                        elemento,
+                        {
+                            backdrop: 'static',
+                            keyboard: false
+                        }
+                    );
+            }
+
+            instancia.show();
+        }
+    }
+
+
+    function cerrarModalDetenidosMunicipios() {
+
+        var modal =
+            $('#modalDetenidosMunicipios');
+
+        if (
+            $.fn.modal &&
+            typeof modal.modal === 'function'
+        ) {
+            modal.modal('hide');
+            return;
+        }
+
+        var elemento =
+            document.getElementById(
+                'modalDetenidosMunicipios'
+            );
+
+        if (
+            window.bootstrap &&
+            window.bootstrap.Modal &&
+            elemento
+        ) {
+            var instancia =
+                window.bootstrap.Modal.getInstance(
+                    elemento
+                );
+
+            if (instancia) {
+                instancia.hide();
+            }
+        }
+    }
+
+    function abrirModalDetenidosMunicipios() {
+        var modal = $('#modalDetenidosMunicipios');
+
+        if ($.fn.modal && typeof modal.modal === 'function') {
+            modal.modal({
+                backdrop: 'static',
+                keyboard: false
+            });
+            modal.modal('show');
+            return;
+        }
+
+        var elemento = document.getElementById('modalDetenidosMunicipios');
+
+        if (window.bootstrap && window.bootstrap.Modal && elemento) {
+            var instancia = window.bootstrap.Modal.getInstance(elemento);
+
+            if (!instancia) {
+                instancia = new window.bootstrap.Modal(elemento, {
+                    backdrop: 'static',
+                    keyboard: false
+                });
+            }
+
+            instancia.show();
+        }
+    }
+
 $(document).ready(function () {
     var titulo = $('.pagetitle h1').first();
 
@@ -1120,19 +1271,58 @@ $(document).ready(function () {
 
             titulo.css({ 'margin': '0' });
 
-            if (contenedorTitulo.find('.sic-page-title-actions').length === 0) {
-                contenedorTitulo.append(
-                    '<div class="sic-page-title-actions">' +
-                        '<a href="@Url.Action("Index", "SIC")" class="sic-btn-light">' +
-                            '<i class="fa fa-arrow-left"></i> Volver' +
-                        '</a>' +
-                    '</div>'
-                );
+           if (contenedorTitulo.find('.sic-page-title-actions').length === 0) {
+    contenedorTitulo.append(
+        '<div class="sic-page-title-actions">' +
+
+            // Botón Recargar imágenes
+            '<button type="button" ' +
+                'id="btnActualizarContenidoTabs" ' +
+                'class="sic-btn-light" ' +
+                'title="Recargar imágenes">' +
+                '<i class="fa fa-refresh"></i> Recargar imágenes' +
+            '</button>' +
+
+            // Botón Detenidos Municipios (solo si existen registros)
+            @if (totalDetenidosMunicipios > 0)
+            {
+                <text>
+                '<button type="button" ' +
+                    'class="sic-btn-light" ' +
+                    'onclick="abrirModalDetenidosMunicipios();" ' +
+                    'title="Ver detenidos municipios">' +
+                    '<i class="fa fa-users"></i> Detenidos Municipios (@totalDetenidosMunicipios)' +
+                '</button>' +
+                </text>
             }
+
+            // Botón Volver
+            '<a href="@Url.Action("Index", "SIC")" class="sic-btn-light">' +
+                '<i class="fa fa-arrow-left"></i> Volver' +
+            '</a>' +
+
+        '</div>'
+    );
+}
         }
     }
 
     registrarEventosDetalleSic();
+
+    if (sicAbrirModalDetenidosMunicipios === true) {
+
+        window.setTimeout(function () {
+
+            $('#modalDetenidosMunicipios').modal({
+                backdrop: 'static',
+                keyboard: false
+            });
+
+            $('#modalDetenidosMunicipios').modal('show');
+
+        }, 300);
+    }
+
 });
 
     function registrarEventosDetalleSic() {
